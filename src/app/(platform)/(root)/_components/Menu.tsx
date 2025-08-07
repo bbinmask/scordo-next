@@ -1,9 +1,16 @@
-import React from "react";
-import RouteNavigations from "../_components/RouteNavigations";
+"use client";
 import { ListIcon, PlusCircle, Search, Users } from "lucide-react";
-import Menu from "../_components/Menu";
+import { Button } from "@/components/ui/button";
+import { MenuIcon } from "lucide-react";
+import React, { useState } from "react";
+import RouteNavigations from "./RouteNavigations";
 
-const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
+const Menu = () => {
+  const [toggle, setToggle] = useState(false);
+
+  const toggleMenu = () => {
+    setToggle((tog) => !tog);
+  };
   const navLinks = [
     {
       title: "All",
@@ -42,14 +49,18 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div className="relative px-4">
-      {/* <RouteNavigations navLinks={navLinks} /> */}
-      <div className="absolute top-0 right-0">
-        <Menu />
+    <div className="relative">
+      <Button onClick={toggleMenu} variant="ghost" className="h-full w-full">
+        <MenuIcon className="h-8 w-8" size={undefined} />
+      </Button>
+
+      <div
+        className={`absolute -top-2 right-6 list-none flex-row gap-2 rounded-md bg-white p-2 transition-all duration-500 ease-in-out ${toggle ? "flex w-fit -translate-x-4 opacity-100" : "hidden translate-x-0 overflow-hidden opacity-0"}`}
+      >
+        <RouteNavigations navLinks={navLinks} />
       </div>
-      {children}
     </div>
   );
 };
 
-export default TeamsLayout;
+export default Menu;

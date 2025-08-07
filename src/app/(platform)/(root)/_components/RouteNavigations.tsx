@@ -29,7 +29,7 @@ const AnimatedNavbar = ({ navLinks }: { navLinks: any }) => {
               : "bg-green-100 text-green-800 hover:bg-green-50 dark:bg-emerald-800 dark:text-lime-300 dark:hover:bg-emerald-700"
           }`}
         >
-          <link.icon className="font-urbanist w-4 transition-all duration-500 md:w-8 md:text-base" />
+          {link.icon}
           <span
             className={`text-xs font-bold transition-all duration-500 md:text-base ${pathname === link.path ? "block" : "hidden"}`}
           >
