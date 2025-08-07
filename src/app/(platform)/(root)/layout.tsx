@@ -1,5 +1,5 @@
-import Bottombar from "./_components/Bottombar";
-import Navbar from "./_components/Navbar";
+import Bottombar from "./dashboard/_components/Bottombar";
+import Navbar from "./dashboard/_components/Navbar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -7,7 +7,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <nav className="mb-24">
         <Navbar />
       </nav>
-      {children}
+      <div className="pb-[86px]">{children}</div>
       <Bottombar />
     </main>
   );

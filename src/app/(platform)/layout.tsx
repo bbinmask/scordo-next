@@ -4,7 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 const PlatformLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <ClerkProvider>
-      <main className="h-screen w-full">
+      <main className="min-h-screen w-full">
         <Toaster />
         {children}
       </main>

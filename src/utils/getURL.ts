@@ -1,4 +1,5 @@
 export function getMatchUrl(teamA: string, teamB: string, date: Date, uuid: string): string {
+  return "url";
   const formatName = (name: string) =>
     name
       .toLowerCase()
