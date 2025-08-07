@@ -3,6 +3,7 @@ import { MoonLoader } from "react-spinners";
 import Card from "./Card";
 import NewsList from "./NewsList";
 import { CarouselSpacing } from "./CarouselSpacing";
+import { Calendar, PlayCircle } from "lucide-react";
 
 const Dashboard = () => {
   const data = [
@@ -24,11 +25,21 @@ const Dashboard = () => {
   }
 
   return (
-    <section className="mt-5 px-4">
-      <div className="grid w-full items-center">
-        <div className="mt-4">
-          <CarouselSpacing matches={["1", "2", "3"]} status="Live" />
-        </div>
+    <div className="mt-5 px-4">
+      <div className="container mx-auto block items-center">
+        <section className="">
+          <h3 className="my-6 flex items-center text-3xl font-bold text-gray-800 dark:text-gray-100">
+            <PlayCircle className="mr-3 h-8 w-8 text-green-600" /> Live Matches
+          </h3>
+
+          <CarouselSpacing matches={["1", "2", "3", "4"]} status="Live" />
+
+          <h3 className="my-6 flex items-center text-3xl font-bold text-gray-800 dark:text-gray-100">
+            <Calendar className="mr-3 h-8 w-8 text-green-600" /> Upcoming Matches
+          </h3>
+
+          <CarouselSpacing matches={["1", "2", "3", "4"]} status="Upcoming" />
+        </section>
 
         <h2 className="my-6 text-center text-3xl font-extrabold text-gray-800 md:text-left">
           <span className="from-prime bg-gradient-to-r to-red-500 bg-clip-text text-transparent">
@@ -49,7 +60,7 @@ const Dashboard = () => {
 
         <NewsList />
       </div>
-    </section>
+    </div>
   );
 };
 

@@ -138,3 +138,7 @@
     @apply items-center justify-between;
   }
 }
+
+.hide_scrollbar::-webkit-scrollbar {
+  display: none;
+}
