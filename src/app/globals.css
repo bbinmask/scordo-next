@@ -44,8 +44,10 @@
 
   /* Customized */
 
-  --color-main: #8bf108;
+  --color-main: var(--main-color);
   --color-subtle: #fff;
+  --color-hover: var(--hover-color);
+  --color-active: var(--active-color);
 }
 
 :root {
@@ -81,7 +83,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --hover-color: oklch(86.195% 0.2433 133.353 / 0.904);
+  --main-color: #195d05;
+  --hover-color: #2a9709;
+  --active-color: #35c40ac4;
 }
 
 .dark {

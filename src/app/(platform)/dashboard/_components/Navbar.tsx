@@ -38,15 +38,15 @@ const navLinks = [
 ];
 const Navbar = () => {
   return (
-    <div className="bg-main fixed top-0 z-50 w-full px-2 py-2">
+    <div className="bg-main fixed top-0 z-50 grid min-h-16 w-full items-center px-2 py-2">
       <div className="flex w-full items-center">
         <div className="flex w-full items-center justify-between">
-          <Link href={"/"} className="mx-2 text-2xl font-bold">
+          <Link href={"/"} className="mx-2 font-[poppins] text-3xl font-bold text-white">
             Scordo
           </Link>
           <div className="flex items-center gap-4">
             <button type="button" className="btn border-none">
-              <Bell className="text-3xl" />
+              <Bell color="white" className="text-3xl" />
             </button>
             <NavbarDropdown data={user} />
           </div>

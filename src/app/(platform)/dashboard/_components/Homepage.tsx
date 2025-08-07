@@ -1,8 +1,8 @@
-import { user } from "@/constants";
+"use client";
 import { MoonLoader } from "react-spinners";
 import Card from "./Card";
 import NewsList from "./NewsList";
-import { CarouselSpacing } from "./CarouselSpacing";
+import { user } from "@/constants";
 
 const Dashboard = () => {
   const data = [
@@ -19,16 +19,17 @@ const Dashboard = () => {
   ];
   const loading = false;
 
-  if (loading) {
-    return <MoonLoader className="animate-spin text-black" />;
-  }
+  if (loading)
+    return (
+      <div>
+        <MoonLoader className="h-5 w-5 animate-spin" />
+      </div>
+    );
 
   return (
     <section className="mt-5 px-4">
       <div className="grid w-full items-center">
-        <div className="mt-4">
-          <CarouselSpacing matches={["1", "2", "3"]} status="Live" />
-        </div>
+        <div className="mt-4"></div>
 
         <h2 className="my-6 text-center text-3xl font-extrabold text-gray-800 md:text-left">
           <span className="from-prime bg-gradient-to-r to-red-500 bg-clip-text text-transparent">
