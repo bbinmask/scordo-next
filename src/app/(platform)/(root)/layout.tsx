@@ -3,13 +3,13 @@ import Navbar from "./dashboard/_components/Navbar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main>
+    <div>
       <nav className="mb-24">
         <Navbar />
       </nav>
       <div className="pb-[86px]">{children}</div>
       <Bottombar />
-    </main>
+    </div>
   );
 };
 

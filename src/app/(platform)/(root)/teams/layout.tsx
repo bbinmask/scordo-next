@@ -42,12 +42,14 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div className="relative px-4">
-      {/* <RouteNavigations navLinks={navLinks} /> */}
-      <div className="absolute top-0 right-0">
-        <Menu />
+    <div className="relative min-h-screen w-full overflow-x-hidden px-4">
+      {/* Button to toggle the main navbar visibility */}
+      <Menu />
+
+      <div className="w-full">
+        <h1>Teams</h1>
+        {children}
       </div>
-      {children}
     </div>
   );
 };

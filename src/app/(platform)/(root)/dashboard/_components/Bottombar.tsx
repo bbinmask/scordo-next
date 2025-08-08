@@ -46,7 +46,7 @@ const Bottombar = () => {
   ];
 
   return (
-    <div className="bg-main fixed bottom-0 left-0 z-50 flex h-[84px] w-full justify-center">
+    <div className="bg-main fixed bottom-0 left-0 z-[999] flex h-[84px] w-full justify-center">
       <ul className="m-0 grid w-full max-w-6xl grid-cols-5 gap-1 px-2 py-1 md:grid-cols-6">
         {navLinks.map((item, i) => {
           const isActive = pathname === item.path;
