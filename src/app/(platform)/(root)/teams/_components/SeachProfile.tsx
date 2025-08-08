@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Spinner from "@/components/extras/Spinner";
+import Spinner from "@/components/Spinner";
 import { useRouter } from "next/navigation";
-import Follow from "../../container/Follow";
-import { user } from "../../../constants/index";
+import { user } from "@/constants/index";
 
-const SearchProfile = ({ username }) => {
+const SearchProfile = ({ username }: { username: string }) => {
   const [userInfo, setUserInfo] = useState(user);
 
   const router = useRouter();
@@ -33,7 +32,7 @@ const SearchProfile = ({ username }) => {
       const { alreadyFriends, alreadyRequested } = response.data;
       setIsFriend(alreadyFriends);
       setIsRequested(alreadyRequested);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error.message);
     }
   };
@@ -87,11 +86,11 @@ const SearchProfile = ({ username }) => {
   return (
     <>
       {load ? (
-        <div className="left-1/2 top-1/2 flex h-screen items-center justify-center">
+        <div className="top-1/2 left-1/2 flex h-screen items-center justify-center">
           <Spinner />
         </div>
       ) : !userInfo?.username ? (
-        <div className="left-1/2 top-1/2 flex h-screen w-full flex-col items-center justify-center bg-black text-white">
+        <div className="top-1/2 left-1/2 flex h-screen w-full flex-col items-center justify-center bg-black text-white">
           <h1>Page not found</h1>
           <button
             className="btn btn-light"
@@ -112,8 +111,7 @@ const SearchProfile = ({ username }) => {
                     <div className="d-flex flex-column relative items-center text-center">
                       <img
                         src={
-                          userInfo.avatar ||
-                          "https://bootdey.com/img/Content/avatar/avatar7.png"
+                          userInfo.avatar || "https://bootdey.com/img/Content/avatar/avatar7.png"
                         }
                         alt="Admin"
                         className={`rounded-circle`}
@@ -128,11 +126,7 @@ const SearchProfile = ({ username }) => {
                               className="buttons btn-outline-primary flex items-center gap-2 border-1 border-blue-600 px-3 text-blue-600 hover:bg-blue-600 hover:text-white active:bg-blue-600 active:text-white"
                               onClick={handleFriendRequest}
                             >
-                              {isFriend
-                                ? "Friend"
-                                : isRequested
-                                  ? "Requested"
-                                  : "Add"}
+                              {isFriend ? "Friend" : isRequested ? "Requested" : "Add"}
                             </button>
                           </div>
                         </div>
@@ -156,9 +150,7 @@ const SearchProfile = ({ username }) => {
                 <div className="card mb-3">
                   <div>
                     <div className="card-body">
-                      <h3 className="mb-4 text-center">
-                        {userInfo.username || "username"}
-                      </h3>
+                      <h3 className="mb-4 text-center">{userInfo.username || "username"}</h3>
                       <div className="row">
                         <div className="col-sm-3">
                           <h6 className="mb-0">Full Name</h6>
@@ -189,7 +181,7 @@ const SearchProfile = ({ username }) => {
                       ) : (
                         <div className="row">
                           <div className="col-sm-3">
-                            <div className="mb-0 text-secondary">Phone</div>
+                            <div className="text-secondary mb-0">Phone</div>
                           </div>
                           <h6 className="col-sm-9">No contact no.</h6>
                         </div>
@@ -206,9 +198,7 @@ const SearchProfile = ({ username }) => {
                   <div className="col-sm-6 mb-3">
                     <div className="card h-100">
                       <div className="card-body">
-                        <h6 className="d-flex align-items-center mb-3">
-                          Matches Analytics
-                        </h6>
+                        <h6 className="d-flex align-items-center mb-3">Matches Analytics</h6>
                         <h4 className="text-center">Total Match</h4>
                         <small>Won</small>
                         <div
@@ -244,9 +234,7 @@ const SearchProfile = ({ username }) => {
                   <div className="col-sm-6 mb-3">
                     <div className="card h-100">
                       <div className="card-body">
-                        <h6 className="d-flex align-items-center mb-3">
-                          Tournament Analytics
-                        </h6>
+                        <h6 className="d-flex align-items-center mb-3">Tournament Analytics</h6>
                         <h4 className="text-center">Total Tournaments</h4>
                         <small>Won</small>
                         <div

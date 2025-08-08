@@ -2,8 +2,7 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { BiSearch } from "react-icons/bi";
-import Spinner from "@/components/extras/Spinner";
+import Spinner from "@/components/Spinner";
 import SearchResults from "./SearchResults";
 import useAxios from "@/hooks/FetchData";
 import { CricketTeamCard } from "@/components/Team/TeamsList";
@@ -160,31 +159,24 @@ export default function SearchPage() {
 
   return (
     <div className="w-full py-4">
-      <h1 className="heading-text mb-8 text-center text-4xl font-extrabold">
-        Search Cricket Data
-      </h1>
+      <h1 className="heading-text mb-8 text-center text-4xl font-extrabold">Search Cricket Data</h1>
       <div className="center mb-8 flex w-full px-16">
         <Input
           type="text"
           placeholder="Search teams, players, or roles..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="subheading-text w-full rounded-md shadow-lg outline-none transition duration-150 ease-in-out"
+          className="subheading-text w-full rounded-md shadow-lg transition duration-150 ease-in-out outline-none"
         />
       </div>
-      {loading && (
-        <div className="text-center text-xl text-gray-600">Searching...</div>
-      )}
+      {loading && <div className="text-center text-xl text-gray-600">Searching...</div>}
       {error && <div className="text-center text-xl text-red-500">{error}</div>}
 
-      {!loading &&
-        !error &&
-        searchTerm.trim() !== "" &&
-        searchResults.length === 0 && (
-          <div className="text-center text-xl text-gray-600">
-            No results found for "{searchTerm}".
-          </div>
-        )}
+      {!loading && !error && searchTerm.trim() !== "" && searchResults.length === 0 && (
+        <div className="text-center text-xl text-gray-600">
+          No results found for "{searchTerm}".
+        </div>
+      )}
 
       {!loading && searchResults.length > 0 && (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
