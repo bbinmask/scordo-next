@@ -1,3 +1,4 @@
+import NotFoundParagraph from "@/components/NotFoundParagraph";
 import TeamCard from "./TeamCard";
 
 const MyTeams = () => {
@@ -46,9 +47,7 @@ const MyTeams = () => {
           My Squads
         </h2>
         {mySquads.length === 0 ? (
-          <p className="py-10 text-center text-lg text-gray-500 dark:text-gray-400">
-            No squads found. Time to step onto the pitch and form one!
-          </p>
+          <NotFoundParagraph />
         ) : (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {mySquads.map((squad) => (
