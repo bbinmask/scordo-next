@@ -1,8 +1,7 @@
 "use client";
-import { ListIcon, PlusCircle, Search, Users } from "lucide-react";
+import { useState } from "react";
+import { ListIcon, PlusCircle, Search, Users, X, MenuIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MenuIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
 import RouteNavigations from "./RouteNavigations";
 const navLinks = [
   {
@@ -45,29 +44,29 @@ const Menu = () => {
 
   // Function to toggle the main horizontal navbar's visibility
   const toggleMainNavbar = () => {
+    console.log(!isNavbarActive);
     setIsNavbarActive((prev) => !prev);
   };
 
   return (
-    <div className="relative flex">
-      {/* Button to toggle the main navbar visibility */}
-      <button
-        id="showNavbarButton"
-        onClick={toggleMainNavbar}
-        className="absolute top-4 right-4 z-[100] cursor-pointer rounded-md bg-emerald-500 px-3 py-2 font-semibold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-emerald-600"
-      >
-        <MenuIcon />
-      </button>
-
+    <div className="absolute top-0 right-0 flex items-center">
       {/* Main Navigation Bar */}
       <nav
         id="mainNavbar"
-        className={`absolute top-0 left-0 z-40 w-full transform p-4 transition-transform duration-500 ease-in-out ${
-          isNavbarActive ? "translate-x-72" : "translate-x-full"
+        className={`top-0 left-0 z-40 w-full transform p-4 transition-transform duration-500 ease-in-out ${
+          isNavbarActive ? "translate-x-0" : "translate-x-96 md:translate-x-[600px]"
         }`}
       >
         <RouteNavigations navLinks={navLinks} />
       </nav>
+      {/* Button to toggle the main navbar visibility */}
+      <Button
+        id="showNavbarButton"
+        onClick={toggleMainNavbar}
+        className={`top-4 right-4 z-[100] w-fit cursor-pointer rounded-md px-3 py-2 font-semibold text-white shadow-md transition duration-300 ease-in-out hover:scale-105 hover:bg-emerald-600 ${isNavbarActive ? "bg-main" : "bg-emerald-500"}`}
+      >
+        {isNavbarActive ? <X /> : <MenuIcon />}
+      </Button>
     </div>
   );
 };
