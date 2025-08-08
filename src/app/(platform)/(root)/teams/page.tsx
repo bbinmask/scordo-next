@@ -1,5 +1,11 @@
+import MyTeams from "./_components/MyTeams";
+
 const TeamsPage = () => {
-  return <div>TeamsPage</div>;
+  return (
+    <div>
+      <MyTeams />
+    </div>
+  );
 };
 
 export default TeamsPage;

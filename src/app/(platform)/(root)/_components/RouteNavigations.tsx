@@ -12,13 +12,14 @@ const RouteNavigations = ({ navLinks }: { navLinks: any }) => {
       {navLinks.map((link: any, index: number) => (
         <Button
           variant={"default"}
+          key={index}
           className={`center relative min-w-16 transform gap-2 rounded-full p-0 shadow-xl transition-all duration-500 ease-in-out hover:scale-105 md:px-5 md:py-3 ${
             pathname === link.path
               ? "bg-gradient-to-r from-emerald-700 to-green-900 text-white shadow-emerald-500/50 dark:shadow-emerald-800/50"
-              : "bg-green-100 text-green-800 hover:bg-green-50 dark:bg-emerald-800 dark:text-lime-300 dark:hover:bg-emerald-700"
+              : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-800 dark:text-lime-300 dark:hover:bg-emerald-700"
           }`}
         >
-          <Link key={index} href={link.path || "#"} className="center flex h-full w-full gap-1">
+          <Link href={link.path || "#"} className="center flex h-full w-full gap-1">
             {link.icon}
             <span
               className={`text-xs font-bold transition-all duration-500 md:text-base ${pathname === link.path ? "block" : "hidden"}`}
