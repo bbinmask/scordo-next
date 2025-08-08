@@ -12,7 +12,7 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
       icon: <ListIcon />,
     },
     {
-      title: "Joined",
+      title: "Squad",
       id: 2,
       path: "/teams/my-teams",
       className: "",

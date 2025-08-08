@@ -15,7 +15,7 @@ const RouteNavigations = ({ navLinks }: { navLinks: any }) => {
           key={index}
           className={`center relative min-w-16 transform gap-2 rounded-full p-0 shadow-xl transition-all duration-500 ease-in-out hover:scale-105 md:px-5 md:py-3 ${
             pathname === link.path
-              ? "bg-gradient-to-r from-emerald-700 to-green-900 text-white shadow-emerald-500/50 dark:shadow-emerald-800/50"
+              ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 text-white shadow-emerald-500/50 dark:shadow-emerald-800/50"
               : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-800 dark:text-lime-300 dark:hover:bg-emerald-700"
           }`}
         >
