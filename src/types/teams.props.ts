@@ -4,6 +4,12 @@ export default interface TeamProps {
   id: string;
   name: string;
   abbreviation: string;
-  owner: UserProps;
+  owner: string | UserProps;
   players: PlayerProps[];
+  banner: string;
+  logo: string;
+  captain: string | UserProps;
+  type: "corporate" | "college";
+  createdAt: Date;
+  updatedAt: Date;
 }

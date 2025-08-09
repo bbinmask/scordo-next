@@ -11,6 +11,7 @@ import { toast } from "sonner";
 // import { useTeamJoinRequest } from "@/hooks/requests";
 import Spinner from "@/components/Spinner";
 import { getTeamUrl } from "@/utils/getURL";
+import { useTeam } from "@/hooks/useTeam";
 
 export function TeamsList({ teams }: { teams: TeamProps[] | undefined }) {
   if (!teams) return notFound();
@@ -85,8 +86,7 @@ export function CricketTeamDetailPage({ teamId }: { teamId: string }) {
 }
 
 export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
-  const { joinTeam, withdrawRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
-    useTeamJoinRequest(team);
+  const { joinTeam, withdrawRequest, loading, isAlreadyInTeam, isAlreadyRequested } = useTeam();
 
   const teamSlug = getTeamUrl(team);
   const encodedSlug = encodeURIComponent(teamSlug);
@@ -125,13 +125,15 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
               <Users className="mr-2 h-4 w-4 text-purple-400" />{" "}
               {`${team.players.length} ${team.players.length > 1 ? "Members" : "Member"}`}
             </p>
-            <p className="flex items-center">
-              <User className="mr-2 h-4 w-4 text-emerald-400" /> Captain:
-              {team.captain.name}
-            </p>
+            {typeof team.captain !== "string" && (
+              <p className="flex items-center">
+                <User className="mr-2 h-4 w-4 text-emerald-400" /> Captain:
+                {team.captain.name}
+              </p>
+            )}
             <p className="flex items-center">
               <Star className="mr-2 h-4 w-4 text-yellow-400" /> Type:
-              {team.teamType}
+              {team.type}
             </p>
             {/* <p className="flex items-center">
             <Award className="mr-2 h-4 w-4 text-orange-400" /> Wins: {team.win}
@@ -142,7 +144,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
           </p>*/}
             <p className="flex items-center">
               <PlusCircle className="mr-2 h-4 w-4 text-cyan-400" /> Established:
-              {formatDate(new Date(team.createdAt))}
+              {formatDate(new Date(team.createdAt), "yyyy-MM-dd")}
             </p>
           </div>
         </div>

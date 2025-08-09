@@ -18,8 +18,7 @@ export const user = {
   ],
   teams: ["64f09ad5b1234567890ab111", "64f09ad5b1234567890ab222"],
   friends: ["64f09ad5b1234567890ab333", "64f09ad5b1234567890ab444"],
-  profile:
-    "https://res.cloudinary.com/irfanulmadar/image/upload/v1748732410/avatar17_hnznuz.jpg",
+  profile: "https://res.cloudinary.com/irfanulmadar/image/upload/v1748732410/avatar17_hnznuz.jpg",
   channels: ["64f09ad5b1234567890ab555"],
   stats: {
     totalRuns: 1030,
@@ -61,3 +60,5 @@ export const user = {
     coordinates: [77.5946, 12.9716], // Longitude, Latitude for Bengaluru
   },
 };
+
+export const baseURL = "http://localhost:3000";
