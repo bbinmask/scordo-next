@@ -3,16 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import useAxios from "./useAxios";
 import TeamProps from "@/types/teams.props";
-import { user } from "@/constants";
+import { AxiosResponse } from "axios";
 
 export const useTeam = () => {
-  const [teams, setTeams] = useState<TeamProps[]>();
-  const [team, setTeam] = useState<TeamProps | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isOwner, setIsOwner] = useState<boolean>(false);
-  const [isAlreadyRequested, setIsAlreadyRequested] = useState(false);
-  const [isAlreadyInTeam, setIsAlreadyInTeam] = useState(false);
 
   const { fetchData } = useAxios();
   // 1. Fetch all teams
@@ -20,9 +15,11 @@ export const useTeam = () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetchData("/teams");
-      if (res?.success) {
-        setTeams(res.data);
+      const res: AxiosResponse = await fetchData("/teams");
+      if (res?.data?.success) {
+        return res.data.data as TeamProps[];
+      } else {
+        return;
       }
     } catch (err: any) {
       setError(err.message || "Failed to fetch teams.");
@@ -37,9 +34,9 @@ export const useTeam = () => {
       setLoading(true);
       setError(null);
 
-      const res = await fetchData(`/teams/${username}`);
-      if (res?.success) {
-        setTeam(res.data.team as TeamProps);
+      const res: AxiosResponse = await fetchData(`/teams/${username}`);
+      if (res?.data?.success) {
+        return res.data.data as TeamProps;
       }
     } catch (err: any) {
       console.log(err);
@@ -54,12 +51,11 @@ export const useTeam = () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetchData(`/teams/${teamId}`, "PUT", updates);
+      const res: AxiosResponse = await fetchData(`/teams/${teamId}`, "PUT", updates);
       console.log(res);
-      if (res?.success) {
-        setTeam(res.data.team);
-      }
-      return res?.success;
+      if (res?.data?.success) {
+        return res.data.data;
+      } else return res?.data.success;
     } catch (err: any) {
       setError(err.message || "Failed to fetch teams.");
       return false;
@@ -74,102 +70,83 @@ export const useTeam = () => {
 
     try {
       setLoading(true);
-      const res = await fetchData(`/teams/search?query=${query}`);
+      const res: AxiosResponse = await fetchData(`/teams/search?query=${query}`);
       console.log(res);
-      if (res?.success) {
-        setTeams(res.data.teams);
+      if (res?.data?.success) {
+        return res.data.data as TeamProps[];
       } else {
-        setTeams([]);
+        return [];
       }
     } catch (error: any) {
       console.error(error);
+      setError(error.message || "Couldn't find any team");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const joinTeam = useCallback(async () => {
-    if (!team || !user) {
-      throw new Error(" JOin team error");
-    }
-
-    try {
-      setLoading(true);
-      const res = await fetchData(`/teams/join-request/${team.abbreviation}`, "POST");
-
-      if (res.success) {
-        setIsAlreadyRequested(true);
-      } else {
-      }
-    } catch (error: any) {
-      console.error("Join request error:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [team, user]);
-
-  const withdrawRequest = useCallback(async () => {
-    if (!team || !user) {
-    }
-
-    try {
-      setLoading(true);
-      const res = await fetchData(`/teams/withdraw-request/${team?.abbreviation}`, "POST");
-
-      if (res.success) {
-        setIsAlreadyRequested(false);
-      } else {
-      }
-    } catch (error: any) {
-      console.error("Remove request error:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [team, user]);
-
-  const leaveTeam = useCallback(async () => {
-    if (!team || !user) {
-    }
-
-    try {
-      setLoading(true);
-      const res = await fetchData(`/teams/leave-team/${team?.abbreviation}`, "POST");
-
-      if (res.success) {
-        setIsAlreadyInTeam(false);
-      } else {
-      }
-    } catch (error: any) {
-      console.error("Remove request error:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [team, user]);
-
-  useEffect(() => {
-    if (!user || !team) return;
-    if (typeof team?.owner !== "object") {
-      setIsOwner(user?._id?.toString() === team?.owner.toString());
-    } else {
-      setIsOwner(user?._id?.toString() === team?.owner?.id?.toString());
-    }
-  }, [team, user]);
-
   return {
-    teams,
-    team,
     loading,
     error,
     fetchTeams,
     getSingleTeam,
     updateTeamById,
-    setTeam,
     searchTeams,
-    isOwner,
+  };
+};
+
+export const useIsTeamOwner = (team: TeamProps, user: { id: string }) => {
+  const isOwner = Boolean(
+    user &&
+      team &&
+      String(user.id) === String(typeof team.owner === "object" ? team.owner.id : team.owner)
+  );
+  return { isOwner };
+};
+
+export const useTeamRequest = (team: TeamProps, user: { id: string }) => {
+  const { fetchData } = useAxios();
+  const [isAlreadyRequested, setIsAlreadyRequested] = useState(false);
+  const [isAlreadyInTeam, setIsAlreadyInTeam] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!team || !user) return;
+    const isInTeam = team.players.some((p) => String(p.id) === String(user.id));
+    const isRequested = team.pendingRequests?.some(
+      (p) => typeof p !== "string" && String(p.id) === String(user.id)
+    );
+    setIsAlreadyInTeam(isInTeam);
+    setIsAlreadyRequested(isRequested);
+  }, [team, user]);
+
+  const runRequest = async (fn: () => Promise<any>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      return await fn();
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const joinTeam = () =>
+    runRequest(() => fetchData(`/teams/join-request/${team.abbreviation}`, "POST"));
+  const withdrawJoinRequest = () =>
+    runRequest(() => fetchData(`/teams/withdraw-request/${team.abbreviation}`, "POST"));
+  const leaveTeam = () =>
+    runRequest(() => fetchData(`/teams/leave-team/${team.abbreviation}`, "POST"));
+
+  return {
     isAlreadyInTeam,
-    leaveTeam,
-    withdrawRequest,
     isAlreadyRequested,
     joinTeam,
+    withdrawJoinRequest,
+    leaveTeam,
+    loading,
+    error,
   };
 };

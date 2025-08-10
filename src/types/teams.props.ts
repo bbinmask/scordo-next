@@ -12,4 +12,6 @@ export default interface TeamProps {
   type: "corporate" | "college";
   createdAt: Date;
   updatedAt: Date;
+  isRecruiting: boolean;
+  pendingRequests: string[] | PlayerProps[];
 }

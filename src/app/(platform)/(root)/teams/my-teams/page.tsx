@@ -1,8 +1,9 @@
 import React from "react";
 import TeamCard from "../_components/TeamCard";
+import TeamProps from "@/types/teams.props";
 
 const MyTeamsPage = () => {
-  const teams: any = [];
+  const teams: TeamProps | [] = [];
 
   return (
     <div className="rounded-3xl border border-gray-300 bg-white p-6 shadow-2xl transition-all duration-300 sm:p-10 dark:border-gray-700 dark:bg-gray-800">

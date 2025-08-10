@@ -7,20 +7,17 @@ import TeamProps from "@/types/teams.props";
 import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
 import { formatDate } from "date-fns";
-import { toast } from "sonner";
-// import { useTeamJoinRequest } from "@/hooks/requests";
 import Spinner from "@/components/Spinner";
 import { getTeamUrl } from "@/utils/getURL";
-import { useTeam } from "@/hooks/useTeam";
-
-export function TeamsList({ teams }: { teams: TeamProps[] | undefined }) {
+import { useTeamRequest } from "@/hooks/useTeam";
+import { user } from "@/constants";
+import { mockTeams as teams } from "@/constants/index";
+export function TeamsList() {
   if (!teams) return notFound();
 
   return (
-    <div className="light_dark_card grid w-full gap-4 rounded-lg p-4 md:grid-cols-2 lg:grid-cols-3">
-      {teams.map((team) => (
-        <CricketTeamCard key={team.id} team={team} />
-      ))}
+    <div className="bg-background grid w-full gap-4 rounded-lg p-4 md:grid-cols-2 lg:grid-cols-3">
+      {teams.length !== 0 && teams.map((team) => <CricketTeamCard key={team.id} team={team} />)}
     </div>
   );
 }
@@ -86,7 +83,8 @@ export function CricketTeamDetailPage({ teamId }: { teamId: string }) {
 }
 
 export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
-  const { joinTeam, withdrawRequest, loading, isAlreadyInTeam, isAlreadyRequested } = useTeam();
+  const { joinTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
+    useTeamRequest(team, user);
 
   const teamSlug = getTeamUrl(team);
   const encodedSlug = encodeURIComponent(teamSlug);
@@ -154,7 +152,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
           {isAlreadyRequested ? (
             <Button
               variant={"default"}
-              onClick={withdrawRequest}
+              onClick={withdrawJoinRequest}
               disabled={loading || !isAlreadyRequested}
               className={`inline-flex items-center rounded-full border-none bg-red-600 px-4 py-1.5 text-xs font-semibold text-white drop-shadow-lg hover:scale-105 hover:bg-red-600/80`}
             >
@@ -165,7 +163,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
               variant={"default"}
               onClick={joinTeam}
               disabled={!team.isRecruiting || loading || isAlreadyInTeam || isAlreadyRequested}
-              className={`inline-flex items-center rounded-full border-none px-4 py-1.5 text-xs font-semibold shadow-md hover:scale-105 hover:shadow-xl ${team.isRecruiting ? "bg-prime hover:bg-hover active:bg-active text-white" : "bg-purple-600 text-white"}`}
+              className={`inline-flex items-center rounded-full border-none px-4 py-1.5 text-xs font-semibold shadow-md hover:scale-105 hover:shadow-xl ${team.isRecruiting ? "bg-main hover:bg-hover active:bg-active text-white" : "bg-purple-600 text-white"}`}
             >
               {loading ? (
                 <Spinner />
