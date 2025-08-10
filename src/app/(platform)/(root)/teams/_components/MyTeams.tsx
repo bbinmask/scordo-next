@@ -41,7 +41,7 @@ const MyTeams = () => {
   ];
 
   return (
-    <div className="rounded-3xl border border-gray-300 bg-white p-6 shadow-2xl transition-all duration-300 sm:p-10 dark:border-gray-700 dark:bg-gray-800">
+    <div className="bg-background-primary rounded-3xl border border-gray-300 p-6 shadow-2xl transition-all duration-300 sm:p-10 dark:border-gray-700 dark:bg-gray-800">
       <div className="animate-fade-in">
         <h2 className="mb-8 text-center font-[poppins] text-3xl font-extrabold text-gray-800 dark:text-gray-100">
           My Squads

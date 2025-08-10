@@ -1,8 +1,11 @@
-import { Bell, ChartNoAxesColumn, Sword } from "lucide-react";
+"use client";
+import { Bell, ChartNoAxesColumn, Moon, Sun, Sword } from "lucide-react";
 import { Group, GroupIcon, Home, Menu, Trophy } from "lucide-react";
 import Link from "next/link";
 import { user } from "@/constants";
 import NavbarDropdown from "./NavbarDropdown";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const navLinks = [
   {
@@ -37,6 +40,12 @@ const navLinks = [
   },
 ];
 const Navbar = () => {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const handleDarkMode = () => {
+    const mode = document.body.classList.toggle("dark");
+    setIsDarkMode(mode);
+  };
+
   return (
     <div className="bg-main fixed top-0 z-[999] grid min-h-16 w-full items-center px-2 py-2">
       <div className="flex w-full items-center">
@@ -45,9 +54,12 @@ const Navbar = () => {
             Scordo
           </Link>
           <div className="flex items-center gap-4">
-            <button type="button" className="btn border-none">
-              <Bell color="white" className="text-3xl" />
-            </button>
+            <Button onClick={handleDarkMode} className="cursor-pointer">
+              {isDarkMode ? <Moon /> : <Sun />}
+            </Button>
+            <Button type="button" className="cursor-pointer border-none">
+              <Bell className="text-3xl" />
+            </Button>
             <NavbarDropdown data={user} />
           </div>
         </div>

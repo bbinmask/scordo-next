@@ -28,7 +28,7 @@ export function TeamsList() {
   if (!teams) return notFound();
 
   return (
-    <div className="bg-background grid w-full gap-4 rounded-lg p-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="bg-background-primary grid w-full gap-4 rounded-lg p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {teams.length !== 0 && teams.map((team) => <CricketTeamCard key={team.id} team={team} />)}
     </div>
   );
@@ -102,7 +102,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
   const encodedSlug = encodeURIComponent(teamSlug);
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl shadow-xl transition-all duration-300 ease-in-out hover:scale-[1.02] hover:border-blue-500 hover:shadow-2xl">
+    <div className="relative aspect-video h-full w-full overflow-hidden rounded-xl shadow-xl transition-all duration-300 ease-in-out hover:scale-105 hover:border-blue-500 hover:shadow-2xl">
       <div
         style={{
           backgroundImage: `url(${team.banner})`,
