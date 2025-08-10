@@ -1,7 +1,7 @@
 "use client";
 import { Users, Trophy, User, PlusCircle, Star, Award, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import TeamProps from "@/types/teams.props";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,22 @@ import { notFound } from "next/navigation";
 import { formatDate } from "date-fns";
 import Spinner from "@/components/Spinner";
 import { getTeamUrl } from "@/utils/getURL";
-import { useTeamRequest } from "@/hooks/useTeam";
+import { useTeam, useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
 import { mockTeams as teams } from "@/constants/index";
+
 export function TeamsList() {
+  // const [teams, setTeams] = useState<TeamProps[]>([]);
+  // const { fetchTeams } = useTeam();
+
+  // useEffect(() => {
+  //   const getTeams = async () => {
+  //     const data = await fetchTeams();
+  //     if (data) setTeams(data);
+  //   };
+  //   getTeams();
+  // }, [fetchTeams]);
+
   if (!teams) return notFound();
 
   return (
