@@ -6,3 +6,8 @@ export type AxiosProps = (
   body?: any,
   options?: AxiosRequestConfig
 ) => Promise<any>;
+
+export interface BreadScrumbLinkProps {
+  href: string;
+  name: string;
+}
