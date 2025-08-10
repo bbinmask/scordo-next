@@ -48,7 +48,11 @@ export function CricketTeamDetailPage({ teamId }: { teamId: string }) {
   // }, [teamId]);
 
   if (loading) {
-    return <div className="text-center text-xl text-gray-600">Loading team details...</div>;
+    return (
+      <div className="h-full w-full p-4 text-center text-xl text-gray-600">
+        Loading team details...
+      </div>
+    );
   }
 
   if (!team) {
