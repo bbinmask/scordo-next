@@ -217,7 +217,7 @@ export const mockTeams: TeamProps[] = [
     players: [mockPlayers[0], mockPlayers[3]],
     banner: "/images/banners/scholarly-shooters.jpg",
     logo: "/images/logos/scholarly-shooters.png",
-    captain: "u1",
+    captain: mockPlayers[2],
     type: "college",
     createdAt: new Date("2023-02-14T12:00:00Z"),
     updatedAt: new Date("2024-07-18T13:25:00Z"),

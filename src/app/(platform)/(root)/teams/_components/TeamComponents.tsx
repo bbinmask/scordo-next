@@ -28,7 +28,7 @@ export function TeamsList() {
   if (!teams) return notFound();
 
   return (
-    <div className="bg-background-primary grid w-full gap-4 rounded-lg p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="bg-background-primary grid w-full gap-4 rounded-lg p-[5%] md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {teams.length !== 0 && teams.map((team) => <CricketTeamCard key={team.id} team={team} />)}
     </div>
   );
@@ -112,7 +112,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
         }}
         className="absolute inset-0 z-0 bg-black"
       ></div>
-      <div className="border-input dark:bg-opacity-50 relative z-10 flex flex-col items-start space-y-4 border bg-white/30 p-6 dark:bg-black">
+      <div className="relative z-10 flex flex-col items-start space-y-4 border-none p-6 dark:bg-black">
         {/* Team Icon/Placeholder */}
         <div className="flex-shrink-0 rounded-full shadow-lg">
           {team.logo === "" ? (
@@ -125,12 +125,12 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
         {/* Team Details */}
         <div className="flex-grow text-center">
           <Link href={`/teams/${encodedSlug}`}>
-            <h3 className="mb-1 text-2xl font-bold text-blue-400 hover:underline dark:text-blue-200">
+            <h3 className="mb-1 text-xl font-bold text-blue-400 hover:underline dark:text-blue-200">
               {team.name}
             </h3>
           </Link>
           {/* <p className="mb-3 text-sm text-gray-300">{team.description}</p> */}
-          <div className="subheading-text grid grid-cols-1 gap-x-4 gap-y-2 text-sm">
+          <div className="text-accent-foreground grid grid-cols-1 gap-x-4 gap-y-1 text-sm">
             <p className="flex items-center">
               <Users className="mr-2 h-4 w-4 text-purple-400" />{" "}
               {`${team.players.length} ${team.players.length > 1 ? "Members" : "Member"}`}
@@ -160,7 +160,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
         </div>
 
         {/* Status Badge */}
-        <div className="mt-4 flex-shrink-0">
+        <div className="absolute top-10 right-4 flex-shrink-0">
           {isAlreadyRequested ? (
             <Button
               variant={"default"}
