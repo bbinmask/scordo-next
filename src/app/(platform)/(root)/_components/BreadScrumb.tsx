@@ -45,7 +45,7 @@ export function BreadcrumbDemo({ links }: { links: BreadScrumbLinkProps[] }) {
           {links.map((link, i) => (
             <BreadcrumbLink asChild>
               <Link href={link.href} key={i}>
-                {links.name}
+                {link.name}
               </Link>
             </BreadcrumbLink>
           ))}

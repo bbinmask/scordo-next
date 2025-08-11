@@ -37,13 +37,8 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="overflow-x-hidden px-4">
-      <div className="between relative mb-8 flex h-full w-full">
-        <BreadcrumbDemo
-          links={[
-            { href: "/my-teams", name: "My Teams" },
-            { href: "search", name: "Search" },
-          ]}
-        />
+      <div className="between sticky top-0 z-10 mb-8 flex h-full w-full">
+        <h1 className="text-main font-[poppins] text-2xl font-black">Teams</h1>
         <Menu navLinks={navLinks} />
       </div>
       {children}
