@@ -118,7 +118,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
         className="absolute inset-0 z-0"
       ></div>
       <div className="absolute inset-0 bg-gray-800 opacity-80" />
-      <div className="relative z-10 flex flex-col items-start space-y-4 border-none p-6 dark:bg-black">
+      <div className="relative z-10 flex flex-col items-start space-y-4 border-none p-6">
         {/* Team Icon/Placeholder */}
         <div className="flex-shrink-0 rounded-full shadow-lg">
           {team.logo === "" ? (
@@ -136,7 +136,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
             </h3>
           </Link>
           {/* <p className="mb-3 text-sm text-gray-300">{team.description}</p> */}
-          <div className="text-accent grid grid-cols-1 gap-x-4 gap-y-1 text-sm">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm text-gray-50">
             <p className="flex items-center">
               <Users className="mr-2 h-4 w-4 text-purple-400" />{" "}
               {`${team.players.length} ${team.players.length > 1 ? "Members" : "Member"}`}

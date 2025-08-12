@@ -181,8 +181,8 @@ export const mockTeams: TeamProps[] = [
   },
   {
     id: "t2",
-    name: "Campus Crushers",
-    abbreviation: "CCS",
+    name: "Royal Challengers Bangaluru",
+    abbreviation: "RCB",
     owner: "u3", // string
     players: [mockPlayers[2], mockPlayers[3]],
     banner: "/img/rcb-banner.png",
@@ -196,8 +196,8 @@ export const mockTeams: TeamProps[] = [
   },
   {
     id: "t3",
-    name: "Boardroom Ballers",
-    abbreviation: "BBR",
+    name: "Gujrat Titans",
+    abbreviation: "GT",
     owner: mockUsers[1],
     players: [mockPlayers[1], mockPlayers[2]],
     banner: "/img/gujrat-banner.png",
@@ -211,8 +211,8 @@ export const mockTeams: TeamProps[] = [
   },
   {
     id: "t4",
-    name: "Scholarly Shooters",
-    abbreviation: "SCH",
+    name: "MI Under-19",
+    abbreviation: "MI U-19",
     owner: "u4",
     players: [mockPlayers[0], mockPlayers[3]],
     banner: "/img/mi-banner.png",

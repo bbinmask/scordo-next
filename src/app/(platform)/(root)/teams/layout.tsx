@@ -37,10 +37,13 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="relative overflow-x-hidden px-4">
-      <div className="between sticky mb-8 flex h-full w-full">
-        <h1 className="text-main font-[poppins] text-2xl font-black">Teams</h1>
+      <div className="sticky top-0 z-10 mb-8 flex h-full w-full items-center justify-between">
+        <h1 className="text-main dark:text-hover relative w-fit font-[poppins] text-2xl font-black">
+          Teams
+        </h1>
         <Menu navLinks={navLinks} />
       </div>
+
       {children}
     </div>
   );

@@ -3,7 +3,7 @@ import Navbar from "./dashboard/_components/Navbar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
+    <div className="">
       <nav className="mb-24">
         <Navbar />
       </nav>
