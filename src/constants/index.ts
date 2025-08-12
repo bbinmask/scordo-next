@@ -166,12 +166,12 @@ const mockUsers: UserProps[] = [
 export const mockTeams: TeamProps[] = [
   {
     id: "t1",
-    name: "Corporate Titans",
-    abbreviation: "CTN",
+    name: "Mumbai Indians",
+    abbreviation: "MI",
     owner: mockUsers[0],
     players: [mockPlayers[0], mockPlayers[1]],
-    banner: "/images/banners/corporate-titans.jpg",
-    logo: "/images/logos/corporate-titans.png",
+    banner: "/img/mi-banner.png",
+    logo: "/img/mi-logo.png",
     captain: mockUsers[0],
     type: "corporate",
     createdAt: new Date("2024-01-10T10:00:00Z"),
@@ -185,8 +185,8 @@ export const mockTeams: TeamProps[] = [
     abbreviation: "CCS",
     owner: "u3", // string
     players: [mockPlayers[2], mockPlayers[3]],
-    banner: "/images/banners/campus-crushers.jpg",
-    logo: "/images/logos/campus-crushers.png",
+    banner: "/img/rcb-banner.png",
+    logo: "/img/rcb-logo.png",
     captain: mockUsers[2], // full object
     type: "college",
     createdAt: new Date("2023-09-05T08:15:00Z"),
@@ -200,8 +200,8 @@ export const mockTeams: TeamProps[] = [
     abbreviation: "BBR",
     owner: mockUsers[1],
     players: [mockPlayers[1], mockPlayers[2]],
-    banner: "/images/banners/boardroom-ballers.jpg",
-    logo: "/images/logos/boardroom-ballers.png",
+    banner: "/img/gujrat-banner.png",
+    logo: "/img/gujrat-logo.svg",
     captain: mockUsers[1],
     type: "corporate",
     createdAt: new Date("2022-11-20T15:20:00Z"),
@@ -215,8 +215,8 @@ export const mockTeams: TeamProps[] = [
     abbreviation: "SCH",
     owner: "u4",
     players: [mockPlayers[0], mockPlayers[3]],
-    banner: "/images/banners/scholarly-shooters.jpg",
-    logo: "/images/logos/scholarly-shooters.png",
+    banner: "/img/mi-banner.png",
+    logo: "/img/mi-logo.png",
     captain: mockPlayers[2],
     type: "college",
     createdAt: new Date("2023-02-14T12:00:00Z"),
@@ -338,112 +338,6 @@ export const mockTournaments = [
     stats: null,
   },
 ];
-
-export const getAllTeams = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(Object.values(mockTeams));
-    }, 300);
-  });
-};
-
-export let mockMatchesDb: any = [];
-
-export const mockCreateMatch = async (matchData: any) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Basic validation for mock
-      if (
-        !matchData.teamA ||
-        !matchData.teamB ||
-        !matchData.overs ||
-        !matchData.tossWinner ||
-        !matchData.tossDecision ||
-        !matchData.startTime
-      ) {
-        return reject({
-          message: "Missing required fields for match creation.",
-        });
-      }
-
-      const newMatch = {
-        id: `match-${Date.now()}`,
-        ...matchData,
-        status: "not_started", // Default status upon creation
-        innings: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      mockMatchesDb.push(newMatch);
-      resolve(newMatch);
-    }, 500);
-  });
-};
-
-export const _socketServer: any = {
-  listeners: {},
-  emit: (event: any, data: any) => {
-    Object.values(_socketServer.listeners).forEach((cb: any) => {
-      if (cb.event === event) {
-        cb.callback(data);
-      }
-    });
-  },
-  on: (event: any, callback: any) => {
-    const listenerId = `listener-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    _socketServer.listeners[listenerId] = { event, callback };
-    return () => {
-      // Return an unsubscribe function
-      delete _socketServer.listeners[listenerId];
-    };
-  },
-};
-
-// Mock API calls
-export const getMatchDetails = async (matchId: string) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const match = mockMatchesDb[matchId];
-      if (match) {
-        resolve(JSON.parse(JSON.stringify(match))); // Return a deep copy
-      } else {
-        reject(new Error("Match not found."));
-      }
-    }, 300);
-  });
-};
-
-export const saveBallToDatabase = async (matchId: string, inningIndex: any, ballData: any) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const match = mockMatchesDb[matchId];
-      if (!match) {
-        return reject(new Error("Match not found for ball update."));
-      }
-      const inning = match.innings[inningIndex];
-      if (!inning) {
-        return reject(new Error("Inning not found for ball update."));
-      }
-
-      // Update inning totals
-      inning.balls.push(ballData);
-      inning.totalRuns += ballData.runs + (ballData.extra?.runs || 0);
-      if (ballData.wicket && ballData.wicket.isWicket) {
-        inning.totalWickets += 1;
-      }
-
-      // Calculate overs (X.Y format)
-      const totalBalls = inning.balls.length;
-      inning.overs = Math.floor(totalBalls / 6) + (totalBalls % 6) / 10;
-      inning.overs = parseFloat(inning.overs.toFixed(1)); // Format to X.Y
-
-      // Simulate Socket.IO broadcast of the updated match state
-      _socketServer.emit("match_update", JSON.parse(JSON.stringify(match)));
-
-      resolve(JSON.parse(JSON.stringify(match)));
-    }, 100); // Simulate very quick DB update
-  });
-};
 
 export const mockUsers2 = [
   { id: "user-player-1", name: "Virat Kohli" },

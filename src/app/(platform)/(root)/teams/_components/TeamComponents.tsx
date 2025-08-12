@@ -113,10 +113,11 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
           backgroundImage: `url(${team.banner})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 0.3, // 👈 control background image opacity here
+          opacity: 1, // 👈 control background image opacity here
         }}
-        className="absolute inset-0 z-0 bg-black"
+        className="absolute inset-0 z-0"
       ></div>
+      <div className="absolute inset-0 bg-gray-800 opacity-80" />
       <div className="relative z-10 flex flex-col items-start space-y-4 border-none p-6 dark:bg-black">
         {/* Team Icon/Placeholder */}
         <div className="flex-shrink-0 rounded-full shadow-lg">
@@ -135,7 +136,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
             </h3>
           </Link>
           {/* <p className="mb-3 text-sm text-gray-300">{team.description}</p> */}
-          <div className="text-accent-foreground grid grid-cols-1 gap-x-4 gap-y-1 text-sm">
+          <div className="text-accent grid grid-cols-1 gap-x-4 gap-y-1 text-sm">
             <p className="flex items-center">
               <Users className="mr-2 h-4 w-4 text-purple-400" />{" "}
               {`${team.players.length} ${team.players.length > 1 ? "Members" : "Member"}`}
