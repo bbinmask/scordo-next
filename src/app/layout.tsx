@@ -18,7 +18,7 @@ const urbanist = Urbanist({
 });
 export const metadata: Metadata = {
   title: "Scordo",
-  description: "Only platform that manages your cricket scores",
+  description: "Only platform that manages your cricket teams and scores",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={` ${poppins.className} ${calSans.className} ${urbanist.className} relative antialiased`}
+        className={` ${poppins.className} ${calSans.className} ${urbanist.className} bg-background-primary antialiased`}
       >
         {children}
       </body>

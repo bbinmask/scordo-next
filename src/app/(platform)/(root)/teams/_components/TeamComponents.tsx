@@ -11,10 +11,8 @@ import Spinner from "@/components/Spinner";
 import { getTeamUrl } from "@/utils/getURL";
 import { useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
-import { mockTeams as teams } from "@/constants/index";
-import NotFoundParagraph from "@/components/NotFoundParagraph";
 
-export function TeamsList() {
+export function TeamsList({ teams }: { teams: TeamProps[] }) {
   // const [teams, setTeams] = useState<TeamProps[]>([]);
   // const { fetchTeams } = useTeam();
 
@@ -29,72 +27,8 @@ export function TeamsList() {
   if (!teams) return notFound();
 
   return (
-    <div className="bg-background-primary grid w-full gap-4 rounded-lg p-4 sm:p-24 md:grid-cols-2 md:p-4 lg:grid-cols-3">
+    <div className="md: grid w-full gap-4 rounded-lg px-2 py-4 md:grid-cols-2 xl:grid-cols-3">
       {teams.length !== 0 && teams.map((team) => <CricketTeamCard key={team.id} team={team} />)}
-    </div>
-  );
-}
-export function CricketTeamDetailPage({ teamId }: { teamId: string }) {
-  const [team, setTeam] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   const loadTeam = async () => {
-  //     setLoading(true);
-  //     const fetchedTeam = await fetchCricketTeamById(teamId);
-  //     setTeam(fetchedTeam);
-  //     setLoading(false);
-  //   };
-  //   loadTeam();
-  // }, [teamId]);
-
-  if (loading) {
-    return (
-      <div className="h-full w-full p-4 text-center text-xl text-gray-600">
-        Loading team details...
-      </div>
-    );
-  }
-
-  if (!team) {
-    return (
-      <div className="container mx-auto rounded-lg border border-gray-200 bg-white p-6 py-10 text-center text-xl font-semibold text-red-600 shadow-md">
-        <p>Cricket Team with ID "{teamId}" not found.</p>
-        <button className="mt-6 inline-block rounded-full bg-green-500 px-6 py-2 text-white transition-colors hover:bg-green-600">
-          Back to Cricket Teams List
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto p-6">
-      <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-2xl">
-        <h1 className="mb-4 text-4xl font-extrabold text-gray-900">{team.name}</h1>
-        <p className="mb-6 text-lg text-gray-700">{team.description}</p>
-        <div className="mb-8">
-          <h2 className="mb-4 border-b pb-2 text-2xl font-bold text-gray-800">
-            Squad Players ({team.players})
-          </h2>
-          {team.members && team.members.length > 0 ? (
-            <ul className="list-none space-y-3">
-              {team.members.map((player: any) => (
-                <li
-                  key={player.id}
-                  className="flex items-center justify-between rounded-lg bg-gray-50 p-4 shadow-sm"
-                >
-                  <span className="text-lg font-medium text-gray-800">{player.name}</span>
-                  <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-gray-600">
-                    {player.role}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <NotFoundParagraph description="No players in this squad yet." />
-          )}
-        </div>
-      </div>
     </div>
   );
 }
@@ -107,7 +41,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
   const encodedSlug = encodeURIComponent(teamSlug);
 
   return (
-    <div className="relative aspect-video h-full w-full overflow-hidden rounded-xl shadow-xl transition-all duration-300 ease-in-out hover:scale-105 hover:border-blue-500 hover:shadow-2xl">
+    <div className="relative aspect-video h-full w-full overflow-hidden rounded-xl shadow-xl transition-all duration-300 hover:scale-105 hover:border-blue-500 hover:shadow-2xl">
       <div
         style={{
           backgroundImage: `url(${team.banner})`,
@@ -118,9 +52,9 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
         className="absolute inset-0 z-0"
       ></div>
       <div className="absolute inset-0 bg-gray-800 opacity-80" />
-      <div className="relative z-10 flex flex-col items-start space-y-4 border-none p-6">
+      <div className="relative z-10 flex flex-col items-start space-y-4 border-none px-3 py-2">
         {/* Team Icon/Placeholder */}
-        <div className="flex-shrink-0 rounded-full shadow-lg">
+        <div className="rounded-full shadow-lg">
           {team.logo === "" ? (
             <Trophy className="h-10 w-10 text-white" />
           ) : (
@@ -129,9 +63,9 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
         </div>
 
         {/* Team Details */}
-        <div className="flex-grow text-center">
+        <div className="flex-grow px-4 text-center">
           <Link href={`/teams/${encodedSlug}`}>
-            <h3 className="mb-1 text-xl font-bold text-blue-400 hover:underline dark:text-blue-200">
+            <h3 className="mb-1 text-2xl font-black text-gray-50 hover:text-blue-400 hover:underline dark:text-gray-200">
               {team.name}
             </h3>
           </Link>
@@ -166,13 +100,13 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
         </div>
 
         {/* Status Badge */}
-        <div className="absolute top-10 right-4 flex-shrink-0">
+        <div className="absolute top-2 right-2 flex-shrink-0">
           {isAlreadyRequested ? (
             <Button
-              variant={"default"}
+              variant={"destructive"}
               onClick={withdrawJoinRequest}
               disabled={loading || !isAlreadyRequested}
-              className={`inline-flex items-center rounded-full border-none bg-red-600 px-4 py-1.5 text-xs font-semibold text-white drop-shadow-lg hover:scale-105 hover:bg-red-600/80`}
+              className={`inline-flex items-center rounded-full border-none bg-red-600 text-[10px] font-semibold text-white drop-shadow-lg hover:scale-105 hover:bg-red-600/80`}
             >
               {loading ? <Spinner /> : "cancel"}
             </Button>
@@ -181,7 +115,7 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
               variant={"default"}
               onClick={joinTeam}
               disabled={!team.isRecruiting || loading || isAlreadyInTeam || isAlreadyRequested}
-              className={`inline-flex items-center rounded-full border-none px-4 py-1.5 text-xs font-semibold shadow-md hover:scale-105 hover:shadow-xl ${team.isRecruiting ? "bg-main hover:bg-hover active:bg-active text-white" : "bg-purple-600 text-white"}`}
+              className={`px- inline-flex items-center rounded-full border-none text-[10px] font-semibold shadow-md hover:scale-105 hover:shadow-xl ${team.isRecruiting ? "bg-main hover:bg-hover active:bg-active text-white" : "bg-purple-600 text-white"}`}
             >
               {loading ? (
                 <Spinner />

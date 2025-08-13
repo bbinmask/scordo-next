@@ -3,6 +3,7 @@ import UserProps from "./user.props";
 export default interface TeamProps {
   id: string;
   name: string;
+  description?: string;
   abbreviation: string;
   owner: string | UserProps;
   players: PlayerProps[];
