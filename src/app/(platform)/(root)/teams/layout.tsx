@@ -10,28 +10,28 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
       id: 1,
       path: "/teams",
       className: "",
-      icon: <ListIcon />,
+      icon: <ListIcon className="h-4 w-4 md:h-5 md:w-5" />,
     },
     {
       title: "Squad",
       id: 2,
       path: "/teams/my-teams",
       className: "",
-      icon: <Users />,
+      icon: <Users className="h-4 w-4 md:h-5 md:w-5" />,
     },
     {
       title: "Find",
       id: 3,
       path: "/teams/search-teams",
       className: "",
-      icon: <Search />,
+      icon: <Search className="h-4 w-4 md:h-5 md:w-5" />,
     },
     {
       title: "Create",
       id: 4,
       path: "/teams/create",
       className: "",
-      icon: <PlusCircle />,
+      icon: <PlusCircle className="h-4 w-4 md:h-5 md:w-5" />,
     },
   ];
 

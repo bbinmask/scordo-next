@@ -26,13 +26,17 @@ const Menu = ({ navLinks }: { navLinks: any }) => {
         <RouteNavigations navLinks={navLinks} />
       </nav>
       {/* Button to toggle the main navbar visibility */}
-      <Button
+      <button
         id="showNavbarButton"
         onClick={toggleMainNavbar}
-        className={`hover:bg-hover bg-main top-0 right-4 z-[100] w-fit cursor-pointer rounded-md px-3 py-2 font-semibold text-white shadow-md transition duration-300 ease-in-out hover:scale-105`}
+        className={`hover:bg-hover bg-main top-0 right-4 z-[100] w-fit cursor-pointer rounded-md p-2 font-semibold text-white shadow-md transition duration-300 ease-in-out hover:scale-105`}
       >
-        {isNavbarActive ? <X /> : <MenuIcon />}
-      </Button>
+        {isNavbarActive ? (
+          <X className="h-4 w-4 md:h-5 md:w-5" />
+        ) : (
+          <MenuIcon className="h-4 w-4 md:h-5 md:w-5" />
+        )}
+      </button>
     </div>
   );
 };

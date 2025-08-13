@@ -28,12 +28,12 @@ export function TeamsList({ teams }: { teams: TeamProps[] }) {
 
   return (
     <div className="md: grid w-full gap-4 rounded-lg px-2 py-4 md:grid-cols-2 xl:grid-cols-3">
-      {teams.length !== 0 && teams.map((team) => <CricketTeamCard key={team.id} team={team} />)}
+      {teams.length !== 0 && teams.map((team) => <TeamCard key={team.id} team={team} />)}
     </div>
   );
 }
 
-export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
+export const TeamCard = ({ team }: { team: TeamProps }) => {
   const { joinTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
@@ -41,7 +41,10 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
   const encodedSlug = encodeURIComponent(teamSlug);
 
   return (
-    <div className="relative aspect-video h-full w-full overflow-hidden rounded-xl shadow-xl transition-all duration-300 hover:scale-105 hover:border-blue-500 hover:shadow-2xl">
+    <Link
+      href={`/teams/${encodedSlug}`}
+      className="relative aspect-video h-full w-full overflow-hidden rounded-xl shadow-black transition-all duration-300 hover:border-blue-500 hover:opacity-95 hover:shadow-md"
+    >
       <div
         style={{
           backgroundImage: `url(${team.banner})`,
@@ -64,11 +67,11 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
 
         {/* Team Details */}
         <div className="flex-grow px-4 text-center">
-          <Link href={`/teams/${encodedSlug}`}>
+          <div>
             <h3 className="mb-1 text-2xl font-black text-gray-50 hover:text-blue-400 hover:underline dark:text-gray-200">
               {team.name}
             </h3>
-          </Link>
+          </div>
           {/* <p className="mb-3 text-sm text-gray-300">{team.description}</p> */}
           <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm text-gray-50">
             <p className="flex items-center">
@@ -132,6 +135,6 @@ export const CricketTeamCard = ({ team }: { team: TeamProps }) => {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

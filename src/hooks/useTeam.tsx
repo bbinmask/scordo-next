@@ -150,3 +150,14 @@ export const useTeamRequest = (team: TeamProps, user: { id: string }) => {
     error,
   };
 };
+
+export const useHandleRequest = () => {
+  const handleAcceptRequest = async () => {
+    return true;
+  };
+  const handleRejectRequest = async () => {
+    return true;
+  };
+
+  return { handleRejectRequest, handleAcceptRequest };
+};
