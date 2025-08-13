@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HomeIcon, Users, PlusCircle, Trophy, User, Settings } from "lucide-react";
+import { Home, Users, PlusCircle, Trophy, User, Settings } from "lucide-react";
 
 const Bottombar = () => {
   const pathname = usePathname();
@@ -9,7 +9,7 @@ const Bottombar = () => {
   const navLinks = [
     {
       title: "Home",
-      icon: HomeIcon,
+      icon: Home,
       path: "/dashboard",
       className: "",
     },
@@ -46,8 +46,8 @@ const Bottombar = () => {
   ];
 
   return (
-    <div className="bg-main fixed bottom-0 left-0 z-[999] flex h-[84px] w-full justify-center">
-      <ul className="m-0 grid w-full max-w-6xl grid-cols-5 gap-1 px-2 py-1 md:grid-cols-6">
+    <div className="fixed bottom-0 left-0 z-[999] flex h-[84px] w-full justify-center rounded-t-lg bg-white shadow-lg">
+      <ul className="m-0 grid w-full max-w-6xl grid-cols-5 gap-1 rounded-t-2xl px-2 py-1 shadow-lg shadow-black md:grid-cols-6">
         {navLinks.map((item, i) => {
           const isActive = pathname === item.path;
           const Icon = item.icon;
@@ -55,11 +55,17 @@ const Bottombar = () => {
           return (
             <li className={`${item.className}`} key={i}>
               <Link
-                className={`center hover:bg-hover flex flex-col rounded-md px-2 py-1 font-[urbanist] text-stone-900 shadow-black transition-all duration-500 ease-in-out hover:translate-y-0 hover:gap-1 hover:shadow-md ${isActive ? "bg-active translate-y-0 gap-1 shadow-md" : "translate-y-6 gap-8"}`}
+                className={`center hover:bg-hover flex flex-col rounded-md px-2 py-1 font-[urbanist] text-stone-900 shadow-black transition-all duration-500 ease-in-out hover:translate-y-0 hover:gap-1 hover:shadow-md hover:brightness-125 ${isActive ? "bg-main translate-y-0 gap-1 shadow-md" : "translate-y-6 gap-8"}`}
                 href={item.path}
               >
-                {Icon && <Icon size={28} className="" />}
-                <span className={`overflow-x-hidden font-[poppins] text-sm font-semibold`}>
+                {Icon && (
+                  // <div className="bg-blue-600">
+                  <Icon size={28} className={`${isActive && "text-white"}`} />
+                  // </div>
+                )}
+                <span
+                  className={`overflow-x-hidden ${isActive ? "font-bold text-white" : "font-semibold"} font-[urbanist] text-sm tracking-wider`}
+                >
                   {item.title}
                 </span>
               </Link>

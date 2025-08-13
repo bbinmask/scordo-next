@@ -1,5 +1,5 @@
-import Bottombar from "./dashboard/_components/Bottombar";
-import Navbar from "./dashboard/_components/Navbar";
+import Bottombar from "./_components/Bottombar";
+import Navbar from "./_components/Navbar";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
