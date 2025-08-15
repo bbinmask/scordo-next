@@ -20,7 +20,7 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
       icon: <Users className="h-4 w-4 md:h-5 md:w-5" />,
     },
     {
-      title: "Find",
+      title: "Search",
       id: 3,
       path: "/teams/search-teams",
       className: "",

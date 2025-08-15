@@ -21,7 +21,7 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
       icon: <Users className="font-urbanist w-4 transition-all duration-500 md:w-8 md:text-base" />,
     },
     {
-      title: "Find",
+      title: "Search",
       id: 3,
       path: "/teams/search-teams",
       className: "",
