@@ -62,19 +62,7 @@ export default function TeamRequests({
                     <div className="flex space-x-2">
                       <button
                         onClick={async () => {
-                          const success = await handleAcceptRequest(team.id, req.id);
-                          if (success) {
-                            setTeam((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    pendingRequests: prev.pendingRequests.filter(
-                                      (r) => r._id !== req._id
-                                    ),
-                                  }
-                                : prev
-                            );
-                          }
+                          const success = await handleAcceptRequest();
                         }}
                         className="group transform-gpu rounded-lg border-none bg-gradient-to-r from-green-600 to-green-800 px-4 py-2 text-base font-medium text-white shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:from-green-700 hover:to-green-900 active:scale-95"
                       >
@@ -83,20 +71,7 @@ export default function TeamRequests({
                       </button>
                       <button
                         onClick={async () => {
-                          const success = await handleRejectRequest(team.id, req.id);
-
-                          if (success) {
-                            setTeam((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    pendingRequests: prev.pendingRequests.filter(
-                                      (r) => r._id !== req._id
-                                    ),
-                                  }
-                                : prev
-                            );
-                          }
+                          const success = await handleRejectRequest();
                         }}
                         className="group transform-gpu rounded-lg border-none bg-gradient-to-r from-red-600 to-red-800 px-4 py-2 text-base font-medium text-white shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:from-red-700 hover:to-red-900 active:scale-95"
                       >
