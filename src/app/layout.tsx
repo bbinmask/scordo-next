@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={` ${poppins.className} ${calSans.className} ${urbanist.className} layout-background antialiased`}
+        className={`min-h-screen w-full ${poppins.className} ${calSans.className} ${urbanist.className} antialiased`}
       >
         {children}
       </body>
