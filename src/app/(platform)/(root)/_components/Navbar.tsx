@@ -47,20 +47,20 @@ const Navbar = () => {
   };
 
   return (
-    <div className="fixed top-0 z-[999] grid min-h-16 w-full items-center rounded-b-md bg-gray-50 px-2 py-2 shadow-lg shadow-gray-500/60 dark:bg-stone-950 dark:shadow-gray-700/40">
+    <div className="primary-background fixed top-0 z-[999] grid min-h-16 w-full items-center rounded-b-md px-2 py-2 shadow-lg shadow-gray-500/60 dark:shadow-gray-700/40">
       <div className="flex w-full items-center">
         <div className="flex w-full items-center justify-between">
           <Link
             href={"/"}
-            className="text-main mx-2 font-[poppins] text-3xl font-black dark:brightness-150 dark:contrast-125 dark:saturate-150"
+            className="mx-2 font-[poppins] text-3xl font-black text-white drop-shadow-lg dark:brightness-150 dark:contrast-125 dark:saturate-150"
           >
             Scordo
           </Link>
           <div className="flex items-center gap-4">
-            <Button onClick={handleDarkMode} className="cursor-pointer">
+            <Button onClick={handleDarkMode} className="buttons cursor-pointer rounded-full">
               {isDarkMode ? <Moon /> : <Sun />}
             </Button>
-            <Button type="button" className="cursor-pointer border-none">
+            <Button type="button" className="buttons cursor-pointer rounded-full">
               <Bell className="text-3xl" />
             </Button>
             <NavbarDropdown data={user} />
