@@ -3,7 +3,7 @@ import { MoonLoader } from "react-spinners";
 import Card from "./_components/Card";
 import NewsList from "./_components/NewsList";
 import { CarouselSpacing } from "./_components/CarouselSpacing";
-import { Calendar, PlayCircle } from "lucide-react";
+import { Calendar, Play } from "lucide-react";
 
 const DashboardPage = () => {
   const data = [
@@ -28,9 +28,14 @@ const DashboardPage = () => {
     <div className="mt-5 px-4">
       <div className="container mx-auto block items-center">
         <section className="">
-          <h3 className="my-6 flex items-center text-3xl font-bold text-gray-800 dark:text-gray-100">
-            <PlayCircle className="mr-3 h-8 w-8 text-green-600" /> Live Matches
-          </h3>
+          <div className="mb-8">
+            <h2 className="flex items-center font-[cal_sans] text-3xl font-extrabold tracking-wide text-lime-600 drop-shadow-lg sm:text-4xl dark:text-lime-300">
+              LIVE ON SCORDO
+            </h2>
+            <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">
+              Follow the action as it happens!
+            </p>
+          </div>
 
           <CarouselSpacing matches={["1", "2", "3", "4"]} status="Live" />
 

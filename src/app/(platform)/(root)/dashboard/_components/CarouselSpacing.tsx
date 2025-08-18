@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Calendar, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
 import { LiveMatchCard, UpcomingMatchCard } from "./CarouselCard";
 import { Button } from "@/components/ui/button";
+import NotFoundParagraph from "@/components/NotFoundParagraph";
 
 const matches = [
   {
@@ -77,9 +78,7 @@ export function CarouselSpacing({
       {/* Scroll Container */}
 
       {matches.length === 0 ? (
-        <h3 className="heading-text mb-6 flex items-center text-base font-bold">
-          No matches found.
-        </h3>
+        <NotFoundParagraph description="No matches found." />
       ) : (
         <div
           ref={scrollRef}
