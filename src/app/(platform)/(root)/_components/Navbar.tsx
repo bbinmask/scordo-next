@@ -42,12 +42,12 @@ const navLinks = [
 const Navbar = () => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const handleDarkMode = () => {
-    const mode = document.body.classList.toggle("dark");
+    const mode = document.querySelector("html")?.classList.toggle("dark") as boolean;
     setIsDarkMode(mode);
   };
 
   return (
-    <div className="primary-background fixed top-0 z-[999] grid min-h-16 w-full items-center rounded-b-md px-2 py-2 shadow-lg shadow-gray-500/60 dark:shadow-gray-700/40">
+    <div className="primary-background fixed top-0 z-[999] grid min-h-16 w-full items-center rounded-b-md px-2 py-2 shadow-lg shadow-black/60">
       <div className="flex w-full items-center">
         <div className="flex w-full items-center justify-between">
           <Link

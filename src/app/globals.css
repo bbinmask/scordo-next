@@ -136,7 +136,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground m-0 box-border p-0;
+    @apply text-foreground m-0 box-border p-0;
   }
 
   .center {
@@ -146,6 +146,12 @@
   .between {
     @apply items-center justify-between;
   }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .primary-background {

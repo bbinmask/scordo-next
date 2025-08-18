@@ -28,10 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`min-h-screen w-full ${poppins.className} ${calSans.className} ${urbanist.className} antialiased`}
-      >
-        {children}
+      <body className="layout-background dark:bg-red-600">
+        <main
+          className={`min-h-screen w-full ${poppins.className} ${calSans.className} ${urbanist.className} antialiased`}
+        >
+          {children}
+        </main>
       </body>
     </html>
   );
