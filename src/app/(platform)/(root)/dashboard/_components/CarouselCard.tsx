@@ -1,4 +1,3 @@
-"use client";
 import { cn } from "@/lib/utils";
 import { getMatchUrl } from "@/utils/getURL";
 import { shortenTeamName } from "@/utils/short";
@@ -9,25 +8,25 @@ export const UpcomingMatchCard = ({ className, match }: { className?: string; ma
   return (
     <div className={cn("flex flex-row flex-nowrap", className)}>
       <div className="w-full">
-        <Link href="#" className="subheading-text mb-2 text-sm hover:underline">
+        <Link href="#" className="text-foreground mb-2 font-[poppins] text-xs hover:underline">
           Indian Premier League 2025
         </Link>
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+          <h4 className="primary-text font-[cal_sans] text-lg font-bold tracking-wide">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
           </h4>
         </div>
-        <p className="mb-1 text-sm text-gray-700 dark:text-gray-300">
+        <p className="text-accent-foreground mb-1 text-sm">
           <span className="mr-1 font-semibold">{"Jul 10, 2025"}</span>at
           <span className="ml-1 font-semibold">{"7:30 PM IST"}</span>
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Venue: {"Chinnaswami Stadium, Bangaluru"}
         </p>
-        <div className="mt-4 flex w-full justify-end">
-          <button className="flex items-center border-none text-sm font-medium text-green-600 hover:underline dark:text-emerald-400">
+        <div className="mt-1 flex w-full justify-end">
+          <button className="flex items-center border-none text-sm font-semibold text-green-600 hover:underline dark:text-emerald-400">
             View Details <ChevronRight className="ml-1 h-4 w-4" />
           </button>
         </div>
@@ -39,7 +38,7 @@ export const UpcomingMatchCard = ({ className, match }: { className?: string; ma
 export const LiveMatchCard = ({ className, match }: { className?: string; match: any }) => {
   return (
     <div className={cn("relative grid", className)}>
-      <Link href="#" className="text-text-subtle text-sm hover:underline">
+      <Link href="#" className="text-foreground mb-2 font-[poppins] text-xs hover:underline">
         Indian Premier League 2025
       </Link>
       <Link

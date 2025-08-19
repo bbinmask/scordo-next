@@ -82,14 +82,14 @@ export function CarouselSpacing({
       ) : (
         <div
           ref={scrollRef}
-          className="hide_scrollbar flex flex-row justify-start gap-4 overflow-x-auto overflow-y-hidden scroll-smooth p-2"
+          className="hide_scrollbar flex flex-row justify-start gap-3 overflow-x-auto overflow-y-hidden scroll-smooth px-3"
         >
           {status === "Live" &&
             matches.map((match, i) => (
               <LiveMatchCard
                 key={i}
                 match={match}
-                className="w-72 flex-shrink-0 transform rounded-xl border border-gray-200 bg-white p-6 shadow-md transition-transform duration-300 hover:scale-105 md:w-96 dark:border-gray-700 dark:bg-gray-800"
+                className="mb-1 w-72 flex-shrink-0 transform rounded-xl border border-gray-200 bg-white p-6 shadow-md transition-transform duration-300 hover:scale-95 dark:border-gray-700 dark:bg-gray-800"
               />
             ))}
           {status === "Upcoming" &&
@@ -97,7 +97,7 @@ export function CarouselSpacing({
               <UpcomingMatchCard
                 key={i}
                 match={match}
-                className="w-72 flex-shrink-0 transform rounded-xl border border-gray-200 bg-white p-6 shadow-md transition-transform duration-300 hover:scale-105 md:w-96 dark:border-gray-700 dark:bg-gray-800"
+                className="mb-1 w-72 flex-shrink-0 transform rounded-xl border border-gray-200 bg-white p-6 shadow-md transition-transform duration-300 hover:scale-95 dark:border-gray-700 dark:bg-gray-800"
               />
             ))}
         </div>
