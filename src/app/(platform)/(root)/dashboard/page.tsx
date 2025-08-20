@@ -5,6 +5,7 @@ import NewsList, { NewList } from "./_components/NewsList";
 import { CarouselSpacing } from "./_components/CarouselSpacing";
 import { BarChart2, Calendar, Play, Users } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
+import UpdatesAndNewsWrapper from "./_components/UpdatesAndNewsWrapper";
 
 const DashboardPage = () => {
   const data = [
@@ -68,14 +69,14 @@ const DashboardPage = () => {
         <div className="mb-6 text-center md:text-left">
           <h2 className="text-4xl font-extrabold text-gray-800 dark:text-white">
             <span className="bg-gradient-to-r from-green-600 to-teal-500 bg-clip-text text-transparent">
-              Latest Updates
+              Featured
             </span>
           </h2>
           <p className="mt-2 text-gray-500 dark:text-gray-400">
             Stay informed with the latest news and announcements.
           </p>
         </div>
-        <NewList />
+        <UpdatesAndNewsWrapper />
       </div>
 
       {/* <NewsList /> */}

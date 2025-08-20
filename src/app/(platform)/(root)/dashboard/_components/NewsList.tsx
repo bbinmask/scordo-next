@@ -177,20 +177,26 @@ function NewsCard({ article }: { article: ArticleProp }) {
     </a>
   );
 }
-
 export const NewList = () => {
   const newsItems = [
     {
       title: "Historic Win: Team Alpha clinches the championship",
       category: "Tournaments",
       time: "4h ago",
+      image: "https://placehold.co/100x80/34D399/FFFFFF?text=Win",
     },
     {
       title: "Player Spotlight: Jane Doe's rise to stardom",
       category: "Interviews",
       time: "1d ago",
+      image: "https://placehold.co/100x80/FBBF24/FFFFFF?text=Spotlight",
     },
-    { title: "Upcoming Rule Changes for the Next Season", category: "Updates", time: "2d ago" },
+    {
+      title: "Upcoming Rule Changes for the Next Season",
+      category: "Updates",
+      time: "2d ago",
+      image: "https://placehold.co/100x80/60A5FA/FFFFFF?text=Rules",
+    },
   ];
   return (
     <div className="space-y-4">
@@ -199,18 +205,31 @@ export const NewList = () => {
           key={i}
           className="flex items-center space-x-4 rounded-lg bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:bg-gray-800"
         >
-          <div className="rounded-lg bg-gray-100 p-3 dark:bg-gray-700">
-            <Newspaper className="h-6 w-6 text-gray-500 dark:text-gray-300" />
+          <div className="flex-shrink-0">
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-24 rounded-md object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = "https://placehold.co/100x80/CCCCCC/FFFFFF?text=Error";
+              }}
+            />
           </div>
           <div className="flex-grow">
-            <p className="font-semibold text-gray-800 dark:text-gray-100">{item.title}</p>
+            <p className="line-clamp-2 font-semibold text-gray-800 dark:text-gray-100">
+              {item.title}
+            </p>
             <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
               <span>{item.category}</span>
               <span className="text-gray-300 dark:text-gray-600">•</span>
               <span>{item.time}</span>
             </div>
           </div>
-          <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <div className="flex-shrink-0">
+            <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          </div>
         </div>
       ))}
     </div>

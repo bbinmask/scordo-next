@@ -4,36 +4,6 @@ import { shortenTeamName } from "@/utils/short";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-export const UpcomingMatchCard = ({ className, match }: { className?: string; match: any }) => {
-  return (
-    <div className={cn("flex flex-row flex-nowrap", className)}>
-      <div className="w-full">
-        <Link href="#" className="text-foreground mb-2 font-[poppins] text-xs hover:underline">
-          Indian Premier League 2025
-        </Link>
-        <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h4 className="primary-text font-[cal_sans] text-lg font-bold tracking-wide">
-            {shortenTeamName("Royal Challengers Bangaluru")}
-            <span className="mx-2">vs</span>
-            {shortenTeamName("Chennai Super Kings")}
-          </h4>
-        </div>
-        <p className="text-accent-foreground mb-1 text-sm">
-          <span className="mr-1 font-semibold">{"Jul 10, 2025"}</span>at
-          <span className="ml-1 font-semibold">{"7:30 PM IST"}</span>
-        </p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Venue: {"Chinnaswami Stadium, Bangaluru"}
-        </p>
-        <div className="mt-1 flex w-full justify-end">
-          <button className="flex items-center border-none text-sm font-semibold text-green-600 hover:underline dark:text-emerald-400">
-            View Details <ChevronRight className="ml-1 h-4 w-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export const LiveMatchCard = ({ className, match }: { className?: string; match: any }) => {
   return (
@@ -71,6 +41,37 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
         <span className="animate-pulse text-sm font-semibold text-red-500 dark:text-red-400">
           ● {"Live"}
         </span>
+      </div>
+    </div>
+  );
+};
+
+export const UpcomingMatchCard = ({ className, match }: { className?: string; match: any }) => {
+  return (
+    <div className={cn("flex flex-row flex-nowrap", className)}>
+      <div className="w-full">
+        <Link href="#" className="text-foreground mb-2 font-[poppins] text-xs hover:underline">
+          Indian Premier League 2025
+        </Link>
+        <div className="mb-2 grid cursor-pointer grid-cols-1">
+          <h4 className="primary-text font-[cal_sans] text-lg font-bold tracking-wide">
+            {shortenTeamName("Royal Challengers Bangaluru")}
+            <span className="mx-2">vs</span>
+            {shortenTeamName("Chennai Super Kings")}
+          </h4>
+        </div>
+        <p className="text-accent-foreground mb-1 text-sm">
+          <span className="mr-1 font-semibold">{"Jul 10, 2025"}</span>at
+          <span className="ml-1 font-semibold">{"7:30 PM IST"}</span>
+        </p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Venue: {"Chinnaswami Stadium, Bangaluru"}
+        </p>
+        <div className="mt-1 flex w-full justify-end">
+          <button className="flex items-center border-none text-sm font-semibold text-green-600 hover:underline dark:text-emerald-400">
+            View Details <ChevronRight className="ml-1 h-4 w-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
