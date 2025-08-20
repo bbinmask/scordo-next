@@ -56,22 +56,22 @@ export function CarouselSpacing({
   };
 
   return (
-    <div className="relative">
+    <div className="relative lg:px-4">
       {/* Scroll Buttons */}
       {matches.length > 3 && (
         <>
-          <Button
+          <button
             onClick={() => scroll(-1)}
-            className="bg-main absolute top-1/2 -left-4 z-10 hidden -translate-y-1/2 cursor-pointer rounded-full border-none p-1 text-white hover:opacity-80 lg:block"
+            className="bg-main absolute top-1/2 left-4 z-10 hidden aspect-square -translate-y-1/2 cursor-pointer rounded-full border-none p-1 text-white opacity-80 hover:opacity-90 md:block"
           >
             <ChevronLeft size={18} />
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={() => scroll(1)}
-            className="bg-main absolute top-1/2 -right-7 z-10 hidden -translate-y-1/2 cursor-pointer rounded-full border-none p-1 text-white hover:opacity-80 lg:block"
+            className="bg-main absolute top-1/2 right-2 z-10 hidden aspect-square -translate-y-1/2 cursor-pointer rounded-full border-none p-1 text-white opacity-80 hover:opacity-90 md:block"
           >
             <ChevronRight size={18} />
-          </Button>
+          </button>
         </>
       )}
 

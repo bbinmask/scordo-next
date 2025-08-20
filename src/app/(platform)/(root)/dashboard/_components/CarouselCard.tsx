@@ -8,7 +8,7 @@ import React from "react";
 export const LiveMatchCard = ({ className, match }: { className?: string; match: any }) => {
   return (
     <div className={cn("relative grid", className)}>
-      <Link href="#" className="text-foreground mb-2 font-[poppins] text-xs hover:underline">
+      <Link href="#" className="text-foreground mb-2 w-fit font-[poppins] text-xs hover:underline">
         Indian Premier League 2025
       </Link>
       <Link
@@ -16,11 +16,11 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
         className="block"
       >
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h4 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+          <h2 className="primary-text font-[cal_sans] text-lg font-bold tracking-wide">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
-          </h4>
+          </h2>
         </div>
         <p className="mb-1 text-sm text-gray-700 dark:text-gray-300">
           {shortenTeamName("Royal Challengers Bangaluru")}:{" "}
@@ -54,11 +54,11 @@ export const UpcomingMatchCard = ({ className, match }: { className?: string; ma
           Indian Premier League 2025
         </Link>
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h4 className="primary-text font-[cal_sans] text-lg font-bold tracking-wide">
+          <h2 className="primary-text font-[cal_sans] text-lg font-bold tracking-wide">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
-          </h4>
+          </h2>
         </div>
         <p className="text-accent-foreground mb-1 text-sm">
           <span className="mr-1 font-semibold">{"Jul 10, 2025"}</span>at

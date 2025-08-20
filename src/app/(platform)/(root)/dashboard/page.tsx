@@ -29,16 +29,16 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="container mt-5 block items-center">
+    <div className="container mt-5 block w-full items-center">
       <section className="">
         <div className="mb-8">
           <TypographyHeading className="mb-4 px-4" content="Live on Scordo" />
-          <CarouselSpacing matches={["1", "2", "3", "4"]} status="Live" />{" "}
+          <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Live" />{" "}
         </div>
         <div className="mb-8">
           <TypographyHeading className="mb-4 px-4" content="Upcoming on Scordo" />
 
-          <CarouselSpacing matches={["1", "2", "3", "4"]} status="Upcoming" />
+          <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Upcoming" />
         </div>
       </section>
 
