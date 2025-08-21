@@ -22,11 +22,12 @@ import { notFound } from "next/navigation";
 // import TeamForm from "./UpdateTeamForm";
 import { useIsTeamOwner, useTeam, useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
+import TeamProps from "@/types/teams.props";
 
-const TeamDetails = ({ abbreviation }: { abbreviation: string }) => {
+const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamProps }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const team = teams[0];
+  // const team = teams[0];
   const { getSingleTeam } = useTeam();
   const { isOwner } = useIsTeamOwner(team, user);
 
@@ -44,14 +45,14 @@ const TeamDetails = ({ abbreviation }: { abbreviation: string }) => {
       {team && !isEdit && (
         <div className="relative w-full max-w-5xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all duration-300 ease-in-out dark:bg-gray-800">
           {/* Banner and Header Section */}
-          <div className="absolute top-2 right-2 z-50">
+          <div className="absolute top-4 right-4 z-20">
             {isOwner && (
               <abbr title="Edit team details">
                 <button
-                  className="cursor-pointer border-none shadow-xl"
+                  className="cursor-pointer rounded-full bg-black/40 p-2 text-white shadow-xl transition-colors hover:bg-black/60"
                   onClick={() => setIsEdit(true)}
                 >
-                  <PencilIcon size={20} className="text-white" />
+                  <PencilIcon size={20} />
                 </button>
               </abbr>
             )}
@@ -61,25 +62,24 @@ const TeamDetails = ({ abbreviation }: { abbreviation: string }) => {
             className="relative h-48 rounded-t-2xl bg-cover bg-center md:h-64"
             style={{ backgroundImage: `url(${team.banner})` }}
           >
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 flex items-end p-6">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 flex items-end p-4 md:p-6">
               <img
                 src={team.logo}
                 alt={`${team.name} Logo`}
-                className="aspect-square w-20 rounded-full border-4 border-blue-500 bg-white object-cover p-2 shadow-lg md:h-28 md:w-28 dark:border-blue-400"
+                className="aspect-square w-24 rounded-full border-4 border-blue-500 bg-white object-cover shadow-lg md:h-32 md:w-32 dark:border-blue-400"
               />
-              <div>
-                <h1 className="primary-heading text-3xl font-extrabold drop-shadow-lg text-shadow-lg md:text-5xl">
+              <div className="ml-4">
+                <h1 className="text-3xl font-extrabold text-white drop-shadow-lg md:text-5xl">
                   {team.name}
                 </h1>
                 <p className="mt-1 text-sm text-gray-200 md:text-base">
-                  {typeof team.owner != "string" && `${team.owner?.name} - `}
-                  Est. {formatDate(new Date(team.createdAt), "MM/dd/yyyy")}
+                  {typeof team.owner !== "string" && team.owner?.name} - Est.{" "}
+                  {formatDate(new Date(team.createdAt), "MMMM d, yyyy")}
                 </p>
               </div>
             </div>
           </div>
-
           {/* Main Content Area */}
           <div className="relative grid grid-cols-1 gap-8 p-6 md:grid-cols-3 md:p-8">
             {/* Requests */}
