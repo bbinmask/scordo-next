@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { mockTeams as teams } from "@/constants";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
+import TeamCard from "../_components/TeamCard";
 const SearchPage = () => {
   const data = teams;
 
@@ -18,20 +19,16 @@ const SearchPage = () => {
           <Input required placeholder="Search for a team" className="py-6 text-lg" />
           <Button
             type="submit"
-            className="bg-main hover:bg-hover active:bg-hover/70 absolute right-0 py-6 text-white dark:brightness-125"
+            className="primary-btn absolute right-0 aspect-square py-6 text-white dark:brightness-125"
           >
-            <Search className="" />
+            <Search />
           </Button>
         </div>
         <div className="center flex flex-col">
           {data.length === 0 ? (
             <NotFoundParagraph description="No teams found" />
           ) : (
-            data.map((team) => (
-              <div className="" key={team.id}>
-                {team.name}
-              </div>
-            ))
+            data.map((team) => <TeamCard key={team.id} team={team} />)
           )}
         </div>
       </div>

@@ -135,8 +135,10 @@ export const useTeamRequest = (team: TeamProps, user: { id: string }) => {
 
   const joinTeam = () =>
     runRequest(() => fetchData(`/teams/join-request/${team.abbreviation}`, "POST"));
+
   const withdrawJoinRequest = () =>
     runRequest(() => fetchData(`/teams/withdraw-request/${team.abbreviation}`, "POST"));
+
   const leaveTeam = () =>
     runRequest(() => fetchData(`/teams/leave-team/${team.abbreviation}`, "POST"));
 

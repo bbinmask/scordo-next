@@ -1,3 +1,5 @@
+"use client";
+
 import { formatDate } from "date-fns";
 import {
   BuildingIcon,
@@ -12,28 +14,28 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import Requests from "./Requests";
+import Requests from "../_components/Requests";
 import { mockTeams as teams } from "@/constants";
-import { useTeamJoinRequest } from "@/hooks/requests";
+import { useHandleRequest } from "@/hooks/useTeam";
 import Spinner from "@/components/Spinner";
 import { notFound } from "next/navigation";
-import TeamForm from "./UpdateTeamForm";
+// import TeamForm from "./UpdateTeamForm";
 import { useIsTeamOwner, useTeam, useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
 
-const TeamDetails = ({ username }: { username: string }) => {
+const TeamDetails = ({ abbreviation }: { abbreviation: string }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const team = teams[0];
   const { getSingleTeam } = useTeam();
   const { isOwner } = useIsTeamOwner(team, user);
 
-  const { joinTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
+  const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
   useEffect(() => {
-    getSingleTeam(username);
-  }, [username]);
+    getSingleTeam(abbreviation);
+  }, [abbreviation]);
 
   return (
     <div className="font-inter relative flex min-h-screen items-center justify-center p-4">
@@ -85,7 +87,7 @@ const TeamDetails = ({ username }: { username: string }) => {
             <div className="absolute top-6 right-6 z-50">
               {isOwner ? (
                 <abbr title="Team join requests">
-                  <Requests team={team} setTeam={setTeam} />
+                  <Requests data={team} />
                 </abbr>
               ) : (
                 <button
@@ -104,7 +106,7 @@ const TeamDetails = ({ username }: { username: string }) => {
                     if (isAlreadyInTeam) {
                       leaveTeam();
                     } else if (isAlreadyRequested) {
-                      withdrawRequest();
+                      withdrawJoinRequest();
                     } else {
                       joinTeam();
                     }
@@ -135,15 +137,18 @@ const TeamDetails = ({ username }: { username: string }) => {
                 <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                   <li className="flex items-center">
                     <MapPinIcon className="mr-2 h-5 w-5 text-blue-500" />{" "}
-                    {`${team.address.city}, ${team.address.state}(${team.address.country})`}
+                    {/* {`${team.address.city}, ${team.address.state}(${team.address.country})`} */}
+                    No address found.
                   </li>
                   <li className="flex items-center">
                     <BuildingIcon className="mr-2 h-5 w-5 text-blue-500" />{" "}
-                    {team.teamType.charAt(0).toUpperCase() + team.teamType.slice(1)} Team
+                    {team.type.charAt(0).toUpperCase() + team.type.slice(1)} Team
                   </li>
                   <li className="flex items-center">
                     <UserIcon className="mr-2 h-5 w-5 text-blue-500" /> Captain:{" "}
-                    <span className="ml-1 font-medium">{team.captain.name}</span>
+                    <span className="ml-1 font-medium">
+                      {typeof team.captain !== "string" && team.captain.name}
+                    </span>
                   </li>
                   <li className="flex items-center">
                     <SparklesIcon className="mr-2 h-5 w-5 text-blue-500" /> Owner:
@@ -179,15 +184,10 @@ const TeamDetails = ({ username }: { username: string }) => {
                 <div className="flex justify-around text-center">
                   <div>
                     <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
-                      {team.follower.length}
+                      {/* {team.followers.length} */}
+                      12000
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Followers</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
-                      {team.following.length}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Following</p>
                   </div>
                 </div>
               </div>
@@ -231,8 +231,8 @@ const TeamDetails = ({ username }: { username: string }) => {
                   </span>
                   Season Statistics
                 </h2>
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {team.matchHistory.map((stat, index) => (
+                {/* <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  {team.matches.map((stat, index) => (
                     <div
                       key={index}
                       className="transform rounded-xl bg-gray-100 p-4 text-center shadow-sm transition-transform duration-200 hover:scale-105 dark:bg-gray-600"
@@ -241,7 +241,7 @@ const TeamDetails = ({ username }: { username: string }) => {
                       <p className="text-sm text-gray-600 dark:text-gray-400">{stat}</p>
                     </div>
                   ))}
-                </div>
+                </div> */}
               </section>
 
               {/* Players Section */}
@@ -301,7 +301,7 @@ const TeamDetails = ({ username }: { username: string }) => {
                   </span>
                   Recent Matches
                 </h2>
-                <ul className="space-y-2">
+                {/* <ul className="space-y-2">
                   {team.matchHistory.map((match, index) => (
                     <li
                       key={index}
@@ -313,14 +313,14 @@ const TeamDetails = ({ username }: { username: string }) => {
                       {match}
                     </li>
                   ))}
-                </ul>
+                </ul> */}
               </section>
             </div>
           </div>
         </div>
       )}
 
-      {isEdit && team && team && <TeamForm setEdit={setIsEdit} team={team}></TeamForm>}
+      {/* {isEdit && team && team && <TeamForm setEdit={setIsEdit} team={team}></TeamForm>} */}
     </div>
   );
 };
