@@ -12,7 +12,7 @@ const NavbarDropdown = ({ data }: NavbarDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar>
+        <Avatar className="shadow">
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>
             <img src="/user.svg" alt="User" />

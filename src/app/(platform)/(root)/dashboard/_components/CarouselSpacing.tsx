@@ -57,7 +57,7 @@ export function CarouselSpacing({
 
   return (
     <div className="relative lg:px-4">
-      {/* Scroll Buttons */}
+      {/* Scroll primary-btn */}
       {matches.length > 3 && (
         <>
           <button

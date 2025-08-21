@@ -47,7 +47,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="primary-background fixed top-0 z-[999] grid min-h-16 w-full items-center rounded-b-md px-2 py-2 shadow-lg shadow-black/60">
+    <div className="primary-background fixed top-0 z-[999] grid min-h-16 w-full items-center px-2 py-2 shadow-lg shadow-black/60">
       <div className="flex w-full items-center">
         <div className="flex w-full items-center justify-between">
           <Link
@@ -57,10 +57,10 @@ const Navbar = () => {
             Scordo
           </Link>
           <div className="flex items-center gap-4">
-            <Button onClick={handleDarkMode} className="buttons cursor-pointer rounded-full">
+            <Button onClick={handleDarkMode} className="primary-btn cursor-pointer rounded-full">
               {isDarkMode ? <Moon /> : <Sun />}
             </Button>
-            <Button type="button" className="buttons cursor-pointer rounded-full">
+            <Button type="button" className="primary-btn cursor-pointer rounded-full">
               <Bell className="text-3xl" />
             </Button>
             <NavbarDropdown data={user} />

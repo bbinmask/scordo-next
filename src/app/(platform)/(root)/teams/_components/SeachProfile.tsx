@@ -123,7 +123,7 @@ const SearchProfile = ({ username }: { username: string }) => {
                           <Follow userInfo={userInfo} username={username} />
                           <div className="w-full">
                             <button
-                              className="buttons btn-outline-primary flex items-center gap-2 border-1 border-blue-600 px-3 text-blue-600 hover:bg-blue-600 hover:text-white active:bg-blue-600 active:text-white"
+                              className="primary-btn btn-outline-primary flex items-center gap-2 border-1 border-blue-600 px-3 text-blue-600 hover:bg-blue-600 hover:text-white active:bg-blue-600 active:text-white"
                               onClick={handleFriendRequest}
                             >
                               {isFriend ? "Friend" : isRequested ? "Requested" : "Add"}
