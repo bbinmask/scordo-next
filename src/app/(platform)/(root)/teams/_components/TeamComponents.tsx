@@ -13,21 +13,10 @@ import { useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
 
 export function TeamsList({ teams }: { teams: TeamProps[] }) {
-  // const [teams, setTeams] = useState<TeamProps[]>([]);
-  // const { fetchTeams } = useTeam();
-
-  // useEffect(() => {
-  //   const getTeams = async () => {
-  //     const data = await fetchTeams();
-  //     if (data) setTeams(data);
-  //   };
-  //   getTeams();
-  // }, [fetchTeams]);
-
   if (!teams) return notFound();
 
   return (
-    <div className="md: grid w-full gap-4 rounded-lg px-2 py-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid w-full gap-4 rounded-lg px-2 py-4 md:grid-cols-2 xl:grid-cols-3">
       {teams.length !== 0 && teams.map((team) => <TeamCard key={team.id} team={team} />)}
     </div>
   );
@@ -68,11 +57,14 @@ export const TeamCard = ({ team }: { team: TeamProps }) => {
         {/* Team Details */}
         <div className="flex-grow px-4 text-center">
           <div>
-            <h3 className="mb-1 text-2xl font-black text-gray-50 hover:text-blue-400 hover:underline dark:text-gray-200">
+            <abbr
+              title={team.description || team.name}
+              className="mb-1 overflow-x-clip text-2xl font-black text-nowrap text-gray-50 no-underline hover:text-blue-400 md:text-xl dark:text-gray-200"
+            >
               {team.name}
-            </h3>
+            </abbr>
           </div>
-          {/* <p className="mb-3 text-sm text-gray-300">{team.description}</p> */}
+          {team.description && <p className="mb-3 text-sm text-gray-300">{team.description}</p>}
           <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm text-gray-50">
             <p className="flex items-center">
               <Users className="mr-2 h-4 w-4 text-purple-400" />{" "}

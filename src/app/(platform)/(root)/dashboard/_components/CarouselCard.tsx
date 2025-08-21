@@ -16,7 +16,7 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
         className="block"
       >
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h2 className="primary-text font-[cal_sans] text-lg font-bold tracking-wide">
+          <h2 className="primary-heading font-[cal_sans] text-lg font-bold tracking-wide">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
@@ -54,7 +54,7 @@ export const UpcomingMatchCard = ({ className, match }: { className?: string; ma
           Indian Premier League 2025
         </Link>
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h2 className="primary-text font-[cal_sans] text-lg font-bold tracking-wide">
+          <h2 className="primary-heading font-[cal_sans] text-lg font-bold tracking-wide">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
