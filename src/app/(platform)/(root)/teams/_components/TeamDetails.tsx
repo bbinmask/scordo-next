@@ -38,11 +38,11 @@ const TeamDetails = ({ abbreviation }: { abbreviation: string }) => {
   }, [abbreviation]);
 
   return (
-    <div className="font-inter relative flex min-h-screen items-center justify-center p-4">
+    <div className="font-inter relative flex min-h-screen items-center justify-center">
       {!team && isLoading ? <Spinner /> : !team && !isLoading && notFound()}
 
       {team && !isEdit && (
-        <div className="bg-light_dark relative w-full max-w-5xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all duration-300 ease-in-out">
+        <div className="relative w-full max-w-5xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all duration-300 ease-in-out dark:bg-gray-800">
           {/* Banner and Header Section */}
           <div className="absolute top-2 right-2 z-50">
             {isOwner && (
@@ -66,15 +66,15 @@ const TeamDetails = ({ abbreviation }: { abbreviation: string }) => {
               <img
                 src={team.logo}
                 alt={`${team.name} Logo`}
-                className="mr-4 -mb-5 h-20 w-20 rounded-full border-4 border-blue-500 object-cover shadow-lg md:h-28 md:w-28 dark:border-blue-400"
+                className="aspect-square w-20 rounded-full border-4 border-blue-500 bg-white object-cover p-2 shadow-lg md:h-28 md:w-28 dark:border-blue-400"
               />
               <div>
-                <h1 className="text-3xl font-extrabold text-white drop-shadow-lg text-shadow-lg md:text-5xl">
+                <h1 className="primary-heading text-3xl font-extrabold drop-shadow-lg text-shadow-lg md:text-5xl">
                   {team.name}
                 </h1>
                 <p className="mt-1 text-sm text-gray-200 md:text-base">
                   {typeof team.owner != "string" && `${team.owner?.name} - `}
-                  Est. {formatDate(new Date(team.createdAt), "MM-DD-YYYY")}
+                  Est. {formatDate(new Date(team.createdAt), "MM/dd/yyyy")}
                 </p>
               </div>
             </div>
@@ -84,14 +84,14 @@ const TeamDetails = ({ abbreviation }: { abbreviation: string }) => {
           <div className="relative grid grid-cols-1 gap-8 p-6 md:grid-cols-3 md:p-8">
             {/* Requests */}
 
-            <div className="absolute top-6 right-6 z-50">
+            <div className="absolute top-8 right-8 z-50">
               {isOwner ? (
                 <abbr title="Team join requests">
                   <Requests data={team} />
                 </abbr>
               ) : (
                 <button
-                  className={`font-urbanist cursor-pointer rounded-lg border-none px-3 py-2 font-bold ${loading && "cursor-not-allowed opacity-50"} ${isAlreadyRequested ? "bg-gray-300 text-gray-800" : "bg-prime hover:bg-hover active:bg-active text-white"}`}
+                  className={`cursor-pointer rounded-lg border-none px-3 py-2 font-bold ${loading && "cursor-not-allowed opacity-50"} ${isAlreadyRequested ? "bg-gray-300 text-gray-800" : "nline-flex items-center rounded-full border-none bg-green-100 px-3 py-1 text-sm font-semibold text-green-800 dark:bg-green-800 dark:text-green-200"}`}
                   onClick={() => {
                     const confirm = window.confirm(
                       isAlreadyInTeam
