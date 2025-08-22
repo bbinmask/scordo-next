@@ -13,7 +13,7 @@ const RouteNavigations = ({ navLinks }: { navLinks: any }) => {
         <Link
           href={link.path || "#"}
           key={index}
-          className={`center relative min-w-12 transform gap-2 rounded-full px-0 py-2 shadow-xl transition-all duration-500 ease-in-out hover:scale-105 md:px-5 ${
+          className={`center relative min-w-12 transform gap-2 rounded-full px-0 py-2 shadow-xl transition-all duration-500 ease-in-out hover:scale-95 md:px-5 ${
             pathname === link.path
               ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 text-white shadow-emerald-500/50 dark:shadow-emerald-800/50"
               : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-800 dark:text-lime-300 dark:hover:bg-emerald-700"

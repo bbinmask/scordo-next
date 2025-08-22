@@ -15,7 +15,7 @@ const Menu = ({ navLinks }: { navLinks: any }) => {
   };
 
   return (
-    <div className="absolute top-0 right-0 flex items-start">
+    <div className="absolute top-0 right-0 flex items-start py-1">
       {/* Main Navigation Bar */}
       <nav
         id="mainNavbar"

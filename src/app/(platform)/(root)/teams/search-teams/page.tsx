@@ -10,8 +10,8 @@ const SearchPage = () => {
   const data = teams;
 
   return (
-    <div className="mt-10 flex w-full flex-col gap-4">
-      <div className="bg-background h-full w-full rounded-md px-2 py-4">
+    <div className="container-bg mt-10 flex w-full flex-col gap-4 rounded-xl px-4">
+      <div className="h-full w-full rounded-md px-2 py-4">
         <h1 className="text-main dark:text-hover mb-8 w-full text-center font-[cal_sans] text-2xl font-black">
           Search Teams
         </h1>
@@ -19,9 +19,9 @@ const SearchPage = () => {
           <Input required placeholder="Search for a team" className="py-6 text-lg" />
           <Button
             type="submit"
-            className="primary-btn absolute right-0 aspect-square py-6 text-white dark:brightness-125"
+            className="bg-main hover:bg-hover active:bg-active absolute right-0 aspect-square cursor-pointer rounded-lg py-6 dark:brightness-125"
           >
-            <Search />
+            <Search className="text-white dark:text-lime-400" />
           </Button>
         </div>
         <div className="center flex flex-col">

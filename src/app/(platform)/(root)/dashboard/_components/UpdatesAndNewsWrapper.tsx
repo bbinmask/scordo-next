@@ -14,7 +14,7 @@ const UpdatesAndNewsWrapper = () => {
   ];
 
   return (
-    <div className="rounded-xl bg-white p-4 shadow-md sm:p-6 dark:bg-gray-800/50">
+    <div className="container-bg rounded-xl p-4 shadow-md sm:p-6">
       <div className="mb-6 flex justify-center border-b border-gray-200 sm:justify-start dark:border-gray-700">
         {contentTabs.map((tab) => (
           <button

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { user } from "@/constants";
 import NavbarDropdown from "./NavbarDropdown";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navLinks = [
   {
@@ -40,11 +40,23 @@ const navLinks = [
   },
 ];
 const Navbar = () => {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [theme, setTheme] = useState<"light" | "dark">();
   const handleDarkMode = () => {
-    const mode = document.querySelector("html")?.classList.toggle("dark") as boolean;
-    setIsDarkMode(mode);
+    const mode = document.querySelector("html")?.classList.toggle("dark");
+    localStorage.setItem("theme", mode ? "dark" : "light");
+    setTheme(mode ? "dark" : "light");
   };
+
+  useEffect(() => {
+    const currentTheme = localStorage.getItem("theme") as "dark" | "light" | null;
+    if (!currentTheme) return;
+
+    setTheme(currentTheme);
+
+    if (currentTheme === "dark") {
+      document.querySelector("html")?.classList.add(currentTheme);
+    }
+  }, []);
 
   return (
     <div className="primary-background fixed top-0 z-[999] grid min-h-16 w-full items-center px-2 py-2 shadow-lg shadow-black/60">
@@ -58,7 +70,7 @@ const Navbar = () => {
           </Link>
           <div className="flex items-center gap-4">
             <Button onClick={handleDarkMode} className="primary-btn cursor-pointer rounded-full">
-              {isDarkMode ? <Moon /> : <Sun />}
+              {theme ? <Moon /> : <Sun />}
             </Button>
             <Button type="button" className="primary-btn cursor-pointer rounded-full">
               <Bell className="text-3xl" />

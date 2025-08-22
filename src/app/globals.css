@@ -166,6 +166,10 @@ body {
   @apply bg-emerald-600 dark:bg-emerald-950;
 }
 
+.container-bg {
+  @apply bg-gray-50 dark:bg-gray-800/50;
+}
+
 .primary-btn {
   @apply transform bg-emerald-600 text-white shadow-md transition-all duration-300 ease-in-out hover:scale-110 focus:ring-4 focus:ring-emerald-400 focus:outline-none dark:bg-gray-700 dark:text-lime-300 dark:focus:ring-green-500;
 }
@@ -176,4 +180,38 @@ body {
 
 .hide_scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Toggle Button CSS */
+
+.switch {
+  @apply relative h-[30px] w-[52px] rounded-full border-gray-600 p-0 shadow-inner shadow-gray-800 transition-all duration-300 ease-in-out dark:border;
+}
+
+.switch input {
+  @apply opacity-0;
+}
+
+.slider {
+  @apply absolute right-0 bottom-0 left-0 z-10 cursor-pointer bg-white duration-500;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  border-radius: 100%;
+  aspect-ratio: 1;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  @apply shadow-md shadow-gray-400;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(22px);
+  -ms-transform: translateX(22px);
+  transform: translateX(22px);
 }

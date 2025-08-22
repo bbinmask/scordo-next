@@ -1,16 +1,18 @@
 import Bottombar from "./_components/Bottombar";
 import Navbar from "./_components/Navbar";
-
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+import QueryProvider from "@/components/providers/QueryProvider";
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="">
-      <nav className="mb-24">
-        <Navbar />
-      </nav>
-      <div className="pb-[86px]">{children}</div>
-      <Bottombar />
-    </div>
+    <QueryProvider>
+      <div className="">
+        <nav className="mb-24">
+          <Navbar />
+        </nav>
+        <div className="pb-[86px]">{children}</div>
+        <Bottombar />
+      </div>
+    </QueryProvider>
   );
 };
 
-export default DashboardLayout;
+export default RootLayout;
