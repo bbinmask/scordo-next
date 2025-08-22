@@ -49,7 +49,7 @@ const DashboardPage = () => {
               Dashboard
             </span>
           </h2>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">
+          <p className="mt-2 font-[poppins] text-gray-500 dark:text-gray-400">
             Manage your teams and track your performance.
           </p>
         </div>
@@ -67,7 +67,7 @@ const DashboardPage = () => {
         </div>
 
         <div className="mb-6 text-center md:text-left">
-          <h2 className="text-4xl font-extrabold text-gray-800 dark:text-white">
+          <h2 className="font-[poppins] text-4xl font-extrabold text-gray-800 dark:text-white">
             <span className="bg-gradient-to-r from-green-600 to-teal-500 bg-clip-text text-transparent">
               Featured
             </span>

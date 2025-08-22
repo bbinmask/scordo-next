@@ -89,7 +89,7 @@ export function CarouselSpacing({
               <LiveMatchCard
                 key={i}
                 match={match}
-                className="mb-1 w-72 flex-shrink-0 transform rounded-xl border border-gray-200 bg-white p-4 shadow-md transition-transform duration-300 hover:scale-95 dark:border-gray-700 dark:bg-gray-800"
+                className="mb-1 w-72 flex-shrink-0 transform rounded-xl bg-white p-4 shadow-md transition-transform duration-300 hover:scale-95 dark:bg-gray-800"
               />
             ))}
           {status === "Upcoming" &&
@@ -97,7 +97,7 @@ export function CarouselSpacing({
               <UpcomingMatchCard
                 key={i}
                 match={match}
-                className="mb-1 w-72 flex-shrink-0 transform rounded-xl border border-gray-200 bg-white p-4 shadow-md transition-transform duration-300 hover:scale-95 dark:border-gray-700 dark:bg-gray-800"
+                className="mb-1 w-72 flex-shrink-0 transform rounded-xl bg-white p-4 shadow-md transition-transform duration-300 hover:scale-95 dark:bg-gray-800"
               />
             ))}
         </div>
