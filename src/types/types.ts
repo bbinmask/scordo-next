@@ -189,6 +189,7 @@ export interface IUser {
       match: string;
     },
   ];
+
   teams: string[];
   friends: string[];
   password: string;
