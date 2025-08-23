@@ -14,6 +14,188 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enums
+
+enum Role {
+  player
+  fan
+  admin
+}
+
+enum Gender {
+    male
+    female
+    other
+}
+
+
+enum Availability {
+  available
+  injured
+  on_break
+}
+
+
+enum MatchCategory {
+  T10
+  T20
+  ODI
+  Test
+  others
+}
+
+enum AuthProvider {
+  email
+  google
+  facebook
+  github
+}
+
 model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String   @unique
+  isVerified   Boolean  @default(false)
+  username     String   @unique
+  phone        String
+  password     String
+  profile      String
+  bio          String?
+  gender       Gender
+  role         Role
+  availability Availability
+  dob          DateTime
+  isBanned     Boolean  @default(false)
+  isOnline     Boolean  @default(false)
+  lastLoginAt  DateTime?
+
+  // Relations
+  matches      Match[]
+  teams        String[] // store team ids
+  friends      String[] // store friend ids
+  channels     String[]
+  notifications String[]
+  tournaments  String[]
+
+  // Auth
+  refreshToken String?
+  authProvider AuthProvider? 
+  providerId   String?
+
+  // Gamification
+  points       Int      @default(0)
+  reputation   Int      @default(0)
+
+  referralCode String?  @unique
+  referredBy   String?
+
+  // Extras
+  permissionsId Int?
+  permissions   Permissions? @relation(fields: [permissionsId], references: [id])
+
+  contactId    Int?
+  contact      Contact?      @relation(fields: [contactId], references: [id])
+
+  kycId        Int?
+  kyc          KYC?          @relation(fields: [kycId], references: [id])
+
+  notificationPreferencesId Int?
+  notificationPreferences   NotificationPreferences? @relation(fields: [notificationPreferencesId], references: [id])
+
+  socialLinksId Int?
+  socialLinks   SocialLinks? @relation(fields: [socialLinksId], references: [id])
+
+  tags         String[]
+
+  // Location & Address
+  location     Location? @relation(fields: [locationid], references: [id])
+locationid Int?
+  address      Address? @relation(fields: [addressid], references: [id])
+addressid Int?
+}
+
+model Match {
+  id       String   @id @default(auto()) @db.ObjectId @map("_id")
+  runs     Int
+  catches  Int
+  wickets  Int
+  runOuts  Int
+  category MatchCategory
+  match    String
+  userId   String   @db.ObjectId
+  user     User     @relation(fields: [userId], references: [id])
+}
+
+
+
+model TournamentRequest {
+  id      String    @id @default(auto()) @db.ObjectId
+  to String @unique @db.ObjectId
+  from String @unique @db.ObjectId
+}
+
+model TeamRequest {
+  id    String    @id @default(auto()) @db.ObjectId
+  team  String
+  sender String
+}
+
+model Location {
+  id          Int      @id @default(autoincrement())
+  type        String
+  coordinates Float[]
+
+  User User[]
+}
+
+model Address {
+  id      Int    @id @default(autoincrement())
+  city    String
+  state   String
+  country String
+
+  User User[]
+}
+
+// Supporting models (skeletons, you can expand)
+model Permissions {
+  id   Int    @id @default(autoincrement())
+  role String
+
+  User User[]
+}
+
+model Contact {
+  id    Int    @id @default(autoincrement())
+  phone String?
+  email String?
+
+  User User[]
+}
+
+model KYC {
+  id       Int    @id @default(autoincrement())
+  document String?
+  status   String?
+
+  User User[]
+}
+
+model NotificationPreferences {
+  id       Int    @id @default(autoincrement())
+  email    Boolean @default(true)
+  sms      Boolean @default(false)
+  push     Boolean @default(true)
+
+  User User[]
+}
+
+model SocialLinks {
+  id      Int    @id @default(autoincrement())
+  twitter String?
+  github  String?
+  facebook String?
+  linkedin String?
+
+  User User[]
 }
