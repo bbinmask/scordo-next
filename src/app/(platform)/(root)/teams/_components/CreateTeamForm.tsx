@@ -140,7 +140,7 @@ const CreateTeamForm: React.FC = () => {
             {...register("logo", {
               onChange: (e) => handleFileChange(e, "logo"),
             })}
-            className="block w-[calc(100%-2rem)] text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-100 file:px-4 file:text-blue-700 hover:file:bg-blue-200"
+            className="block w-[calc(100%-2rem)] text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
           />
           {logoFileName && (
             <div>
@@ -159,7 +159,7 @@ const CreateTeamForm: React.FC = () => {
             {...register("banner", {
               onChange: (e) => handleFileChange(e, "banner"),
             })}
-            className="block w-[calc(100%-2rem)] text-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-100 file:px-4 file:text-blue-700 hover:file:bg-blue-200"
+            className="block w-[calc(100%-2rem)] text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
           />
           {bannerFileName && (
             <img src={URL.createObjectURL(banner[0])} alt="" className="w-20 object-cover" />
@@ -176,7 +176,7 @@ const CreateTeamForm: React.FC = () => {
             id="type"
             {...register("type", { required: "Select a team type" })}
             defaultValue={"local"}
-            className="w-[calc(100%-2rem)] rounded-md border border-gray-300 bg-white p-2 font-semibold text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-100"
+            className="w-[calc(100%-2rem)] rounded-md border border-gray-300 bg-white p-2 font-semibold text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-100"
           >
             <option value="local">Local</option>
             <option value="college">College</option>
@@ -237,7 +237,7 @@ const CreateTeamForm: React.FC = () => {
           <Input
             type="checkbox"
             {...register("isRecruiting")}
-            className="relative z-20 h-full w-full rounded border-gray-300 text-blue-600"
+            className="relative z-20 h-full w-full rounded border-gray-300 text-emerald-600"
           />
           <div className="slider" />
         </div>
@@ -248,7 +248,7 @@ const CreateTeamForm: React.FC = () => {
         variant={"default"}
         type="submit"
         disabled={loading}
-        className={`font-urbanist relative w-full rounded-md border-none bg-blue-600 px-6 py-3 tracking-wide text-white outline-none hover:bg-blue-700 focus:ring-1 focus:ring-blue-500 ${loading && "text-opacity-70"}`}
+        className={`font-urbanist relative w-full rounded-md border-none bg-emerald-600 px-6 py-3 tracking-wide text-white outline-none hover:bg-emerald-700 focus:ring-1 focus:ring-emerald-500 ${loading && "text-opacity-70"}`}
       >
         Create Team
         {loading && <CgSpinner className="absolute animate-spin text-white" />}
