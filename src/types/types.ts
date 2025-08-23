@@ -96,11 +96,6 @@ interface NotificationPreferences {
   email: boolean;
 }
 
-interface Contact {
-  address?: string;
-  whatsapp?: string;
-}
-
 export interface IBattingStats {
   matches: number;
   innings: number;
@@ -227,8 +222,6 @@ export interface IUser {
 
   referralCode?: string;
   referredBy?: string;
-
-  contact?: Contact;
 
   kyc?: KYC;
   notificationPreferences: NotificationPreferences;

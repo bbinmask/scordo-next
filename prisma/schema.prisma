@@ -57,7 +57,7 @@ model User {
   email        String   @unique
   isVerified   Boolean  @default(false)
   username     String   @unique
-  phone        String
+  contact        String
   password     String
   profile      String
   bio          String?
@@ -91,10 +91,8 @@ model User {
 
   // Extras
   permissionsId Int?
-  permissions   Permissions? @relation(fields: [permissionsId], references: [id])
 
   contactId    Int?
-  contact      Contact?      @relation(fields: [contactId], references: [id])
 
   kycId        Int?
   kyc          KYC?          @relation(fields: [kycId], references: [id])
@@ -129,19 +127,19 @@ model Match {
 
 
 model TournamentRequest {
-  id      String    @id @default(auto()) @db.ObjectId
+  id      String    @id @default(auto()) @db.ObjectId @map("_id")
   to String @unique @db.ObjectId
   from String @unique @db.ObjectId
 }
 
 model TeamRequest {
-  id    String    @id @default(auto()) @db.ObjectId
+  id    String    @id @default(auto()) @db.ObjectId @map("_id")
   team  String
   sender String
 }
 
 model Location {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(auto()) @db.ObjectId @map("_id")
   type        String
   coordinates Float[]
 
@@ -149,7 +147,7 @@ model Location {
 }
 
 model Address {
-  id      Int    @id @default(autoincrement())
+  id     String      @id @default(auto()) @db.ObjectId @map("_id")
   city    String
   state   String
   country String
@@ -157,24 +155,9 @@ model Address {
   User User[]
 }
 
-// Supporting models (skeletons, you can expand)
-model Permissions {
-  id   Int    @id @default(autoincrement())
-  role String
-
-  User User[]
-}
-
-model Contact {
-  id    Int    @id @default(autoincrement())
-  phone String?
-  email String?
-
-  User User[]
-}
 
 model KYC {
-  id       Int    @id @default(autoincrement())
+  id      String      @id @default(auto()) @db.ObjectId @map("_id")
   document String?
   status   String?
 
@@ -182,7 +165,7 @@ model KYC {
 }
 
 model NotificationPreferences {
-  id       Int    @id @default(autoincrement())
+  id       String      @id @default(auto()) @db.ObjectId @map("_id")
   email    Boolean @default(true)
   sms      Boolean @default(false)
   push     Boolean @default(true)
@@ -191,7 +174,7 @@ model NotificationPreferences {
 }
 
 model SocialLinks {
-  id      Int    @id @default(autoincrement())
+  id      String      @id @default(auto()) @db.ObjectId @map("_id")
   twitter String?
   github  String?
   facebook String?
