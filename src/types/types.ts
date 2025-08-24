@@ -131,7 +131,6 @@ export interface IUserStats {
   batting: IBattingStats;
   bowling: IBowlingStats;
   fielding: IFieldingStats;
-
   matchesPlayed: number;
   totalRuns: number;
   highestScore: number;
@@ -143,12 +142,11 @@ export interface IUserStats {
   playerOfTheMatch: number;
   recentForm: string[];
   totalWickets: number;
-  bestBowling: string; // e.g. "5/27"
+  bestBowling: string;
   economy: number;
   bowlingAverage: number;
   oversBowled: number;
   runsConceded: number;
-
   catches: number;
   runOuts: number;
 }
