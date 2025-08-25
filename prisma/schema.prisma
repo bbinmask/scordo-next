@@ -49,6 +49,12 @@ enum AuthProvider {
   github
 }
 
+enum RequestStatus {
+  pending
+  accepted
+  rejected
+}
+
 // Embedded type 
 
 type Address {
@@ -110,48 +116,72 @@ model Team {
 }
 
 model TournamentRequest {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  to        String   @unique @db.ObjectId
-  from      String   @unique @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  to        String     @unique @db.ObjectId
+  from      String     @unique @db.ObjectId
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  reqId     String     @db.ObjectId
+  requests  Tournament @relation(fields: [reqId], references: [id])
 }
 
 model TeamRequest {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  to        String   @unique @db.ObjectId
-  from      String   @unique @db.ObjectId
-  teamId    String   @unique @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  team      Team     @relation(fields: [teamId], references: [id])
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  to        String        @unique @db.ObjectId
+  from      String        @unique @db.ObjectId
+  status    RequestStatus
+  teamId    String        @unique @db.ObjectId
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  team      Team          @relation(fields: [teamId], references: [id])
 }
 
 model Match {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  teamA          String        @db.ObjectId
-  teamB          String        @db.ObjectId
-  teamAPlayingXI String[]      @db.ObjectId
-  teamBPlayingXI String[]      @db.ObjectId
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  teamA          String   @db.ObjectId
+  teamB          String   @db.ObjectId
+  teamAPlayingXI String[] @db.ObjectId
+  teamBPlayingXI String[] @db.ObjectId
   overs          Int
-  status         String
-  venue          Address
-  uid            String        @default(uuid())
-  tossWinner     String?
-  tossDecision   String?
-  category       MatchCategory @default(others)
-  date           DateTime?
-  location       String?
-  innings        String[]      @db.ObjectId
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  inning1        Inning   @relation("Inning1", fields: [inningId], references: [id])
+  inning2        Inning   @relation("Inning2", fields: [inningId], references: [id])
+  inning3        Inning?  @relation("Inning3")
+  inning4        Inning?  @relation("Inning4")
+
+  superOvers String[] @db.ObjectId
+
+  status       String
+  venue        Address
+  uid          String        @default(uuid())
+  tossWinner   String?
+  tossDecision String?
+  category     MatchCategory @default(others)
+  date         DateTime?
+  location     String?
+  innings      String[]      @db.ObjectId
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  inningId     String        @db.ObjectId
+  inningId     String        @db.ObjectId
 }
 
 model Tournament {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String   @unique
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  title       String              @unique
+  details     TournamentDetails
   description String?
+  requests    TournamentRequest[]
+  organizer   String              @db.ObjectId
   rules       String[]
   startDate   DateTime
   endDate     DateTime
+}
+
+model Inning {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  matchId String @unique @db.ObjectId
+  inning1 Match? @relation("Inning1", fields: [matchId], references: [id])
+  inning2 Match? @relation("Inning2", fields: [matchId], references: [id])
+  inning3 Match? @relation("Inning3", fields: [matchId], references: [id])
+  inning4 Match? @relation("Inning4", fields: [matchId], references: [id])
 }
