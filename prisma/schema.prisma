@@ -70,28 +70,25 @@ model UserFriend {
 }
 
 model User {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  email        String       @unique
-  isVerified   Boolean      @default(false)
-  username     String       @unique
+  email        String        @unique
+  isVerified   Boolean       @default(false)
+  username     String        @unique
   contact      String
   bio          String?
   gender       Gender
   role         Role
   availability Availability
   dob          DateTime
-
-  userFriends UserFriend[] @relation("UserUserFriends")
-  friendUsers UserFriend[] @relation("FriendUserFriends")
-
-  tournaments String[]
-  address     Address?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  userId      String   @db.ObjectId
-
-  MatchPlayer MatchPlayer[]
+  friends      UserFriend[]  @relation("UserUserFriends")
+  friendsOf    UserFriend[]  @relation("FriendUserFriends")
+  address      Address?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       String        @db.ObjectId
+  MatchPlayer  MatchPlayer[]
+  teamsOwned   Team[]
 }
 
 model Team {
@@ -104,6 +101,7 @@ model Team {
   category     MatchCategory
   match        String
   ownerId      String        @db.ObjectId
+  owner        User          @relation(fields: [ownerId], references: [id])
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   isRecruiting Boolean       @default(false)
