@@ -23,18 +23,16 @@ enum Role {
 }
 
 enum Gender {
-    male
-    female
-    other
+  male
+  female
+  other
 }
-
 
 enum Availability {
   available
   injured
   on_break
 }
-
 
 enum MatchCategory {
   T10
@@ -51,108 +49,119 @@ enum AuthProvider {
   github
 }
 
+// Embedded type 
+
+type Address {
+  city    String
+  state   String
+  country String
+}
+
+// Models
+
+model UserFriend {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId   String @db.ObjectId
+  friendId String @db.ObjectId
+
+  user   User @relation("UserUserFriends", fields: [userId], references: [id])
+  friend User @relation("FriendUserFriends", fields: [friendId], references: [id])
+}
+
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  email        String   @unique
-  isVerified   Boolean  @default(false)
-  username     String   @unique
-  contact        String
-  password     String
-  profile      String
+  email        String       @unique
+  isVerified   Boolean      @default(false)
+  username     String       @unique
+  contact      String
   bio          String?
   gender       Gender
   role         Role
   availability Availability
   dob          DateTime
-  friends      String[]
-  tournaments  String[]
-  addressId    String? @db.ObjectId @unique
-  address      Address? @relation(fields: [addressId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  userFriends UserFriend[] @relation("UserUserFriends")
+  friendUsers UserFriend[] @relation("FriendUserFriends")
+
+  tournaments String[]
+  address     Address?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String   @db.ObjectId
 
   MatchPlayer MatchPlayer[]
 }
 
 model Team {
-  id       String   @id @default(auto()) @db.ObjectId @map("_id")
-  name String
-  logo String
-  banner String
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  logo         String
+  banner       String
   abbreviation String
-  players String[] @unique
-  category MatchCategory
-  match    String
-  ownerId   String   @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isRecruiting Boolean @default(false)
-  captain String
-  joinRequests String[] @unique
+  players      String[]      @unique
+  category     MatchCategory
+  match        String
+  ownerId      String        @db.ObjectId
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  isRecruiting Boolean       @default(false)
+  captain      String
+  joinRequests String[]      @unique
 
   MatchTeam MatchTeam[]
 }
 
-
-
 model TournamentRequest {
-  id      String    @id @default(auto()) @db.ObjectId @map("_id")
-  to String @unique @db.ObjectId
-  from String @unique @db.ObjectId
-    createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  to        String   @unique @db.ObjectId
+  from      String   @unique @db.ObjectId
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model TeamRequest {
-  id     String   @id @default(auto()) @db.ObjectId @map("_id")
-  to String @unique @db.ObjectId
-  from String @unique @db.ObjectId
-  teamId String @unique @db.ObjectId
-    createdAt DateTime @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  to        String   @unique @db.ObjectId
+  from      String   @unique @db.ObjectId
+  teamId    String   @unique @db.ObjectId
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Address {
-  id      String   @id @default(auto()) @db.ObjectId @map("_id")
-  city    String
-  state   String
-  country String
-  user    User?
-}
-
 model Match {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  title         String
-  description   String?
-  date          DateTime
-  location      String?
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  date        DateTime
+  location    String?
 
-  tournamentId  String      @db.ObjectId
-  tournament    Tournament  @relation(fields: [tournamentId], references: [id])
+  tournamentId String     @db.ObjectId
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
 
-  teams         MatchTeam[]
+  teams MatchTeam[]
 
-  players       MatchPlayer[]
+  players MatchPlayer[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model MatchTeam {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  matchId  String   @db.ObjectId
-  teamId   String   @db.ObjectId
-  match    Match    @relation(fields: [matchId], references: [id])
-  team     Team     @relation(fields: [teamId], references: [id])
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  matchId String @db.ObjectId
+  teamId  String @db.ObjectId
+  match   Match  @relation(fields: [matchId], references: [id])
+  team    Team   @relation(fields: [teamId], references: [id])
 }
 
 model MatchPlayer {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  matchId  String   @db.ObjectId
-  playerId String   @db.ObjectId
-  match    Match    @relation(fields: [matchId], references: [id])
-  player   User     @relation(fields: [playerId], references: [id])
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  matchId  String @db.ObjectId
+  playerId String @db.ObjectId
+  match    Match  @relation(fields: [matchId], references: [id])
+  player   User   @relation(fields: [playerId], references: [id])
 }
 
 model Tournament {
