@@ -58,18 +58,6 @@ export interface IMatch {
   uid: string;
   tossWinner?: string;
   tossDecision?: string;
-  highlights: [
-    {
-      time: Date;
-      title: string;
-      description: string;
-      videoUrl: string;
-    },
-  ];
-  location: {
-    type: string;
-    coordinates: Number;
-  };
   category: "T10" | "T20" | "ODI" | "Test" | "others";
   umpires?: string[];
   matchReferee?: string;
