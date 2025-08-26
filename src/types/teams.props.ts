@@ -10,7 +10,7 @@ export default interface TeamProps {
   banner: string;
   logo: string;
   captain: string | UserProps;
-  type: "corporate" | "college";
+  teamType: "local" | "club" | "college" | "corporate" | "others";
   createdAt: Date;
   updatedAt: Date;
   isRecruiting: boolean;
