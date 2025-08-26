@@ -181,27 +181,24 @@ model TeamRequest {
 }
 
 model Match {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  teamA          String   @db.ObjectId
-  teamB          String   @db.ObjectId
-  teamAPlayingXI String[] @db.ObjectId
-  teamBPlayingXI String[] @db.ObjectId
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  teamA          String        @db.ObjectId
+  teamB          String        @db.ObjectId
+  teamAPlayingXI String[]      @db.ObjectId
+  teamBPlayingXI String[]      @db.ObjectId
   overs          Int
-
-  innings Inning[]
-
-  superOvers String[] @db.ObjectId
-
-  status       String
-  venue        Address
-  uid          String        @default(uuid())
-  tossWinner   String?
-  tossDecision String?
-  category     MatchCategory @default(others)
-  date         DateTime?
-  location     String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  innings        Inning[]
+  superOvers     String[]      @db.ObjectId
+  status         String
+  venue          Address
+  uid            String        @default(uuid())
+  tossWinner     String?
+  tossDecision   String?
+  category       MatchCategory @default(others)
+  date           DateTime?
+  location       String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model Inning {
