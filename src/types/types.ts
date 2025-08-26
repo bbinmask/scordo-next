@@ -345,3 +345,36 @@ export interface INotification {
   actionType: "join_request" | "invite_response" | "info" | "reminder";
   redirectUrl: string; // e.g. /teams/:id
 }
+
+// {
+//   id: null,
+//   playerDetails: {
+//     name: `Player 5`,
+//     position: "All-rounder",
+//     captain: false,
+//     wk: false,
+//   },
+//   batting: {
+//     out: false,
+//     playing: false,
+//     runs: 0,
+//     dots: 0,
+//     balls: 0,
+//     fours: 0,
+//     sixes: 0,
+//   },
+//   bowling: {
+//     playing: false,
+//     overs: 0,
+//     limit: 0,
+//     dots: 0,
+//     balls: 0,
+//     maidens: 0,
+//     runs: 0,
+//     wickets: 0,
+//   },
+//   fielding: {
+//     runOut: [{ name: null, id: null }],
+//     catchOut: [{ name: null, id: null }],
+//   },
+// },

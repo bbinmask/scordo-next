@@ -218,11 +218,6 @@ model Inning {
   currentNonStrikerId String? @db.ObjectId
   currentBowlerId     String? @db.ObjectId
 
-  // Relations
-  striker    Player? @relation("Striker", fields: [currentStrikerId], references: [id])
-  nonStriker Player? @relation("NonStriker", fields: [currentNonStrikerId], references: [id])
-  bowler     Player? @relation("Bowler", fields: [currentBowlerId], references: [id])
-
   ballsData Ball[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -230,8 +225,47 @@ model Inning {
   InningBatting InningBatting[]
 
   InningBowling InningBowling[]
+}
 
-  Delivery Delivery[]
+model Player {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  name   String
+  teamId String @db.ObjectId
+  team   Team   @relation(fields: [teamId], references: [id])
+
+  inningsBatting InningBatting[]
+  inningsBowling InningBowling[]
+}
+
+model InningBatting {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  inningId String  @db.ObjectId
+  inning   Inning  @relation(fields: [inningId], references: [id])
+  runs     Int     @default(0)
+  balls    Int     @default(0)
+  fours    Int     @default(0)
+  sixes    Int     @default(0)
+  isOut    Boolean @default(false)
+  dots     Int     @default(0)
+  playerId String  @db.ObjectId
+  player   Player  @relation(fields: [playerId], references: [id])
+}
+
+model InningBowling {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  inningId String @db.ObjectId
+  inning   Inning @relation(fields: [inningId], references: [id])
+  overs    Int    @default(0)
+  balls    Int    @default(0)
+  runs     Int    @default(0)
+  wickets  Int    @default(0)
+  maidens  Int    @default(0)
+  noBalls  Int    @default(0)
+  wides    Int    @default(0)
+
+  playerId String @db.ObjectId
+  player   Player @relation(fields: [playerId], references: [id])
 }
 
 model Ball {
@@ -245,85 +279,12 @@ model Ball {
   batsmanId String @db.ObjectId
   bowlerId  String @db.ObjectId
 
-  runs          Int     @default(0)
-  isWide        Boolean @default(false)
-  isNoBall      Boolean @default(false)
-  isBye         Boolean @default(false)
-  isLegBye      Boolean @default(false)
-  isWicket      Boolean @default(false)
-  dismissalType String? // e.g. "bowled", "caught", "run out"
-
-  createdAt DateTime @default(now())
-}
-
-model Player {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  name   String
-  teamId String @db.ObjectId
-  team   Team   @relation(fields: [teamId], references: [id])
-
-  inningsBatting   InningBatting[]
-  inningsBowling   InningBowling[]
-  deliveriesFaced  Delivery[]      @relation("BatterDeliveries")
-  deliveriesBowled Delivery[]      @relation("BowlerDeliveries")
-
-  Inning            Inning[] @relation("Striker")
-  NonStrikerInnings Inning[] @relation("NonStriker")
-  BowlerInnings     Inning[] @relation("Bowler")
-}
-
-model InningBatting {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  inningId String @db.ObjectId
-  inning   Inning @relation(fields: [inningId], references: [id])
-
-  playerId String @db.ObjectId
-  player   Player @relation(fields: [playerId], references: [id])
-
-  runs      Int     @default(0)
-  balls     Int     @default(0)
-  fours     Int     @default(0)
-  sixes     Int     @default(0)
-  isOut     Boolean @default(false)
-  dismissal String?
-}
-
-model InningBowling {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  inningId String @db.ObjectId
-  inning   Inning @relation(fields: [inningId], references: [id])
-
-  playerId String @db.ObjectId
-  player   Player @relation(fields: [playerId], references: [id])
-
-  overs   Int @default(0)
-  balls   Int @default(0)
-  runs    Int @default(0)
-  wickets Int @default(0)
-  maidens Int @default(0)
-  noBalls Int @default(0)
-  wides   Int @default(0)
-}
-
-model Delivery {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  inningId String @db.ObjectId
-  inning   Inning @relation(fields: [inningId], references: [id])
-
-  overNumber Int
-  ballNumber Int
-  legalBall  Boolean @default(true)
-
-  batterId String @db.ObjectId
-  batter   Player @relation("BatterDeliveries", fields: [batterId], references: [id])
-
-  bowlerId String @db.ObjectId
-  bowler   Player @relation("BowlerDeliveries", fields: [bowlerId], references: [id])
-
-  runsOffBat Int         @default(0)
-  extras     Int         @default(0)
-  extraType  ExtraType?
-  isWicket   Boolean     @default(false)
-  wicketType WicketType?
-  dismissal  String?
+  runs          Int         @default(0)
+  isWide        Boolean     @default(false)
+  isNoBall      Boolean     @default(false)
+  isBye         Boolean     @default(false)
+  isLegBye      Boolean     @default(false)
+  isWicket      Boolean     @default(false)
+  dismissalType WicketType?
+  createdAt     DateTime    @default(now())
 }
