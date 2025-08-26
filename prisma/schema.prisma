@@ -143,10 +143,8 @@ model Match {
   teamAPlayingXI String[] @db.ObjectId
   teamBPlayingXI String[] @db.ObjectId
   overs          Int
-  inning1        Inning   @relation("Inning1", fields: [inningId], references: [id])
-  inning2        Inning   @relation("Inning2", fields: [inningId], references: [id])
-  inning3        Inning?  @relation("Inning3")
-  inning4        Inning?  @relation("Inning4")
+
+  innings Inning[]
 
   superOvers String[] @db.ObjectId
 
@@ -158,11 +156,14 @@ model Match {
   category     MatchCategory @default(others)
   date         DateTime?
   location     String?
-  innings      String[]      @db.ObjectId
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  inningId     String        @db.ObjectId
-  inningId     String        @db.ObjectId
+}
+
+model Inning {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  matchId String @db.ObjectId
+  match   Match  @relation(fields: [matchId], references: [id])
 }
 
 model Tournament {
@@ -175,13 +176,4 @@ model Tournament {
   rules       String[]
   startDate   DateTime
   endDate     DateTime
-}
-
-model Inning {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  matchId String @unique @db.ObjectId
-  inning1 Match? @relation("Inning1", fields: [matchId], references: [id])
-  inning2 Match? @relation("Inning2", fields: [matchId], references: [id])
-  inning3 Match? @relation("Inning3", fields: [matchId], references: [id])
-  inning4 Match? @relation("Inning4", fields: [matchId], references: [id])
 }
