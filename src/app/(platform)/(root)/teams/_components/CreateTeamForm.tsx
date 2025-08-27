@@ -5,20 +5,12 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import useAxios from "@/hooks/useAxios";
-import { CgLaptop, CgSpinner } from "react-icons/cg";
+import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { createSafeAction } from "@/lib/create-safe-action";
 import { createTeam } from "@/actions/create-team";
 import { useAction } from "@/hooks/useAction";
-import { TeamType } from "@/generated/prisma";
-import { ClerkDegraded } from "@clerk/nextjs";
 
-interface AddressType {
-  city: string;
-  state: string;
-  country: string;
-}
 interface ITeamForm {
   name: string;
   logo: FileList;

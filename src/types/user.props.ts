@@ -5,6 +5,8 @@ export default interface UserProps {
   username: string;
   name: string;
   dob: string;
+  email: string;
+  contact: string;
   role: "fan" | "player" | "admin";
   teams: TeamProps[];
   avatar: string;

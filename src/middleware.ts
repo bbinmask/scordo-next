@@ -17,6 +17,12 @@ export default clerkMiddleware(async (auth, req) => {
   const isRedirectable =
     pathname.includes("sign-in") || pathname.includes("sign-up") || pathname == "/";
 
+  console.log(userId);
+  if (userId) {
+    return NextResponse.redirect(new URL(`/profile/complete-profile/${userId}`, req.url));
+  }
+  return;
+
   if (!userId && !isPublic) {
     return redirectToSignIn({ returnBackUrl: new URL("sign-in", req.url) });
   }
@@ -24,7 +30,7 @@ export default clerkMiddleware(async (auth, req) => {
   let isProfileCompleted = sessionClaims?.isProfileCompleted || false;
 
   if (userId && !isProfileCompleted) {
-    return redirect(`/profile/complete-profile`);
+    return redirect(`/profile/complete-profile/${userId}`);
   }
 
   if (userId && isPublic && isRedirectable) {
