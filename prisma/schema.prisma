@@ -105,6 +105,7 @@ type TournamentDetails {
 
 model User {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId      String @unique
   name         String
   email        String       @unique
   avatar       String?

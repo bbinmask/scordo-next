@@ -9,7 +9,7 @@ const MarketingPage = () => {
       <Navbar />
       <div className="container mx-auto px-4 pt-16 pb-4 sm:px-6 md:px-8">
         {/* Hero Section */}
-        <section className="between mb-10 flex flex-col rounded-2xl bg-gradient-to-br p-6 shadow-xl md:flex-row xl:p-10">
+        <section className="between mt-4 mb-10 flex flex-col rounded-2xl bg-white bg-gradient-to-br p-6 shadow-xl md:flex-row xl:p-10">
           <div className="mb-6">
             <h1 className="text-main font-[poppins] text-5xl font-black saturate-200 lg:text-7xl dark:brightness-125">
               Scordo
@@ -37,7 +37,7 @@ const MarketingPage = () => {
           </div>
           <div className="relative flex items-center justify-center md:w-1/2">
             {/* Placeholder for a cricket-related visual (e.g., a stylized bat or ball) */}
-            <div className="bg-main absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full opacity-30 blur-3xl sm:h-64 sm:w-64 md:opacity-40"></div>
+            <div className="absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full opacity-30 blur-3xl sm:h-64 sm:w-64 md:opacity-40"></div>
             <img
               src={"/hero.png"}
               alt="Cricket hero"

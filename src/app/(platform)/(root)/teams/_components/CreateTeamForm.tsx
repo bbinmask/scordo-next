@@ -5,16 +5,26 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import useAxios from "@/hooks/useAxios";
-import { CgSpinner } from "react-icons/cg";
+import { CgLaptop, CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { createSafeAction } from "@/lib/create-safe-action";
+import { createTeam } from "@/actions/create-team";
+import { useAction } from "@/hooks/useAction";
+import { TeamType } from "@/generated/prisma";
+import { ClerkDegraded } from "@clerk/nextjs";
 
+interface AddressType {
+  city: string;
+  state: string;
+  country: string;
+}
 interface ITeamForm {
   name: string;
   logo: FileList;
   banner: FileList;
-  type: "local" | "college" | "club" | "corporate" | "";
-  username: string;
+  type: "local" | "college" | "club" | "corporate" | "others";
+  abbreviation: string;
   address: {
     city: string;
     state: string;
@@ -33,14 +43,24 @@ const CreateTeamForm: React.FC = () => {
   } = useForm<ITeamForm>({
     defaultValues: {
       name: "",
-      type: "local",
-      username: "",
+      type: "others",
+      abbreviation: "",
       address: {
         city: "",
         state: "",
         country: "",
       },
       isRecruiting: false,
+    },
+  });
+
+  const { execute, error, isLoading } = useAction(createTeam, {
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success(data.name + " is created");
+    },
+    onError: (error) => {
+      console.log(error);
     },
   });
 
@@ -62,45 +82,20 @@ const CreateTeamForm: React.FC = () => {
   const isRecruiting = watch("isRecruiting");
   const logo = watch("logo");
   const banner = watch("banner");
+
   const onSubmit: SubmitHandler<ITeamForm> = async (data) => {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("type", data.type);
-    formData.append("address", JSON.stringify(data.address));
-    formData.append("username", data.username);
-    formData.append("isRecruiting", data.isRecruiting.toString());
-    if (data.logo && data.logo[0]) {
-      formData.append("logo", data.logo[0]);
-    }
-
-    if (data.banner && data.banner[0]) {
-      formData.append("banner", data.banner[0]);
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetchData("/teams/create", "POST", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      if (response?.success) {
-        toast.success(response.message);
-        navigate.push("/teams/my-teams");
-      } else {
-        if (response?.errors?.usernameExistsError) {
-          setError("username", {
-            type: "validate",
-            message: response.message || "Username already exists!",
-          });
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    const { name, abbreviation, type, address, logo, banner, isRecruiting } = data;
+    const logoFile = logo && logo.length > 0 ? logo[0] : undefined;
+    const bannerFile = banner && banner.length > 0 ? banner[0] : undefined;
+    execute({
+      name,
+      abbreviation,
+      type,
+      address,
+      logo: logoFile,
+      banner: bannerFile,
+      isRecruiting,
+    });
   };
 
   return (
@@ -108,7 +103,6 @@ const CreateTeamForm: React.FC = () => {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Team Name */}
         <div className="mb-1">
-          <label className="text-foreground mb-1 block text-base font-semibold">Team Name</label>
           <Input
             {...register("name", { required: "Team name is required" })}
             placeholder="Enter your team's name"
@@ -121,14 +115,14 @@ const CreateTeamForm: React.FC = () => {
         <div className="mb-1">
           <label className="text-foreground mb-1 block text-base font-semibold">Username</label>
           <Input
-            {...register("username", {
-              required: "Create a username for the team",
+            {...register("abbreviation", {
+              required: "Create a   abbreviation for the team",
             })}
-            placeholder="Create a username"
+            placeholder="Create a   abbreviation"
             className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
           />
-          {errors.username && (
-            <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
+          {errors.abbreviation && (
+            <p className="mt-1 text-sm text-red-600">{errors.abbreviation.message}</p>
           )}
         </div>
         {/* Logo Upload */}
@@ -182,7 +176,7 @@ const CreateTeamForm: React.FC = () => {
             <option value="college">College</option>
             <option value="club">Club</option>
             <option value="corporate">Corporate</option>
-            <option value="professional">Professional</option>
+            <option value="others">Others</option>
           </select>
           {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>}
         </div>
@@ -245,7 +239,7 @@ const CreateTeamForm: React.FC = () => {
 
       {/* Submit */}
       <Button
-        variant={"default"}
+        variant="default"
         type="submit"
         disabled={loading}
         className={`font-urbanist relative w-full rounded-md border-none bg-emerald-600 px-6 py-3 tracking-wide text-white outline-none hover:bg-emerald-700 focus:ring-1 focus:ring-emerald-500 ${loading && "text-opacity-70"}`}
