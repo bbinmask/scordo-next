@@ -79,6 +79,12 @@ enum WicketType {
   HIT_WICKET
 }
 
+enum MatchStatus {
+  not_started
+  in_progress
+  completed
+}
+
 // Embedded type 
 
 type Address {
@@ -188,7 +194,6 @@ model Match {
   overs          Int
   innings        Inning[]
   superOvers     String[]      @db.ObjectId
-  status         String
   venue          Address
   uid            String        @default(uuid())
   tossWinner     String?
@@ -198,6 +203,8 @@ model Match {
   location       String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  status         MatchStatus   @default(not_started)
+  result         String?
 }
 
 model Inning {
