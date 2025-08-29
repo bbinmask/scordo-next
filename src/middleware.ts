@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { db } from "./lib/db";
 import { redirect } from "next/navigation";
 const isPublicRoute = createRouteMatcher([
   "/",

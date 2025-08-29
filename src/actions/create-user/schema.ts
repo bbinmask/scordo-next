@@ -9,9 +9,9 @@ export const CreateUser = z.object({
     .min(2, { message: "Abbreviation must be atleast 2 characters long" }),
   address: z
     .object({
-      city: z.string().optional(),
-      state: z.string().optional(),
-      country: z.string().optional(),
+      city: z.string(),
+      state: z.string(),
+      country: z.string(),
     })
     .optional(),
   gender: z.enum(["male", "female", "other"]).nullable().default(null).optional(),

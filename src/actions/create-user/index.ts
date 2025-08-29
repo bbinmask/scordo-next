@@ -16,17 +16,16 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  return { error: "Something went wrong!" };
-
   let user;
   try {
     user = await db.user.create({
       data: {
         name,
         username,
-        clerkId: "userId",
+        clerkId: userId,
         email,
         contact,
+        address,
         role,
         gender,
         dob,
@@ -35,10 +34,11 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     });
 
     console.log(user);
-    if (!user)
+    if (!user) {
       return {
         error: "Request Failed",
       };
+    }
   } catch (error: any) {
     console.log(error);
     return {
