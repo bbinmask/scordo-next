@@ -108,9 +108,9 @@ const CreateTeamForm: React.FC = () => {
           <label className="text-foreground mb-1 block text-base font-semibold">Username</label>
           <Input
             {...register("abbreviation", {
-              required: "Create a   abbreviation for the team",
+              required: "Create a abbreviation for the team",
             })}
-            placeholder="Create a   abbreviation"
+            placeholder="Create a abbreviation"
             className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
           />
           {errors.abbreviation && (

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -5,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { BiSave } from "react-icons/bi";
 import Spinner from "@/components/Spinner";
 import UserProps from "@/types/user.props";
+import FormInput from "@/components/FormInput";
+
 interface ProfileFormData {
   username: string;
   name: string;
@@ -56,17 +60,19 @@ const ProfileForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="relative flex w-full flex-col items-center justify-center">
-        <label htmlFor="username-input" className="sr-only">
-          Username
-        </label>
-        <Input
-          id="username"
-          {...register("username", { required: "username is required" })}
-          placeholder="Create a username"
+      <div className="">
+        <FormInput<ProfileFormData>
+          register={register}
+          errors={errors}
+          name="username"
           maxLength={15}
-          className="text-lg md:col-span-3"
+          label="Username"
+          className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
+          id="username"
+          rules={{ required: "Username is required" }}
+          placeholder="Create a username"
         />
+
         <div className="mt-1">
           <UsernameError errorMessage={"Something went wrong"} />
         </div>
