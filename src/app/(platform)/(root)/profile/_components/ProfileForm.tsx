@@ -8,7 +8,8 @@ import { BiSave } from "react-icons/bi";
 import Spinner from "@/components/Spinner";
 import UserProps from "@/types/user.props";
 import FormInput from "@/components/FormInput";
-
+import FormSelect from "../../_components/FormSelect";
+import { Save } from "lucide-react";
 interface ProfileFormData {
   username: string;
   name: string;
@@ -37,6 +38,17 @@ const UsernameError = ({ errorMessage }: { errorMessage: string }) => {
   ) : null;
 };
 
+const selectGenderData = [
+  { label: "Male", value: "male" },
+  { label: "Female", value: "female" },
+  { label: "Others", value: "others" },
+];
+
+const selectRoleData = [
+  { label: "Fan", value: "fan" },
+  { label: "Player", value: "player" },
+  { label: "Admin", value: "admin" },
+];
 const ProfileForm = () => {
   const {
     register,
@@ -59,130 +71,112 @@ const ProfileForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="">
-        <FormInput<ProfileFormData>
-          register={register}
-          errors={errors}
-          name="username"
-          maxLength={15}
-          label="Username"
-          className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
-          id="username"
-          rules={{ required: "Username is required" }}
-          placeholder="Create a username"
-        />
+    <div className="flex min-h-screen items-center justify-center p-4 font-sans">
+      <div className="container-bg w-full max-w-4xl rounded-2xl border p-8 shadow-2xl backdrop-blur-sm md:p-12">
+        <h1 className="mb-2 text-3xl font-bold md:text-4xl">Edit Your Profile</h1>
+        <p className="text-foreground mb-8">Update your information below.</p>
 
-        <div className="mt-1">
-          <UsernameError errorMessage={"Something went wrong"} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 items-center gap-y-4 md:grid-cols-4 md:gap-x-4">
-        <label htmlFor="fullname-input" className="text-lg font-medium md:col-span-1">
-          Full Name
-        </label>
-
-        <Input
-          id="fullname-input"
-          {...register("name", { required: "Name is required" })}
-          placeholder="Enter your name here"
-          className="text-lg md:col-span-3"
-        />
-      </div>
-      <hr className="border-gray-200" />
-      <div className="grid grid-cols-1 items-center gap-y-4 md:grid-cols-4 md:gap-x-4">
-        <label htmlFor="email-input" className="text-lg font-medium md:col-span-1">
-          Email
-        </label>
-
-        <Input
-          id="email-input"
-          {...register("email", { required: "Email is required" })}
-          type="email"
-          placeholder="Enter your email here"
-          className="text-lg md:col-span-3"
-        />
-      </div>
-      <hr className="border-gray-200" />
-
-      <div className="grid grid-cols-1 items-center gap-y-4 md:grid-cols-4 md:gap-x-4">
-        <label htmlFor="phone-input" className="text-lg font-medium md:col-span-1">
-          Phone
-        </label>
-
-        <Input
-          id="phone-input"
-          {...register("contact")}
-          type="text"
-          maxLength={15}
-          minLength={10}
-          placeholder="Enter contact no."
-          className="text-lg md:col-span-3"
-        />
-      </div>
-
-      <div className="">
-        <div className="grid grid-cols-1 items-center gap-y-4 md:grid-cols-4 md:gap-x-4">
-          <label htmlFor="city" className="text-lg font-medium md:col-span-1">
-            City
-          </label>
-          <Input
-            id="city"
-            placeholder="Enter your city"
-            {...register("address.city", { required: "City is required" })}
-            className="text-lg md:col-span-3"
-          />
-          {errors.address?.city && (
-            <p className="mt-1 text-sm text-red-600">{errors.address.city.message}</p>
-          )}
-        </div>
-        <div className="grid grid-cols-1 items-center gap-y-4 md:grid-cols-4 md:gap-x-4">
-          <label htmlFor="state" className="text-lg font-medium md:col-span-1">
-            State
-          </label>
-          <Input
-            {...register("address.state")}
-            placeholder="Enter your state"
-            className="text-lg md:col-span-3"
-          />
-          {errors.address?.state && (
-            <p className="mt-1 text-sm text-red-600">{errors.address.state.message}</p>
-          )}
-        </div>
-        <div className="grid grid-cols-1 items-center gap-y-4 md:grid-cols-4 md:gap-x-4">
-          <label htmlFor="country" className="text-lg font-medium md:col-span-1">
-            Country
-          </label>
-          <Input
-            {...register("address.country", {
-              required: "Country is required",
-            })}
-            placeholder="Enter your country"
-            className="text-lg md:col-span-3"
-          />
-          {errors.address?.country && (
-            <p className="mt-1 text-sm text-red-600">{errors.address.country.message}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="flex justify-end pt-4">
-        <Button
-          type="submit"
-          className="font-urbanist border-none bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3 shadow-md hover:from-blue-600 hover:to-blue-700 focus:ring-blue-500"
-          disabled={loading}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2"
         >
-          {loading ? (
-            <Spinner />
-          ) : (
-            <>
-              <BiSave className="mr-1 text-xl" /> Save
-            </>
-          )}
-        </Button>
+          {/* Column 1 */}
+          <div className="flex flex-col gap-6">
+            <FormInput<ProfileFormData>
+              register={register}
+              errors={errors}
+              name="username"
+              label="Username"
+              id="username"
+              rules={{
+                required: "Username is required",
+                maxLength: { value: 15, message: "Username cannot exceed 15 characters" },
+              }}
+              placeholder="Create a username"
+            />
+            <FormInput<ProfileFormData>
+              register={register}
+              errors={errors}
+              name="name"
+              label="Full Name"
+              id="name"
+              rules={{
+                required: "Name is required",
+                maxLength: { value: 50, message: "Name cannot exceed 50 characters" },
+              }}
+              placeholder="Enter your full name"
+            />
+            <FormInput<ProfileFormData>
+              register={register}
+              errors={errors}
+              name="email"
+              type="email"
+              label="Email Address"
+              id="email"
+              rules={{
+                required: "Email is required",
+                pattern: { value: /^\S+@\S+$/i, message: "Invalid email format" },
+              }}
+              placeholder="you@example.com"
+            />
+            <FormInput<ProfileFormData>
+              register={register}
+              errors={errors}
+              name="contact"
+              type="tel"
+              label="Contact Number (Optional)"
+              id="contact"
+              rules={{
+                pattern: { value: /^[0-9+-]*$/, message: "Invalid phone number" },
+              }}
+              placeholder="Enter your phone number"
+            />
+          </div>
+
+          {/* Column 2 */}
+          <div className="flex flex-col gap-6">
+            <FormSelect<ProfileFormData>
+              register={register}
+              name="gender"
+              label="Gender"
+              data={selectGenderData}
+              placeholder="Select your gender"
+              rules={{ required: "Gender is required!" }}
+            />
+            <FormSelect<ProfileFormData>
+              register={register}
+              name="role"
+              label="Select Role (Optional)"
+              data={selectRoleData}
+              placeholder="Select your role"
+              rules={{ required: false }}
+            />
+            <FormInput<ProfileFormData>
+              register={register}
+              errors={errors}
+              type="date"
+              name="dob"
+              label="Date of Birth"
+              id="dob"
+              rules={{ required: "Date of birth is required" }}
+            />
+          </div>
+
+          {/* Submit Button - Spans both columns */}
+          <div className="mt-4 md:col-span-2">
+            <Button type="submit" disabled={loading}>
+              {loading ? (
+                <Spinner />
+              ) : (
+                <>
+                  <Save className="mr-2 h-5 w-5" /> Save Changes
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
 };
 

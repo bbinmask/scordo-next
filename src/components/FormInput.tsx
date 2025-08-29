@@ -4,10 +4,10 @@ import { Label } from "./ui/label";
 
 interface FormInputProps<T extends Record<string, any>>
   extends Omit<React.ComponentProps<"input">, "name"> {
-  name: keyof T & string; // field name from form schema, forced to string
-  label?: string; // optional label
-  register: UseFormRegister<T>; // register from RHF
-  errors: FieldErrors<T>; // errors from RHF
+  name: keyof T & string;
+  label?: string;
+  register: UseFormRegister<T>;
+  errors: FieldErrors<T>;
   rules: RegisterOptions;
 }
 
@@ -36,7 +36,7 @@ const FormInput = <T extends Record<string, any>>({
         id={id || String(name)}
         {...register(name as any, rules as any)}
         className={className}
-        {...inputProps} // spread other props (placeholder, type, etc.)
+        {...inputProps}
       />
 
       {errors[name] && <p className="mt-1 text-sm text-red-600">{String(errors[name]?.message)}</p>}
