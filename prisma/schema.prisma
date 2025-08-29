@@ -113,16 +113,16 @@ model User {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
   clerkId      String       @unique
   name         String
-  email        String       @unique
-  avatar       String?
-  isVerified   Boolean      @default(false)
   username     String       @unique
+  email        String       @unique
   contact      String?
-  bio          String?
   gender       Gender?
   role         Role         @default(fan)
-  availability Availability @default(available)
   dob          DateTime
+  availability Availability @default(available)
+  avatar       String?
+  isVerified   Boolean      @default(false)
+  bio          String?
   friends      String[]     @db.ObjectId
   friendsOf    String[]     @db.ObjectId
   address      Address?

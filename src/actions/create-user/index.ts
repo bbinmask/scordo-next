@@ -5,56 +5,48 @@ import { revalidatePath } from "next/cache";
 import { InputType, ReturnType } from "./types";
 import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { CreateTeam } from "./schema";
-import { uploadImage } from "@/utils/uploadOnCloudinary";
+import { CreateUser } from "./schema";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
+  const { name, username, email, contact, address, role, gender, dob, availability } = data;
+
+  console.log({ name, username, email, contact, address, role, gender, dob, availability });
   const { userId } = await auth();
   if (!userId) {
     return { error: "Unauthorized" };
   }
 
-  const { name, abbreviation, address, logo, banner, isRecruiting, type } = data;
+  return { error: "Something went wrong!" };
 
-  let logoUrl, bannerUrl;
-
-  if (logo) {
-    logoUrl = (await uploadImage(logo)).imageUrl;
-  }
-  if (banner) {
-    bannerUrl = (await uploadImage(banner)).imageUrl;
-  }
-
-  console.log(bannerUrl);
-
-  let team;
+  let user;
   try {
-    team = await db.team.create({
+    user = await db.user.create({
       data: {
         name,
-        abbreviation,
-        address,
-        logo: (logoUrl as string) || null,
-        banner: (bannerUrl as string) || null,
-        isRecruiting,
-        type,
-        owner: userId,
+        username,
+        clerkId: "userId",
+        email,
+        contact,
+        role,
+        gender,
+        dob,
+        availability,
       },
     });
 
-    console.log(team);
-    if (!team)
+    console.log(user);
+    if (!user)
       return {
-        error: "Failed to create team",
+        error: "Request Failed",
       };
   } catch (error: any) {
     console.log(error);
     return {
-      error: error.message || "Failed to create",
+      error: error.message || "Request Failed",
     };
   }
-  revalidatePath(`/teams/${team.id}`);
-  return { data: team };
+  revalidatePath(`/teams/${user.id}`);
+  return { data: user };
 };
 
-export const createTeam = createSafeAction(CreateTeam, handler);
+export const createUser = createSafeAction(CreateUser, handler);

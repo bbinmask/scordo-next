@@ -25,8 +25,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     bannerUrl = (await uploadImage(banner)).imageUrl;
   }
 
-  console.log(bannerUrl);
-
   let team;
   try {
     team = await db.team.create({

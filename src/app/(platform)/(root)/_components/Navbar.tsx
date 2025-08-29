@@ -70,7 +70,7 @@ const Navbar = () => {
           </Link>
           <div className="flex items-center gap-4">
             <Button onClick={handleDarkMode} className="primary-btn cursor-pointer rounded-full">
-              {theme ? <Moon /> : <Sun />}
+              {theme == "dark" ? <Moon /> : <Sun />}
             </Button>
             <Button type="button" className="primary-btn cursor-pointer rounded-full">
               <Bell className="text-3xl" />

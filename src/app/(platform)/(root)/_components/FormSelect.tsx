@@ -31,7 +31,7 @@ const FormSelect = <T extends Record<string, any>>({
 }: FormSelectProps<T>) => {
   return (
     <Select {...register(name as any, rules as any)}>
-      <SelectTrigger className="w-[90%]">
+      <SelectTrigger className="w-full">
         <SelectValue className="font-semibold" placeholder={placeholder || "Select"} />
       </SelectTrigger>
       <SelectContent>
