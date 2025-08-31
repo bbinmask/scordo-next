@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="layout-background dark:bg-red-600">
         <main
-          className={`min-h-[calc(100vh-20px)] w-full ${poppins.className} ${calSans.className} ${urbanist.className} antialiased`}
+          className={`min-h-screen w-full ${poppins.className} ${calSans.className} ${urbanist.className} antialiased`}
         >
           {children}
         </main>

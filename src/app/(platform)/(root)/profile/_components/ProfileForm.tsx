@@ -7,11 +7,9 @@ import Spinner from "@/components/Spinner";
 import FormInput from "@/components/FormInput";
 import FormSelect from "../../_components/FormSelect";
 import { useAction } from "@/hooks/useAction";
-import { createUser } from "@/actions/create-user";
+import { createUser } from "@/actions/user-actions";
 import { toast } from "sonner";
-import { createTeam } from "@/actions/create-team";
-import { actionOK } from "@/actions/action-ok";
-
+import { useAuth, useUser } from "@clerk/nextjs";
 interface ProfileFormData {
   username: string;
   name: string;
@@ -54,6 +52,8 @@ const ProfileForm = ({ update }: { update?: boolean }) => {
       role: "fan",
     },
   });
+
+  const { user } = useUser();
 
   const { execute, isLoading, fieldErrors } = useAction(createUser, {
     onSuccess: (data) => {
@@ -99,6 +99,7 @@ const ProfileForm = ({ update }: { update?: boolean }) => {
                 name="name"
                 label="Full Name"
                 id="name"
+                defaultValue={user?.firstName || ""}
                 rules={{
                   required: "Name is required",
                   maxLength: { value: 50, message: "Name cannot exceed 50 characters" },
@@ -129,6 +130,8 @@ const ProfileForm = ({ update }: { update?: boolean }) => {
                 name="email"
                 type="email"
                 label="Email Address"
+                defaultValue={user?.primaryEmailAddress?.emailAddress || ""}
+                readOnly={user?.primaryEmailAddress?.emailAddress ? true : false}
                 id="email"
                 rules={{
                   required: "Email is required",
@@ -136,13 +139,16 @@ const ProfileForm = ({ update }: { update?: boolean }) => {
                 }}
                 placeholder="you@example.com"
               />
+
               <FormInput<ProfileFormData>
                 register={register}
                 errors={errors}
                 name="contact"
                 type="tel"
                 label="Contact Number (Optional)"
+                defaultValue={user?.primaryPhoneNumber?.phoneNumber || ""}
                 id="contact"
+                readOnly={user?.primaryPhoneNumber?.phoneNumber ? true : false}
                 rules={{
                   pattern: { value: /^[0-9+-]*$/, message: "Invalid phone number" },
                 }}

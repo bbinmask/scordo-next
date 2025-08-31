@@ -7,11 +7,10 @@ import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
 import { CreateTeam } from "./schema";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
+import { customClerkSession } from "@/utils/clerk";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = await auth();
-
-  console.log("object");
 
   if (!userId) {
     return { error: "Unauthorized" };
@@ -43,17 +42,18 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       },
     });
 
-    console.log(team);
     if (!team)
       return {
         error: "Failed to create team",
       };
   } catch (error: any) {
-    console.log(error);
     return {
       error: error.message || "Failed to create",
     };
   }
+
+  await customClerkSession(userId, "isProfileCompleted", true);
+
   revalidatePath(`/teams/${team.id}`);
   return { data: team };
 };

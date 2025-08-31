@@ -39,7 +39,6 @@ export const useTeam = () => {
         return res.data.data as TeamProps;
       }
     } catch (err: any) {
-      console.log(err);
       setError(err.message || "Failed to fetch teams.");
     } finally {
       setLoading(false);
@@ -52,7 +51,6 @@ export const useTeam = () => {
       setLoading(true);
       setError(null);
       const res: AxiosResponse = await fetchData(`/teams/${teamId}`, "PUT", updates);
-      console.log(res);
       if (res?.data?.success) {
         return res.data.data;
       } else return res?.data.success;
@@ -71,7 +69,6 @@ export const useTeam = () => {
     try {
       setLoading(true);
       const res: AxiosResponse = await fetchData(`/teams/search?query=${query}`);
-      console.log(res);
       if (res?.data?.success) {
         return res.data.data as TeamProps[];
       } else {

@@ -2,7 +2,9 @@ import { AxiosRequestConfig } from "axios";
 
 declare global {
   interface CustomJwtSessionClaims {
-    isProfileCompleted: boolean;
+    metadata: {
+      isProfileCompleted: boolean;
+    };
   }
 }
 

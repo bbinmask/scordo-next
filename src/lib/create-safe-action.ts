@@ -16,8 +16,6 @@ export const createSafeAction = <TInput, TOutput>(
 ) => {
   return async (data: TInput): Promise<ActionState<TInput, TOutput>> => {
     const validationResult = schema.safeParse(data);
-    console.log("ahsdflsfl");
-    console.log(validationResult);
 
     if (!validationResult.success) {
       return {

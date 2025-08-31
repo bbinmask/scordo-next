@@ -7,11 +7,13 @@ import { auth } from "@clerk/nextjs/server";
 import { createSafeAction, ActionState } from "@/lib/create-safe-action";
 import { CreateUser } from "./schema";
 
-const handler = async (data: InputType): Promise<ActionState<InputType, any>> => {
+const createUserHandler = async (data: InputType): Promise<ActionState<InputType, any>> => {
   const { userId } = await auth();
   if (!userId) {
     return { error: "Unauthorized" };
   }
+
+  console.log(userId);
 
   const { username, availability, name, email, contact, role, gender, address, dob } = data;
 
@@ -35,7 +37,7 @@ const handler = async (data: InputType): Promise<ActionState<InputType, any>> =>
       return { error: "Failed to create user" };
     }
 
-    revalidatePath(`/teams/${user.id}`);
+    revalidatePath(`/profile/${user.id}`);
     return { data: user };
   } catch (error: any) {
     console.error(error);
@@ -43,4 +45,4 @@ const handler = async (data: InputType): Promise<ActionState<InputType, any>> =>
   }
 };
 
-export const createUser = createSafeAction(CreateUser, handler);
+export const createUser = createSafeAction(CreateUser, createUserHandler);

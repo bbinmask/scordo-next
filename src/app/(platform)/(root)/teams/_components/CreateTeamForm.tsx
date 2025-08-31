@@ -8,9 +8,9 @@ import useAxios from "@/hooks/useAxios";
 import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { createTeam } from "@/actions/create-team";
+import { createTeam } from "@/actions/team-actions";
 import { useAction } from "@/hooks/useAction";
-import { createUser } from "@/actions/create-user";
+import { createUser } from "@/actions/user-actions";
 
 interface ITeamForm {
   name: string;
@@ -49,11 +49,10 @@ const CreateTeamForm: React.FC = () => {
 
   const { execute, error, isLoading } = useAction(createTeam, {
     onSuccess: (data) => {
-      console.log(data);
       toast.success(data.name + " is created");
     },
     onError: (error) => {
-      console.log(error);
+      toast.error(error);
     },
   });
 

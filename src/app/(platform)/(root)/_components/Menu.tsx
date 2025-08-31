@@ -10,7 +10,6 @@ const Menu = ({ navLinks }: { navLinks: any }) => {
 
   // Function to toggle the main horizontal navbar's visibility
   const toggleMainNavbar = () => {
-    console.log(!isNavbarActive);
     setIsNavbarActive((prev) => !prev);
   };
 

@@ -14,10 +14,16 @@ export default clerkMiddleware(async (auth, req) => {
     return redirectToSignIn({ returnBackUrl: new URL("sign-in", req.url) });
   }
 
-  let isProfileCompleted = sessionClaims?.isProfileCompleted || false;
+  let isProfileCompleted = sessionClaims?.metadata?.isProfileCompleted || false;
 
-  if (userId && !isProfileCompleted) {
-    return redirect(`/profile/complete-profile/${userId}`);
+  console.log(sessionClaims?.metadata);
+
+  if (
+    userId &&
+    !isProfileCompleted &&
+    !req.nextUrl.pathname.startsWith(`/profile/complete-profile`)
+  ) {
+    return NextResponse.redirect(new URL(`/profile/complete-profile/${userId}`, req.url), req);
   }
 
   if (userId && isPublic && isRedirectable) {
