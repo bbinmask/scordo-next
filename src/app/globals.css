@@ -138,14 +138,6 @@
   body {
     @apply text-foreground m-0 box-border p-0;
   }
-
-  .center {
-    @apply items-center justify-center;
-  }
-
-  .between {
-    @apply items-center justify-between;
-  }
 }
 
 body {
@@ -160,6 +152,14 @@ body {
 
 .layout-background {
   @apply bg-gradient-to-br from-lime-100 to-green-200 text-gray-800 transition-all dark:from-gray-950 dark:to-emerald-900 dark:text-gray-100;
+}
+
+.center {
+  @apply items-center justify-center;
+}
+
+.between {
+  @apply items-center justify-between;
 }
 
 .secondary-background {

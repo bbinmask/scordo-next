@@ -1,4 +1,3 @@
-// actions/create-user.ts
 "use server";
 
 import { db } from "@/lib/db";
@@ -13,8 +12,6 @@ const handler = async (data: InputType): Promise<ActionState<InputType, any>> =>
   if (!userId) {
     return { error: "Unauthorized" };
   }
-
-  console.log("User");
 
   const { username, availability, name, email, contact, role, gender, address, dob } = data;
 
