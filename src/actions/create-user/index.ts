@@ -1,52 +1,49 @@
+// actions/create-user.ts
 "use server";
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { InputType, ReturnType } from "./types";
+import { InputType } from "./types";
 import { auth } from "@clerk/nextjs/server";
-import { createSafeAction } from "@/lib/create-safe-action";
+import { createSafeAction, ActionState } from "@/lib/create-safe-action";
 import { CreateUser } from "./schema";
 
-const handler = async (data: InputType): Promise<ReturnType> => {
-  const { name, username, email, contact, address, role, gender, dob, availability } = data;
-
-  console.log({ name, username, email, contact, address, role, gender, dob, availability });
+const handler = async (data: InputType): Promise<ActionState<InputType, any>> => {
   const { userId } = await auth();
   if (!userId) {
     return { error: "Unauthorized" };
   }
 
-  let user;
+  console.log("User");
+
+  const { username, availability, name, email, contact, role, gender, address, dob } = data;
+
   try {
-    user = await db.user.create({
+    const user = await db.user.create({
       data: {
-        name,
         username,
-        clerkId: userId,
+        availability,
+        name,
         email,
         contact,
         address,
         role,
         gender,
         dob,
-        availability,
+        clerkId: userId,
       },
     });
 
-    console.log(user);
     if (!user) {
-      return {
-        error: "Request Failed",
-      };
+      return { error: "Failed to create user" };
     }
+
+    revalidatePath(`/teams/${user.id}`);
+    return { data: user };
   } catch (error: any) {
-    console.log(error);
-    return {
-      error: error.message || "Request Failed",
-    };
+    console.error(error);
+    return { error: error.message || "Failed to create" };
   }
-  revalidatePath(`/teams/${user.id}`);
-  return { data: user };
 };
 
 export const createUser = createSafeAction(CreateUser, handler);

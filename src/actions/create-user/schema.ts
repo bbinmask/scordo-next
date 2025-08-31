@@ -5,8 +5,8 @@ export const CreateUser = z.object({
   contact: z.string().optional(),
   email: z.string({ message: "Email is required!" }),
   username: z
-    .string({ message: "Abbreviation is required!" })
-    .min(2, { message: "Abbreviation must be atleast 2 characters long" }),
+    .string({ message: "username is required!" })
+    .min(2, { message: "username must be atleast 2 characters long" }),
   address: z
     .object({
       city: z.string(),

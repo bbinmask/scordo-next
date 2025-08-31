@@ -16,7 +16,6 @@ export default clerkMiddleware(async (auth, req) => {
   const isRedirectable =
     pathname.includes("sign-in") || pathname.includes("sign-up") || pathname == "/";
 
-  console.log(userId);
   if (userId) {
     return NextResponse.redirect(new URL(`/profile/complete-profile/${userId}`, req.url));
   }

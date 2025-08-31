@@ -10,6 +10,9 @@ import { uploadImage } from "@/utils/uploadOnCloudinary";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = await auth();
+
+  console.log("object");
+
   if (!userId) {
     return { error: "Unauthorized" };
   }

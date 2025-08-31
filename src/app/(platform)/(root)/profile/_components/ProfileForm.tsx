@@ -9,6 +9,8 @@ import FormSelect from "../../_components/FormSelect";
 import { useAction } from "@/hooks/useAction";
 import { createUser } from "@/actions/create-user";
 import { toast } from "sonner";
+import { createTeam } from "@/actions/create-team";
+import { actionOK } from "@/actions/action-ok";
 
 interface ProfileFormData {
   username: string;
@@ -65,7 +67,9 @@ const ProfileForm = ({ update }: { update?: boolean }) => {
   });
 
   const onSubmit: SubmitHandler<ProfileFormData> = (formData) => {
-    execute(formData).catch((err) => console.error(err));
+    const { dob } = formData;
+
+    execute({ ...formData, dob: new Date(dob) });
   };
 
   return (

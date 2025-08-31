@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createTeam } from "@/actions/create-team";
 import { useAction } from "@/hooks/useAction";
+import { createUser } from "@/actions/create-user";
 
 interface ITeamForm {
   name: string;
@@ -56,6 +57,8 @@ const CreateTeamForm: React.FC = () => {
     },
   });
 
+  const { execute: newExecute } = useAction(createUser);
+
   const [logoFileName, setLogoFileName] = useState<string | null>(null);
   const [bannerFileName, setBannerFileName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -79,6 +82,7 @@ const CreateTeamForm: React.FC = () => {
     const { name, abbreviation, type, address, logo, banner, isRecruiting } = data;
     const logoFile = logo && logo.length > 0 ? logo[0] : undefined;
     const bannerFile = banner && banner.length > 0 ? banner[0] : undefined;
+
     execute({
       name,
       abbreviation,

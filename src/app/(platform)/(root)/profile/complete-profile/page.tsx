@@ -1,5 +1,5 @@
 import React from "react";
-import ProfileForm from "../../_components/ProfileForm";
+import ProfileForm from "../_components/ProfileForm";
 
 const CompleteProfilePage = () => {
   return (
