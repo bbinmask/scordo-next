@@ -1,6 +1,6 @@
 import { clerkClient } from "@clerk/nextjs/server";
 
-export async function customClerkSession(
+export async function customClerkMetadata(
   userId: string,
   key: string,
   value: string | number | boolean
@@ -12,4 +12,6 @@ export async function customClerkSession(
       [key]: value,
     },
   });
+
+  return new Response("ok");
 }

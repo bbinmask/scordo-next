@@ -6,14 +6,12 @@ import { InputType } from "./types";
 import { auth } from "@clerk/nextjs/server";
 import { createSafeAction, ActionState } from "@/lib/create-safe-action";
 import { CreateUser } from "./schema";
-
+import { customClerkMetadata } from "@/utils/clerk";
 const createUserHandler = async (data: InputType): Promise<ActionState<InputType, any>> => {
   const { userId } = await auth();
   if (!userId) {
     return { error: "Unauthorized" };
   }
-
-  console.log(userId);
 
   const { username, availability, name, email, contact, role, gender, address, dob } = data;
 
@@ -36,6 +34,8 @@ const createUserHandler = async (data: InputType): Promise<ActionState<InputType
     if (!user) {
       return { error: "Failed to create user" };
     }
+
+    await customClerkMetadata(userId, "isProfileCompleted", true);
 
     revalidatePath(`/profile/${user.id}`);
     return { data: user };

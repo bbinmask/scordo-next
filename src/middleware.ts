@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { redirect } from "next/navigation";
 const isPublicRoute = createRouteMatcher(["/", "/auth(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -15,8 +14,6 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   let isProfileCompleted = sessionClaims?.metadata?.isProfileCompleted || false;
-
-  console.log(sessionClaims?.metadata);
 
   if (
     userId &&

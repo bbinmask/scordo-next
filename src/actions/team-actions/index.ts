@@ -7,7 +7,6 @@ import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
 import { CreateTeam } from "./schema";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
-import { customClerkSession } from "@/utils/clerk";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId } = await auth();
@@ -51,8 +50,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       error: error.message || "Failed to create",
     };
   }
-
-  await customClerkSession(userId, "isProfileCompleted", true);
 
   revalidatePath(`/teams/${team.id}`);
   return { data: team };
