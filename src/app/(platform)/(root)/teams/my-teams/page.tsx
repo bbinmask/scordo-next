@@ -1,6 +1,6 @@
 import React from "react";
 import TeamCard from "../_components/TeamCard";
-import { mockTeams as teams } from "@/constants/index";
+import { teams } from "@/constants/index";
 import { TeamsList } from "../_components/TeamComponents";
 const MyTeamsPage = () => {
   return (
