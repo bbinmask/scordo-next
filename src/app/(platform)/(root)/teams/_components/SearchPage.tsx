@@ -1,13 +1,13 @@
-"use client";
+// "use client";
 
-import axios from "axios";
-import { useEffect, useState } from "react";
-import Spinner from "@/components/Spinner";
-import SearchResults from "./SearchResults";
-import useAxios from "@/hooks/FetchData";
-import { CricketTeamCard } from "@/components/Team/TeamsList";
-import { Input } from "@/components/ui/input";
-import { user } from "@/constants";
+// import axios from "axios";
+// import { useEffect, useState } from "react";
+// import Spinner from "@/components/Spinner";
+// import SearchResults from "./SearchResults";
+// import useAxios from "@/hooks/FetchData";
+// import { CricketTeamCard } from "@/components/Team/TeamsList";
+// import { Input } from "@/components/ui/input";
+// import { user } from "@/constants";
 
 // const SearchPage = () => {
 //   const userInfo = user;
@@ -138,53 +138,53 @@ import { user } from "@/constants";
 
 ///////////////////
 
-export default function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+// export default function SearchPage() {
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [searchResults, setSearchResults] = useState<any[]>([]);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(async () => {
-      if (searchTerm.trim() === "") {
-        setSearchResults([]);
-        return;
-      }
-      setLoading(true);
-      setError(null);
-    }, 500);
+//   useEffect(() => {
+//     const delayDebounceFn = setTimeout(async () => {
+//       if (searchTerm.trim() === "") {
+//         setSearchResults([]);
+//         return;
+//       }
+//       setLoading(true);
+//       setError(null);
+//     }, 500);
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
+//     return () => clearTimeout(delayDebounceFn);
+//   }, [searchTerm]);
 
-  return (
-    <div className="w-full py-4">
-      <h1 className="heading-text mb-8 text-center text-4xl font-extrabold">Search Cricket Data</h1>
-      <div className="center mb-8 flex w-full px-16">
-        <Input
-          type="text"
-          placeholder="Search teams, players, or roles..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="subheading-text w-full rounded-md shadow-lg transition duration-150 ease-in-out outline-none"
-        />
-      </div>
-      {loading && <div className="text-center text-xl text-gray-600">Searching...</div>}
-      {error && <div className="text-center text-xl text-red-500">{error}</div>}
+//   return (
+//     <div className="w-full py-4">
+//       <h1 className="heading-text mb-8 text-center text-4xl font-extrabold">Search Cricket Data</h1>
+//       <div className="center mb-8 flex w-full px-16">
+//         <Input
+//           type="text"
+//           placeholder="Search teams, players, or roles..."
+//           value={searchTerm}
+//           onChange={(e) => setSearchTerm(e.target.value)}
+//           className="subheading-text w-full rounded-md shadow-lg transition duration-150 ease-in-out outline-none"
+//         />
+//       </div>
+//       {loading && <div className="text-center text-xl text-gray-600">Searching...</div>}
+//       {error && <div className="text-center text-xl text-red-500">{error}</div>}
 
-      {!loading && !error && searchTerm.trim() !== "" && searchResults.length === 0 && (
-        <div className="text-center text-xl text-gray-600">
-          No results found for "{searchTerm}".
-        </div>
-      )}
+//       {!loading && !error && searchTerm.trim() !== "" && searchResults.length === 0 && (
+//         <div className="text-center text-xl text-gray-600">
+//           No results found for "{searchTerm}".
+//         </div>
+//       )}
 
-      {!loading && searchResults.length > 0 && (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {searchResults.map((team) => (
-            <CricketTeamCard key={team.id} team={team} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+//       {!loading && searchResults.length > 0 && (
+//         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+//           {searchResults.map((team) => (
+//             <CricketTeamCard key={team.id} team={team} />
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }

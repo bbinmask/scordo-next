@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Requests from "../_components/Requests";
-import { mockTeams as teams } from "@/constants";
+import { teams } from "@/constants";
 import { useHandleRequest } from "@/hooks/useTeam";
 import Spinner from "@/components/Spinner";
 import { notFound } from "next/navigation";

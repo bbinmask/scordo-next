@@ -38,12 +38,12 @@ export default function TeamRequests({
           <DialogDescription>Player requests to join the team.</DialogDescription>
         </DialogHeader>
         <div className="grid w-full gap-2">
-          {team.pendingRequests.length === 0 ? (
+          {team.joinRequests.length === 0 ? (
             <div>
               <NotFoundParagraph description="No requests available" />
             </div>
           ) : (
-            team.pendingRequests.map(
+            team.joinRequests.map(
               (req, i) =>
                 typeof req !== "string" && (
                   <div
