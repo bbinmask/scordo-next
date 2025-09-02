@@ -9,7 +9,7 @@ import FormSelect from "../_components/FormSelect";
 import { useAction } from "@/hooks/useAction";
 import { createUser } from "@/actions/user-actions";
 import { toast } from "sonner";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 interface ProfileFormData {
   username: string;
   name: string;
@@ -40,7 +40,7 @@ const selectRoleData = [
   { label: "Admin", value: "admin" },
 ];
 
-const CompleteProfilePage = ({ update }: { update?: boolean }) => {
+const CompleteProfilePage = () => {
   const {
     register,
     handleSubmit,
