@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { mockTeams as teams } from "@/constants";
+import { teams } from "@/constants";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import TeamCard from "../_components/TeamCard";
 const SearchPage = () => {
