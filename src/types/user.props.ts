@@ -2,14 +2,26 @@ import TeamProps from "./teams.props";
 
 export default interface UserProps {
   id: string;
-  username: string;
+  clerkId: string;
   name: string;
-  dob: string;
+  username: string;
   email: string;
   contact: string;
-  role: "fan" | "player" | "admin";
-  teams: TeamProps[];
+  gender: "male" | "female" | "other";
+  role: "player" | "fan" | "admin";
+  dob: Date;
+  availability: "available" | "injured" | "on_break";
   avatar: string;
-  following: string[];
-  follwers: string[];
+  isVerified: boolean;
+  bio: string;
+  friends: string[] | UserProps[];
+  friendsOf: string[] | UserProps[];
+  address?: {
+    city: string;
+    state: string;
+    country: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+  teams: string[] | TeamProps[];
 }
