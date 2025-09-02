@@ -5,14 +5,19 @@ export default interface TeamProps {
   name: string;
   description?: string;
   abbreviation: string;
+  address?: {
+    city: string;
+    state: string;
+    country: string;
+  };
   owner: string | UserProps;
-  players: PlayerProps[];
+  players: UserProps[] | string[];
   banner: string;
   logo: string;
   captain: string | UserProps;
-  teamType: "local" | "club" | "college" | "corporate" | "others";
+  team: "local" | "club" | "college" | "corporate" | "others";
   createdAt: Date;
   updatedAt: Date;
   isRecruiting: boolean;
-  pendingRequests: string[] | PlayerProps[];
+  joinRequests: string[] | UserProps[];
 }
