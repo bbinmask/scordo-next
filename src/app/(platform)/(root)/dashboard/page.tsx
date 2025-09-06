@@ -29,7 +29,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="container mt-5 block w-full items-center">
+    <div className="mt-5 block w-full items-center">
       <section className="">
         <div className="mb-8">
           <TypographyHeading className="mb-4 px-4" content="Live on Scordo" />

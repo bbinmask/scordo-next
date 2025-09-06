@@ -1,12 +1,9 @@
+import { cn } from "@/lib/utils";
 import { LoaderCircle } from "lucide-react";
 import React from "react";
 
-const Spinner = () => {
-  return (
-    <div className="repeat-infinite animate-spin">
-      <LoaderCircle />
-    </div>
-  );
+const Spinner = ({ className }: { className?: string }) => {
+  return <LoaderCircle className={cn("repeat-infinite animate-spin", className)} />;
 };
 
 export default Spinner;

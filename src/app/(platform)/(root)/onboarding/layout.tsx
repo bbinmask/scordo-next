@@ -1,14 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
+import { useUser } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { sessionClaims } = await auth();
+  const user = await currentUser();
 
-  console.log(sessionClaims.metadata);
-
-  if (sessionClaims.metadata.isProfileCompleted) {
+  if (user.publicMetadata?.isProfileCompleted) {
     redirect("/dashboard");
   }
 
-  return <>{children}</>;
+  return <div className="h-full">{children}</div>;
 }

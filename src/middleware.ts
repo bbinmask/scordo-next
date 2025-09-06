@@ -1,12 +1,13 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkClient, clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 const isPublicRoute = createRouteMatcher(["/", "/auth(.*)"]);
 const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
 
 export default clerkMiddleware(async (auth, req) => {
+  const { userId, redirectToSignIn } = await auth();
+
   const { pathname } = req.nextUrl;
   const isPublic = isPublicRoute(req);
-  const { userId, redirectToSignIn, sessionClaims } = await auth();
   const isRedirectable =
     pathname.includes("sign-in") || pathname.includes("sign-up") || pathname == "/";
 
@@ -14,20 +15,24 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  console.log("isProfileCompleted is ", sessionClaims?.metadata.isProfileCompleted);
-
-  if (userId && !sessionClaims?.metadata?.isProfileCompleted) {
-    const onboardingUrl = new URL("/onboarding", req.url);
-    return NextResponse.redirect(onboardingUrl);
-  }
-
   if (!userId && !isPublic) {
     return redirectToSignIn({ returnBackUrl: new URL("sign-in", req.url) });
   }
 
-  if (userId && isPublic && isRedirectable) {
-    return redirectToSignIn({ returnBackUrl: new URL("dashboard", req.url) });
+  if (userId) {
+    const clerk = await clerkClient();
+    const user = await clerk.users.getUser(userId);
+
+    if (userId && !user?.publicMetadata?.isProfileCompleted) {
+      const onboardingUrl = new URL("/onboarding", req.url);
+      return NextResponse.redirect(onboardingUrl);
+    }
+
+    if (userId && isPublic && isRedirectable) {
+      return redirectToSignIn({ returnBackUrl: new URL("dashboard", req.url) });
+    }
   }
+
   return NextResponse.next();
 });
 

@@ -10,6 +10,7 @@ import { useAction } from "@/hooks/useAction";
 import { createUser } from "@/actions/user-actions";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
+import { redirect, useRouter } from "next/navigation";
 interface ProfileFormData {
   username: string;
   name: string;
@@ -41,27 +42,29 @@ const selectRoleData = [
 ];
 
 const CompleteProfilePage = () => {
+  const { user } = useUser();
+  const router = useRouter();
+  const { execute, isLoading, fieldErrors } = useAction(createUser, {
+    onSuccess: (data) => {
+      toast.success(`${data.name}, Your account is successfully created.`);
+      router.push("/dashboard");
+    },
+    onError: (err) => {
+      toast.error(err);
+    },
+  });
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, defaultValues },
   } = useForm<ProfileFormData>({
     defaultValues: {
       availability: "available",
       gender: "male",
       role: "fan",
-    },
-  });
-
-  const { user } = useUser();
-  const { execute, isLoading, fieldErrors } = useAction(createUser, {
-    onSuccess: (data) => {
-      console.log("Successful");
-      toast.success(`${data.name}, Your account is successfully created.`);
-    },
-    onError: (err) => {
-      console.error(err);
-      toast.error(err);
+      email: user?.primaryEmailAddress.emailAddress,
+      name: user?.firstName,
     },
   });
 
@@ -70,6 +73,14 @@ const CompleteProfilePage = () => {
 
     execute({ ...formData, dob: new Date(dob) });
   };
+
+  if (!user) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 font-sans">
@@ -98,7 +109,7 @@ const CompleteProfilePage = () => {
                 name="name"
                 label="Full Name"
                 id="name"
-                defaultValue={user?.firstName || ""}
+                defaultValue={user?.firstName}
                 rules={{
                   required: "Name is required",
                   maxLength: { value: 50, message: "Name cannot exceed 50 characters" },
@@ -129,7 +140,7 @@ const CompleteProfilePage = () => {
                 name="email"
                 type="email"
                 label="Email Address"
-                defaultValue={user?.primaryEmailAddress?.emailAddress}
+                defaultValue={user.primaryEmailAddress.emailAddress}
                 readOnly={user?.primaryEmailAddress?.emailAddress ? true : false}
                 id="email"
                 rules={{

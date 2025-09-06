@@ -16,21 +16,21 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
         className="block"
       >
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h2 className="primary-heading font-[cal_sans] text-lg font-bold tracking-wide">
+          <h2 className="primary-heading font-[cal_sans] text-lg font-semibold tracking-widest">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
           </h2>
         </div>
-        <p className="mb-1 text-sm text-gray-700 dark:text-gray-300">
+        <p className="mb-1 font-[poppins] text-sm text-gray-700 dark:text-gray-300">
           {shortenTeamName("Royal Challengers Bangaluru")}:{" "}
           <span className="font-semibold">{"205/5 (20 overs)"}</span>
         </p>
-        <p className="text-sm text-gray-700 dark:text-gray-300">
+        <p className="font-[poppins] text-sm text-gray-700 dark:text-gray-300">
           {shortenTeamName("Chennai Super Kings")}:{" "}
           <span className="font-semibold">{"105/5 (15 overs)"}</span>
         </p>
-        <p className="text-sm leading-10 font-bold text-red-500">
+        <p className="font-[urbanist] text-sm leading-10 font-semibold text-red-500">
           {`${shortenTeamName("Chennai Super Kings")} needs 101 runs in 30 balls`}
         </p>
         <div className="absolute right-6 bottom-6">
@@ -54,7 +54,7 @@ export const UpcomingMatchCard = ({ className, match }: { className?: string; ma
           Indian Premier League 2025
         </Link>
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h2 className="primary-heading font-[cal_sans] text-lg font-bold tracking-wide">
+          <h2 className="primary-heading font-[cal_sans] text-lg font-bold tracking-widest">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
