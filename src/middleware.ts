@@ -14,7 +14,7 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  console.log(sessionClaims?.metadata.isProfileCompleted);
+  console.log("isProfileCompleted is ", sessionClaims?.metadata.isProfileCompleted);
 
   if (userId && !sessionClaims?.metadata?.isProfileCompleted) {
     const onboardingUrl = new URL("/onboarding", req.url);

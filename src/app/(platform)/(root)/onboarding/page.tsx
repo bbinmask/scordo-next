@@ -54,7 +54,6 @@ const CompleteProfilePage = () => {
   });
 
   const { user } = useUser();
-
   const { execute, isLoading, fieldErrors } = useAction(createUser, {
     onSuccess: (data) => {
       console.log("Successful");
@@ -130,7 +129,7 @@ const CompleteProfilePage = () => {
                 name="email"
                 type="email"
                 label="Email Address"
-                defaultValue={user?.primaryEmailAddress?.emailAddress || ""}
+                defaultValue={user?.primaryEmailAddress?.emailAddress}
                 readOnly={user?.primaryEmailAddress?.emailAddress ? true : false}
                 id="email"
                 rules={{
