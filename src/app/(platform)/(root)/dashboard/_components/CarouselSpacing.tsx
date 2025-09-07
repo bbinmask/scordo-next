@@ -1,38 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { Calendar, ChevronLeft, ChevronRight, PlayCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { LiveMatchCard, UpcomingMatchCard } from "./CarouselCard";
-import { Button } from "@/components/ui/button";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
-
-const matches = [
-  {
-    title: "India vs Australia",
-    date: "2025-06-05",
-    image: "/images/ind-aus.jpg",
-  },
-  {
-    title: "England vs Pakistan",
-    date: "2025-06-07",
-    image: "/images/eng-pak.jpg",
-  },
-  {
-    title: "South Africa vs New Zealand",
-    date: "2025-06-09",
-    image: "/images/sa-nz.jpg",
-  },
-  {
-    title: "Sri Lanka vs Bangladesh",
-    date: "2025-06-10",
-    image: "/images/sl-ban.jpg",
-  },
-  {
-    title: "West Indies vs Afghanistan",
-    date: "2025-06-12",
-    image: "/images/wi-afg.jpg",
-  },
-];
 
 export function CarouselSpacing({
   matches,
@@ -49,8 +20,8 @@ export function CarouselSpacing({
 
     const cardWidth =
       container.firstChild instanceof HTMLElement
-        ? container.firstChild.offsetWidth + 16 // 16px = gap-4
-        : 336; // default w-80 + gap
+        ? container.firstChild.offsetWidth + 12 // 12px = gap-3
+        : 252; // w-60 + gap
 
     container.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
   };
@@ -89,7 +60,7 @@ export function CarouselSpacing({
               <LiveMatchCard
                 key={i}
                 match={match}
-                className="mb-1 w-72 flex-shrink-0 transform rounded-xl bg-white p-4 shadow-md transition-transform duration-300 hover:scale-95 dark:bg-gray-800"
+                className="mb-1 w-60 flex-shrink-0 transform rounded-xl bg-white p-4 shadow-md transition-transform duration-300 hover:scale-95 dark:bg-gray-800"
               />
             ))}
           {status === "Upcoming" &&
@@ -97,7 +68,7 @@ export function CarouselSpacing({
               <UpcomingMatchCard
                 key={i}
                 match={match}
-                className="mb-1 w-72 flex-shrink-0 transform rounded-xl bg-white p-4 shadow-md transition-transform duration-300 hover:scale-95 dark:bg-gray-800"
+                className="mb-1 w-60 flex-shrink-0 transform rounded-xl bg-white p-4 shadow-md transition-transform duration-300 hover:scale-95 dark:bg-gray-800"
               />
             ))}
         </div>

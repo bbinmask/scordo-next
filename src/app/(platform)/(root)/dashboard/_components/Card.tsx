@@ -35,7 +35,7 @@ export const NewCard = ({
             </div>
             <div>
               <h3 className="text-xl font-bold text-gray-800 dark:text-white">{title}</h3>
-              <p className="mt-1 text-gray-500 dark:text-gray-400">{desc}</p>
+              <p className="mt-1 font-[poppins] text-xs text-gray-500 dark:text-gray-400">{desc}</p>
             </div>
           </div>
         </div>
