@@ -5,7 +5,7 @@ import { ListIcon, PlusCircle, Search, Users } from "lucide-react";
 const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
   const navLinks = [
     {
-      title: "All",
+      title: "Home",
       id: 1,
       path: "/teams",
       className: "",
