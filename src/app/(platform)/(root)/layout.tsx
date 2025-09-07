@@ -8,7 +8,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <Navbar />
       </nav>
       <div className="flex justify-center">
-        <div className="w-full max-w-[1200px]">{children}</div>
+        <div className="w-full max-w-[1200px] pb-[70px]">{children}</div>
       </div>
       <Bottombar />
     </QueryProvider>

@@ -1,11 +1,9 @@
-import { user } from "@/constants";
 import { MoonLoader } from "react-spinners";
-import Card, { NewCard } from "./_components/Card";
-import NewsList, { NewList } from "./_components/NewsList";
+import { NewCard } from "./_components/Card";
 import { CarouselSpacing } from "./_components/CarouselSpacing";
-import { BarChart2, Calendar, Play, Users } from "lucide-react";
+import { BarChart2, Users } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
-import UpdatesAndNewsWrapper from "./_components/UpdatesAndNewsWrapper";
+import UpdatesAndNewsWrapper from "./_components/UpdatesAndVideosWrapper";
 
 const DashboardPage = () => {
   const data = [
@@ -18,7 +16,7 @@ const DashboardPage = () => {
     {
       title: "Performance",
       desc: "See your performance",
-      link: "/stats/my-stats",
+      link: "/profile/stats",
       icon: <BarChart2 className="h-6 w-6" />,
     },
   ];
@@ -44,16 +42,12 @@ const DashboardPage = () => {
 
       <div className="px-4">
         <div className="mb-6 text-center md:text-left">
-          <h2 className="text-4xl font-extrabold text-gray-800 dark:text-white">
-            <span className="bg-gradient-to-r from-green-800 to-lime-600 bg-clip-text text-transparent dark:from-green-600 dark:to-lime-500">
+          <h1 className="font-[poppins] text-4xl font-extrabold text-gray-800 dark:text-white">
+            <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
               Dashboard
             </span>
-          </h2>
-          <p className="mt-2 font-[poppins] text-gray-500 dark:text-gray-400">
-            Manage your teams and track your performance.
-          </p>
+          </h1>
         </div>
-
         <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
           {data.map((item, i) => (
             <NewCard
@@ -68,13 +62,10 @@ const DashboardPage = () => {
 
         <div className="mb-6 text-center md:text-left">
           <h2 className="font-[poppins] text-4xl font-extrabold text-gray-800 dark:text-white">
-            <span className="bg-gradient-to-r from-green-600 to-teal-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
               Featured
             </span>
           </h2>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">
-            Stay informed with the latest news and announcements.
-          </p>
         </div>
         <UpdatesAndNewsWrapper />
       </div>

@@ -117,7 +117,7 @@ export default function NewsList() {
   );
 }
 
-function NewsCard({ article }: { article: ArticleProp }) {
+export function NewsCard({ article }: { article: ArticleProp }) {
   // Destructure properties from the article object.
   const { title, description, imageUrl, source, publishedAt, url } = article;
 
@@ -177,7 +177,7 @@ function NewsCard({ article }: { article: ArticleProp }) {
     </a>
   );
 }
-export const NewList = () => {
+export const UpdatesList = () => {
   const newsItems = [
     {
       title: "Historic Win: Team Alpha clinches the championship",
@@ -203,7 +203,7 @@ export const NewList = () => {
       {newsItems.map((item, i) => (
         <div
           key={i}
-          className="flex items-center space-x-4 rounded-lg bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:bg-gray-800"
+          className="flex items-center space-x-4 rounded-lg bg-gray-50 p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:bg-gray-800"
         >
           <div className="flex-shrink-0">
             <img

@@ -24,14 +24,14 @@ export const VideoList = () => {
       {videoItems.map((video, i) => (
         <div
           key={i}
-          className="my-2 flex w-full cursor-pointer gap-2 rounded-lg p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg"
+          className="my-2 flex w-full cursor-pointer gap-2 rounded-lg bg-gray-50 p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:bg-gray-800"
         >
           <div className="relative w-28 overflow-hidden rounded-lg shadow-lg transition-shadow duration-300">
             <img src={video.thumbnail} alt={video.title} className="w-full object-cover" />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <PlayCircle className="h-16 w-16 text-white/80" />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 hover:opacity-100">
+              <PlayCircle className="z-[999] h-6 w-6 text-white/80" />
             </div>
-            <span className="absolute right-2 bottom-2 rounded bg-black/70 px-2 py-1 text-xs font-semibold text-white">
+            <span className="absolute right-2 bottom-2 rounded bg-black/70 px-1 py-0.5 font-[poppins] text-[10px] font-medium text-white">
               {video.duration}
             </span>
           </div>

@@ -5,8 +5,8 @@ import { TeamsList } from "../_components/TeamComponents";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 const MyTeamsPage = () => {
   return (
-    <div className="rounded-3xl border py-6 transition-all duration-300">
-      <h1 className="text-main mb-4 text-center font-[Poppins] text-3xl font-black">My Teams</h1>
+    <div className="rounded-3xl border transition-all duration-300">
+      <h1 className="text-main mb-4 text-center font-[Poppins] text-3xl font-black">Your Teams</h1>
       {teams.length === 0 ? (
         <NotFoundParagraph description=" No squads found. Time to step onto the pitch and form one!" />
       ) : (

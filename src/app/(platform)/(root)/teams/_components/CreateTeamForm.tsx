@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createTeam } from "@/actions/team-actions";
 import { useAction } from "@/hooks/useAction";
-import { createUser } from "@/actions/user-actions";
 
 interface ITeamForm {
   name: string;
@@ -26,7 +25,7 @@ interface ITeamForm {
   isRecruiting: boolean;
 }
 
-const CreateTeamForm: React.FC = () => {
+const CreateTeamForm = () => {
   const {
     register,
     handleSubmit,
@@ -56,11 +55,8 @@ const CreateTeamForm: React.FC = () => {
     },
   });
 
-  const { execute: newExecute } = useAction(createUser);
-
   const [logoFileName, setLogoFileName] = useState<string | null>(null);
   const [bannerFileName, setBannerFileName] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const navigate = useRouter();
 
@@ -98,23 +94,36 @@ const CreateTeamForm: React.FC = () => {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Team Name */}
         <div className="mb-1">
+          <label htmlFor="name" className="text-foreground noun mb-1 block text-base font-medium">
+            <abbr className="" title="Enter your team's name">
+              Name
+            </abbr>
+          </label>
           <Input
+            id="name"
             {...register("name", { required: "Team name is required" })}
             placeholder="Enter your team's name"
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
+            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
           />
           {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
         </div>
 
-        {/* Username */}
         <div className="mb-1">
-          <label className="text-foreground mb-1 block text-base font-semibold">Username</label>
+          <label
+            htmlFor="abbreviation"
+            className="text-foreground noun mb-1 block text-base font-medium"
+          >
+            <abbr className="" title="A short name for your team (eg. IND for INDIA)">
+              Abbreviation
+            </abbr>
+          </label>
           <Input
+            id="abbreviation"
             {...register("abbreviation", {
-              required: "Create a abbreviation for the team",
+              required: "Create an abbreviation for the team",
             })}
-            placeholder="Create a abbreviation"
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
+            placeholder="Create an abbreviation"
+            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
           />
           {errors.abbreviation && (
             <p className="mt-1 text-sm text-red-600">{errors.abbreviation.message}</p>
@@ -122,8 +131,11 @@ const CreateTeamForm: React.FC = () => {
         </div>
         {/* Logo Upload */}
         <div>
-          <label className="text-foreground mb-1 block text-base font-semibold">Team Logo</label>
+          <label htmlFor="logo" className="text-foreground mb-1 block text-base font-medium">
+            Team Logo
+          </label>
           <Input
+            id="logo"
             type="file"
             accept="image/*"
             {...register("logo", {
@@ -141,8 +153,11 @@ const CreateTeamForm: React.FC = () => {
 
         {/* Banner Upload */}
         <div>
-          <label className="text-foreground mb-1 block text-base font-semibold">Team Banner</label>
+          <label htmlFor="banner" className="text-foreground mb-1 block text-base font-medium">
+            Team Banner
+          </label>
           <Input
+            id="banner"
             type="file"
             accept="image/*"
             {...register("banner", {
@@ -160,12 +175,14 @@ const CreateTeamForm: React.FC = () => {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Team Type */}
         <div>
-          <label className="text-foreground mb-1 block text-base font-semibold">Team Type</label>
+          <label htmlFor="type" className="text-foreground mb-1 block text-base font-medium">
+            Team Type
+          </label>
           <select
             id="type"
             {...register("type", { required: "Select a team type" })}
             defaultValue={"local"}
-            className="w-[calc(100%-2rem)] rounded-md border border-gray-300 bg-white p-2 font-semibold text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-100"
+            className="w-[calc(100%-2rem)] rounded-md border border-gray-300 bg-white p-2 font-normal text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-100"
           >
             <option value="local">Local</option>
             <option value="college">College</option>
@@ -178,35 +195,44 @@ const CreateTeamForm: React.FC = () => {
 
         {/* Location */}
         <div>
-          <label className="text-foreground mb-1 block text-base font-semibold">City</label>
+          <label htmlFor="city" className="text-foreground mb-1 block text-base font-medium">
+            City
+          </label>
           <Input
+            id="city"
             placeholder="Enter your city"
             {...register("address.city", { required: "City is required" })}
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
+            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
           />
           {errors.address?.city && (
             <p className="mt-1 text-sm text-red-600">{errors.address.city.message}</p>
           )}
         </div>
         <div>
-          <label className="text-foreground mb-1 block text-base font-semibold">State</label>
+          <label htmlFor="state" className="text-foreground mb-1 block text-base font-medium">
+            State
+          </label>
           <Input
+            id="state"
             {...register("address.state")}
             placeholder="Enter your state"
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
+            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
           />
           {errors.address?.state && (
             <p className="mt-1 text-sm text-red-600">{errors.address.state.message}</p>
           )}
         </div>
         <div className="">
-          <label className="text-foreground mb-1 block text-base font-semibold">Country</label>
+          <label htmlFor="country" className="text-foreground mb-1 block text-base font-medium">
+            Country
+          </label>
           <Input
+            id="country"
             {...register("address.country", {
               required: "Country is required",
             })}
             placeholder="Enter your country"
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-semibold"
+            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
           />
           {errors.address?.country && (
             <p className="mt-1 text-sm text-red-600">{errors.address.country.message}</p>
@@ -216,14 +242,14 @@ const CreateTeamForm: React.FC = () => {
 
       {/* Recruiting */}
       <div className="between relative flex gap-2">
-        {" "}
-        <label className="text-accent-foreground text-base font-semibold">
+        <label htmlFor="isRecruiting" className="text-accent-foreground text-base font-normal">
           Recruiting new players
         </label>
         <div
           className={`switch bg-gradient-to-r ${isRecruiting ? "from-lime-500 via-green-600 to-emerald-600" : "from-teal-900 via-green-900/80 to-gray-400/70"}`}
         >
           <Input
+            id="isRecruiting"
             type="checkbox"
             {...register("isRecruiting")}
             className="relative z-20 h-full w-full rounded border-gray-300 text-emerald-600"
@@ -236,11 +262,11 @@ const CreateTeamForm: React.FC = () => {
       <Button
         variant="default"
         type="submit"
-        disabled={loading}
-        className={`font-urbanist relative w-full rounded-md border-none bg-emerald-600 px-6 py-3 tracking-wide text-white outline-none hover:bg-emerald-700 focus:ring-1 focus:ring-emerald-500 ${loading && "text-opacity-70"}`}
+        disabled={isLoading}
+        className={`font-urbanist relative w-full rounded-md border-none bg-emerald-600 px-6 py-3 tracking-wide text-white outline-none hover:bg-emerald-700 focus:ring-1 focus:ring-emerald-500 ${isLoading && "text-opacity-70"}`}
       >
         Create Team
-        {loading && <CgSpinner className="absolute animate-spin text-white" />}
+        {isLoading && <CgSpinner className="absolute animate-spin text-white" />}
       </Button>
     </form>
   );

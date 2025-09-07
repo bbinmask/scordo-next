@@ -140,6 +140,10 @@
   body {
     @apply text-foreground m-0 box-border p-0;
   }
+
+  abbr {
+    @apply no-underline;
+  }
 }
 
 body {

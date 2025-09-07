@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { VideoList } from "../../_components/VideoList";
-import NewsList, { NewList } from "./NewsList";
+import { UpdatesList } from "./NewsList";
 import { Newspaper, Video } from "lucide-react";
 
 const UpdatesAndNewsWrapper = () => {
@@ -33,7 +33,7 @@ const UpdatesAndNewsWrapper = () => {
       </div>
 
       <div>
-        {activeTab === "updates" && <NewList />}
+        {activeTab === "updates" && <UpdatesList />}
         {activeTab === "videos" && <VideoList />}
       </div>
     </div>
