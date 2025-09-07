@@ -1,6 +1,8 @@
 import cloudinary from "@/lib/cloudinary";
 
-export async function uploadImage(image: File) {
+type FolderProp = "logo" | "banner" | "team-logo" | "team-banner";
+
+export async function uploadImage(image: File, folder: FolderProp = "logo") {
   let imageUrl;
 
   const arrayBuffer = await image.arrayBuffer();

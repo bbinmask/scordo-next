@@ -19,9 +19,7 @@ export function CarouselSpacing({
     if (!container) return;
 
     const cardWidth =
-      container.firstChild instanceof HTMLElement
-        ? container.firstChild.offsetWidth + 12 // 12px = gap-3
-        : 252; // w-60 + gap
+      container.firstChild instanceof HTMLElement ? container.firstChild.offsetWidth + 12 : 252;
 
     container.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
   };

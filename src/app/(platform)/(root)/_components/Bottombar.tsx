@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Users, PlusCircle, Trophy, User, Settings } from "lucide-react";
+import { isTabActive } from "@/utils";
 
 const Bottombar = () => {
   const pathname = usePathname();
@@ -49,7 +50,7 @@ const Bottombar = () => {
     <div className="primary-background fixed bottom-0 left-1/2 z-[999] flex h-16 w-full max-w-[800px] -translate-x-1/2 justify-center rounded-t-lg shadow-lg transition-all">
       <ul className="m-0 grid w-full grid-cols-5 gap-2 rounded-t-2xl px-2 py-1 shadow-lg shadow-black md:grid-cols-6">
         {navLinks.map((item, i) => {
-          const isActive = pathname === item.path || pathname.startsWith(`${item.path}/`);
+          const isActive = isTabActive(pathname, item.path);
           const Icon = item.icon;
 
           return (

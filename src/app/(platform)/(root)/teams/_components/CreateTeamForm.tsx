@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createTeam } from "@/actions/team-actions";
 import { useAction } from "@/hooks/useAction";
+import FormSelect from "../../_components/FormSelect";
 
 interface ITeamForm {
   name: string;
@@ -68,7 +69,6 @@ const CreateTeamForm = () => {
     if (fieldName === "logo") setLogoFileName(file?.name || null);
     if (fieldName === "banner") setBannerFileName(file?.name || null);
   };
-  const { fetchData } = useAxios();
   const isRecruiting = watch("isRecruiting");
   const logo = watch("logo");
   const banner = watch("banner");
@@ -94,13 +94,16 @@ const CreateTeamForm = () => {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Team Name */}
         <div className="mb-1">
-          <label htmlFor="name" className="text-foreground noun mb-1 block text-base font-medium">
+          <label
+            htmlFor="team-name"
+            className="text-foreground noun mb-1 block text-base font-medium"
+          >
             <abbr className="" title="Enter your team's name">
               Name
             </abbr>
           </label>
           <Input
-            id="name"
+            id="team-name"
             {...register("name", { required: "Team name is required" })}
             placeholder="Enter your team's name"
             className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
@@ -131,11 +134,11 @@ const CreateTeamForm = () => {
         </div>
         {/* Logo Upload */}
         <div>
-          <label htmlFor="logo" className="text-foreground mb-1 block text-base font-medium">
+          <label htmlFor="team-logo" className="text-foreground mb-1 block text-base font-medium">
             Team Logo
           </label>
           <Input
-            id="logo"
+            id="team-logo"
             type="file"
             accept="image/*"
             {...register("logo", {
@@ -153,11 +156,11 @@ const CreateTeamForm = () => {
 
         {/* Banner Upload */}
         <div>
-          <label htmlFor="banner" className="text-foreground mb-1 block text-base font-medium">
+          <label htmlFor="team-banner" className="text-foreground mb-1 block text-base font-medium">
             Team Banner
           </label>
           <Input
-            id="banner"
+            id="team-banner"
             type="file"
             accept="image/*"
             {...register("banner", {
@@ -174,24 +177,22 @@ const CreateTeamForm = () => {
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* Team Type */}
-        <div>
-          <label htmlFor="type" className="text-foreground mb-1 block text-base font-medium">
-            Team Type
-          </label>
-          <select
-            id="type"
-            {...register("type", { required: "Select a team type" })}
-            defaultValue={"local"}
-            className="w-[calc(100%-2rem)] rounded-md border border-gray-300 bg-white p-2 font-normal text-gray-900 shadow-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-100"
-          >
-            <option value="local">Local</option>
-            <option value="college">College</option>
-            <option value="club">Club</option>
-            <option value="corporate">Corporate</option>
-            <option value="others">Others</option>
-          </select>
-          {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>}
-        </div>
+        <FormSelect
+          data={[
+            { label: "Local", value: "local" },
+            { label: "College", value: "college" },
+            { label: "Club", value: "club" },
+            { label: "Corporate", value: "corporate" },
+            { label: "Others", value: "other" },
+          ]}
+          name="type"
+          register={register}
+          label="Team Type"
+          placeholder="Select your team's type"
+          rules={{ required: "Type is required" }}
+        />
+
+        {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>}
 
         {/* Location */}
         <div>

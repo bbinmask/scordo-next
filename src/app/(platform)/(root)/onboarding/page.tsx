@@ -63,8 +63,8 @@ const CompleteProfilePage = () => {
       availability: "available",
       gender: "male",
       role: "fan",
-      email: user?.primaryEmailAddress.emailAddress,
-      name: user?.firstName,
+      email: user?.primaryEmailAddress?.emailAddress,
+      name: user?.firstName || undefined,
     },
   });
 
@@ -109,7 +109,7 @@ const CompleteProfilePage = () => {
                 name="name"
                 label="Full Name"
                 id="name"
-                defaultValue={user?.firstName}
+                defaultValue={user?.firstName || undefined}
                 rules={{
                   required: "Name is required",
                   maxLength: { value: 50, message: "Name cannot exceed 50 characters" },
@@ -140,7 +140,7 @@ const CompleteProfilePage = () => {
                 name="email"
                 type="email"
                 label="Email Address"
-                defaultValue={user.primaryEmailAddress.emailAddress}
+                defaultValue={user.primaryEmailAddress?.emailAddress}
                 readOnly={user?.primaryEmailAddress?.emailAddress ? true : false}
                 id="email"
                 rules={{

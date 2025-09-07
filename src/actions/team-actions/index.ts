@@ -20,10 +20,10 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   let logoUrl, bannerUrl;
 
   if (logo) {
-    logoUrl = (await uploadImage(logo)).imageUrl;
+    logoUrl = (await uploadImage(logo, "team-logo")).imageUrl;
   }
   if (banner) {
-    bannerUrl = (await uploadImage(banner)).imageUrl;
+    bannerUrl = (await uploadImage(banner, "team-banner")).imageUrl;
   }
 
   let team;
