@@ -4,7 +4,7 @@ interface StatsCardProps {
   iconPath: string;
 }
 
-const StatsCard = ({ title, value, iconPath }: StatsCardProps) => {
+export const StatsCard = ({ title, value, iconPath }: StatsCardProps) => {
   return (
     <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-6 text-center shadow-md dark:border-emerald-700 dark:bg-emerald-800">
       <div className="mb-4 flex justify-center text-green-800 dark:text-lime-300">

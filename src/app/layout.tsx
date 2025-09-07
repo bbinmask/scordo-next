@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="layout-background dark:bg-red-600">
-        <main className={`min-h-screen w-full antialiased`}>{children}</main>
+        <main className={`min-h-[calc(100vh-100px)] w-full antialiased`}>{children}</main>
       </body>
     </html>
   );

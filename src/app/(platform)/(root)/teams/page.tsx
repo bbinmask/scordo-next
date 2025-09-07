@@ -1,13 +1,12 @@
+import { StatsCard } from "./_components/stats/StatsCard";
+
 const TeamsPage = () => {
   return (
     <div>
       <div className="mb-16 text-center">
         <h1 className="text-4xl font-extrabold tracking-wide text-green-800 drop-shadow-lg sm:text-5xl dark:text-lime-300">
-          Your Cricket Squads
+          Scordo Teams
         </h1>
-        <p className="mt-2 text-lg text-gray-700 dark:text-gray-300">
-          Unite with players and form your championship-winning teams.
-        </p>
       </div>
 
       {/* Your Teams Section */}

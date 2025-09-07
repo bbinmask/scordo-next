@@ -4,13 +4,13 @@ import QueryProvider from "@/components/providers/QueryProvider";
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryProvider>
-      <div className="">
-        <nav className="mb-24">
-          <Navbar />
-        </nav>
-        <div className="pb-[86px]">{children}</div>
-        <Bottombar />
+      <nav className="mb-24">
+        <Navbar />
+      </nav>
+      <div className="flex justify-center">
+        <div className="w-full max-w-[1200px]">{children}</div>
       </div>
+      <Bottombar />
     </QueryProvider>
   );
 };

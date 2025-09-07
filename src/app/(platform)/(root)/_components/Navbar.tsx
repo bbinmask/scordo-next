@@ -59,7 +59,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="primary-background fixed top-0 z-[999] grid min-h-12 w-full items-center px-2 py-3 shadow-lg shadow-black/60">
+    <div className="primary-background fixed top-0 z-[999] grid min-h-12 w-full items-center rounded-md px-2 py-3 shadow-lg shadow-black/60">
       <div className="flex w-full items-center">
         <div className="flex w-full items-center justify-between">
           <Link
