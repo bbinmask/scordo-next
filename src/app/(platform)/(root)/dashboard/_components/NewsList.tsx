@@ -198,40 +198,34 @@ export const UpdatesList = () => {
       image: "https://placehold.co/100x80/60A5FA/FFFFFF?text=Rules",
     },
   ];
-  return (
-    <div className="space-y-4">
-      {newsItems.map((item, i) => (
-        <div
-          key={i}
-          className="flex items-center space-x-4 rounded-lg bg-gray-50 p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:bg-gray-800"
-        >
-          <div className="flex-shrink-0">
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-24 rounded-md object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.onerror = null;
-                target.src = "https://placehold.co/100x80/CCCCCC/FFFFFF?text=Error";
-              }}
-            />
-          </div>
-          <div className="flex-grow">
-            <p className="line-clamp-2 font-semibold text-gray-800 dark:text-gray-100">
-              {item.title}
-            </p>
-            <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
-              <span>{item.category}</span>
-              <span className="text-gray-300 dark:text-gray-600">•</span>
-              <span>{item.time}</span>
-            </div>
-          </div>
-          <div className="flex-shrink-0">
-            <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-          </div>
+  return newsItems.map((item, i) => (
+    <div
+      key={i}
+      className="mb-2 flex items-center space-x-4 rounded-lg border border-transparent bg-gray-50 p-4 shadow-sm transition-shadow duration-300 hover:border-gray-300 hover:shadow-lg dark:bg-gray-800 dark:hover:border-gray-700"
+    >
+      <div className="flex-shrink-0">
+        <img
+          src={item.image}
+          alt={item.title}
+          className="w-24 rounded-md object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.onerror = null;
+            target.src = "https://placehold.co/100x80/CCCCCC/FFFFFF?text=Error";
+          }}
+        />
+      </div>
+      <div className="flex-grow">
+        <p className="line-clamp-2 font-semibold text-gray-800 dark:text-gray-100">{item.title}</p>
+        <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
+          <span>{item.category}</span>
+          <span className="text-gray-300 dark:text-gray-600">•</span>
+          <span>{item.time}</span>
         </div>
-      ))}
+      </div>
+      <div className="flex-shrink-0">
+        <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+      </div>
     </div>
-  );
+  ));
 };

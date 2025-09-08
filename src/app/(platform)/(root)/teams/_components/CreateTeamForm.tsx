@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import useAxios from "@/hooks/useAxios";
 import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -52,6 +51,7 @@ const CreateTeamForm = () => {
       toast.success(data.name + " is created");
     },
     onError: (error) => {
+      console.error(error);
       toast.error(error);
     },
   });
@@ -106,7 +106,7 @@ const CreateTeamForm = () => {
             id="team-name"
             {...register("name", { required: "Team name is required" })}
             placeholder="Enter your team's name"
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
+            className="text-foreground w-full py-4 font-normal"
           />
           {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
         </div>
@@ -126,7 +126,7 @@ const CreateTeamForm = () => {
               required: "Create an abbreviation for the team",
             })}
             placeholder="Create an abbreviation"
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
+            className="text-foreground w-full py-4 font-normal"
           />
           {errors.abbreviation && (
             <p className="mt-1 text-sm text-red-600">{errors.abbreviation.message}</p>
@@ -144,7 +144,7 @@ const CreateTeamForm = () => {
             {...register("logo", {
               onChange: (e) => handleFileChange(e, "logo"),
             })}
-            className="block w-[calc(100%-2rem)] text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
+            className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
           />
           {logoFileName && (
             <div>
@@ -166,7 +166,7 @@ const CreateTeamForm = () => {
             {...register("banner", {
               onChange: (e) => handleFileChange(e, "banner"),
             })}
-            className="block w-[calc(100%-2rem)] text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
+            className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
           />
           {bannerFileName && (
             <img src={URL.createObjectURL(banner[0])} alt="" className="w-20 object-cover" />
@@ -175,7 +175,7 @@ const CreateTeamForm = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid items-end gap-4 md:grid-cols-2">
         {/* Team Type */}
         <FormSelect
           data={[
@@ -203,7 +203,7 @@ const CreateTeamForm = () => {
             id="city"
             placeholder="Enter your city"
             {...register("address.city", { required: "City is required" })}
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
+            className="text-foreground w-full py-4 font-normal"
           />
           {errors.address?.city && (
             <p className="mt-1 text-sm text-red-600">{errors.address.city.message}</p>
@@ -217,7 +217,7 @@ const CreateTeamForm = () => {
             id="state"
             {...register("address.state")}
             placeholder="Enter your state"
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
+            className="text-foreground w-full py-4 font-normal"
           />
           {errors.address?.state && (
             <p className="mt-1 text-sm text-red-600">{errors.address.state.message}</p>
@@ -233,7 +233,7 @@ const CreateTeamForm = () => {
               required: "Country is required",
             })}
             placeholder="Enter your country"
-            className="text-foreground w-[calc(100%-2rem)] py-4 font-normal"
+            className="text-foreground w-full py-4 font-normal"
           />
           {errors.address?.country && (
             <p className="mt-1 text-sm text-red-600">{errors.address.country.message}</p>
@@ -260,15 +260,17 @@ const CreateTeamForm = () => {
       </div>
 
       {/* Submit */}
-      <Button
-        variant="default"
-        type="submit"
-        disabled={isLoading}
-        className={`font-urbanist relative w-full rounded-md border-none bg-emerald-600 px-6 py-3 tracking-wide text-white outline-none hover:bg-emerald-700 focus:ring-1 focus:ring-emerald-500 ${isLoading && "text-opacity-70"}`}
-      >
-        Create Team
-        {isLoading && <CgSpinner className="absolute animate-spin text-white" />}
-      </Button>
+      <div className="center flex w-full">
+        <Button
+          variant="default"
+          type="submit"
+          disabled={isLoading}
+          className={`primary-btn w-full max-w-48`}
+        >
+          {!isLoading && "Create Team"}
+          {isLoading && <CgSpinner className="absolute animate-spin text-white" />}
+        </Button>
+      </div>
     </form>
   );
 };

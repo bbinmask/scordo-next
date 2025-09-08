@@ -7,17 +7,38 @@ import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
 import { CreateTeam } from "./schema";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
+import { User } from "@/generated/prisma";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
-  const { userId } = await auth();
+  const { userId: clerkId } = await auth();
 
-  if (!userId) {
+  if (!clerkId) {
     return { error: "Unauthorized" };
   }
 
   const { name, abbreviation, address, logo, banner, isRecruiting, type } = data;
 
   let logoUrl, bannerUrl;
+
+  let user: User | null = null;
+  try {
+    user =
+      (await prisma?.user.findUnique({
+        where: {
+          clerkId,
+        },
+      })) ?? null;
+  } catch (error: any) {
+    return {
+      error: error.message || "User not found!",
+    };
+  }
+
+  if (!user) {
+    return {
+      error: "User not found!",
+    };
+  }
 
   if (logo) {
     logoUrl = (await uploadImage(logo, "team-logo")).imageUrl;
@@ -36,8 +57,10 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         logo: (logoUrl as string) || null,
         banner: (bannerUrl as string) || null,
         isRecruiting,
+        captain: user.id,
+        players: [user.id],
         type,
-        owner: userId,
+        owner: user.id,
       },
     });
 
@@ -46,6 +69,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         error: "Failed to create team",
       };
   } catch (error: any) {
+    console.log(error);
     return {
       error: error.message || "Failed to create",
     };
