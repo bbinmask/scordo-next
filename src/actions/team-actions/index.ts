@@ -8,6 +8,7 @@ import { createSafeAction } from "@/lib/create-safe-action";
 import { CreateTeam } from "./schema";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
 import { User } from "@/generated/prisma";
+import { redirect } from "next/navigation";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId: clerkId } = await auth();
@@ -75,8 +76,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  revalidatePath(`/teams/${team.id}`);
-  return { data: team };
+  redirect(`/teams/${team.id}`);
 };
 
 export const createTeam = createSafeAction(CreateTeam, handler);

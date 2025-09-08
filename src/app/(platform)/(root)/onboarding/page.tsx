@@ -177,7 +177,11 @@ const CompleteProfilePage = () => {
           </div>
 
           <div className="center mt-4 flex w-full">
-            <Button type="submit" className="mx-auto w-full max-w-72" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="primary-btn w-full max-w-72 cursor-pointer"
+              disabled={isLoading}
+            >
               {isLoading ? <Spinner /> : <>Submit</>}
             </Button>
           </div>

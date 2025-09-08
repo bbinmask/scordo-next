@@ -14,17 +14,23 @@ const MyTeamsPage = async () => {
     },
   });
 
-  console.log(teams);
-  return;
-
   return (
-    <div className="rounded-3xl border transition-all duration-300">
-      <h1 className="text-main mb-4 text-center font-[Poppins] text-3xl font-black">Your Teams</h1>
-      {teams.length === 0 ? (
-        <NotFoundParagraph description=" No squads found. Time to step onto the pitch and form one!" />
-      ) : (
-        <TeamsList teams={teams} />
-      )}
+    <div className="center flex w-full">
+      <div className="container-bg w-full rounded-2xl border p-6 lg:p-10">
+        <h2 className="primary-heading mb-6 text-center font-[cal_sans] text-3xl font-black tracking-wide">
+          Your Teams
+        </h2>
+        {teams.length === 0 ? (
+          <NotFoundParagraph
+            description=" No squads found. Time to step onto the pitch and form one!"
+            redirect
+            title="Create a team"
+            link="/teams/create"
+          />
+        ) : (
+          <TeamsList teams={teams} />
+        )}
+      </div>
     </div>
   );
 };

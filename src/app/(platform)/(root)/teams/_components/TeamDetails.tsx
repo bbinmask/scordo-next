@@ -65,7 +65,7 @@ const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamP
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
             <div className="absolute bottom-0 left-0 flex items-end p-4 md:p-6">
               <img
-                src={team.logo}
+                src={team.logo || "./user.svg"}
                 alt={`${team.name} Logo`}
                 className="aspect-square w-24 rounded-full border-4 border-blue-500 bg-white object-cover shadow-lg md:h-32 md:w-32 dark:border-blue-400"
               />
@@ -75,7 +75,7 @@ const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamP
                 </h1>
                 <p className="mt-1 text-sm text-gray-200 md:text-base">
                   {typeof team.owner !== "string" && team.owner?.name} - Est.{" "}
-                  {formatDate(new Date(team.createdAt), "MMMM d, yyyy")}
+                  {team?.createdAt && formatDate(new Date(team.createdAt), "MMMM d, yyyy")}
                 </p>
               </div>
             </div>
@@ -147,7 +147,7 @@ const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamP
                   <li className="flex items-center">
                     <UserIcon className="mr-2 h-5 w-5 text-blue-500" /> Captain:{" "}
                     <span className="ml-1 font-medium">
-                      {typeof team.captain !== "string" && team.captain.name}
+                      {team.captain && typeof team.captain !== "string" && team.captain.name}
                     </span>
                   </li>
                   <li className="flex items-center">
