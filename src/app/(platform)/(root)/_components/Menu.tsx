@@ -1,21 +1,18 @@
 "use client";
+
 import { useState } from "react";
-import { ListIcon, PlusCircle, Search, Users, X, MenuIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { X, MenuIcon } from "lucide-react";
 import RouteNavigations from "./RouteNavigations";
 
 const Menu = ({ navLinks }: { navLinks: any }) => {
-  // State to control the visibility of the entire horizontal navbar
-  const [isNavbarActive, setIsNavbarActive] = useState(false);
+  const [isNavbarActive, setIsNavbarActive] = useState(true);
 
-  // Function to toggle the main horizontal navbar's visibility
   const toggleMainNavbar = () => {
     setIsNavbarActive((prev) => !prev);
   };
 
   return (
     <div className="absolute top-0 right-0 flex items-start py-1">
-      {/* Main Navigation Bar */}
       <nav
         id="mainNavbar"
         className={`top-0 left-0 z-40 w-full transform px-2 transition-transform duration-500 ease-in-out ${
@@ -24,7 +21,6 @@ const Menu = ({ navLinks }: { navLinks: any }) => {
       >
         <RouteNavigations navLinks={navLinks} />
       </nav>
-      {/* Button to toggle the main navbar visibility */}
       <button
         id="showNavbarButton"
         onClick={toggleMainNavbar}
