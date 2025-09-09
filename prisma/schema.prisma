@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -13,8 +7,6 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-
-// Enums
 
 enum Role {
   player
@@ -63,13 +55,6 @@ enum RequestStatus {
   rejected
 }
 
-enum ExtraType {
-  WIDE
-  NO_BALL
-  BYE
-  LEG_BYE
-}
-
 enum WicketType {
   BOWLED
   CAUGHT
@@ -84,8 +69,6 @@ enum MatchStatus {
   in_progress
   completed
 }
-
-// Embedded type 
 
 type Address {
   city    String
@@ -107,8 +90,6 @@ type TournamentDetails {
   location       Address?
 }
 
-// Models
-
 model User {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
   clerkId      String       @unique
@@ -123,12 +104,17 @@ model User {
   avatar       String?
   isVerified   Boolean      @default(false)
   bio          String?
-  friends      String[]     @db.ObjectId
-  friendsOf    String[]     @db.ObjectId
   address      Address?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  teams        String[]     @db.ObjectId
+
+  teamsOwned       Team[]        @relation("UserTeams")
+  captainOf        Team[]        @relation("TeamCaptain")
+  tournaments      Tournament[]  @relation("TournamentOrganizer")
+  players          Player[]      @relation("UserPlayerEntries")
+  sentRequests     TeamRequest[] @relation("SentRequests")
+  receivedRequests TeamRequest[] @relation("ReceivedRequests")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Team {
@@ -138,154 +124,199 @@ model Team {
   banner       String?
   abbreviation String
   address      Address?
-  players      String[] @db.ObjectId
   type         TeamType @default(others)
-  owner        String   @db.ObjectId
   isRecruiting Boolean  @default(false)
-  captain      String?  @db.ObjectId
 
-  joinRequests TeamRequest[]
+  ownerId   String  @db.ObjectId
+  owner     User    @relation("UserTeams", fields: [ownerId], references: [id])
+  captainId String? @db.ObjectId
+  captain   User?   @relation("TeamCaptain", fields: [captainId], references: [id])
 
-  Player Player[]
+  players           Player[]            @relation("TeamPlayers")
+  joinRequests      TeamRequest[]       @relation("TeamJoinRequests")
+  tournamentRequest TournamentRequest[] @relation("TeamTournamentRequests")
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  matchesAsTeamA Match[] @relation("TeamA")
+  matchesAsTeamB Match[] @relation("TeamB")
+
+  inningsBatted Inning[] @relation("BattingInnings")
+  inningsBowled Inning[] @relation("BowlingInnings")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Tournament {
-  id          String              @id @default(auto()) @map("_id") @db.ObjectId
-  title       String              @unique
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  title       String            @unique
   details     TournamentDetails
   description String?
-  requests    TournamentRequest[]
-  organizer   String              @db.ObjectId
-  rules       String[]
-  startDate   DateTime
-  endDate     DateTime
+  organizerId String            @db.ObjectId
+
+  organizer User                @relation("TournamentOrganizer", fields: [organizerId], references: [id])
+  requests  TournamentRequest[] @relation("TournamentJoinRequests")
+  matches   Match[]             @relation("TournamentMatches")
+
+  rules     String[]
+  startDate DateTime
+  endDate   DateTime
 }
 
 model TournamentRequest {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  to        String     @unique @db.ObjectId
-  from      String     @unique @db.ObjectId
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  reqId     String     @db.ObjectId
-  requests  Tournament @relation(fields: [reqId], references: [id])
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  teamId       String @db.ObjectId
+  tournamentId String @db.ObjectId
+
+  team       Team       @relation("TeamTournamentRequests", fields: [teamId], references: [id])
+  tournament Tournament @relation("TournamentJoinRequests", fields: [tournamentId], references: [id])
+
+  status    RequestStatus @default(pending)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@unique([teamId, tournamentId])
 }
 
 model TeamRequest {
-  id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  to        String        @unique @db.ObjectId
-  from      String        @unique @db.ObjectId
-  status    RequestStatus
-  teamId    String        @unique @db.ObjectId
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  toId   String @db.ObjectId
+  fromId String @db.ObjectId
+  teamId String @db.ObjectId
+
+  to   User @relation("ReceivedRequests", fields: [toId], references: [id])
+  from User @relation("SentRequests", fields: [fromId], references: [id])
+  team Team @relation("TeamJoinRequests", fields: [teamId], references: [id])
+
+  status    RequestStatus @default(pending)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-  team      Team          @relation(fields: [teamId], references: [id])
+
+  @@unique([toId, fromId, teamId])
 }
 
 model Match {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  teamA          String        @db.ObjectId
-  teamB          String        @db.ObjectId
-  teamAPlayingXI String[]      @db.ObjectId
-  teamBPlayingXI String[]      @db.ObjectId
-  overs          Int
-  innings        Inning[]
-  superOvers     String[]      @db.ObjectId
-  venue          Address
-  uid            String        @default(uuid())
-  tossWinner     String?
-  tossDecision   String?
-  category       MatchCategory @default(others)
-  date           DateTime?
-  location       String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  status         MatchStatus   @default(not_started)
-  result         String?
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  teamAId      String  @db.ObjectId
+  teamBId      String  @db.ObjectId
+  tournamentId String? @db.ObjectId
+
+  teamA      Team        @relation("TeamA", fields: [teamAId], references: [id])
+  teamB      Team        @relation("TeamB", fields: [teamBId], references: [id])
+  tournament Tournament? @relation("TournamentMatches", fields: [tournamentId], references: [id])
+
+  innings      Inning[]      @relation("MatchInnings")
+  venue        Address
+  tossWinner   String?
+  tossDecision String?
+  category     MatchCategory @default(others)
+  date         DateTime?
+  location     String?
+
+  status MatchStatus @default(not_started)
+  result String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Inning {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  matchId String @db.ObjectId
-  match   Match  @relation(fields: [matchId], references: [id])
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  matchId       String @db.ObjectId
+  battingTeamId String @db.ObjectId
+  bowlingTeamId String @db.ObjectId
 
-  battingTeam String @db.ObjectId
-  bowlingTeam String @db.ObjectId
+  match       Match @relation("MatchInnings", fields: [matchId], references: [id])
+  battingTeam Team  @relation("BattingInnings", fields: [battingTeamId], references: [id])
+  bowlingTeam Team  @relation("BowlingInnings", fields: [bowlingTeamId], references: [id])
 
   runs    Int @default(0)
   wickets Int @default(0)
   overs   Int @default(0)
   balls   Int @default(0)
 
-  currentStrikerId    String? @db.ObjectId
-  currentNonStrikerId String? @db.ObjectId
-  currentBowlerId     String? @db.ObjectId
+  currentStrikerId    String? @unique @db.ObjectId
+  currentNonStrikerId String? @unique @db.ObjectId
+  currentBowlerId     String? @unique @db.ObjectId
 
-  ballsData Ball[]
+  currentStriker    Player? @relation("CurrentStriker", fields: [currentStrikerId], references: [id])
+  currentNonStriker Player? @relation("CurrentNonStriker", fields: [currentNonStrikerId], references: [id])
+  currentBowler     Player? @relation("CurrentBowler", fields: [currentBowlerId], references: [id])
+
+  ballsData     Ball[]          @relation("InningBalls")
+  InningBatting InningBatting[] @relation("InningBatsmenStats")
+  InningBowling InningBowling[] @relation("InningBowlerStats")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  InningBatting InningBatting[]
-
-  InningBowling InningBowling[]
 }
 
 model Player {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @db.ObjectId
-  name   String
   teamId String @db.ObjectId
-  team   Team   @relation(fields: [teamId], references: [id])
 
-  inningsBatting InningBatting[]
-  inningsBowling InningBowling[]
+  user User @relation("UserPlayerEntries", fields: [userId], references: [id])
+  team Team @relation("TeamPlayers", fields: [teamId], references: [id])
 
-  Ball Ball[]
+  inningsBatting InningBatting[] @relation("PlayerBattingStats")
+  inningsBowling InningBowling[] @relation("PlayerBowlingStats")
+
+  ballsBatted  Ball[] @relation("Batsman")
+  ballsBowled  Ball[] @relation("Bowler")
+  ballsFielded Ball[] @relation("Fielder")
+
+  inningAsStriker    Inning? @relation("CurrentStriker")
+  inningAsNonStriker Inning? @relation("CurrentNonStriker")
+  inningAsBowler     Inning? @relation("CurrentBowler")
 }
 
 model InningBatting {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  inningId String  @db.ObjectId
-  inning   Inning  @relation(fields: [inningId], references: [id])
-  runs     Int     @default(0)
-  balls    Int     @default(0)
-  fours    Int     @default(0)
-  sixes    Int     @default(0)
-  isOut    Boolean @default(false)
-  dots     Int     @default(0)
-  playerId String  @db.ObjectId
-  player   Player  @relation(fields: [playerId], references: [id])
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  inningId String @db.ObjectId
+  playerId String @db.ObjectId
+
+  inning Inning @relation("InningBatsmenStats", fields: [inningId], references: [id])
+  player Player @relation("PlayerBattingStats", fields: [playerId], references: [id])
+
+  runs  Int     @default(0)
+  balls Int     @default(0)
+  fours Int     @default(0)
+  sixes Int     @default(0)
+  isOut Boolean @default(false)
+  dots  Int     @default(0)
 }
 
 model InningBowling {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   inningId String @db.ObjectId
-  inning   Inning @relation(fields: [inningId], references: [id])
-  overs    Int    @default(0)
-  balls    Int    @default(0)
-  runs     Int    @default(0)
-  wickets  Int    @default(0)
-  maidens  Int    @default(0)
-  noBalls  Int    @default(0)
-  wides    Int    @default(0)
-
   playerId String @db.ObjectId
-  player   Player @relation(fields: [playerId], references: [id])
+
+  inning Inning @relation("InningBowlerStats", fields: [inningId], references: [id])
+  player Player @relation("PlayerBowlingStats", fields: [playerId], references: [id])
+
+  overs   Int @default(0)
+  balls   Int @default(0)
+  runs    Int @default(0)
+  wickets Int @default(0)
+  maidens Int @default(0)
+  noBalls Int @default(0)
+  wides   Int @default(0)
 }
 
 model Ball {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  inningId String @db.ObjectId
-  inning   Inning @relation(fields: [inningId], references: [id])
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  inningId  String  @db.ObjectId
+  batsmanId String  @db.ObjectId
+  bowlerId  String  @db.ObjectId
+  fielderId String? @db.ObjectId
+
+  inning  Inning  @relation("InningBalls", fields: [inningId], references: [id])
+  batsman Player  @relation("Batsman", fields: [batsmanId], references: [id])
+  bowler  Player  @relation("Bowler", fields: [bowlerId], references: [id])
+  fielder Player? @relation("Fielder", fields: [fielderId], references: [id])
 
   over Int
   ball Int
-
-  batsmanId String @db.ObjectId
-  bowlerId  String @db.ObjectId
 
   runs          Int         @default(0)
   isWide        Boolean     @default(false)
@@ -295,7 +326,5 @@ model Ball {
   isWicket      Boolean     @default(false)
   dismissalType WicketType?
 
-  fielderId String?  @db.ObjectId
-  fielder   Player?  @relation(fields: [fielderId], references: [id])
   createdAt DateTime @default(now())
 }

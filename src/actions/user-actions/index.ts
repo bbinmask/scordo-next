@@ -39,7 +39,6 @@ const createUserHandler = async (data: InputType): Promise<ActionState<InputType
     const res = await clerk.users.updateUserMetadata(userId, {
       publicMetadata: {
         isProfileCompleted: true,
-        id: user.id,
       },
     });
 
