@@ -19,7 +19,7 @@ const createUserHandler = async (data: InputType): Promise<ActionState<InputType
   try {
     const user = await db.user.create({
       data: {
-        username,
+        username: username.toLowerCase(),
         availability,
         name,
         email,
