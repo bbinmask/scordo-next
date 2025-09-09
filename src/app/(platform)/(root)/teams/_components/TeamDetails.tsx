@@ -3,7 +3,6 @@
 import { formatDate } from "date-fns";
 import {
   BuildingIcon,
-  Edit,
   GitBranchPlusIcon,
   MapPinIcon,
   PencilIcon,
@@ -15,11 +14,8 @@ import {
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Requests from "../_components/Requests";
-import { teams } from "@/constants";
-import { useHandleRequest } from "@/hooks/useTeam";
 import Spinner from "@/components/Spinner";
 import { notFound } from "next/navigation";
-// import TeamForm from "./UpdateTeamForm";
 import { useIsTeamOwner, useTeam, useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
 import TeamProps from "@/types/teams.props";
@@ -27,7 +23,7 @@ import TeamProps from "@/types/teams.props";
 const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamProps }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  // const team = teams[0];
+
   const { getSingleTeam } = useTeam();
   const { isOwner } = useIsTeamOwner(team, user);
 
@@ -136,13 +132,14 @@ const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamP
                 </h2>
                 <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                   <li className="flex items-center">
-                    <MapPinIcon className="mr-2 h-5 w-5 text-blue-500" />{" "}
-                    {/* {`${team.address.city}, ${team.address.state}(${team.address.country})`} */}
-                    No address found.
+                    <MapPinIcon className="mr-2 h-5 w-5 text-blue-500" />
+                    {!team.address
+                      ? "No address found."
+                      : `${team.address.city}, ${team.address.state}(${team.address.country})`}
                   </li>
                   <li className="flex items-center">
-                    <BuildingIcon className="mr-2 h-5 w-5 text-blue-500" />{" "}
-                    {team.type.charAt(0).toUpperCase() + team.type.slice(1)} Team
+                    <BuildingIcon className="mr-2 h-5 w-5 text-blue-500" /> Type:{" "}
+                    {team.type.charAt(0).toUpperCase() + team.type.slice(1)}
                   </li>
                   <li className="flex items-center">
                     <UserIcon className="mr-2 h-5 w-5 text-blue-500" /> Captain:{" "}

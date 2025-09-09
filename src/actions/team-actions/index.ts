@@ -58,10 +58,20 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         logo: (logoUrl as string) || null,
         banner: (bannerUrl as string) || null,
         isRecruiting,
-        captain: user.id,
-        players: [user.id],
+        captain: { connect: { id: user.id } },
+        players: {
+          create: {
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+          },
+        },
         type,
-        owner: user.id,
+        owner: {
+          connect: { id: user.id },
+        },
       },
     });
 
