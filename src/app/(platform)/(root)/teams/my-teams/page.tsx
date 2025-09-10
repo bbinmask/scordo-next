@@ -1,19 +1,27 @@
 import React from "react";
-import TeamCard from "../_components/TeamCard";
 import { TeamsList } from "../_components/TeamComponents";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { db } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
+import { getUser } from "@/lib/getUser";
+import { Prisma } from "@/generated/prisma";
+
 const MyTeamsPage = async () => {
-  const user = await currentUser();
+  const user = await getUser();
+
   if (!user) return null;
 
   const teams = await db.team.findMany({
     where: {
-      owner: user.publicMetadata.id as string,
+      ownerId: user.id,
+    },
+    include: {
+      players: true,
+      captain: true,
+      _count: true,
+      owner: true,
     },
   });
-
   return (
     <div className="center flex w-full">
       <div className="container-bg w-full rounded-2xl border p-6 lg:p-10">

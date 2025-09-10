@@ -19,5 +19,5 @@ export default interface TeamProps {
   createdAt: Date | null;
   updatedAt: Date | null;
   isRecruiting: boolean;
-  // joinRequests: string[] | UserProps[];
+  joinRequests: string[] | UserProps[];
 }

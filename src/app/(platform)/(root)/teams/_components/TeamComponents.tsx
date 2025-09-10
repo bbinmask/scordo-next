@@ -1,5 +1,5 @@
 "use client";
-import { Users, Trophy, User, PlusCircle, Star, Award, ShieldCheck } from "lucide-react";
+import { Users, Trophy, User, PlusCircle, Star } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -11,8 +11,9 @@ import Spinner from "@/components/Spinner";
 import { getTeamUrl } from "@/utils/getURL";
 import { useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
+import { TeamForListComponent } from "@/lib/types";
 
-export function TeamsList({ teams }: { teams: TeamProps[] }) {
+export function TeamsList({ teams }: { teams: TeamForListComponent[] }) {
   if (!teams) return notFound();
 
   return (
@@ -22,7 +23,7 @@ export function TeamsList({ teams }: { teams: TeamProps[] }) {
   );
 }
 
-export const TeamCard = ({ team }: { team: TeamProps }) => {
+export const TeamCard = ({ team }: { team: TeamForListComponent }) => {
   const { joinTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
@@ -50,7 +51,11 @@ export const TeamCard = ({ team }: { team: TeamProps }) => {
           {team.logo === "" ? (
             <Trophy className="h-10 w-10 text-white" />
           ) : (
-            <img src={team.logo} alt="Profile" className="h-10 w-10 rounded-full object-cover" />
+            <img
+              src={team.logo || undefined}
+              alt="Profile"
+              className="h-10 w-10 rounded-full object-cover"
+            />
           )}
         </div>
 
@@ -73,7 +78,7 @@ export const TeamCard = ({ team }: { team: TeamProps }) => {
             {typeof team.captain !== "string" && (
               <p className="flex items-center">
                 <User className="mr-2 h-4 w-4 text-emerald-400" /> Captain:
-                {team.captain.name}
+                {team.captain && team.captain.name}
               </p>
             )}
             <p className="flex items-center">
@@ -89,7 +94,7 @@ export const TeamCard = ({ team }: { team: TeamProps }) => {
           </p>*/}
             <p className="flex items-center">
               <PlusCircle className="mr-2 h-4 w-4 text-cyan-400" /> Established:
-              {formatDate(new Date(team.createdAt), "yyyy-MM-dd")}
+              {team.createdAt && formatDate(new Date(team.createdAt), "yyyy-MM-dd")}
             </p>
           </div>
         </div>

@@ -16,32 +16,9 @@ const TeamIdPage: React.FC<TeamIdProps> = async ({ params }) => {
       id,
     },
     include: {
-      owner: {
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          avatar: true,
-        },
-      },
-      players: {
-        select: {
-          id: true,
-          user: {
-            select: {
-              name: true,
-              username: true,
-            },
-          },
-        },
-      },
-      captain: {
-        select: {
-          name: true,
-          username: true,
-          id: true,
-        },
-      },
+      owner: true,
+      players: true,
+      captain: true,
       matchesAsTeamA: {
         select: {
           id: true,
