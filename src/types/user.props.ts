@@ -1,3 +1,4 @@
+import { Availability, Gender, Role } from "@/generated/prisma";
 import TeamProps from "./teams.props";
 
 export default interface UserProps {
@@ -7,10 +8,10 @@ export default interface UserProps {
   username: string;
   email: string;
   contact: string;
-  gender: "male" | "female" | "other";
-  role: "player" | "fan" | "admin";
+  gender: Gender;
+  role: Role;
   dob: Date;
-  availability: "available" | "injured" | "on_break";
+  availability: Availability;
   avatar: string;
   isVerified: boolean;
   bio: string;

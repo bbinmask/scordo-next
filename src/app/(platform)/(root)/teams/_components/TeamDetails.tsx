@@ -18,9 +18,20 @@ import Spinner from "@/components/Spinner";
 import { notFound } from "next/navigation";
 import { useIsTeamOwner, useTeam, useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
-import TeamProps from "@/types/teams.props";
+import { Player, Team as TeamProps, User, TeamRequest } from "@/generated/prisma";
 
-const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamProps }) => {
+interface PlayerProps extends Player {
+  user: User;
+  userId: string;
+}
+
+interface TeamDetailsProp extends TeamProps {
+  owner: User | string;
+  captain: User | string | null;
+  players: PlayerProps[];
+  joinRequests: TeamRequest[];
+}
+const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,16 +41,14 @@ const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamP
   const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
-  useEffect(() => {
-    getSingleTeam(abbreviation);
-  }, [abbreviation]);
+  //
 
   return (
     <div className="font-inter relative flex min-h-screen items-center justify-center">
       {!team && isLoading ? <Spinner /> : !team && !isLoading && notFound()}
 
       {team && !isEdit && (
-        <div className="relative w-full max-w-5xl transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all duration-300 ease-in-out dark:bg-gray-800">
+        <div className="relative w-full transform overflow-hidden transition-all duration-300 ease-in-out">
           {/* Banner and Header Section */}
           <div className="absolute top-4 right-4 z-20">
             {isOwner && (
@@ -55,7 +64,7 @@ const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamP
           </div>
 
           <div
-            className="relative h-48 rounded-t-2xl bg-cover bg-center md:h-64"
+            className="relative aspect-video rounded-t-2xl bg-cover bg-center sm:aspect-auto sm:h-60 md:h-72 lg:h-80 xl:h-96"
             style={{ backgroundImage: `url(${team.banner})` }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
@@ -260,10 +269,10 @@ const TeamDetails = ({ abbreviation, team }: { abbreviation: string; team: TeamP
                       </span>
                       {typeof player !== "string" ? (
                         <Link
-                          href={`/profile/${player.username}`}
+                          href={`/profile/${player.user.username}`}
                           className="text-gray-800 dark:text-gray-200"
                         >
-                          {player.name}
+                          {player.user.name}
                         </Link>
                       ) : (
                         <span className="text-gray-800 dark:text-gray-200">null</span>

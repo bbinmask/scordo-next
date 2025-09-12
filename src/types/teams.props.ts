@@ -1,3 +1,4 @@
+import { TeamType } from "@/generated/prisma";
 import PlayerProps from "./player.props";
 import UserProps from "./user.props";
 export default interface TeamProps {
@@ -15,7 +16,7 @@ export default interface TeamProps {
   banner: string | null;
   logo: string | null;
   captain: string | UserProps | null;
-  type: "local" | "club" | "college" | "corporate" | "others";
+  type: TeamType;
   createdAt: Date | null;
   updatedAt: Date | null;
   isRecruiting: boolean;

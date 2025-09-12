@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import useAxios from "./useAxios";
-import TeamProps from "@/types/teams.props";
 import { AxiosResponse } from "axios";
+import { Team } from "@/generated/prisma";
 
 export const useTeam = () => {
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ export const useTeam = () => {
       setError(null);
       const res: AxiosResponse = await fetchData("/teams");
       if (res?.data?.success) {
-        return res.data.data as TeamProps[];
+        return res.data.data as Team[];
       } else {
         return;
       }
@@ -36,7 +36,7 @@ export const useTeam = () => {
 
       const res: AxiosResponse = await fetchData(`/teams/${username}`);
       if (res?.data?.success) {
-        return res.data.data as TeamProps;
+        return res.data.data as Team;
       }
     } catch (err: any) {
       setError(err.message || "Failed to fetch teams.");
@@ -46,7 +46,7 @@ export const useTeam = () => {
   }, []);
 
   // 3. Update a team
-  const updateTeamById = useCallback(async (teamId: string, updates: Partial<TeamProps>) => {
+  const updateTeamById = useCallback(async (teamId: string, updates: Partial<Team>) => {
     try {
       setLoading(true);
       setError(null);
@@ -70,7 +70,7 @@ export const useTeam = () => {
       setLoading(true);
       const res: AxiosResponse = await fetchData(`/teams/search?query=${query}`);
       if (res?.data?.success) {
-        return res.data.data as TeamProps[];
+        return res.data.data as Team[];
       } else {
         return [];
       }
@@ -92,7 +92,7 @@ export const useTeam = () => {
   };
 };
 
-export const useIsTeamOwner = (team: TeamProps, user: { id: string }) => {
+export const useIsTeamOwner = (team: Team, user: { id: string }) => {
   const isOwner = Boolean(
     user &&
       team &&
@@ -101,7 +101,7 @@ export const useIsTeamOwner = (team: TeamProps, user: { id: string }) => {
   return { isOwner };
 };
 
-export const useTeamRequest = (team: TeamProps, user: { id: string }) => {
+export const useTeamRequest = (team: Team, user: { id: string }) => {
   const { fetchData } = useAxios();
   const [isAlreadyRequested, setIsAlreadyRequested] = useState(false);
   const [isAlreadyInTeam, setIsAlreadyInTeam] = useState(false);

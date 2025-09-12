@@ -53,7 +53,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     team = await db.team.create({
       data: {
         name,
-        abbreviation,
+        abbreviation: abbreviation.toLowerCase(),
         address,
         logo: (logoUrl as string) || null,
         banner: (bannerUrl as string) || null,

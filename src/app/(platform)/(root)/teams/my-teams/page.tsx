@@ -6,8 +6,6 @@ import { currentUser } from "@clerk/nextjs/server";
 import { getUser } from "@/lib/getUser";
 import { Prisma } from "@/generated/prisma";
 
-// Comment
-
 const MyTeamsPage = async () => {
   const user = await getUser();
 

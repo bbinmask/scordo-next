@@ -9,31 +9,35 @@ interface TeamIdProps {
 
 const TeamIdPage: React.FC<TeamIdProps> = async ({ params }) => {
   const resolved = await params;
-  const id = resolved?.teamId;
+  const abbr = resolved?.teamId.split("-team-")[1];
 
-  const team = await db.team.findUnique({
-    where: {
-      id,
-    },
+  if (!abbr) {
+    return notFound();
+  }
+
+  const team = await db.team.findFirst({
+    where: { abbreviation: abbr },
     include: {
       owner: true,
-      players: true,
-      captain: true,
-      matchesAsTeamA: {
+      players: {
         select: {
           id: true,
-          result: true,
+          userId: true,
+          teamId: true,
+          user: true,
         },
       },
+      captain: true,
+
+      joinRequests: true,
+      matchesAsTeamA: {
+        select: { id: true, result: true },
+      },
       matchesAsTeamB: {
-        select: {
-          id: true,
-          result: true,
-        },
+        select: { id: true, result: true },
       },
     },
   });
-
   console.log(team);
 
   if (!team) {
@@ -42,8 +46,8 @@ const TeamIdPage: React.FC<TeamIdProps> = async ({ params }) => {
 
   return (
     <div className="center flex w-full">
-      <div className="container-bg w-full rounded-2xl border p-4">
-        <TeamDetails team={team} abbreviation={team.abbreviation} />
+      <div className="container-bg w-full rounded-2xl border">
+        <TeamDetails team={team} />
       </div>
     </div>
   );

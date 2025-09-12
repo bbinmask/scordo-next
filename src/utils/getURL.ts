@@ -1,3 +1,5 @@
+import TeamProps from "@/types/teams.props";
+
 export function getMatchUrl(teamA: string, teamB: string, date: Date, uuid: string): string {
   return "url";
   const formatName = (name: string) =>
@@ -10,9 +12,15 @@ export function getMatchUrl(teamA: string, teamB: string, date: Date, uuid: stri
   return `${formatName(teamA)}-vs-${formatName(teamB)}-${formattedDate}_${uuid}`;
 }
 
-export function getTeamUrl(team: any): string {
-  const { name, username } = team;
-  const teamSlug = `${name.toLowerCase()}_&team_${username}`;
+export function getTeamUrl(team: TeamProps): string {
+  const { name, abbreviation } = team;
 
-  return teamSlug.replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
+  const slugify = (str: string) =>
+    str
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+
+  return `${slugify(name)}-team-${slugify(abbreviation)}`;
 }

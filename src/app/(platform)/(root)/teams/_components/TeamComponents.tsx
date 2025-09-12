@@ -1,8 +1,6 @@
 "use client";
 import { Users, Trophy, User, PlusCircle, Star } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
 import TeamProps from "@/types/teams.props";
 import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
