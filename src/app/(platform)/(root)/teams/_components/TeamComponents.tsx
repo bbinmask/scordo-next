@@ -9,9 +9,15 @@ import Spinner from "@/components/Spinner";
 import { getTeamUrl } from "@/utils/getURL";
 import { useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
-import { TeamForListComponent } from "@/lib/types";
+import { defaultTeamLogo } from "@/constants/urls";
+import { Player, Team } from "@/generated/prisma";
 
-export function TeamsList({ teams }: { teams: TeamForListComponent[] }) {
+interface TeamWithPlayers extends Team {
+  players: Player[];
+  captain: string | { name: string } | null;
+}
+
+export function TeamsList({ teams }: { teams: TeamWithPlayers[] }) {
   if (!teams) return notFound();
 
   return (
@@ -21,7 +27,7 @@ export function TeamsList({ teams }: { teams: TeamForListComponent[] }) {
   );
 }
 
-export const TeamCard = ({ team }: { team: TeamForListComponent }) => {
+export const TeamCard = ({ team }: { team: TeamWithPlayers }) => {
   const { joinTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
@@ -31,14 +37,14 @@ export const TeamCard = ({ team }: { team: TeamForListComponent }) => {
   return (
     <Link
       href={`/teams/${encodedSlug}`}
-      className="relative aspect-video h-full w-full overflow-hidden rounded-xl shadow-black transition-all duration-300 hover:border-blue-500 hover:opacity-95 hover:shadow-md"
+      className="relative aspect-video h-full w-full overflow-hidden rounded-xl border-gray-600 font-[poppins] shadow-black transition-all duration-300 hover:border-emerald-700 hover:opacity-95 hover:shadow-md focus:ring-2 focus:ring-emerald-700 dark:border"
     >
       <div
         style={{
-          backgroundImage: `url(${team.banner})`,
+          backgroundImage: `url(${team.banner || defaultTeamLogo})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 1, // 👈 control background image opacity here
+          opacity: 1,
         }}
         className="absolute inset-0 z-0"
       ></div>
@@ -59,15 +65,15 @@ export const TeamCard = ({ team }: { team: TeamForListComponent }) => {
 
         {/* Team Details */}
         <div className="flex-grow px-4 text-center">
-          <div>
+          <div className="mb-2">
             <abbr
-              title={team.description || team.name}
-              className="mb-1 overflow-x-clip text-2xl font-black text-nowrap text-gray-50 no-underline hover:text-blue-400 md:text-xl dark:text-gray-200"
+              title={team.name}
+              className="mb-1 overflow-x-clip font-[cal_sans] text-2xl font-medium text-nowrap text-gray-50 no-underline hover:text-blue-400 md:text-xl dark:text-gray-200"
             >
               {team.name}
             </abbr>
           </div>
-          {team.description && <p className="mb-3 text-sm text-gray-300">{team.description}</p>}
+
           <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm text-gray-50">
             <p className="flex items-center">
               <Users className="mr-2 h-4 w-4 text-purple-400" />{" "}
@@ -75,13 +81,13 @@ export const TeamCard = ({ team }: { team: TeamForListComponent }) => {
             </p>
             {typeof team.captain !== "string" && (
               <p className="flex items-center">
-                <User className="mr-2 h-4 w-4 text-emerald-400" /> Captain:
-                {team.captain && team.captain.name}
+                <User className="mr-2 h-4 w-4 text-emerald-400" />
+                {`Captain: ${team.captain?.name || "N/A"}`}
               </p>
             )}
             <p className="flex items-center">
-              <Star className="mr-2 h-4 w-4 text-yellow-400" /> Type:
-              {team.type}
+              <Star className="mr-2 h-4 w-4 text-yellow-400" />
+              {`Type: ${team.type}`}
             </p>
             {/* <p className="flex items-center">
             <Award className="mr-2 h-4 w-4 text-orange-400" /> Wins: {team.win}
@@ -91,8 +97,8 @@ export const TeamCard = ({ team }: { team: TeamForListComponent }) => {
             {team.losses}
           </p>*/}
             <p className="flex items-center">
-              <PlusCircle className="mr-2 h-4 w-4 text-cyan-400" /> Established:
-              {team.createdAt && formatDate(new Date(team.createdAt), "yyyy-MM-dd")}
+              <PlusCircle className="mr-2 h-4 w-4 text-cyan-400" />
+              {`Established: ${team.createdAt && formatDate(new Date(team.createdAt), "yyyy-MM-dd")}`}
             </p>
           </div>
         </div>

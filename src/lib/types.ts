@@ -6,6 +6,7 @@ const teamWithPlayerCountAndOwner = Prisma.validator<Prisma.TeamDefaultArgs>()({
     id: true,
     name: true,
     logo: true,
+    banner: true,
     abbreviation: true,
     owner: {
       select: {

@@ -1,3 +1,4 @@
+import { heroImages } from "@/constants/urls";
 import TeamProps from "@/types/teams.props";
 import { PlayCircle } from "lucide-react";
 import Link from "next/link";
@@ -5,7 +6,7 @@ import Link from "next/link";
 const TeamCard = ({ team }: { team: TeamProps }) => {
   const video = {
     title: "This is my title",
-    thumbnail: "/hero2.png",
+    thumbnail: heroImages[2],
     duration: 20.5,
   };
   return (

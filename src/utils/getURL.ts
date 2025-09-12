@@ -1,3 +1,4 @@
+import { Team } from "@/generated/prisma";
 import TeamProps from "@/types/teams.props";
 
 export function getMatchUrl(teamA: string, teamB: string, date: Date, uuid: string): string {
@@ -12,7 +13,7 @@ export function getMatchUrl(teamA: string, teamB: string, date: Date, uuid: stri
   return `${formatName(teamA)}-vs-${formatName(teamB)}-${formattedDate}_${uuid}`;
 }
 
-export function getTeamUrl(team: TeamProps): string {
+export function getTeamUrl(team: Team): string {
   const { name, abbreviation } = team;
 
   const slugify = (str: string) =>

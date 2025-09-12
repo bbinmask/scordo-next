@@ -44,7 +44,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
   //
 
   return (
-    <div className="font-inter relative flex min-h-screen items-center justify-center">
+    <div className="relative flex min-h-screen items-center justify-center">
       {!team && isLoading ? <Spinner /> : !team && !isLoading && notFound()}
 
       {team && !isEdit && (

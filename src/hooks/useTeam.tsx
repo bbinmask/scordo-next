@@ -75,7 +75,7 @@ export const useTeam = () => {
         return [];
       }
     } catch (error: any) {
-      console.error(error);
+      console.error(error?.message);
       setError(error.message || "Couldn't find any team");
     } finally {
       setLoading(false);

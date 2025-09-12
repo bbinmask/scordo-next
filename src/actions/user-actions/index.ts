@@ -52,7 +52,7 @@ const createUserHandler = async (data: InputType): Promise<ActionState<InputType
 
     return { data: user };
   } catch (error: any) {
-    console.error(error);
+    console.error(error?.message);
     return { error: error.message || "Failed to create user" };
   }
 };

@@ -51,7 +51,7 @@ const CreateTeamForm = () => {
       toast.success(data.name + " is created");
     },
     onError: (error) => {
-      console.error(error);
+      console.error(error?.message);
       toast.error(error);
     },
   });
