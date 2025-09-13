@@ -48,7 +48,7 @@ export default function TeamRequests({
                 typeof req !== "string" && (
                   <div
                     key={i}
-                    className="bg-light_dark flex transform-gpu flex-col items-center justify-between rounded-xl border p-4 shadow-md transition-all duration-200 hover:scale-[1.01] hover:shadow-lg md:flex-row"
+                    className="container-bg flex transform-gpu flex-col items-center justify-between rounded-xl border p-4 shadow-md transition-all duration-200 hover:scale-[1.01] hover:shadow-lg md:flex-row"
                   >
                     <div className="mb-2 flex-1 text-center md:mr-4 md:mb-0 md:text-left">
                       <p className="heading-text text-lg font-semibold">{req.name}</p>
