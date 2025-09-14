@@ -3,6 +3,8 @@
 import { JSX, useState } from "react";
 import { VideoList } from "./VideoList";
 import { UpdatesList } from "../dashboard/_components/NewsList";
+import StatsChart from "../profile/_components/StatsChart";
+import { user } from "@/constants";
 
 interface TabsProps {
   tabs: {
@@ -13,7 +15,7 @@ interface TabsProps {
 }
 
 const Tabs = ({ tabs }: TabsProps) => {
-  const [activeTab, setActiveTab] = useState("updates");
+  const [activeTab, setActiveTab] = useState(tabs[0].id);
 
   return (
     <div className="container-bg rounded-xl p-4 shadow-md sm:p-6">

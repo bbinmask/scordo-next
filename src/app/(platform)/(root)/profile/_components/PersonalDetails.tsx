@@ -4,7 +4,13 @@ import { CalendarIcon, MailIcon, UserIcon } from "lucide-react";
 import { CgGenderFemale, CgGenderMale } from "react-icons/cg";
 import { MdLocationPin, MdOutlineEventAvailable } from "react-icons/md";
 
-const InfoCard = ({ label, value, icon }) => (
+interface InfoCardProps {
+  label: string;
+  value: string;
+  icon: React.ReactNode;
+}
+
+const InfoCard = ({ label, value, icon }: InfoCardProps) => (
   <div className="border-input flex items-center justify-between rounded-xl border bg-gray-50 p-5 font-[poppins]">
     <div>
       <p className="text-[13px] text-gray-500">{label}</p>
@@ -14,7 +20,7 @@ const InfoCard = ({ label, value, icon }) => (
   </div>
 );
 
-const ProfileDetails = ({ profile }: { profile: User }) => {
+const PersonalDetails = ({ profile }: { profile: User }) => {
   return (
     <div className="flex flex-col gap-12 md:flex-row">
       <section className="w-full">
@@ -59,4 +65,4 @@ const ProfileDetails = ({ profile }: { profile: User }) => {
   );
 };
 
-export default ProfileDetails;
+export default PersonalDetails;

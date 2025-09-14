@@ -5,17 +5,16 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { MdEdit } from "react-icons/md";
 import { BiSolidCamera } from "react-icons/bi";
-import ProfileForm from "./_components/ProfileForm";
-import ProfileDetails from "./_components/ProfileDetails";
+import PersonalDetails from "./_components/PersonalDetails";
 import MatchStats from "./_components/MatchStats";
 import TournamentStats from "./_components/TournamentStats";
 import StatsChart from "./_components/StatsChart";
-import User from "@/types/user.props";
 import { user } from "@/constants";
 import { Verified } from "lucide-react";
 import Spinner from "@/components/Spinner";
+import Tabs from "../_components/Tabs";
+import LinkTabs from "../_components/LinkTabs";
 
 export interface ProfileFormData {
   newUsername: string;
@@ -29,6 +28,17 @@ const ProfilePage = () => {
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
   const profile = user;
+
+  const contentTabs = [
+    { label: "StatsChart", id: "statschart", icon: <Verified className="h-4 w-4" /> },
+    { label: "MatchStats", id: "matchstats", icon: <Verified className="h-4 w-4" /> },
+    {
+      label: "TournamentStats",
+      id: "tournamentstats",
+      icon: <Verified className="h-4 w-4" />,
+    },
+  ];
+
   // const {
   //   control,
   //   handleUsername,
@@ -134,44 +144,20 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* User Details and Edit Form */}
           <div className="mb-6 h-full p-6 transition-all duration-300 md:col-span-2">
             <div>
-              <ProfileDetails profile={profile} />
-              {/* {isEdit ? (
-                <ProfileForm
-                  loading={loading}
-                  errorMessage={errorMessage}
-                  control={control}
-                  onUsername={handleUsername}
-                  handleSubmit={handleSubmit}
-                  submitChanges={submitChanges}
-                  profile={profile}
-                />
-              ) : (
-                <ProfileDetails profile={profile} />
-              )} */}
-              {/* {!isEdit && isOwner && (
-                <div className="flex justify-end pt-4">
-                  <Button
-                    onClick={toggleEdit}
-                    variant={"default"}
-                    className="border-none bg-gradient-to-r from-gray-400 to-gray-500 px-6 py-3 text-stone-800 shadow-md hover:from-gray-500 hover:to-gray-600 focus:ring-gray-400"
-                  >
-                    <MdEdit className="mr-1 text-xl" /> Edit
-                  </Button>
-                </div>
-              )} */}
+              <PersonalDetails profile={profile} />
             </div>
           </div>
         </div>
 
-        <div className="grid h-full w-full gap-2 px-3 md:grid-cols-3">
-          {/* Analytics Sections */}
-          <StatsChart profile={profile} />
-          <MatchStats profile={profile} />
-          <TournamentStats profile={profile} />
+        <div className="">
+          <LinkTabs tabs={contentTabs} />
         </div>
+        {/* Analytics Sections */}
+        <StatsChart profile={profile} />
+        <MatchStats profile={profile} />
+        <TournamentStats profile={profile} />
       </div>
     </div>
   );
