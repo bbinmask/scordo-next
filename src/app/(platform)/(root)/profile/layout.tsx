@@ -52,7 +52,9 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
           )} */}
             <img
-              src={"https://bootdey.com/img/Content/avatar/avatar7.png"}
+              src={
+                "https://res.cloudinary.com/irfanulmadar/image/upload/v1757846636/user_h1lqzf.svg"
+              }
               // onClick={() => {
               //   // if (!isOwner) return;
               //   setIsEditProfile(true);
