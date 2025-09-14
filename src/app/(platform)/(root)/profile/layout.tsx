@@ -6,14 +6,15 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
   const profile = user;
 
   return (
-    <div className="container-bg border-input relative mb-6 grid w-full gap-6 rounded-xl border px-3 md:grid-cols-3">
+    <div className="relative">
       {/* Profile Picture */}
-      <div className="h-full p-6 transition-all duration-300 md:col-span-1">
-        <div className="mb-6">
-          <h3 className="font-[cal_sans] text-2xl">Profile Information</h3>
-        </div>
-        <div className="relative flex flex-col items-center text-center">
-          {/* {isEditProfile && (
+      <div className="container-bg mb-6 grid grid-cols-1 gap-6 rounded-xl p-4 shadow-md md:grid-cols-3">
+        <div className="container-bg h-full rounded-xl p-6 transition-all duration-300 md:col-span-1">
+          <div className="mb-6 md:hidden">
+            <h3 className="font-[cal_sans] text-2xl">Profile Information</h3>
+          </div>
+          <div className="relative flex h-full flex-col items-center text-center">
+            {/* {isEditProfile && (
             <div className="absolute top-20 z-50 flex w-full items-center justify-center">
               <Input
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,36 +51,38 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
           )} */}
-          <img
-            src={"https://bootdey.com/img/Content/avatar/avatar7.png"}
-            // onClick={() => {
-            //   // if (!isOwner) return;
-            //   setIsEditProfile(true);
-            // }}
-            alt="profile"
-            className={`border-input borderh-36 w-36 rounded-full object-cover`}
-          />
-          <div className="relative mt-4 text-center">
-            {profile.isVerified && (
-              <span className="absolute top-0 -right-5 rounded-full bg-green-700 text-white">
-                <Verified className="h-4 w-4" />
-              </span>
-            )}
-            <p className="font-[poppins] text-base font-medium">{`@${profile.username}`}</p>
-            <div className="my-3 flex justify-center gap-6 text-base">
-              <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm">
-                Friends: {profile?.friends?.length || 0}
-              </span>
+            <img
+              src={"https://bootdey.com/img/Content/avatar/avatar7.png"}
+              // onClick={() => {
+              //   // if (!isOwner) return;
+              //   setIsEditProfile(true);
+              // }}
+              alt="profile"
+              className={`border-input borderh-36 w-36 rounded-full object-cover`}
+            />
+            <div className="relative mt-4 text-center">
+              {profile.isVerified && (
+                <span className="absolute top-0 -right-5 rounded-full bg-green-700 text-white">
+                  <Verified className="h-4 w-4" />
+                </span>
+              )}
+              <p className="font-[poppins] text-base font-medium">{`@${profile.username}`}</p>
+              <div className="my-3 flex justify-center gap-6 text-base">
+                <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm">
+                  Friends: {profile?.friends?.length || 0}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="mb-6 h-full p-6 transition-all duration-300 md:col-span-2">
-        <div>
-          <PersonalDetails profile={profile} />
+        <div className="container-bg mb-6 h-full rounded-xl p-6 transition-all duration-300 md:col-span-2">
+          <div>
+            <PersonalDetails profile={profile} />
+          </div>
         </div>
       </div>
+      <div className="">{children}</div>
     </div>
   );
 };

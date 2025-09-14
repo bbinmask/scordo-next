@@ -11,12 +11,12 @@ interface InfoCardProps {
 }
 
 const InfoCard = ({ label, value, icon }: InfoCardProps) => (
-  <div className="border-input flex items-center justify-between rounded-xl border bg-gray-50 p-5 font-[poppins]">
+  <div className="border-input container-bg flex items-center justify-between rounded-xl border p-5 font-[poppins]">
     <div>
-      <p className="text-[13px] text-gray-500">{label}</p>
-      <p className="text-sm font-semibold text-gray-800">{value}</p>
+      <p className="text-[13px] text-gray-600 dark:text-gray-300">{label}</p>
+      <p className="text-foreground text-sm font-semibold">{value}</p>
     </div>
-    <div className="rounded-lg bg-gray-200 p-2">{icon}</div>
+    <div className="bg-input rounded-lg p-2">{icon}</div>
   </div>
 );
 

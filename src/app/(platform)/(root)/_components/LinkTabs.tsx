@@ -10,6 +10,7 @@ interface LinkTabsProps {
   tabs: {
     id: string;
     label: string;
+    href: string;
     icon: React.ReactNode;
   }[];
 }
@@ -21,7 +22,7 @@ const LinkTabs = ({ tabs }: LinkTabsProps) => {
     <div className="container-bg rounded-xl p-4 shadow-md sm:p-6">
       <div className="mb-6 flex justify-center border-b border-gray-200 sm:justify-start dark:border-gray-700">
         {tabs.map((tab) => (
-          <Link key={tab.id} href={`/${tab.id}`}>
+          <Link key={tab.id} href={tab.href}>
             <button
               className={`flex items-center px-4 py-3 font-semibold transition-colors duration-300 ${
                 isTabActive(pathname, tab.id, false)
