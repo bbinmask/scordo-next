@@ -89,10 +89,10 @@ const ProfilePage = () => {
                   />
                   <BiSolidCamera className="h-6 w-6" />
 
-                  <div className="absolute -bottom-24 flex gap-2">
+                  <div className="absolute right-0 flex gap-2">
                     <Button
                       variant="default"
-                      className="font-urbanist cursor-pointer border-none bg-blue-500 hover:bg-blue-500/90 active:bg-blue-500/80"
+                      className="font-urbanist w-14 cursor-pointer border-none bg-blue-500 text-xs hover:bg-blue-500/90 active:bg-blue-500/80"
                       onClick={() => {
                         setIsEditProfile(false);
                       }}
@@ -100,8 +100,8 @@ const ProfilePage = () => {
                       Save
                     </Button>
                     <Button
-                      variant="default"
-                      className="font-urbanist cursor-pointer border-none bg-blue-500 hover:bg-blue-500/90 active:bg-blue-500/80"
+                      variant="outline"
+                      className="font-urbanist w-14 cursor-pointer text-xs"
                       onClick={() => {
                         setIsEditProfile(false);
                       }}
@@ -135,7 +135,6 @@ const ProfilePage = () => {
           <div className="mb-6 h-full p-6 transition-all duration-300 md:col-span-2">
             <div>
               <ProfileDetails profile={profile} />
-
               {/* {isEdit ? (
                 <ProfileForm
                   loading={loading}

@@ -77,6 +77,9 @@ const teamStatsData = {
 };
 
 const TeamsStatsPage = () => {
+  console.log("Error");
+  alert("I'm here");
+
   return (
     <div>
       <div className="min-h-screen bg-gray-50 p-4 font-sans transition-colors duration-500 md:p-8 dark:bg-gradient-to-br dark:from-gray-900 dark:to-green-900">

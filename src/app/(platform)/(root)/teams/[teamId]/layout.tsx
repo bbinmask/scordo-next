@@ -32,9 +32,7 @@ const TeamIdLayout = async ({ params }: { params: Promise<{ teamId: string }> })
     },
   });
 
-  console.log(team);
-
-  return <div>TeamIdLayout</div>;
+  return <div></div>;
 };
 
 export default TeamIdLayout;

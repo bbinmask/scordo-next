@@ -10,6 +10,7 @@ export const user = {
   username: "irfanulmadar",
   phone: "9876543210",
   email: "irfan@example.com",
+  gender: "male",
   matches: [
     {
       runs: 45,
