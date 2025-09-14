@@ -14,10 +14,8 @@ import TournamentStats from "./_components/TournamentStats";
 import StatsChart from "./_components/StatsChart";
 import User from "@/types/user.props";
 import { user } from "@/constants";
-
-const Spinner = () => (
-  <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-gray-900"></div>
-);
+import { Verified } from "lucide-react";
+import Spinner from "@/components/Spinner";
 
 export interface ProfileFormData {
   newUsername: string;
@@ -120,7 +118,12 @@ const ProfilePage = () => {
                 alt="profile"
                 className={`border-input rounded-full border ${isEditProfile && "opacity-25"} h-36 w-36 object-cover`}
               />
-              <div className="mt-4 text-center">
+              <div className="relative mt-4 text-center">
+                {profile.isVerified && (
+                  <span className="absolute top-0 -right-5 rounded-full bg-green-700 text-white">
+                    <Verified className="h-4 w-4" />
+                  </span>
+                )}
                 <p className="font-[poppins] text-base font-medium">{`@${profile.username}`}</p>
                 <div className="my-3 flex justify-center gap-6 text-base">
                   <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm">

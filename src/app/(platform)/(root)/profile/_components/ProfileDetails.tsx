@@ -1,12 +1,14 @@
 import User from "@/types/user.props";
-import { CalendarIcon, LanguagesIcon, LocationEditIcon, MailIcon, UserIcon } from "lucide-react";
-import { CgGenderMale } from "react-icons/cg";
+import { capitalize } from "lodash";
+import { CalendarIcon, MailIcon, UserIcon } from "lucide-react";
+import { CgGenderFemale, CgGenderMale } from "react-icons/cg";
+import { MdLocationPin, MdOutlineEventAvailable } from "react-icons/md";
 
 const InfoCard = ({ label, value, icon }) => (
-  <div className="flex items-center justify-between rounded-xl bg-gray-50 p-5">
+  <div className="border-input flex items-center justify-between rounded-xl border bg-gray-50 p-5 font-[poppins]">
     <div>
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="font-semibold text-gray-800">{value}</p>
+      <p className="text-[13px] text-gray-500">{label}</p>
+      <p className="text-sm font-semibold text-gray-800">{value}</p>
     </div>
     <div className="rounded-lg bg-gray-200 p-2">{icon}</div>
   </div>
@@ -14,30 +16,45 @@ const InfoCard = ({ label, value, icon }) => (
 
 const ProfileDetails = ({ profile }: { profile: User }) => {
   return (
-    <div className="min-h-screen bg-gray-100 font-sans text-gray-800">
-      <div className="flex flex-col gap-12 md:flex-row">
-        <section className="w-full md:w-3/4">
-          <div className="rounded-2xl bg-white p-8 shadow-sm">
-            <h2 className="mb-2 text-3xl font-bold">Personal information</h2>
-            <p className="mb-10 text-gray-500">
-              Manage your personal information, including phone numers and email adress where you
-              can be contacted
-            </p>
+    <div className="flex flex-col gap-12 md:flex-row">
+      <section className="w-full">
+        <div className="">
+          <h2 className="mb-2 font-[cal_sans] text-3xl">Personal information</h2>
+          <p className="mb-10 font-[urbanist] text-sm text-gray-500">
+            Manage your personal information, including phone numers and email adress where you can
+            be contacted
+          </p>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <InfoCard label="Name" value={profile.name} icon={<UserIcon />} />
-              <InfoCard label="Date of Birth" value="07 July 1993" icon={<CalendarIcon />} />
-              <InfoCard
-                value={profile.address?.city + " " + profile.address?.country}
-                label="Location"
-                icon={<LocationEditIcon />}
-              />
-              <InfoCard label="Gender" value={profile.gender} icon={<CgGenderMale />} />
-              <InfoCard label="Contactable at" value="ikakodesign@gmail.com" icon={<MailIcon />} />
-            </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <InfoCard label="Name" value={profile.name} icon={<UserIcon />} />
+            <InfoCard
+              label="Date of Birth"
+              value={new Date(profile.dob).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+              icon={<CalendarIcon />}
+            />
+            <InfoCard
+              value={profile.address?.city + " " + profile.address?.country}
+              label="Location"
+              icon={<MdLocationPin />}
+            />
+            <InfoCard
+              label="Gender"
+              value={capitalize(profile.gender)}
+              icon={profile.gender.toLowerCase() === "male" ? <CgGenderMale /> : <CgGenderFemale />}
+            />
+            <InfoCard label="Email" value={profile.email} icon={<MailIcon />} />
+            <InfoCard
+              label="Availability"
+              value={profile.availability ? "Available" : "Not Available"}
+              icon={<MdOutlineEventAvailable />}
+            />
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 };

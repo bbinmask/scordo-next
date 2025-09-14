@@ -1,9 +1,9 @@
 import { MoonLoader } from "react-spinners";
 import { NewCard } from "./_components/Card";
 import { CarouselSpacing } from "./_components/CarouselSpacing";
-import { BarChart2, Users } from "lucide-react";
+import { BarChart2, Newspaper, Users, Video } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
-import UpdatesAndNewsWrapper from "./_components/UpdatesAndVideosWrapper";
+import UpdatesAndNewsWrapper from "../_components/Tabs";
 
 const DashboardPage = () => {
   const data = [
@@ -21,6 +21,11 @@ const DashboardPage = () => {
     },
   ];
   const loading = false;
+
+  const contentTabs = [
+    { id: "updates", label: "Latest Updates", icon: <Newspaper className="mr-2 h-5 w-5" /> },
+    { id: "videos", label: "Featured Videos", icon: <Video className="mr-2 h-5 w-5" /> },
+  ];
 
   if (loading) {
     return <MoonLoader className="animate-spin text-black" />;
@@ -67,7 +72,7 @@ const DashboardPage = () => {
             </span>
           </h2>
         </div>
-        <UpdatesAndNewsWrapper />
+        <UpdatesAndNewsWrapper tabs={contentTabs} />
       </div>
     </div>
   );

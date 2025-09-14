@@ -1,22 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { VideoList } from "../../_components/VideoList";
-import { UpdatesList } from "./NewsList";
-import { Newspaper, Video } from "lucide-react";
+import { JSX, useState } from "react";
+import { VideoList } from "./VideoList";
+import { UpdatesList } from "../dashboard/_components/NewsList";
 
-const UpdatesAndNewsWrapper = () => {
+interface TabsProps {
+  tabs: {
+    id: string;
+    label: string;
+    icon: JSX.Element;
+  }[];
+}
+
+const Tabs = ({ tabs }: TabsProps) => {
   const [activeTab, setActiveTab] = useState("updates");
-
-  const contentTabs = [
-    { id: "updates", label: "Latest Updates", icon: <Newspaper className="mr-2 h-5 w-5" /> },
-    { id: "videos", label: "Featured Videos", icon: <Video className="mr-2 h-5 w-5" /> },
-  ];
 
   return (
     <div className="container-bg rounded-xl p-4 shadow-md sm:p-6">
       <div className="mb-6 flex justify-center border-b border-gray-200 sm:justify-start dark:border-gray-700">
-        {contentTabs.map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -40,4 +42,4 @@ const UpdatesAndNewsWrapper = () => {
   );
 };
 
-export default UpdatesAndNewsWrapper;
+export default Tabs;
