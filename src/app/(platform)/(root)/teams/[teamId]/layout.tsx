@@ -1,20 +1,13 @@
 import { db } from "@/lib/db";
-import { notFound } from "next/navigation";
 import React from "react";
-import TeamDetails from "../_components/TeamDetails";
 
-interface TeamIdProps {
-  params?: Promise<{ teamId: string }>;
-}
-
-const TeamIdPage: React.FC<TeamIdProps> = async ({ params }) => {
+const TeamIdLayout = async ({ params }: { params: Promise<{ teamId: string }> }) => {
   const resolved = await params;
   const abbr = resolved?.teamId.split("-team-")[1];
 
   if (!abbr) {
-    return notFound();
+    return;
   }
-
   const team = await db.team.findFirst({
     where: { abbreviation: abbr },
     include: {
@@ -39,17 +32,9 @@ const TeamIdPage: React.FC<TeamIdProps> = async ({ params }) => {
     },
   });
 
-  if (!team) {
-    return notFound();
-  }
+  console.log(team);
 
-  return (
-    <div className="center flex w-full">
-      <div className="container-bg w-full rounded-2xl border">
-        <TeamDetails team={team} />
-      </div>
-    </div>
-  );
+  return <div>TeamIdLayout</div>;
 };
 
-export default TeamIdPage;
+export default TeamIdLayout;

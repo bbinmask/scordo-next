@@ -231,12 +231,15 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
 
               {/* Key Stats Section */}
               <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 md:text-2xl dark:text-white">
+                <Link
+                  href={`/teams/${team.id}/stats`}
+                  className="mb-3 flex items-center text-xl font-bold text-gray-900 md:text-2xl dark:text-white"
+                >
                   <span className="mr-2 text-green-500 dark:text-green-400">
                     <TrophyIcon />
                   </span>
                   Season Statistics
-                </h2>
+                </Link>
                 {/* <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   {team.matches.map((stat, index) => (
                     <div
