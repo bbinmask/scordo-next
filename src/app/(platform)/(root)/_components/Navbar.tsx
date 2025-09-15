@@ -48,14 +48,13 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const currentTheme = localStorage.getItem("theme") as "dark" | "light" | null;
-    if (!currentTheme) return;
-
-    setTheme(currentTheme);
-
+    const currentTheme = localStorage.getItem("theme") as "light" | "dark";
     if (currentTheme === "dark") {
-      document.querySelector("html")?.classList.add(currentTheme);
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
+    setTheme(currentTheme);
   }, []);
 
   return (

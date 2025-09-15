@@ -1,4 +1,4 @@
-import User from "@/types/user.props";
+import { User } from "@/generated/prisma";
 import { capitalize } from "lodash";
 import { CalendarIcon, MailIcon, UserIcon } from "lucide-react";
 import { CgGenderFemale, CgGenderMale } from "react-icons/cg";
@@ -49,8 +49,14 @@ const PersonalDetails = ({ profile }: { profile: User }) => {
             />
             <InfoCard
               label="Gender"
-              value={capitalize(profile.gender)}
-              icon={profile.gender.toLowerCase() === "male" ? <CgGenderMale /> : <CgGenderFemale />}
+              value={capitalize(profile.gender as string)}
+              icon={
+                profile.gender && profile.gender.toLowerCase() === "male" ? (
+                  <CgGenderMale />
+                ) : (
+                  <CgGenderFemale />
+                )
+              }
             />
             <InfoCard label="Email" value={profile.email} icon={<MailIcon />} />
             <InfoCard

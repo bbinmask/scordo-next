@@ -1,11 +1,18 @@
+"use client";
+
 import { MoonLoader } from "react-spinners";
 import { NewCard } from "./_components/Card";
 import { CarouselSpacing } from "./_components/CarouselSpacing";
 import { BarChart2, Newspaper, Users, Video } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
-import UpdatesAndNewsWrapper from "../_components/Tabs";
+import Tabs from "../_components/Tabs";
+import { useState } from "react";
+import { UpdatesList } from "./_components/NewsList";
+import { VideoList } from "../_components/VideoList";
 
 const DashboardPage = () => {
+  const [currentTab, setCurrentTab] = useState("updates");
+
   const data = [
     {
       title: "Teams",
@@ -72,7 +79,12 @@ const DashboardPage = () => {
             </span>
           </h2>
         </div>
-        <UpdatesAndNewsWrapper tabs={contentTabs} />
+        <div className="container-bg w-full rounded-xl p-4 sm:p-6">
+          <Tabs setCurrentTab={setCurrentTab} currentTab={currentTab} tabs={contentTabs} />
+
+          {currentTab === "updates" && <UpdatesList />}
+          {currentTab === "videos" && <VideoList />}
+        </div>
       </div>
     </div>
   );

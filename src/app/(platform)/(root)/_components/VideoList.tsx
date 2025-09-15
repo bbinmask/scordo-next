@@ -24,7 +24,7 @@ export const VideoList = () => {
       {videoItems.map((video, i) => (
         <div
           key={i}
-          className="mb-2 flex cursor-pointer space-x-4 rounded-lg border border-transparent bg-gray-50 p-4 font-[poppins] shadow-sm transition-shadow duration-300 hover:border-gray-300 hover:shadow-lg dark:bg-gray-800 dark:hover:border-gray-700"
+          className="mb-2 flex cursor-pointer space-x-4 rounded-lg border-2 border-transparent bg-gray-50 p-4 shadow-sm transition-shadow duration-300 hover:border-emerald-600 hover:shadow-lg dark:bg-gray-800 dark:hover:border-green-700"
         >
           <div className="relative w-28 overflow-hidden rounded-lg shadow-lg transition-shadow duration-300">
             <img src={video.thumbnail} alt={video.title} className="w-full object-cover" />
