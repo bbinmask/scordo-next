@@ -1,8 +1,8 @@
-import User from "@/types/user.props";
 import React from "react";
 import { DoughnutChart } from "../../_components/charts/doughnut-chart";
+import { User } from "@/generated/prisma";
 
-const StatsChart = ({ profile }: { profile: User }) => {
+const StatsChart = ({ user }: { user: User }) => {
   const data = [
     { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
     { browser: "safari", visitors: 200, fill: "var(--color-safari)" },

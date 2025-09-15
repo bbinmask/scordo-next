@@ -1,7 +1,7 @@
-import User from "@/types/user.props";
+import { User } from "@/generated/prisma";
 import React from "react";
 
-const TournamentStats = ({ profile }: { profile: User }) => {
+const TournamentStats = ({ user }: { user: User }) => {
   return (
     <div className="border-input mb-6 h-full w-full rounded-xl border">
       <div className="container-bg h-full rounded-xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl">
