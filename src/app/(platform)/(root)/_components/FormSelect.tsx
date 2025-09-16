@@ -8,10 +8,10 @@ import {
   SelectLabel,
 } from "@/components/ui/select";
 import React from "react";
-import { FieldErrors, RegisterOptions, UseFormRegister } from "react-hook-form";
+import { RegisterOptions, UseFormRegister } from "react-hook-form";
 
 interface FormSelectProps<T extends Record<string, any>> {
-  data: { label: string; value: string }[];
+  data: { label: string; value: string; id?: string }[];
   label: string;
   name: string;
   className?: string;
@@ -37,11 +37,16 @@ const FormSelect = <T extends Record<string, any>>({
       <SelectContent>
         <SelectGroup>
           <SelectLabel className="font-semibold">{label}</SelectLabel>
-          {data.map((item, i) => (
-            <SelectItem key={i} value={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
+          <SelectItem value="No">No</SelectItem>
+          {data.length === 0 ? (
+            <SelectItem value={"null"}>N/A</SelectItem>
+          ) : (
+            data.map((item, i) => (
+              <SelectItem key={i} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))
+          )}
         </SelectGroup>
       </SelectContent>
     </Select>
