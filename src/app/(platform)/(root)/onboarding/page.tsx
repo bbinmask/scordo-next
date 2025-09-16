@@ -5,7 +5,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/Spinner";
 import FormInput from "@/components/FormInput";
-import FormSelect from "../_components/FormSelect";
+import { EnumFormSelect } from "../_components/FormSelect";
 import { useAction } from "@/hooks/useAction";
 import { createUser } from "@/actions/user-actions";
 import { toast } from "sonner";
@@ -122,7 +122,7 @@ const CompleteProfilePage = () => {
                   }}
                   placeholder="Enter your full name"
                 />
-                <FormSelect<ProfileFormData>
+                <EnumFormSelect<ProfileFormData>
                   register={register}
                   name="gender"
                   label="Gender"
@@ -130,7 +130,7 @@ const CompleteProfilePage = () => {
                   placeholder="Select your gender"
                   rules={{ required: "Gender is required!" }}
                 />
-                <FormSelect<ProfileFormData>
+                <EnumFormSelect<ProfileFormData>
                   register={register}
                   name="role"
                   label="Select Role (Optional)"
