@@ -70,6 +70,13 @@ enum MatchStatus {
   completed
 }
 
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
 type Address {
   city    String
   state   String
@@ -113,8 +120,27 @@ model User {
   sentRequests     TeamRequest[] @relation("SentRequests")
   receivedRequests TeamRequest[] @relation("ReceivedRequests")
 
+  sentFriendRequests     Friendship[] @relation("SentFriendRequests")
+  receivedFriendRequests Friendship[] @relation("ReceivedFriendRequests")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Friendship {
+  id     String           @id @default(auto()) @map("_id") @db.ObjectId
+  status FriendshipStatus @default(PENDING)
+
+  requesterId String @db.ObjectId
+  requester   User   @relation("SentFriendRequests", fields: [requesterId], references: [id])
+
+  addresseeId String @db.ObjectId
+  addressee   User   @relation("ReceivedFriendRequests", fields: [addresseeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([requesterId, addresseeId])
 }
 
 model Team {
