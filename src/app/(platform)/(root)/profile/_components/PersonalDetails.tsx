@@ -83,13 +83,14 @@ const PersonalDetails = ({ user }: { user: User }) => {
   // });
 
   return (
-    <div className="container-bg mb-6 grid grid-cols-1 gap-6 rounded-xl p-4 md:grid-cols-3">
-      <div className="h-full rounded-xl p-6 transition-all duration-300 md:col-span-1">
-        <div className="mb-6 md:hidden">
-          <h3 className="font-[cal_sans] text-2xl">Profile Information</h3>
-        </div>
-        <div className="relative flex h-full flex-col items-center text-center">
-          {/* {isEditProfile && (
+    <>
+      <div className="container-bg mb-6 grid grid-cols-1 gap-6 rounded-xl p-4 shadow-lg md:grid-cols-3">
+        <div className="h-full rounded-xl p-6 transition-all duration-300 md:col-span-1">
+          <div className="mb-6 md:hidden">
+            <h3 className="font-[cal_sans] text-2xl">Profile Information</h3>
+          </div>
+          <div className="relative flex h-full flex-col items-center text-center">
+            {/* {isEditProfile && (
             <div className="absolute top-20 z-50 flex w-full items-center justify-center">
               <Input
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,78 +127,83 @@ const PersonalDetails = ({ user }: { user: User }) => {
               </div>
             </div>
           )} */}
-          <img
-            src={"https://res.cloudinary.com/irfanulmadar/image/upload/v1757846636/user_h1lqzf.svg"}
-            alt="profile"
-            className={`border-input borderh-36 w-36 rounded-full object-cover`}
-          />
-          <div className="relative mt-4 text-center">
-            {user.isVerified && (
-              <span className="absolute top-0 -right-5 rounded-full bg-green-700 text-white">
-                <Verified className="h-4 w-4" />
-              </span>
-            )}
-            <p className="font-[poppins] text-base font-medium">{`@${user.username}`}</p>
-            <div className="my-3 flex justify-center gap-6 text-base">
-              <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm">
-                Friends: {user?.friends?.length || 0}
-              </span>
+            <img
+              src={
+                "https://res.cloudinary.com/irfanulmadar/image/upload/v1757846636/user_h1lqzf.svg"
+              }
+              alt="profile"
+              className={`border-input borderh-36 w-36 rounded-full object-cover`}
+            />
+            <div className="relative mt-4 text-center">
+              {user.isVerified && (
+                <span className="absolute top-0 -right-5 rounded-full bg-green-700 text-white">
+                  <Verified className="h-4 w-4" />
+                </span>
+              )}
+              <p className="font-[poppins] text-base font-medium">{`@${user.username}`}</p>
+              <div className="my-3 flex justify-center gap-6 text-base">
+                <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm">
+                  Friends: {user?.friends?.length || 0}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">{/* Bio */}</div>
+          </div>
+        </div>
+
+        <div className="relative mb-6 h-full rounded-xl p-6 transition-all duration-300 md:col-span-2">
+          <div>
+            <div className="flex flex-col gap-12 md:flex-row">
+              <section className="w-full">
+                <div className="">
+                  <h2 className="mb-2 font-[cal_sans] text-3xl">Personal information</h2>
+                  <p className="mb-10 font-[urbanist] text-sm text-gray-500">
+                    Manage your personal information, including phone numers and email adress where
+                    you can be contacted
+                  </p>
+
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <InfoCard label="Name" value={user.name} icon={<UserIcon />} />
+                    <InfoCard
+                      label="Date of Birth"
+                      value={new Date(user.dob).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                      icon={<CalendarIcon />}
+                    />
+                    <InfoCard
+                      value={getFullAddress(user?.address)}
+                      label="Address"
+                      icon={<MdLocationPin />}
+                    />
+                    <InfoCard
+                      label="Gender"
+                      value={capitalize(user.gender as string)}
+                      icon={
+                        user.gender && user.gender.toLowerCase() === "male" ? (
+                          <CgGenderMale />
+                        ) : (
+                          <CgGenderFemale />
+                        )
+                      }
+                    />
+                    <InfoCard label="Email" value={user.email} icon={<MailIcon />} />
+                    <InfoCard
+                      label="Availability"
+                      value={checkAvailability(user.availability)}
+                      icon={<MdOutlineEventAvailable />}
+                    />
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
         </div>
       </div>
-
-      <div className="relative mb-6 h-full rounded-xl p-6 transition-all duration-300 md:col-span-2">
-        <div>
-          <div className="flex flex-col gap-12 md:flex-row">
-            <section className="w-full">
-              <div className="">
-                <h2 className="mb-2 font-[cal_sans] text-3xl">Personal information</h2>
-                <p className="mb-10 font-[urbanist] text-sm text-gray-500">
-                  Manage your personal information, including phone numers and email adress where
-                  you can be contacted
-                </p>
-
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                  <InfoCard label="Name" value={user.name} icon={<UserIcon />} />
-                  <InfoCard
-                    label="Date of Birth"
-                    value={new Date(user.dob).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                    icon={<CalendarIcon />}
-                  />
-                  <InfoCard
-                    value={getFullAddress(user?.address)}
-                    label="Address"
-                    icon={<MdLocationPin />}
-                  />
-                  <InfoCard
-                    label="Gender"
-                    value={capitalize(user.gender as string)}
-                    icon={
-                      user.gender && user.gender.toLowerCase() === "male" ? (
-                        <CgGenderMale />
-                      ) : (
-                        <CgGenderFemale />
-                      )
-                    }
-                  />
-                  <InfoCard label="Email" value={user.email} icon={<MailIcon />} />
-                  <InfoCard
-                    label="Availability"
-                    value={checkAvailability(user.availability)}
-                    icon={<MdOutlineEventAvailable />}
-                  />
-                </div>
-              </div>
-            </section>
-          </div>
-        </div>
-      </div>
-      <div className="container-bg mb-6 rounded-xl p-4">
+      <div className="container-bg mb-6 w-full rounded-xl p-4 shadow-lg">
         <div className="mb-6 md:hidden">
           <h3 className="font-[cal_sans] text-2xl">Statistics</h3>
         </div>
@@ -206,7 +212,7 @@ const PersonalDetails = ({ user }: { user: User }) => {
         {currentTab === "match-stats" && <MatchStats user={user} />}
         {currentTab === "tournament-stats" && <TournamentStats user={user} />}
       </div>
-    </div>
+    </>
   );
 };
 

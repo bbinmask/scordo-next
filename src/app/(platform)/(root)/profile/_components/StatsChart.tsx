@@ -38,10 +38,8 @@ const StatsChart = ({ user }: { user: User }) => {
   };
 
   return (
-    <div className="flex w-full flex-col-reverse items-center gap-5 md:flex-row">
-      <div className="flex-center flex w-full sm:px-8 md:px-16 lg:px-0">
-        <DoughnutChart data={data} config={config} />
-      </div>
+    <div className="w-full sm:px-8 md:px-16 lg:px-0">
+      <DoughnutChart data={data} config={config} />
     </div>
   );
 };

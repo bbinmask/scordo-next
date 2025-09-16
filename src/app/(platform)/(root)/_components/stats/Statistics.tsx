@@ -295,8 +295,6 @@ const PlayerList = ({ teamName, players }) => (
   </div>
 );
 
-// --- Main MatchStats Component ---
-
 const MatchStats = () => {
   const [theme, setTheme] = useState("dark");
   const [activeTab, setActiveTab] = useState("scorecard");

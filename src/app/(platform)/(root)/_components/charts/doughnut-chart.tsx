@@ -27,7 +27,7 @@ export function DoughnutChart({ data, config }: { data: any; config: ChartConfig
   }, []);
 
   return (
-    <Card className="container-bg flex w-full flex-col">
+    <Card className="container-bg w-full border-none shadow-none">
       <CardHeader className="items-center pb-0">
         <CardTitle>Stats</CardTitle>
         <CardDescription>January - Now 2025</CardDescription>

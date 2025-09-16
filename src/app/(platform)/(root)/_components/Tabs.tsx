@@ -17,8 +17,12 @@ interface TabsProps {
 }
 
 const Tabs = ({ tabs, currentTab, setCurrentTab }: TabsProps) => {
+  const length = tabs.length;
+
   return (
-    <div className="mb-6 flex justify-center border-b border-gray-200 sm:justify-start dark:border-gray-700">
+    <div
+      className={`mb-6 flex w-full items-center justify-between border-b border-gray-200 dark:border-gray-700 ${"px-4"}`}
+    >
       {tabs.map((tab) => (
         <button
           key={tab.id}
