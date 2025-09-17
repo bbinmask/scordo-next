@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ChangeEvent, useState } from "react";
 import { EnumFormSelect, FormSelect } from "../../_components/FormSelect";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useMyTeams } from "@/hooks/useTeam";
 
 interface FormInputProps {
   teamAId: string;
@@ -47,6 +48,12 @@ const CreateMatchForm = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const { data, isLoading, error } = useMyTeams();
+
+  console.log(isLoading);
+  console.log(data);
+  console.log(error);
 
   const handleVenueChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
