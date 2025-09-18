@@ -57,9 +57,9 @@ const CreateMatchForm = () => {
     },
   });
 
-  console.log(isLoading);
-  console.log(data);
-  console.log(error);
+  // console.log(isLoading);
+  // console.log(data);
+  // console.log(error);
 
   const handleVenueChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

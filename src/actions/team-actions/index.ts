@@ -9,8 +9,9 @@ import { CreateTeam } from "./schema";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
 import { User } from "@/generated/prisma";
 import { redirect } from "next/navigation";
+import { getTeamUrl } from "@/utils/getURL";
 
-const handler = async (data: InputType): Promise<ReturnType> => {
+const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
   const { userId: clerkId } = await auth();
 
   if (!clerkId) {
@@ -86,7 +87,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  redirect(`/teams/${team.id}`);
+  redirect(`/teams/${getTeamUrl(team)}`);
 };
 
-export const createTeam = createSafeAction(CreateTeam, handler);
+export const createTeam = createSafeAction(CreateTeam, createTeamHandler);

@@ -221,14 +221,15 @@ model TeamRequest {
 }
 
 model Match {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  teamAId      String  @db.ObjectId
-  teamBId      String  @db.ObjectId
-  tournamentId String? @db.ObjectId
-
-  teamA      Team        @relation("TeamA", fields: [teamAId], references: [id])
-  teamB      Team        @relation("TeamB", fields: [teamBId], references: [id])
-  tournament Tournament? @relation("TournamentMatches", fields: [tournamentId], references: [id])
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  teamAId      String      @db.ObjectId
+  teamBId      String      @db.ObjectId
+  tournamentId String?     @db.ObjectId
+  overs        Int
+  overLimit    Int
+  teamA        Team        @relation("TeamA", fields: [teamAId], references: [id])
+  teamB        Team        @relation("TeamB", fields: [teamBId], references: [id])
+  tournament   Tournament? @relation("TournamentMatches", fields: [tournamentId], references: [id])
 
   innings      Inning[]      @relation("MatchInnings")
   venue        Address

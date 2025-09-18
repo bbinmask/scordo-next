@@ -56,7 +56,9 @@ export const EnumFormSelect = <T extends Record<string, any>>({
           <SelectLabel className="font-semibold">{label}</SelectLabel>
           <SelectItem value="No">No</SelectItem>
           {data.length === 0 ? (
-            <SelectItem value={"null"}>N/A</SelectItem>
+            <SelectItem key={1} value={"null"}>
+              N/A
+            </SelectItem>
           ) : (
             data.map((item, i) => (
               <SelectItem key={i} value={item.value}>
@@ -89,7 +91,9 @@ export const FormSelect = <T extends Record<string, any>>({
           <SelectLabel className="font-semibold">{label}</SelectLabel>
           <SelectItem value="No">No</SelectItem>
           {data.length === 0 ? (
-            <SelectItem value={"null"}>N/A</SelectItem>
+            <SelectItem key={1} value={"null"}>
+              N/A
+            </SelectItem>
           ) : (
             data.map((item, i) => (
               <SelectItem key={i} value={item.id}>

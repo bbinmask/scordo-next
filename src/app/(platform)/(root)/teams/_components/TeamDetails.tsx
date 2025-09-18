@@ -19,6 +19,8 @@ import { notFound } from "next/navigation";
 import { useIsTeamOwner, useTeam, useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
 import { Player, Team as TeamProps, User, TeamRequest } from "@/generated/prisma";
+import { useQuery } from "@tanstack/react-query";
+import AxiosRequest from "@/utils/AxiosResponse";
 
 interface PlayerProps extends Player {
   user: User;
@@ -33,9 +35,14 @@ interface TeamDetailsProp extends TeamProps {
 }
 const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
   const [isEdit, setIsEdit] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const { getSingleTeam } = useTeam();
+  console.log(team);
+  const { isLoading, data, error } = useQuery({
+    queryKey: ["team"],
+    queryFn: async () => {
+      const { data } = await AxiosRequest.get("/api/teams/my-teams");
+      return data;
+    },
+  });
   const { isOwner } = useIsTeamOwner(team, user);
 
   const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =

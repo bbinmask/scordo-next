@@ -10,6 +10,29 @@ export async function GET(req: NextRequest) {
   if (!clerkUser) return NextResponse.json(new ApiError(404, "User not found"));
 
   try {
+    const teams = await db.team.findMany({
+      where: {
+        OR: [
+          {
+            players: {
+              some: {
+                user: {
+                  clerkId: clerkUser.id,
+                },
+              },
+            },
+          },
+          {
+            owner: {
+              clerkId: clerkUser.id,
+            },
+          },
+        ],
+      },
+    });
+
+    console.log(teams);
+
     const user = await db.user.findUnique({
       where: {
         clerkId: clerkUser.id,

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createTeam } from "@/actions/team-actions";
 import { useAction } from "@/hooks/useAction";
-import FormSelect from "../../_components/FormSelect";
+import { EnumFormSelect } from "../../_components/FormSelect";
 
 interface ITeamForm {
   name: string;
@@ -51,7 +51,7 @@ const CreateTeamForm = () => {
       toast.success(data.name + " is created");
     },
     onError: (error) => {
-      console.error(error?.message);
+      console.error(error);
       toast.error(error);
     },
   });
@@ -177,7 +177,7 @@ const CreateTeamForm = () => {
 
       <div className="grid items-end gap-4 md:grid-cols-2">
         {/* Team Type */}
-        <FormSelect
+        <EnumFormSelect
           data={[
             { label: "Local", value: "local" },
             { label: "College", value: "college" },
