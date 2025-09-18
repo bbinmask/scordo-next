@@ -1,12 +1,12 @@
 "use client";
 
 import { teams } from "@/constants";
-
 import { Input } from "@/components/ui/input";
 import { ChangeEvent, useState } from "react";
 import { EnumFormSelect, FormSelect } from "../../_components/FormSelect";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useMyTeams } from "@/hooks/useTeam";
+import { useQuery } from "@tanstack/react-query";
+import AxiosRequest from "@/utils/AxiosResponse";
 
 interface FormInputProps {
   teamAId: string;
@@ -49,7 +49,13 @@ const CreateMatchForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const { data, isLoading, error } = useMyTeams();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["teams"],
+    queryFn: async () => {
+      const { data } = await AxiosRequest.get("/api/teams/my-teams");
+      return data;
+    },
+  });
 
   console.log(isLoading);
   console.log(data);
