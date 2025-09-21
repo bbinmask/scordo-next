@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { Cal_Sans, Poppins, Urbanist } from "next/font/google";
 

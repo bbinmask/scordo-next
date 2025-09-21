@@ -9,6 +9,7 @@ import axios from "axios";
 import AxiosRequest from "@/utils/AxiosResponse";
 import { useParams } from "next/navigation";
 import Spinner from "@/components/Spinner";
+import NotFoundParagraph from "@/components/NotFoundParagraph";
 interface TeamIdProps {
   params?: any;
 }
@@ -16,8 +17,6 @@ interface TeamIdProps {
 const TeamIdPage: React.FC<TeamIdProps> = () => {
   const params: { teamId: string } = useParams();
   const abbr = params?.teamId?.split("-team-")[1];
-
-  console.log(params);
 
   const {
     data: team,
@@ -34,7 +33,13 @@ const TeamIdPage: React.FC<TeamIdProps> = () => {
   return (
     <div className="center flex w-full">
       <div className="container-bg w-full rounded-2xl border">
-        {isLoading ? <Spinner /> : !team && !isLoading ? notFound() : <TeamDetails team={team} />}
+        {isLoading ? (
+          <Spinner />
+        ) : !team && !isLoading && error?.message ? (
+          <NotFoundParagraph description={error.message} />
+        ) : (
+          <TeamDetails team={team} />
+        )}
       </div>
     </div>
   );
