@@ -1,6 +1,6 @@
 import React from "react";
 import Menu from "../_components/Menu";
-import { ListIcon, PlusCircle, Search, Users } from "lucide-react";
+import { ListIcon, PlusCircle, Search, Shield, Users } from "lucide-react";
 import { BreadcrumbDemo } from "../_components/BreadScrumb";
 
 const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
@@ -17,7 +17,7 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
       id: 2,
       path: "/teams/my-teams",
       className: "",
-      icon: <Users className="h-4 w-4 md:h-5 md:w-5" />,
+      icon: <Shield className="h-4 w-4 md:h-5 md:w-5" />,
     },
     {
       title: "Search",

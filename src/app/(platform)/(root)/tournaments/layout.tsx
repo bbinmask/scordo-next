@@ -1,6 +1,6 @@
 import React from "react";
 import Menu from "../_components/Menu";
-import { LinkIcon, User, Users } from "lucide-react";
+import { LinkIcon, ShieldEllipsisIcon, User, Users } from "lucide-react";
 
 const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
   const navLinks: {
@@ -16,7 +16,7 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
       path: "/tournaments/my",
     },
     {
-      icon: <Users />,
+      icon: <ShieldEllipsisIcon />,
       title: "Friend's Tournaments",
       description: "See tournaments your friends are involved in and join the fun.",
       path: "/tournaments/friends",

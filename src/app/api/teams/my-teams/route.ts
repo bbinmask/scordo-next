@@ -1,13 +1,12 @@
 import { db } from "@/lib/db";
-import { ApiError } from "@/utils/ApiError";
 import { ApiResponse } from "@/utils/ApiResponse";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-
+import ApiError from "http-errors";
 export async function GET(req: NextRequest) {
   const clerkUser = await currentUser();
 
-  if (!clerkUser) return NextResponse.json(new ApiError(404, "User not found"));
+  if (!clerkUser) return NextResponse.json(ApiError.NotFound("User not found"));
 
   try {
     const teams = await db.team.findMany({
@@ -31,8 +30,6 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    console.log(teams);
-
     const user = await db.user.findUnique({
       where: {
         clerkId: clerkUser.id,
@@ -47,10 +44,10 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!user) return NextResponse.json(new ApiError(404, "User not found"));
+    if (!user) return NextResponse.json(ApiError.NotFound("User not found"));
 
     return NextResponse.json(new ApiResponse(user, 201));
   } catch (error) {
-    return NextResponse.json(new ApiError());
+    return NextResponse.json(ApiError[500]);
   }
 }

@@ -42,8 +42,12 @@ const createUserHandler = async (data: InputType): Promise<ActionState<InputType
       },
     });
 
+    const [firstName, lastName] = name.split(" ");
     await clerk.users.updateUser(userId, {
       username,
+      firstName,
+      lastName,
+      primaryPhoneNumberID: contact,
     });
 
     if (!res.publicMetadata?.isProfileCompleted) {

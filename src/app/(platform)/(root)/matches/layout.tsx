@@ -1,6 +1,6 @@
 import React from "react";
 import Menu from "../_components/Menu";
-import { ListIcon, PlusCircle, Search, Users } from "lucide-react";
+import { ListIcon, PlusCircle, Search, Shield, Users } from "lucide-react";
 
 const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
   const navLinks = [
@@ -18,7 +18,9 @@ const TeamsLayout = ({ children }: { children: React.ReactNode }) => {
       id: 2,
       path: "/teams/my-teams",
       className: "",
-      icon: <Users className="font-urbanist w-4 transition-all duration-500 md:w-8 md:text-base" />,
+      icon: (
+        <Shield className="font-urbanist w-4 transition-all duration-500 md:w-8 md:text-base" />
+      ),
     },
     {
       title: "Search",

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Users, PlusCircle, Trophy, User, Settings } from "lucide-react";
+import { Home, PlusCircle, Trophy, User, Settings, Shield } from "lucide-react";
 import { isTabActive } from "@/utils";
 
 const Bottombar = () => {
@@ -16,7 +16,7 @@ const Bottombar = () => {
     },
     {
       title: "Teams",
-      icon: Users,
+      icon: Shield,
       path: "/teams",
       className: "",
     },
