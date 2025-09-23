@@ -13,7 +13,7 @@ import HeroSection from "../_components/Hero";
 import AxiosRequest from "@/utils/AxiosResponse";
 import { useQuery } from "@tanstack/react-query";
 
-const data = [
+const cardData = [
   {
     title: "Teams",
     desc: "Create or edit teams",
@@ -36,19 +36,13 @@ const contentTabs = [
 const DashboardPage = () => {
   const [currentTab, setCurrentTab] = useState("updates");
 
-  const {
-    data: user,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       const { data } = await AxiosRequest.get("/api/user/profile");
       return data;
     },
   });
-
-  console.log(user);
 
   if (isLoading) {
     return <MoonLoader className="animate-spin text-black" />;
@@ -66,9 +60,9 @@ const DashboardPage = () => {
             </h1>
           </div>
 
-          <HeroSection user={user} />
+          <HeroSection user={data.user} />
           <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {data.map((item, i) => (
+            {cardData.map((item, i) => (
               <NewCard
                 icon={item.icon}
                 key={i}

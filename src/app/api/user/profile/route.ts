@@ -2,6 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import ApiError from "http-errors";
 import { db } from "@/lib/db";
+import { ApiResponse } from "@/utils/ApiResponse";
 export const GET = async (req: NextRequest) => {
   try {
     const clerkUser = await currentUser();
@@ -13,26 +14,19 @@ export const GET = async (req: NextRequest) => {
         clerkId: clerkUser.id,
       },
       include: {
-        teamsOwned: {
-          select: {
-            matchesAsTeamA: true,
-            matchesAsTeamB: true,
-          },
-        },
         players: {
           select: {
-            team: {
-              select: {
-                players: {
-                  select: {
-                    user: {},
-                  },
-                },
-              },
-            },
+            team: true,
           },
         },
       },
     });
-  } catch (error) {}
+
+    if (!user) return NextResponse.json(ApiError.NotFound("User not found"));
+
+    return NextResponse.json({ user, success: true, status: 201 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(ApiError.InternalServerError("Something went wrong"));
+  }
 };

@@ -21,3 +21,15 @@ const teamWithPlayerCountAndOwner = Prisma.validator<Prisma.TeamDefaultArgs>()({
 });
 
 export type TeamForListComponent = Prisma.TeamGetPayload<typeof teamWithPlayerCountAndOwner>;
+
+const userWithTeams = Prisma.validator<Prisma.UserDefaultArgs>()({
+  include: {
+    players: {
+      select: {
+        team: true,
+      },
+    },
+  },
+});
+
+export type UserWithTeamsProps = Prisma.UserGetPayload<typeof userWithTeams>;
