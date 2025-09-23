@@ -19,7 +19,7 @@ const QuickActionButton = ({ title, icon: Icon, href }: QuickActionButtonProps) 
 );
 
 interface HeroSectionProps {
-  user: User;
+  user?: User;
 }
 
 const HeroSection = ({ user }: HeroSectionProps) => {
@@ -41,7 +41,9 @@ const HeroSection = ({ user }: HeroSectionProps) => {
       <div className="relative z-10">
         <header className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold md:text-4xl">Welcome back, {user.username}!</h1>
+            <h1 className="text-3xl font-extrabold md:text-4xl">
+              Welcome back, {user?.username || "User"}!
+            </h1>
             <p className="text-md text-gray-300">Here's your personal cricket hub.</p>
           </div>
         </header>

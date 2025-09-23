@@ -43,10 +43,12 @@ const DashboardPage = () => {
   } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const { data } = await AxiosRequest.get("/api/user/my-teams");
+      const { data } = await AxiosRequest.get("/api/user/profile");
       return data;
     },
   });
+
+  console.log(user);
 
   if (isLoading) {
     return <MoonLoader className="animate-spin text-black" />;
