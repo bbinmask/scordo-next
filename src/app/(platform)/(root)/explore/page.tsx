@@ -1,3 +1,5 @@
+"use client";
+
 interface ExplorePageProps {}
 
 import React, { useState, useMemo, ForwardRefExoticComponent, RefAttributes } from "react";
