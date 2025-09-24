@@ -15,6 +15,7 @@ import {
   Trophy,
   LucideProps,
 } from "lucide-react";
+import AfterSearch from "./_components/AfterSearch";
 
 const mockTournaments = [
   {
@@ -281,11 +282,13 @@ const TeamCard = ({ team }: any) => (
 
 const ExplorePage = ({}: ExplorePageProps) => {
   const [theme, setTheme] = useState("dark");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
+  const results = {
+    users: [],
+    teams: [],
+    tournaments: [],
   };
 
   const FilterButton = ({
@@ -305,7 +308,7 @@ const ExplorePage = ({}: ExplorePageProps) => {
   );
 
   const filteredData = useMemo(() => {
-    const lowercasedFilter = searchTerm.toLowerCase();
+    const lowercasedFilter = query.toLowerCase();
 
     const tournaments = mockTournaments.filter((t) =>
       t.title.toLowerCase().includes(lowercasedFilter)
@@ -314,7 +317,11 @@ const ExplorePage = ({}: ExplorePageProps) => {
     const players = mockPlayers.filter((p) => p.name.toLowerCase().includes(lowercasedFilter));
 
     return { tournaments, teams, players };
-  }, [searchTerm]);
+  }, [query]);
+
+  const clearSearch = () => {
+    setQuery("");
+  };
 
   return (
     <div className={theme}>
@@ -327,17 +334,7 @@ const ExplorePage = ({}: ExplorePageProps) => {
           }}
         >
           <div className="absolute inset-0 bg-black/60"></div>
-          <div className="relative mx-auto max-w-7xl px-4">
-            <header className="mb-12 flex items-center justify-between">
-              <div> {/* This is a spacer */} </div>
-              <button
-                onClick={toggleTheme}
-                className="rounded-full border border-white/20 bg-white/10 p-2 text-white backdrop-blur-md transition-colors duration-300 hover:bg-white/20"
-                aria-label="Toggle theme"
-              >
-                {theme === "light" ? <Moon className="h-6 w-6" /> : <Sun className="h-6 w-6" />}
-              </button>
-            </header>
+          <div className="relative mx-auto max-w-7xl px-4 py-8">
             <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl">
               Discover Your Next Challenge
             </h1>
@@ -349,10 +346,10 @@ const ExplorePage = ({}: ExplorePageProps) => {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search Scordo..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full rounded-full border border-white/20 bg-white/20 p-4 pl-12 text-lg text-white placeholder-gray-300 backdrop-blur-lg outline-none focus:ring-2 focus:ring-yellow-500"
+                  placeholder="Search Users, Teams, Tournaments etc."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full rounded-full border border-white/20 bg-white/20 p-4 pl-12 text-lg text-white placeholder-gray-300 backdrop-blur-lg outline-none focus:ring-2 focus:ring-green-500"
                 />
                 <Search className="absolute top-1/2 left-4 h-6 w-6 -translate-y-1/2 text-gray-300" />
               </div>
@@ -366,64 +363,68 @@ const ExplorePage = ({}: ExplorePageProps) => {
           </div>
         </div>
 
-        <div className="mx-auto -mt-10 max-w-7xl p-4 md:p-8">
-          {/* Live & Upcoming Matches Carousel */}
-          <section className="mb-12">
-            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-              Live & Upcoming
-            </h2>
-            <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent -mx-4 flex space-x-6 overflow-x-auto px-4 pb-4">
-              {mockMatches
-                .filter((m) => m.status !== "Completed")
-                .map((match) => (
-                  <LiveMatchCard key={match.id} match={match} />
-                ))}
-            </div>
-          </section>
-
-          {/* Filtered Content */}
-          {(activeFilter === "All" || activeFilter === "Tournaments") &&
-            filteredData.tournaments.length > 0 && (
-              <section className="mb-12">
-                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                  Tournaments Nearby
-                </h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredData.tournaments.map((tour) => (
-                    <TournamentCard key={tour.id} tournament={tour} />
+        {query.trim() === "" ? (
+          <div className="mx-auto -mt-10 max-w-7xl p-4 md:p-8">
+            {/* Live & Upcoming Matches Carousel */}
+            <section className="mb-12">
+              <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                Live & Upcoming
+              </h2>
+              <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent -mx-4 flex space-x-6 overflow-x-auto px-4 pb-4">
+                {mockMatches
+                  .filter((m) => m.status !== "Completed")
+                  .map((match) => (
+                    <LiveMatchCard key={match.id} match={match} />
                   ))}
-                </div>
-              </section>
-            )}
+              </div>
+            </section>
 
-          {(activeFilter === "All" || activeFilter === "Teams") &&
-            filteredData.teams.length > 0 && (
-              <section className="mb-12">
-                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                  Featured Teams
-                </h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredData.teams.map((team) => (
-                    <TeamCard key={team.id} team={team} />
-                  ))}
-                </div>
-              </section>
-            )}
+            {/* Filtered Content */}
+            {(activeFilter === "All" || activeFilter === "Tournaments") &&
+              filteredData.tournaments.length > 0 && (
+                <section className="mb-12">
+                  <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                    Tournaments Nearby
+                  </h2>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredData.tournaments.map((tour) => (
+                      <TournamentCard key={tour.id} tournament={tour} />
+                    ))}
+                  </div>
+                </section>
+              )}
 
-          {(activeFilter === "All" || activeFilter === "Players") &&
-            filteredData.players.length > 0 && (
-              <section className="mb-12">
-                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                  Top Players
-                </h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredData.players.map((player) => (
-                    <PlayerCard key={player.id} player={player} />
-                  ))}
-                </div>
-              </section>
-            )}
-        </div>
+            {(activeFilter === "All" || activeFilter === "Teams") &&
+              filteredData.teams.length > 0 && (
+                <section className="mb-12">
+                  <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                    Featured Teams
+                  </h2>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredData.teams.map((team) => (
+                      <TeamCard key={team.id} team={team} />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+            {(activeFilter === "All" || activeFilter === "Players") &&
+              filteredData.players.length > 0 && (
+                <section className="mb-12">
+                  <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                    Top Players
+                  </h2>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {filteredData.players.map((player) => (
+                      <PlayerCard key={player.id} player={player} />
+                    ))}
+                  </div>
+                </section>
+              )}
+          </div>
+        ) : (
+          <AfterSearch results={results} query={query} clearSearch={clearSearch}></AfterSearch>
+        )}
       </div>
     </div>
   );
