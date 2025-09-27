@@ -1,5 +1,5 @@
-import "./globals.css";
 import { Cal_Sans, Poppins, Urbanist } from "next/font/google";
+import "../app/globals.css";
 
 const cal_sans = Cal_Sans({
   weight: "400",

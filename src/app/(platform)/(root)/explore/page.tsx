@@ -323,108 +323,99 @@ const ExplorePage = ({}: ExplorePageProps) => {
   };
 
   return (
-    <div className={theme}>
-      <div className="min-h-screen bg-gray-50 font-sans transition-colors duration-500 dark:bg-gradient-to-br dark:from-gray-900 dark:to-green-900">
-        {/* Hero Section */}
-        <div
-          className="relative bg-cover bg-center pt-8 pb-16 text-center md:pb-24"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=2070&auto=format&fit=crop')`,
-          }}
-        >
-          <div className="absolute inset-0 bg-black/60"></div>
-          <div className="relative mx-auto max-w-7xl px-4 py-8">
-            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl">
-              Discover Your Next Challenge
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-300">
-              Find live matches, upcoming tournaments, and talented players in your area.
-            </p>
-
-            <div className="mx-auto mt-8 max-w-2xl">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search Users, Teams, Tournaments etc."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="w-full rounded-full border border-white/20 bg-white/20 p-4 pl-12 text-lg text-white placeholder-gray-300 backdrop-blur-lg outline-none focus:ring-2 focus:ring-green-500"
-                />
-                <Search className="absolute top-1/2 left-4 h-6 w-6 -translate-y-1/2 text-gray-300" />
-              </div>
-              <div className="mt-4 flex justify-center space-x-2 md:space-x-4">
-                <FilterButton label="All" icon={Search} />
-                <FilterButton label="Teams" icon={Shield} />
-                <FilterButton label="Players" icon={Users} />
-                <FilterButton label="Tournaments" icon={Trophy} />
-              </div>
+    <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
+      {/* Hero Section */}
+      <div
+        className="relative aspect-video bg-cover bg-bottom pt-8 pb-16 text-center md:aspect-auto md:pb-24"
+        style={{
+          backgroundImage: `url('./default-team-banner.jpg')`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="relative mx-auto mt-44 max-w-7xl px-4 py-8">
+          <div className="mx-auto mt-8 max-w-2xl">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search Users, Teams, Tournaments etc."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full rounded-full border border-white/20 bg-white/20 p-4 pl-12 text-lg text-white placeholder-gray-300 backdrop-blur-lg outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <Search className="absolute top-1/2 left-4 h-6 w-6 -translate-y-1/2 text-gray-300" />
+            </div>
+            <div className="mt-4 flex justify-center space-x-2 md:space-x-4">
+              <FilterButton label="All" icon={Search} />
+              <FilterButton label="Teams" icon={Shield} />
+              <FilterButton label="Players" icon={Users} />
+              <FilterButton label="Tournaments" icon={Trophy} />
             </div>
           </div>
         </div>
-
-        {query.trim() === "" ? (
-          <div className="mx-auto -mt-10 max-w-7xl p-4 md:p-8">
-            {/* Live & Upcoming Matches Carousel */}
-            <section className="mb-12">
-              <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                Live & Upcoming
-              </h2>
-              <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent -mx-4 flex space-x-6 overflow-x-auto px-4 pb-4">
-                {mockMatches
-                  .filter((m) => m.status !== "Completed")
-                  .map((match) => (
-                    <LiveMatchCard key={match.id} match={match} />
-                  ))}
-              </div>
-            </section>
-
-            {/* Filtered Content */}
-            {(activeFilter === "All" || activeFilter === "Tournaments") &&
-              filteredData.tournaments.length > 0 && (
-                <section className="mb-12">
-                  <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                    Tournaments Nearby
-                  </h2>
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredData.tournaments.map((tour) => (
-                      <TournamentCard key={tour.id} tournament={tour} />
-                    ))}
-                  </div>
-                </section>
-              )}
-
-            {(activeFilter === "All" || activeFilter === "Teams") &&
-              filteredData.teams.length > 0 && (
-                <section className="mb-12">
-                  <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                    Featured Teams
-                  </h2>
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredData.teams.map((team) => (
-                      <TeamCard key={team.id} team={team} />
-                    ))}
-                  </div>
-                </section>
-              )}
-
-            {(activeFilter === "All" || activeFilter === "Players") &&
-              filteredData.players.length > 0 && (
-                <section className="mb-12">
-                  <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                    Top Players
-                  </h2>
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredData.players.map((player) => (
-                      <PlayerCard key={player.id} player={player} />
-                    ))}
-                  </div>
-                </section>
-              )}
-          </div>
-        ) : (
-          <AfterSearch results={results} query={query} clearSearch={clearSearch}></AfterSearch>
-        )}
       </div>
+
+      {query.trim() === "" ? (
+        <div className="mx-auto -mt-10 max-w-7xl p-4 md:p-8">
+          {/* Live & Upcoming Matches Carousel */}
+          <section className="mb-12">
+            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+              Live & Upcoming
+            </h2>
+            <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent -mx-4 flex space-x-6 overflow-x-auto px-4 pb-4">
+              {mockMatches
+                .filter((m) => m.status !== "Completed")
+                .map((match) => (
+                  <LiveMatchCard key={match.id} match={match} />
+                ))}
+            </div>
+          </section>
+
+          {/* Filtered Content */}
+          {(activeFilter === "All" || activeFilter === "Tournaments") &&
+            filteredData.tournaments.length > 0 && (
+              <section className="mb-12">
+                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                  Tournaments Nearby
+                </h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredData.tournaments.map((tour) => (
+                    <TournamentCard key={tour.id} tournament={tour} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+          {(activeFilter === "All" || activeFilter === "Teams") &&
+            filteredData.teams.length > 0 && (
+              <section className="mb-12">
+                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                  Featured Teams
+                </h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredData.teams.map((team) => (
+                    <TeamCard key={team.id} team={team} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+          {(activeFilter === "All" || activeFilter === "Players") &&
+            filteredData.players.length > 0 && (
+              <section className="mb-12">
+                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                  Top Players
+                </h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredData.players.map((player) => (
+                    <PlayerCard key={player.id} player={player} />
+                  ))}
+                </div>
+              </section>
+            )}
+        </div>
+      ) : (
+        <AfterSearch results={results} query={query} clearSearch={clearSearch}></AfterSearch>
+      )}
     </div>
   );
 };
