@@ -331,7 +331,7 @@ const ExplorePage = ({}: ExplorePageProps) => {
   }) => (
     <button
       onClick={() => setActiveFilter(label)}
-      className={`flex items-center space-x-2 rounded-full border px-4 py-2 text-sm font-semibold backdrop-blur-md transition-all duration-300 ${activeFilter === label ? "border-transparent bg-green-500 text-white shadow-lg" : "border-white/20 bg-white/30 text-gray-800 hover:bg-white/50 dark:bg-black/20 dark:text-gray-100 dark:hover:bg-black/40"}`}
+      className={`center hover:border-hover/90 flex w-full transform border border-transparent px-2 py-2 font-[urbanist] text-nowrap shadow-xl transition-all duration-500 ease-in-out md:px-5 dark:hover:border-gray-100 ${activeFilter === label ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 font-semibold text-white shadow-emerald-500/50 dark:shadow-emerald-800/50" : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-900 dark:text-lime-300 dark:hover:bg-emerald-700"}`}
     >
       <Icon className="h-5 w-5" />
       <span>{label}</span>
@@ -358,7 +358,7 @@ const ExplorePage = ({}: ExplorePageProps) => {
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
       {/* Hero Section */}
       <div className="relative mx-auto">
-        <div className="mt-4 flex justify-center space-x-2 md:space-x-4">
+        <div className="flex justify-center">
           <FilterButton label="All" icon={Search} />
           <FilterButton label="Players" icon={Users} />
           <FilterButton label="Teams" icon={Shield} />
@@ -366,7 +366,6 @@ const ExplorePage = ({}: ExplorePageProps) => {
         </div>
         <div className="relative">
           <PlaceholdersAndVanishInput
-            icon={Search}
             onSubmit={() => {}}
             placeholders={[
               "Search for teams",
@@ -375,9 +374,8 @@ const ExplorePage = ({}: ExplorePageProps) => {
               "Search for matches",
             ]}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-full p-4 pl-12 text-lg outline-none placeholder:pl-12 focus:ring-2 focus:ring-green-500"
+            className=""
           />
-          <Search className="absolute top-1/2 left-4 h-6 w-6 -translate-y-1/2 text-gray-300" />
         </div>
       </div>
       {query.trim() === "" ? (
