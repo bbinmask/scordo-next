@@ -311,6 +311,8 @@ export function PlaceholdersAndVanishInputDemo() {
   );
 }
 
+// comment
+
 const ExplorePage = ({}: ExplorePageProps) => {
   const [theme, setTheme] = useState("dark");
   const [query, setQuery] = useState("");
