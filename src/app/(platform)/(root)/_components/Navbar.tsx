@@ -41,6 +41,8 @@ const navLinks = [
 ];
 const Navbar = () => {
   const [theme, setTheme] = useState<"light" | "dark">();
+  const [isSticky, setIsSticky] = useState(false);
+
   const handleDarkMode = () => {
     const mode = document.querySelector("html")?.classList.toggle("dark");
     localStorage.setItem("theme", mode ? "dark" : "light");
@@ -55,10 +57,20 @@ const Navbar = () => {
       document.documentElement.classList.remove("dark");
     }
     setTheme(currentTheme);
+
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 0.1);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <div className="primary-background fixed top-0 z-[999] grid min-h-12 w-full items-center px-2 py-3 shadow-lg shadow-black/60">
+    <nav
+      className={`primary-background sticky top-0 z-[999] grid min-h-12 w-full items-center px-2 py-3 ${
+        isSticky && "shadow-lg shadow-black/60"
+      }`}
+    >
       <div className="flex w-full items-center">
         <div className="flex w-full items-center justify-between">
           <Link
@@ -81,7 +93,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
 
