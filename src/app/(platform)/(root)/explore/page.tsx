@@ -1,6 +1,8 @@
 "use client";
 
-interface ExplorePageProps {}
+interface ExplorePageProps {
+  children?: React.ReactNode;
+}
 
 import React, { useState, useMemo, ForwardRefExoticComponent, RefAttributes } from "react";
 import {
