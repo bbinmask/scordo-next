@@ -20,6 +20,8 @@ import {
 import AfterSearch from "./_components/AfterSearch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CarouselSpacing } from "../dashboard/_components/CarouselSpacing";
+import TournamentCard from "../_components/TournamentCard";
 
 const mockTournaments = [
   {
@@ -163,91 +165,6 @@ const mockPlayers = [
   },
 ];
 
-const TournamentCard = ({ tournament }: any) => (
-  <div className="group transform overflow-hidden rounded-xl border border-white/20 bg-white/30 shadow-lg backdrop-blur-lg transition-transform duration-300 hover:-translate-y-2 dark:bg-white/10">
-    <div className="relative">
-      <img
-        src={tournament.banner}
-        alt={tournament.title}
-        className="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-      <h3 className="absolute bottom-3 left-4 text-xl font-extrabold tracking-tight text-white">
-        {tournament.title}
-      </h3>
-    </div>
-    <div className="p-4">
-      <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
-        <MapPin className="mr-2 h-4 w-4 text-yellow-500" />
-        <span>{tournament.location}</span>
-      </div>
-      <div className="mt-1 flex items-center text-sm text-gray-700 dark:text-gray-300">
-        <Calendar className="mr-2 h-4 w-4 text-yellow-500" />
-        <span>{tournament.dates}</span>
-      </div>
-      <div className="mt-4 flex items-center justify-between">
-        <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-          Entry: {tournament.entryFee}
-        </span>
-        <button className="flex items-center text-sm font-bold text-gray-800 transition-colors hover:text-green-500 dark:text-white dark:hover:text-green-400">
-          View Details <ArrowRight className="ml-1 h-4 w-4" />
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-const LiveMatchCard = ({ match }: any) => (
-  <div className="flex w-80 flex-shrink-0 transform flex-col justify-between rounded-xl border border-white/20 bg-white/30 p-4 shadow-md backdrop-blur-lg transition-transform duration-300 hover:scale-105 dark:bg-white/10">
-    <div>
-      <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs text-gray-600 dark:text-gray-300">M. Chinnaswamy Stadium</p>
-        {match.status === "Live" && (
-          <span className="flex animate-pulse items-center text-xs font-bold text-red-500">
-            <span className="mr-1.5 h-2 w-2 rounded-full bg-red-500"></span>LIVE
-          </span>
-        )}
-        {match.status === "Upcoming" && (
-          <span className="text-xs font-bold text-blue-500">{match.summary}</span>
-        )}
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <img src={match.teamA.logo} alt={match.teamA.name} className="h-10 w-10 rounded-full" />
-          <span className="text-lg font-bold text-gray-800 dark:text-gray-100">
-            {match.teamA.shortName}
-          </span>
-        </div>
-        <div className="text-right">
-          <p className="text-lg font-bold text-gray-900 dark:text-white">{match.teamA.score}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {match.teamA.overs ? `(${match.teamA.overs} ov)` : ""}
-          </p>
-        </div>
-      </div>
-      <div className="mt-2 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <img src={match.teamB.logo} alt={match.teamB.name} className="h-10 w-10 rounded-full" />
-          <span className="text-lg font-bold text-gray-800 dark:text-gray-100">
-            {match.teamB.shortName}
-          </span>
-        </div>
-        <div className="text-right">
-          <p className="text-lg font-bold text-gray-900 dark:text-white">{match.teamB.score}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {match.teamB.overs ? `(${match.teamB.overs} ov)` : ""}
-          </p>
-        </div>
-      </div>
-    </div>
-    <div className="mt-3 border-t border-white/20 pt-3 text-center">
-      <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-        {match.status !== "Upcoming" ? match.summary : "Match yet to begin"}
-      </p>
-    </div>
-  </div>
-);
-
 const PlayerCard = ({ player }: any) => (
   <div className="flex transform flex-col items-center rounded-xl border border-white/20 bg-white/30 p-4 text-center shadow-lg backdrop-blur-lg transition-transform duration-300 hover:-translate-y-2 dark:bg-white/10">
     <img
@@ -282,10 +199,14 @@ const TeamCard = ({ team }: any) => (
   </div>
 );
 
-// comment
+const filters = [
+  { label: "All", icon: Search },
+  { label: "Players", icon: Users },
+  { label: "Teams", icon: Shield },
+  { label: "Tournaments", icon: Trophy },
+];
 
 const ExplorePage = ({}: ExplorePageProps) => {
-  const [theme, setTheme] = useState("dark");
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -294,22 +215,6 @@ const ExplorePage = ({}: ExplorePageProps) => {
     teams: [],
     tournaments: [],
   };
-
-  const FilterButton = ({
-    label,
-    icon: Icon,
-  }: {
-    label: string;
-    icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
-  }) => (
-    <button
-      onClick={() => setActiveFilter(label)}
-      className={`center flex w-full transform px-2 py-2 font-[urbanist] text-nowrap transition-all duration-500 ease-in-out hover:opacity-80 md:px-5 ${activeFilter === label ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 font-semibold text-white" : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-900 dark:text-lime-300 dark:hover:bg-emerald-700"}`}
-    >
-      <Icon className="mr-1 h-5 w-5" />
-      <span>{label}</span>
-    </button>
-  );
 
   const filteredData = useMemo(() => {
     const lowercasedFilter = query.toLowerCase();
@@ -341,26 +246,23 @@ const ExplorePage = ({}: ExplorePageProps) => {
           </button>
         </div>
         <div className="flex justify-center p-1">
-          <FilterButton label="All" icon={Search} />
-          <FilterButton label="Players" icon={Users} />
-          <FilterButton label="Teams" icon={Shield} />
-          <FilterButton label="Tournaments" icon={Trophy} />
+          {filters.map(({ label, icon: Icon }) => (
+            <button
+              key={label}
+              onClick={() => setActiveFilter(label)}
+              className={`center flex w-full transform px-2 py-2 font-[urbanist] text-nowrap transition-all duration-500 ease-in-out hover:opacity-80 md:px-5 ${activeFilter === label ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 font-semibold text-white" : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-900 dark:text-lime-300 dark:hover:bg-emerald-700"}`}
+            >
+              <Icon className="mr-1 h-5 w-5" />
+              <span>{label}</span>
+            </button>
+          ))}
         </div>
       </div>
       {query.trim() === "" ? (
         <div className="mx-auto mt-2 max-w-7xl border p-4 md:p-8">
-          {/* Live & Upcoming Matches Carousel */}
           <section className="mb-12">
-            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-              Live & Upcoming
-            </h2>
-            <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent -mx-4 flex space-x-6 overflow-x-auto px-4 py-4">
-              {mockMatches
-                .filter((m) => m.status !== "Completed")
-                .map((match) => (
-                  <LiveMatchCard key={match.id} match={match} />
-                ))}
-            </div>
+            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Live</h2>
+            <CarouselSpacing matches={mockMatches} status="Live" />
           </section>
 
           {/* Filtered Content */}
