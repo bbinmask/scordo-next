@@ -303,9 +303,9 @@ const ExplorePage = ({}: ExplorePageProps) => {
   }) => (
     <button
       onClick={() => setActiveFilter(label)}
-      className={`center hover:border-hover/90 flex w-full transform border border-transparent px-2 py-2 font-[urbanist] text-nowrap shadow-xl transition-all duration-500 ease-in-out md:px-5 dark:hover:border-gray-100 ${activeFilter === label ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 font-semibold text-white shadow-emerald-500/50 dark:shadow-emerald-800/50" : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-900 dark:text-lime-300 dark:hover:bg-emerald-700"}`}
+      className={`center flex w-full transform px-2 py-2 font-[urbanist] text-nowrap transition-all duration-500 ease-in-out hover:opacity-80 md:px-5 ${activeFilter === label ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 font-semibold text-white" : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-900 dark:text-lime-300 dark:hover:bg-emerald-700"}`}
     >
-      <Icon className="h-5 w-5" />
+      <Icon className="mr-1 h-5 w-5" />
       <span>{label}</span>
     </button>
   );
@@ -330,77 +330,80 @@ const ExplorePage = ({}: ExplorePageProps) => {
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
       {/* Hero Section */}
       <div className="relative mx-auto">
+        <div className="relative py-2">
+          <Input
+            placeholder="Search..."
+            className="rounded-full border border-gray-400 p-6 font-[poppins] text-lg ring-green-600 focus:ring-2 focus-visible:ring-2"
+          />
+        </div>
         <div className="flex justify-center">
           <FilterButton label="All" icon={Search} />
           <FilterButton label="Players" icon={Users} />
           <FilterButton label="Teams" icon={Shield} />
           <FilterButton label="Tournaments" icon={Trophy} />
         </div>
-        <div className="relative">
-          <Input></Input>
-        </div>
       </div>
       {query.trim() === "" ? (
-        // <div className="mx-auto -mt-10 max-w-7xl p-4 md:p-8">
-        //   {/* Live & Upcoming Matches Carousel */}
-        //   <section className="mb-12">
-        //     <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-        //       Live & Upcoming
-        //     </h2>
-        //     <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent -mx-4 flex space-x-6 overflow-x-auto px-4 pb-4">
-        //       {mockMatches
-        //         .filter((m) => m.status !== "Completed")
-        //         .map((match) => (
-        //           <LiveMatchCard key={match.id} match={match} />
-        //         ))}
-        //     </div>
-        //   </section>
+        <div className="mx-auto mt-2 max-w-7xl border p-4 md:p-8">
+          {/* Live & Upcoming Matches Carousel */}
+          <section className="mb-12">
+            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+              Live & Upcoming
+            </h2>
+            <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent -mx-4 flex space-x-6 overflow-x-auto px-4 py-4">
+              {mockMatches
+                .filter((m) => m.status !== "Completed")
+                .map((match) => (
+                  <LiveMatchCard key={match.id} match={match} />
+                ))}
+            </div>
+          </section>
 
-        //   {/* Filtered Content */}
-        //   {(activeFilter === "All" || activeFilter === "Tournaments") &&
-        //     filteredData.tournaments.length > 0 && (
-        //       <section className="mb-12">
-        //         <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-        //           Tournaments Nearby
-        //         </h2>
-        //         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        //           {filteredData.tournaments.map((tour) => (
-        //             <TournamentCard key={tour.id} tournament={tour} />
-        //           ))}
-        //         </div>
-        //       </section>
-        //     )}
+          {/* Filtered Content */}
+          {(activeFilter === "All" || activeFilter === "Tournaments") &&
+            filteredData.tournaments.length > 0 && (
+              <section className="mb-12">
+                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                  Tournaments Nearby
+                </h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredData.tournaments.map((tour) => (
+                    <TournamentCard key={tour.id} tournament={tour} />
+                  ))}
+                </div>
+              </section>
+            )}
 
-        //   {(activeFilter === "All" || activeFilter === "Teams") &&
-        //     filteredData.teams.length > 0 && (
-        //       <section className="mb-12">
-        //         <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-        //           Featured Teams
-        //         </h2>
-        //         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        //           {filteredData.teams.map((team) => (
-        //             <TeamCard key={team.id} team={team} />
-        //           ))}
-        //         </div>
-        //       </section>
-        //     )}
+          {(activeFilter === "All" || activeFilter === "Teams") &&
+            filteredData.teams.length > 0 && (
+              <section className="mb-12">
+                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                  Featured Teams
+                </h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredData.teams.map((team) => (
+                    <TeamCard key={team.id} team={team} />
+                  ))}
+                </div>
+              </section>
+            )}
 
-        //   {(activeFilter === "All" || activeFilter === "Players") &&
-        //     filteredData.players.length > 0 && (
-        //       <section className="mb-12">
-        //         <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-        //           Top Players
-        //         </h2>
-        //         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        //           {filteredData.players.map((player) => (
-        //             <PlayerCard key={player.id} player={player} />
-        //           ))}
-        //         </div>
-        //       </section>
-        //     )}
-        // </div>
-        <div></div>
+          {(activeFilter === "All" || activeFilter === "Players") &&
+            filteredData.players.length > 0 && (
+              <section className="mb-12">
+                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                  Top Players
+                </h2>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredData.players.map((player) => (
+                    <PlayerCard key={player.id} player={player} />
+                  ))}
+                </div>
+              </section>
+            )}
+        </div>
       ) : (
+        // <div></div>
         <AfterSearch results={results} query={query} clearSearch={clearSearch}></AfterSearch>
       )}
     </div>
