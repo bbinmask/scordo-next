@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import AfterSearch from "./_components/AfterSearch";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const mockTournaments = [
   {
@@ -330,13 +331,16 @@ const ExplorePage = ({}: ExplorePageProps) => {
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
       {/* Hero Section */}
       <div className="relative mx-auto">
-        <div className="relative py-2">
+        <div className="relative p-2">
           <Input
             placeholder="Search..."
-            className="rounded-full border border-gray-400 p-6 font-[poppins] text-lg ring-green-600 focus:ring-2 focus-visible:ring-2"
+            className="rounded-full border border-gray-400 p-4 pr-12 font-[poppins] text-base ring-green-600 focus:ring-2 focus-visible:ring-2 lg:p-6 lg:text-lg"
           />
+          <button className="absolute top-4 right-4">
+            <Search size={20} />
+          </button>
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center p-1">
           <FilterButton label="All" icon={Search} />
           <FilterButton label="Players" icon={Users} />
           <FilterButton label="Teams" icon={Shield} />
