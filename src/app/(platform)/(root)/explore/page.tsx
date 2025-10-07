@@ -2,9 +2,13 @@
 
 interface ExplorePageProps {
   children?: React.ReactNode;
+  searchParams?: {
+    query?: string;
+  };
 }
-
-import React, { useState, useMemo, ForwardRefExoticComponent, RefAttributes } from "react";
+import { debounce, replace } from "lodash";
+import React, { useState, useMemo, ChangeEvent } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Sun,
   Moon,
@@ -19,7 +23,6 @@ import {
 } from "lucide-react";
 import AfterSearch from "./_components/AfterSearch";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { CarouselSpacing } from "../dashboard/_components/CarouselSpacing";
 import TournamentCard from "../_components/TournamentCard";
 
@@ -206,8 +209,12 @@ const filters = [
   { label: "Tournaments", icon: Trophy },
 ];
 
-const ExplorePage = ({}: ExplorePageProps) => {
-  const [query, setQuery] = useState("");
+const ExplorePage = ({ searchParams }: ExplorePageProps) => {
+  const sParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const [query, setQuery] = useState(sParams.get("query") || "");
   const [activeFilter, setActiveFilter] = useState("All");
 
   const results = {
@@ -228,6 +235,21 @@ const ExplorePage = ({}: ExplorePageProps) => {
     return { tournaments, teams, players };
   }, [query]);
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    const params = new URLSearchParams(sParams);
+
+    if (!term) {
+      setQuery("");
+      params.delete("query");
+    } else {
+      setQuery(term);
+      params.set("query", term);
+    }
+
+    replace(`${pathname}?${params.toString()}`);
+  };
+
   const clearSearch = () => {
     setQuery("");
   };
@@ -238,6 +260,7 @@ const ExplorePage = ({}: ExplorePageProps) => {
       <div className="relative mx-auto">
         <div className="relative p-2">
           <Input
+            onChange={handleChange}
             placeholder="Search..."
             className="rounded-full border border-gray-400 p-4 pr-12 font-[poppins] text-base ring-green-600 focus:ring-2 focus-visible:ring-2 lg:p-6 lg:text-lg"
           />
