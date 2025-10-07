@@ -2,12 +2,11 @@ import React from "react";
 import { TeamsList } from "../_components/TeamComponents";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { db } from "@/lib/db";
-import { currentUser } from "@clerk/nextjs/server";
-import { getUser } from "@/lib/getUser";
+import { currentUser } from "@/lib/currentUser";
 import { Prisma } from "@/generated/prisma";
 
 const MyTeamsPage = async () => {
-  const user = await getUser();
+  const user = await currentUser();
 
   if (!user) return null;
 

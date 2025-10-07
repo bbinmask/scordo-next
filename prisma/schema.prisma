@@ -158,6 +158,8 @@ model Team {
   captainId String? @db.ObjectId
   captain   User?   @relation("TeamCaptain", fields: [captainId], references: [id])
 
+  tournaments TournamentTeam[] @relation("TeamParticipants")
+
   players           Player[]            @relation("TeamPlayers")
   joinRequests      TeamRequest[]       @relation("TeamJoinRequests")
   tournamentRequest TournamentRequest[] @relation("TeamTournamentRequests")
@@ -179,13 +181,13 @@ model Tournament {
   description String?
   organizerId String            @db.ObjectId
 
-  organizer User                @relation("TournamentOrganizer", fields: [organizerId], references: [id])
-  requests  TournamentRequest[] @relation("TournamentJoinRequests")
-  matches   Match[]             @relation("TournamentMatches")
-
-  rules     String[]
-  startDate DateTime
-  endDate   DateTime
+  organizer          User                @relation("TournamentOrganizer", fields: [organizerId], references: [id])
+  requests           TournamentRequest[] @relation("TournamentJoinRequests")
+  matches            Match[]             @relation("TournamentMatches")
+  participatingTeams TournamentTeam[]    @relation("TournamentParticipants")
+  rules              String[]
+  startDate          DateTime
+  endDate            DateTime
 }
 
 model TournamentRequest {
@@ -199,6 +201,19 @@ model TournamentRequest {
   status    RequestStatus @default(pending)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+
+  @@unique([teamId, tournamentId])
+}
+
+model TournamentTeam {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  teamId       String @db.ObjectId
+  tournamentId String @db.ObjectId
+
+  team       Team       @relation("TeamParticipants", fields: [teamId], references: [id])
+  tournament Tournament @relation("TournamentParticipants", fields: [tournamentId], references: [id])
+
+  createdAt DateTime @default(now())
 
   @@unique([teamId, tournamentId])
 }

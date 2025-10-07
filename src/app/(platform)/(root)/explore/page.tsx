@@ -250,7 +250,7 @@ const ExplorePage = ({}: ExplorePageProps) => {
             <button
               key={label}
               onClick={() => setActiveFilter(label)}
-              className={`center flex w-full transform px-2 py-2 font-[urbanist] text-nowrap transition-all duration-500 ease-in-out hover:opacity-80 md:px-5 ${activeFilter === label ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 font-semibold text-white" : "hover:bg-hover/60 bg-main/20 text-green-800 hover:text-gray-50 dark:bg-emerald-900 dark:text-lime-300 dark:hover:bg-emerald-700"}`}
+              className={`center flex w-full transform border-r px-2 py-2 font-[urbanist] text-nowrap transition-all duration-500 ease-in-out hover:opacity-80 md:px-5 ${activeFilter === label ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 font-semibold text-white" : "hover:bg-hover/60 bg-gray-50 text-green-800 hover:text-gray-50 dark:bg-gray-800 dark:text-lime-300 dark:hover:bg-emerald-700"}`}
             >
               <Icon className="mr-1 h-5 w-5" />
               <span>{label}</span>

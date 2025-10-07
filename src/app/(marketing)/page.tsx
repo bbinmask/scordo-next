@@ -25,13 +25,13 @@ const MarketingPage = () => {
             </p>
             <Button
               variant={"default"}
-              className="center bg-main text-accent hover:bg-hover mx-auto h-full transform rounded-full border-none shadow-lg transition-all duration-300 hover:scale-105 md:mx-0"
+              className="center bg-main text-accent hover:bg-hover mx-auto transform rounded-full border-none px-4 py-8 shadow-lg transition-all duration-300 hover:scale-105 md:mx-0"
             >
               <Link
                 href={"/auth/sign-in"}
-                className="center flex py-2 font-[urbanist] text-xl font-semibold text-gray-50"
+                className="center flex w-full py-2 font-[urbanist] text-xl font-semibold text-gray-50"
               >
-                <PlayCircle className="mr-2 h-6 w-6" /> Explore Scordo
+                <PlayCircle className="mr-2 h-10 w-10" /> Explore Scordo
               </Link>
             </Button>
           </div>

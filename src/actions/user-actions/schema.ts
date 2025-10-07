@@ -19,3 +19,7 @@ export const CreateUser = z.object({
   dob: z.date(),
   availability: z.enum(["available", "injured", "on_break"]).default("available"),
 });
+
+export const SendRequest = z.object({
+  addresseeId: z.string({ error: "AddresseeId is required" }),
+});

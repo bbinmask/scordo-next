@@ -50,10 +50,10 @@ const DashboardPage = () => {
 
   return (
     <div className="block w-full items-center">
-      <div className="px-4">
-        <section className="" title="Dashboard">
-          <div className="mb-6 text-center md:text-left">
-            <h1 className="font-[poppins] text-4xl font-extrabold text-gray-800 dark:text-white">
+      <div className="py-4">
+        <section className="px-4" title="Dashboard">
+          <div className="mb-6 text-left">
+            <h1 className="font-[poppins] text-4xl font-extrabold">
               <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
                 Dashboard
               </span>
@@ -84,7 +84,7 @@ const DashboardPage = () => {
             <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Upcoming" />
           </div>
         </section>
-        <section className="" title="Featured">
+        <section className="px-4" title="Featured">
           <div className="mb-6 text-center md:text-left">
             <h2 className="font-[poppins] text-4xl font-extrabold text-gray-800 dark:text-white">
               <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
