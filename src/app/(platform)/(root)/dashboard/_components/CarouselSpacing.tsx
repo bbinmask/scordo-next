@@ -31,13 +31,13 @@ export function CarouselSpacing({
         <>
           <button
             onClick={() => scroll(-1)}
-            className="bg-main absolute top-1/2 left-4 z-10 hidden aspect-square -translate-y-1/2 cursor-pointer rounded-full border-none p-1 text-white opacity-80 hover:opacity-90 md:block"
+            className="bg-main absolute top-1/2 left-0 z-10 hidden aspect-square -translate-y-1/2 cursor-pointer rounded-full border-none p-1 text-white opacity-80 hover:opacity-90 md:block"
           >
             <ChevronLeft size={18} />
           </button>
           <button
             onClick={() => scroll(1)}
-            className="bg-main absolute top-1/2 right-2 z-10 hidden aspect-square -translate-y-1/2 cursor-pointer rounded-full border-none p-1 text-white opacity-80 hover:opacity-90 md:block"
+            className="bg-main absolute top-1/2 right-0 z-10 hidden aspect-square -translate-y-1/2 cursor-pointer rounded-full border-none p-1 text-white opacity-80 hover:opacity-90 md:block"
           >
             <ChevronRight size={18} />
           </button>
@@ -51,7 +51,7 @@ export function CarouselSpacing({
       ) : (
         <div
           ref={scrollRef}
-          className="hide_scrollbar flex flex-row justify-start gap-3 overflow-x-auto overflow-y-hidden scroll-smooth px-3"
+          className="hide_scrollbar flex flex-row justify-start gap-3 overflow-x-auto overflow-y-hidden"
         >
           {status === "Live" &&
             matches.map((match, i) => (

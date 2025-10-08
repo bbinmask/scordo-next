@@ -22,7 +22,7 @@ interface SearchResultItemProps {
 
 const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
   const { tournaments, teams, users } = results;
-  const totalResults = tournaments.length + teams.length + users.length;
+  const totalResults = tournaments?.length + teams?.length + users?.length;
 
   return (
     <div className="rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6 dark:bg-white/10">

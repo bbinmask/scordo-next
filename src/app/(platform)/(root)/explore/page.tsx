@@ -3,11 +3,11 @@
 interface ExplorePageProps {
   children?: React.ReactNode;
   searchParams?: {
-    query?: string;
+    query: string;
   };
 }
 import { debounce, replace } from "lodash";
-import React, { useState, useMemo, ChangeEvent } from "react";
+import React, { useState, useMemo, ChangeEvent, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Sun,
@@ -25,6 +25,8 @@ import AfterSearch from "./_components/AfterSearch";
 import { Input } from "@/components/ui/input";
 import { CarouselSpacing } from "../dashboard/_components/CarouselSpacing";
 import TournamentCard from "../_components/TournamentCard";
+import { useAction } from "@/hooks/useAction";
+import { searchTeams, searchTournaments, searchUsers } from "@/actions/search-actions";
 
 const mockTournaments = [
   {
@@ -204,76 +206,120 @@ const TeamCard = ({ team }: any) => (
 
 const filters = [
   { label: "All", icon: Search },
-  { label: "Players", icon: Users },
+  { label: "Users", icon: Users },
   { label: "Teams", icon: Shield },
   { label: "Tournaments", icon: Trophy },
 ];
 
-const ExplorePage = ({ searchParams }: ExplorePageProps) => {
+const ExplorePage = () => {
   const sParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
+  const router = useRouter();
 
   const [query, setQuery] = useState(sParams.get("query") || "");
-  const [activeFilter, setActiveFilter] = useState("All");
-
-  const results = {
+  const [activeFilter, setActiveFilter] = useState<"all" | "users" | "teams" | "tournaments">(
+    "all"
+  );
+  const [results, setResults] = useState<any>({
     users: [],
     teams: [],
     tournaments: [],
-  };
+  });
 
-  const filteredData = useMemo(() => {
-    const lowercasedFilter = query.toLowerCase();
+  const { execute: searchUser } = useAction(searchUsers, {
+    onSuccess: (data) => {
+      setResults({ ...results, users: data });
+    },
+  });
+  const { execute: searchTeam } = useAction(searchTeams, {
+    onSuccess: (data) => {
+      setResults({ ...results, teams: data });
+    },
+  });
+  const { execute: searchTournament } = useAction(searchTournaments, {
+    onSuccess: (data) => {
+      setResults({ ...results, tournaments: data });
+    },
+  });
 
-    const tournaments = mockTournaments.filter((t) =>
-      t.title.toLowerCase().includes(lowercasedFilter)
-    );
-    const teams = mockTeams.filter((t) => t.name.toLowerCase().includes(lowercasedFilter));
-    const players = mockPlayers.filter((p) => p.name.toLowerCase().includes(lowercasedFilter));
+  const cache = useRef(new Map());
 
-    return { tournaments, teams, players };
-  }, [query]);
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async (term: string) => {
+        const params = new URLSearchParams(sParams);
+        if (term) params.set("query", term);
+        else params.delete("query");
+        router.replace(`${pathname}?${params.toString()}`);
+
+        // if (cache.current.has(term)) {
+        //   setResults(cache.current.get(term));
+        //   return;
+        // }
+
+        let res = { users: [], teams: [], tournaments: [] };
+
+        if (term) {
+          switch (activeFilter) {
+            case "users":
+              await searchUser({ q: term });
+              break;
+            case "teams":
+              await searchTeam({ q: term });
+              break;
+            case "tournaments":
+              await searchTournament({ q: term });
+              break;
+            default:
+              await searchUser({ q: term });
+              await searchTeam({ q: term });
+              await searchTournament({ q: term });
+          }
+        }
+
+        cache.current.set(term, res);
+      }, 400),
+    [router, pathname, activeFilter]
+  );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
-    const params = new URLSearchParams(sParams);
-
-    if (!term) {
-      setQuery("");
-      params.delete("query");
-    } else {
-      setQuery(term);
-      params.set("query", term);
-    }
-
-    replace(`${pathname}?${params.toString()}`);
+    setQuery(term);
+    debouncedSearch(term);
   };
 
   const clearSearch = () => {
     setQuery("");
+    router.replace(pathname);
   };
+
+  console.log(results);
 
   return (
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
-      {/* Hero Section */}
-      <div className="relative mx-auto">
-        <div className="relative p-2">
+      <div className="relative mx-auto p-2">
+        <div className="relative">
           <Input
+            value={query}
             onChange={handleChange}
             placeholder="Search..."
-            className="rounded-full border border-gray-400 p-4 pr-12 font-[poppins] text-base ring-green-600 focus:ring-2 focus-visible:ring-2 lg:p-6 lg:text-lg"
+            className="rounded-full border border-gray-400 p-4 pr-12 font-[poppins] text-base ring-green-600 focus:ring-2 lg:p-6 lg:text-lg"
           />
-          <button className="absolute top-4 right-4">
+          <button onClick={() => debouncedSearch(query)} className="absolute top-4 right-4">
             <Search size={20} />
           </button>
         </div>
+
         <div className="flex justify-center p-1">
           {filters.map(({ label, icon: Icon }) => (
             <button
               key={label}
-              onClick={() => setActiveFilter(label)}
-              className={`center flex w-full transform border-r px-2 py-2 font-[urbanist] text-nowrap transition-all duration-500 ease-in-out hover:opacity-80 md:px-5 ${activeFilter === label ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 font-semibold text-white" : "hover:bg-hover/60 bg-gray-50 text-green-800 hover:text-gray-50 dark:bg-gray-800 dark:text-lime-300 dark:hover:bg-emerald-700"}`}
+              onClick={() => setActiveFilter(label.toLowerCase() as any)}
+              className={`center flex w-full transform border-r px-2 py-2 transition-all ${
+                activeFilter === label.toLowerCase()
+                  ? "bg-green-700 text-white"
+                  : "bg-gray-50 text-green-800 hover:bg-green-100"
+              }`}
             >
               <Icon className="mr-1 h-5 w-5" />
               <span>{label}</span>
@@ -281,59 +327,14 @@ const ExplorePage = ({ searchParams }: ExplorePageProps) => {
           ))}
         </div>
       </div>
+
       {query.trim() === "" ? (
         <div className="mx-auto mt-2 max-w-7xl border p-4 md:p-8">
-          <section className="mb-12">
-            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Live</h2>
-            <CarouselSpacing matches={mockMatches} status="Live" />
-          </section>
-
-          {/* Filtered Content */}
-          {(activeFilter === "All" || activeFilter === "Tournaments") &&
-            filteredData.tournaments.length > 0 && (
-              <section className="mb-12">
-                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                  Tournaments Nearby
-                </h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredData.tournaments.map((tour) => (
-                    <TournamentCard key={tour.id} tournament={tour} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-          {(activeFilter === "All" || activeFilter === "Teams") &&
-            filteredData.teams.length > 0 && (
-              <section className="mb-12">
-                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                  Featured Teams
-                </h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredData.teams.map((team) => (
-                    <TeamCard key={team.id} team={team} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-          {(activeFilter === "All" || activeFilter === "Players") &&
-            filteredData.players.length > 0 && (
-              <section className="mb-12">
-                <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-                  Top Players
-                </h2>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredData.players.map((player) => (
-                    <PlayerCard key={player.id} player={player} />
-                  ))}
-                </div>
-              </section>
-            )}
+          <CarouselSpacing status="Live" matches={mockMatches} />
+          {/* Your default home content */}
         </div>
       ) : (
-        // <div></div>
-        <AfterSearch results={results} query={query} clearSearch={clearSearch}></AfterSearch>
+        <AfterSearch results={results} query={query} clearSearch={clearSearch} />
       )}
     </div>
   );
