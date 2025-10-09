@@ -293,7 +293,6 @@ const ExplorePage = () => {
     router.replace(pathname);
   };
 
-  console.log(results);
 
   return (
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
