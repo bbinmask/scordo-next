@@ -1,4 +1,3 @@
-import { User } from "@/generated/prisma";
 import { UserWithTeamsProps } from "@/lib/types";
 import AxiosRequest from "@/utils/AxiosResponse";
 import { useQuery } from "@tanstack/react-query";
@@ -12,15 +11,17 @@ interface QuickActionButtonProps {
   href: string;
 }
 
-const QuickActionButton = ({ title, icon: Icon, href }: QuickActionButtonProps) => (
-  <Link
-    href={href}
-    className="flex items-center rounded-lg bg-white/10 p-4 font-[urbanist] backdrop-blur-md transition-colors duration-300 hover:bg-white/20"
-  >
-    <Icon className="h-6 w-6 text-green-300" />
-    <span className="ml-4 font-semibold text-white">{title}</span>
-  </Link>
-);
+const QuickActionButton = ({ title, icon: Icon, href }: QuickActionButtonProps) => {
+  return (
+    <Link
+      href={href}
+      className="group flex items-center justify-between rounded-xl bg-slate-100 p-4 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:scale-[1.03] hover:bg-slate-200/60 hover:shadow-md dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-teal-500/10 dark:hover:ring-slate-600"
+    >
+      <span className="font-sans tracking-wide text-slate-700 dark:text-slate-300">{title}</span>
+      <Icon className="h-5 w-5 text-slate-500 transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400" />
+    </Link>
+  );
+};
 
 interface HeroSectionProps {
   user?: UserWithTeamsProps;
@@ -41,64 +42,72 @@ const HeroSection = ({ user }: HeroSectionProps) => {
   console.log(banner);
 
   return (
-    <div
-      className="border-input relative mb-8 overflow-hidden rounded-xl border bg-cover bg-center p-6 text-white shadow-lg md:p-8"
-      style={{
-        backgroundImage: `url(${banner})`,
-      }}
-    >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-900 shadow-lg shadow-slate-200/50 md:p-8 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:shadow-2xl dark:shadow-black/30">
+      {/* Subtle background glow effect */}
+      <div
+        className="absolute top-0 left-1/2 -z-10 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-teal-500/10 blur-3xl"
+        aria-hidden="true"
+      ></div>
+
       <div className="relative z-10">
-        <header className="mb-6 flex items-center justify-between">
+        <header className="mb-8">
           <div>
-            <h1 className="font-[cal_sans] text-3xl font-extrabold tracking-wide md:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-800 md:text-4xl dark:text-slate-100">
               Welcome back, {user?.username || "User"}!
             </h1>
-            <p className="text-md font-[poppins] leading-10 text-gray-300">
+            <p className="text-md mt-2 text-slate-600 dark:text-slate-400">
               Here's your personal cricket hub.
             </p>
           </div>
         </header>
 
-        <div className="grid items-center gap-6 md:grid-cols-5">
+        <div className="grid items-stretch gap-6 md:grid-cols-5">
           {/* Upcoming Match Card */}
-          <div className="rounded-lg bg-white/10 p-5 backdrop-blur-md md:col-span-3">
-            <h2 className="mb-3 font-[poppins] text-sm font-bold tracking-wider text-gray-300 uppercase">
+          <div className="flex flex-col rounded-xl bg-white/60 p-5 shadow-md ring-1 ring-slate-200/50 backdrop-blur-sm transition-all duration-300 hover:ring-slate-300 md:col-span-3 dark:bg-slate-800/50 dark:shadow-lg dark:ring-slate-700/50 dark:hover:ring-slate-600">
+            <h2 className="mb-4 text-sm font-semibold tracking-wider text-teal-600 uppercase dark:text-teal-400">
               Your Next Match
             </h2>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
+            <div className="grid grid-cols-5 items-center justify-between">
+              <div className="col-span-2 flex flex-col items-center gap-2 text-center md:flex-row md:gap-4">
                 <img
                   src={upcomingMatch.teamA.logo}
                   alt={upcomingMatch.teamA.name}
-                  className="h-12 w-12 rounded-full"
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-slate-300 md:h-14 md:w-14 dark:ring-slate-600"
                 />
-                <span className="font-[cal_sans] text-xl tracking-wide">
+                <span className="font-[poppins] text-lg font-semibold text-slate-800 md:text-xl dark:text-slate-100">
                   {upcomingMatch.teamA.name}
                 </span>
               </div>
-              <span className="text-lg font-bold text-gray-400">vs</span>
-              <div className="flex items-center space-x-3">
-                <span className="font-[cal_sans] text-xl tracking-wide">
+              <span className="col-span-1 text-center text-lg font-bold text-slate-400 dark:text-slate-500">
+                vs
+              </span>
+              <div className="col-span-2 flex flex-col-reverse items-center gap-2 text-center md:flex-row md:gap-4">
+                <span className="font-[poppins] text-lg font-semibold text-slate-800 md:text-xl dark:text-slate-100">
                   {upcomingMatch.teamB.name}
                 </span>
                 <img
                   src={upcomingMatch.teamB.logo}
                   alt={upcomingMatch.teamB.name}
-                  className="h-12 w-12 rounded-full"
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-slate-300 md:h-14 md:w-14 dark:ring-slate-600"
                 />
               </div>
             </div>
-            <div className="mt-4 text-center">
-              <p className="font-[poppins] font-semibold">{upcomingMatch.time}</p>
-              <p className="font-[poppins] text-xs text-gray-300">{upcomingMatch.venue}</p>
+            <div className="mt-5 border-t border-slate-200 pt-4 text-center dark:border-slate-700">
+              <p className="font-semibold text-slate-700 dark:text-slate-200">
+                {upcomingMatch.time}
+              </p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{upcomingMatch.venue}</p>
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="space-y-4 md:col-span-2">
-            <QuickActionButton title="Create a New Match" icon={PlusCircle} href="#" />
-            <QuickActionButton title="Find a Player" icon={Search} href="#" />
+          <div className="flex flex-col justify-center space-y-4 md:col-span-2">
+            <QuickActionButton
+              title="Create a New Match"
+              icon={PlusCircle}
+              href="/matches/create"
+            />
+            <QuickActionButton title="Find a Player" icon={Search} href="/explore" />
           </div>
         </div>
       </div>

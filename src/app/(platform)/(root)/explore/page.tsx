@@ -6,7 +6,7 @@ interface ExplorePageProps {
     query: string;
   };
 }
-import { debounce, replace } from "lodash";
+import { debounce } from "lodash";
 import React, { useState, useMemo, ChangeEvent, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -24,7 +24,6 @@ import {
 import AfterSearch from "./_components/AfterSearch";
 import { Input } from "@/components/ui/input";
 import { CarouselSpacing } from "../dashboard/_components/CarouselSpacing";
-import TournamentCard from "../_components/TournamentCard";
 import { useAction } from "@/hooks/useAction";
 import { searchTeams, searchTournaments, searchUsers } from "@/actions/search-actions";
 
@@ -228,16 +227,22 @@ const ExplorePage = () => {
 
   const { execute: searchUser } = useAction(searchUsers, {
     onSuccess: (data) => {
+      console.log(data);
       setResults({ ...results, users: data });
+    },
+    onError: (err) => {
+      console.error(err);
     },
   });
   const { execute: searchTeam } = useAction(searchTeams, {
     onSuccess: (data) => {
       setResults({ ...results, teams: data });
+      console.log(data);
     },
   });
   const { execute: searchTournament } = useAction(searchTournaments, {
     onSuccess: (data) => {
+      console.log(data);
       setResults({ ...results, tournaments: data });
     },
   });
@@ -262,18 +267,18 @@ const ExplorePage = () => {
         if (term) {
           switch (activeFilter) {
             case "users":
-              await searchUser({ q: term });
+              await searchUser({ query: term });
               break;
             case "teams":
-              await searchTeam({ q: term });
+              await searchTeam({ query: term });
               break;
             case "tournaments":
-              await searchTournament({ q: term });
+              await searchTournament({ query: term });
               break;
             default:
-              await searchUser({ q: term });
-              await searchTeam({ q: term });
-              await searchTournament({ q: term });
+              await searchUser({ query: term });
+              await searchTeam({ query: term });
+              await searchTournament({ query: term });
           }
         }
 
@@ -292,7 +297,6 @@ const ExplorePage = () => {
     setQuery("");
     router.replace(pathname);
   };
-
 
   return (
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">

@@ -51,7 +51,7 @@ export function CarouselSpacing({
       ) : (
         <div
           ref={scrollRef}
-          className="hide_scrollbar flex flex-row justify-start gap-3 overflow-x-auto overflow-y-hidden"
+          className="hide_scrollbar flex flex-row justify-start gap-2 overflow-x-auto overflow-y-hidden p-2"
         >
           {status === "Live" &&
             matches.map((match, i) => (
