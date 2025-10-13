@@ -30,12 +30,9 @@ export const TeamCard = ({ team }: { team: TeamWithPlayers }) => {
   const { joinTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
-  const teamSlug = getTeamUrl(team);
-  const encodedSlug = encodeURIComponent(teamSlug);
-
   return (
     <Link
-      href={`/teams/${encodedSlug}`}
+      href={`/teams/${team.abbreviation}`}
       className="relative aspect-video h-full w-full overflow-hidden rounded-xl border-gray-600 font-[poppins] shadow-black transition-all duration-300 hover:border-emerald-700 hover:opacity-95 hover:shadow-md focus:ring-2 focus:ring-emerald-700 dark:border"
     >
       <div

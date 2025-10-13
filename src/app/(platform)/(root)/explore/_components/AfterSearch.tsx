@@ -23,7 +23,7 @@ interface SearchResultItemProps {
 const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
   const { tournaments, teams, users } = results;
   const totalResults = tournaments?.length + teams?.length + users?.length;
-
+  console.log(results);
   return (
     <div className="rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6 dark:bg-white/10">
       <div className="mb-4 flex items-center justify-between">
@@ -46,26 +46,28 @@ const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
         <div className="space-y-4">
           {teams.length > 0 && (
             <div className="space-y-2">
-              {teams.map((item) => (
+              {teams.map((team) => (
                 <SearchResultItem
-                  key={item.id}
+                  key={team.id}
                   icon={Shield}
-                  title={item.name}
+                  title={team.name}
                   subtitle={
-                    item.address?.city ? `${item.address?.city} (${item.address.state})` : "Go to"
+                    team.address?.city ? `${team.address?.city} (${team.address.state})` : "Go to"
                   }
+                  href={`/teams/${team.abbreviation}`}
                 />
               ))}
             </div>
           )}
           {users.length > 0 && (
             <div className="space-y-2">
-              {users.map((item) => (
+              {users.map((user) => (
                 <SearchResultItem
-                  key={item.id}
+                  key={user.id}
                   icon={Users}
-                  title={item.name}
-                  subtitle={item.bio || "Go to"}
+                  title={user.name}
+                  subtitle={user.bio || "Go to"}
+                  href={`/users/${user.username}`}
                 />
               ))}
             </div>

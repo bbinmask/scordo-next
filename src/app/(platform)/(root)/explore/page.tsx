@@ -26,6 +26,9 @@ import { Input } from "@/components/ui/input";
 import { CarouselSpacing } from "../dashboard/_components/CarouselSpacing";
 import { useAction } from "@/hooks/useAction";
 import { searchTeams, searchTournaments, searchUsers } from "@/actions/search-actions";
+import { useQuery } from "@tanstack/react-query";
+import AxiosRequest from "@/utils/AxiosResponse";
+import axios from "axios";
 
 const mockTournaments = [
   {
@@ -219,78 +222,49 @@ const ExplorePage = () => {
   const [activeFilter, setActiveFilter] = useState<"all" | "users" | "teams" | "tournaments">(
     "all"
   );
+
   const [results, setResults] = useState<any>({
     users: [],
     teams: [],
     tournaments: [],
   });
+  const { isLoading: isUsersLoading } = useQuery({
+    queryKey: ["search-users"],
+    queryFn: async () => {
+      const res = await axios.get(`/api/search/users?query=${query}`);
 
-  const { execute: searchUser } = useAction(searchUsers, {
-    onSuccess: (data) => {
-      console.log(data);
-      setResults({ ...results, users: data });
+      setResults((prev: any) => ({ ...prev, users: res.data }));
+
+      return res.data;
     },
-    onError: (err) => {
-      console.error(err);
-    },
+    enabled: query.trim().length > 0,
   });
-  const { execute: searchTeam } = useAction(searchTeams, {
-    onSuccess: (data) => {
-      setResults({ ...results, teams: data });
-      console.log(data);
+  const { isLoading: isTeamsLoading } = useQuery({
+    queryKey: ["search-teams"],
+    queryFn: async () => {
+      const res = await axios.get(`/api/search/teams?query=${query}`);
+
+      setResults((prev: any) => ({ ...prev, teams: res.data }));
+
+      return res.data;
     },
+    enabled: query.trim().length > 0,
   });
-  const { execute: searchTournament } = useAction(searchTournaments, {
-    onSuccess: (data) => {
-      console.log(data);
-      setResults({ ...results, tournaments: data });
+  const { isLoading: isTournamentsLoading } = useQuery({
+    queryKey: ["search-tournaments"],
+    queryFn: async () => {
+      const res = await axios.get(`/api/search/tournaments?query=${query}`);
+
+      setResults((prev: any) => ({ ...prev, tournaments: res.data }));
+
+      return res.data;
     },
+    enabled: query.trim().length > 0,
   });
-
-  const cache = useRef(new Map());
-
-  const debouncedSearch = useMemo(
-    () =>
-      debounce(async (term: string) => {
-        const params = new URLSearchParams(sParams);
-        if (term) params.set("query", term);
-        else params.delete("query");
-        router.replace(`${pathname}?${params.toString()}`);
-
-        // if (cache.current.has(term)) {
-        //   setResults(cache.current.get(term));
-        //   return;
-        // }
-
-        let res = { users: [], teams: [], tournaments: [] };
-
-        if (term) {
-          switch (activeFilter) {
-            case "users":
-              await searchUser({ query: term });
-              break;
-            case "teams":
-              await searchTeam({ query: term });
-              break;
-            case "tournaments":
-              await searchTournament({ query: term });
-              break;
-            default:
-              await searchUser({ query: term });
-              await searchTeam({ query: term });
-              await searchTournament({ query: term });
-          }
-        }
-
-        cache.current.set(term, res);
-      }, 400),
-    [router, pathname, activeFilter]
-  );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setQuery(term);
-    debouncedSearch(term);
   };
 
   const clearSearch = () => {
@@ -308,7 +282,7 @@ const ExplorePage = () => {
             placeholder="Search..."
             className="rounded-full border border-gray-400 p-4 pr-12 font-[poppins] text-base ring-green-600 focus:ring-2 lg:p-6 lg:text-lg"
           />
-          <button onClick={() => debouncedSearch(query)} className="absolute top-4 right-4">
+          <button disabled className="absolute top-2 right-2 lg:top-4 lg:right-4">
             <Search size={20} />
           </button>
         </div>
