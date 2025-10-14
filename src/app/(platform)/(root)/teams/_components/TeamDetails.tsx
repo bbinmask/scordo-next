@@ -48,7 +48,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
   const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
-  //
+  console.log(team.type);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center">
@@ -155,7 +155,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
                   </li>
                   <li className="flex items-center">
                     <BuildingIcon className="mr-2 h-5 w-5 text-blue-500" /> Type:{" "}
-                    {team.type.charAt(0).toUpperCase() + team.type.slice(1)}
+                    {/* {team.type.charAt(0).toUpperCase() + team.type.slice(1)} */}
                   </li>
                   <li className="flex items-center">
                     <UserIcon className="mr-2 h-5 w-5 text-blue-500" /> Captain:{" "}

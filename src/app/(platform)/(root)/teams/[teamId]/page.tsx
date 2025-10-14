@@ -22,7 +22,8 @@ const TeamIdPage: React.FC<TeamIdProps> = () => {
   } = useQuery({
     queryKey: ["team"],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/teams/${params.teamId}`);
+      const { data } = await axios.get(`/api/teams`);
+      console.log(data);
       return data;
     },
   });
