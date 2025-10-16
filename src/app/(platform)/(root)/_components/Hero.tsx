@@ -39,8 +39,6 @@ const HeroSection = ({ user }: HeroSectionProps) => {
     ? user?.players[0].team.banner
     : `/assets/banners/hero-team-banner.png`;
 
-  console.log(banner);
-
   return (
     <div className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-900 shadow-lg shadow-slate-200/50 md:p-8 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:shadow-2xl dark:shadow-black/30">
       {/* Subtle background glow effect */}

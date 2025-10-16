@@ -57,7 +57,6 @@ const ProfileForm = ({ update }: { update?: boolean }) => {
 
   const { execute, isLoading, fieldErrors } = useAction(createUser, {
     onSuccess: (data) => {
-      console.log("Successful");
       toast.success(`${data.name}, Your account is successfully created.`);
     },
     onError: (err) => {

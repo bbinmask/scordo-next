@@ -23,10 +23,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ abbr
             },
           },
         },
+        captain: {
+          select: {
+            name: true,
+            username: true,
+          },
+        },
       },
     });
-
-    console.log(team);
 
     if (!team) return NextResponse.error();
 

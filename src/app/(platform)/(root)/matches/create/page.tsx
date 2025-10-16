@@ -57,10 +57,6 @@ const CreateMatchForm = () => {
     },
   });
 
-  // console.log(isLoading);
-  // console.log(data);
-  // console.log(error);
-
   const handleVenueChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, venue: { ...prev.venue, [name]: value } }));
@@ -69,13 +65,10 @@ const CreateMatchForm = () => {
   const [tossWinner, teamAId, teamBId] = watch(["tossWinner", "teamAId", "teamBId"]);
 
   const onSubmit: SubmitHandler<FormInputProps> = (data) => {
-    console.log(data);
-
     if (formData.teamAId === formData.teamBId && formData.teamAId !== "") {
       alert("Team A and Team B cannot be the same.");
       return;
     }
-    console.log("Match Data Submitted:", { ...formData, status: "not_started" });
     alert("Match creation data logged to console. See the console (F12) for details.");
   };
 

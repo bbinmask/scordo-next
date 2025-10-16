@@ -1,11 +1,11 @@
-import { Team, Tournament, User } from "@/generated/prisma";
-import { ArrowRight, LucideProps, Shield, Trophy, Users, X } from "lucide-react";
+import { Team, Tournament, User as UserProps } from "@/generated/prisma";
+import { ArrowRight, LucideProps, Shield, Trophy, User, X } from "lucide-react";
 import Link from "next/link";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 
 interface AfterSearchProps {
   results: {
-    users: User[];
+    users: UserProps[];
     teams: Team[];
     tournaments: Tournament[];
   };
@@ -23,7 +23,6 @@ interface SearchResultItemProps {
 const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
   const { tournaments, teams, users } = results;
   const totalResults = tournaments?.length + teams?.length + users?.length;
-  console.log(results);
   return (
     <div className="rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6 dark:bg-white/10">
       <div className="mb-4 flex items-center justify-between">
@@ -44,6 +43,20 @@ const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
         </p>
       ) : (
         <div className="space-y-4">
+          {users.length > 0 && (
+            <div className="space-y-2">
+              {users.map((user) => (
+                <SearchResultItem
+                  key={user.id}
+                  icon={User}
+                  title={user.name}
+                  subtitle={user.bio || "Go to"}
+                  href={`/users/${user.username}`}
+                />
+              ))}
+            </div>
+          )}
+
           {teams.length > 0 && (
             <div className="space-y-2">
               {teams.map((team) => (
@@ -59,19 +72,7 @@ const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
               ))}
             </div>
           )}
-          {users.length > 0 && (
-            <div className="space-y-2">
-              {users.map((user) => (
-                <SearchResultItem
-                  key={user.id}
-                  icon={Users}
-                  title={user.name}
-                  subtitle={user.bio || "Go to"}
-                  href={`/users/${user.username}`}
-                />
-              ))}
-            </div>
-          )}
+
           {tournaments.length > 0 && (
             <div className="space-y-2">
               {tournaments.map((item) => (
@@ -93,6 +94,8 @@ const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
 const SearchResultItem = ({ icon: Icon, title, subtitle, href = "#" }: SearchResultItemProps) => (
   <Link
     href={href}
+    target="_blank"
+    rel="noopener noreferrer"
     className="group flex items-center rounded-lg p-3 transition-colors duration-200 hover:bg-white/20 dark:hover:bg-black/20"
   >
     <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/20 dark:bg-black/20">

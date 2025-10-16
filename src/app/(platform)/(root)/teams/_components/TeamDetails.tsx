@@ -4,6 +4,7 @@ import { formatDate } from "date-fns";
 import {
   BuildingIcon,
   GitBranchPlusIcon,
+  Info,
   MapPinIcon,
   PencilIcon,
   SparklesIcon,
@@ -35,24 +36,15 @@ interface TeamDetailsProp extends TeamProps {
 }
 const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
   const [isEdit, setIsEdit] = useState(false);
-  console.log(team);
-  const { isLoading, data, error } = useQuery({
-    queryKey: ["team"],
-    queryFn: async () => {
-      const { data } = await AxiosRequest.get("/api/teams/my-teams");
-      return data;
-    },
-  });
+
   const { isOwner } = useIsTeamOwner(team, user);
 
   const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
-  console.log(team.type);
-
   return (
     <div className="relative flex min-h-screen items-center justify-center">
-      {!team && isLoading ? <Spinner /> : !team && !isLoading && notFound()}
+      {!team && notFound()}
 
       {team && !isEdit && (
         <div className="relative w-full transform overflow-hidden transition-all duration-300 ease-in-out">
@@ -142,7 +134,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
             {/* Left Column - General Info & Recruitment */}
             <div className="space-y-6 md:col-span-1">
               {/* Quick Info */}
-              <div className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
+              <div className="rounded-xl bg-gray-50 p-5 font-[poppins] shadow-sm dark:bg-gray-700">
                 <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
                   Team Overview
                 </h2>
@@ -155,19 +147,29 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
                   </li>
                   <li className="flex items-center">
                     <BuildingIcon className="mr-2 h-5 w-5 text-blue-500" /> Type:{" "}
-                    {/* {team.type.charAt(0).toUpperCase() + team.type.slice(1)} */}
+                    {team.type.charAt(0).toUpperCase() + team.type.slice(1)}
                   </li>
                   <li className="flex items-center">
                     <UserIcon className="mr-2 h-5 w-5 text-blue-500" /> Captain:{" "}
-                    <span className="ml-1 font-medium">
-                      {team.captain && typeof team.captain !== "string" && team.captain.name}
-                    </span>
+                    {team.captain && typeof team.captain !== "string" && (
+                      <Link
+                        href={`/users/${team.captain.username}`}
+                        className="ml-1 font-medium hover:underline"
+                      >
+                        {team.captain.name}
+                      </Link>
+                    )}
                   </li>
                   <li className="flex items-center">
                     <SparklesIcon className="mr-2 h-5 w-5 text-blue-500" /> Owner:
-                    <span className="ml-1 font-medium">
-                      {typeof team.owner !== "string" ? team.owner.name : "null"}
-                    </span>
+                    {team.owner && typeof team.owner !== "string" && (
+                      <Link
+                        href={`/users/${team.owner.username}`}
+                        className="ml-1 font-medium hover:underline"
+                      >
+                        {team.owner.name}
+                      </Link>
+                    )}
                   </li>
                 </ul>
               </div>
@@ -212,22 +214,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
               <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
                 <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 md:text-2xl dark:text-white">
                   <span className="mr-2 text-blue-500 dark:text-blue-400">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="lucide lucide-info"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <path d="M12 16v-4" />
-                      <path d="M12 8h.01" />
-                    </svg>
+                    <Info />
                   </span>
                   About the Team
                 </h2>
@@ -239,7 +226,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
               {/* Key Stats Section */}
               <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
                 <Link
-                  href={`/teams/${team.id}/stats`}
+                  href={`/teams/${team.abbreviation}/stats`}
                   className="mb-3 flex items-center text-xl font-bold text-gray-900 md:text-2xl dark:text-white"
                 >
                   <span className="mr-2 text-green-500 dark:text-green-400">
@@ -266,7 +253,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
                   <span className="mr-2 text-purple-500 dark:text-purple-400">
                     <UsersIcon />
                   </span>
-                  Roster
+                  Members
                 </h2>
                 <ul className="custom-scrollbar grid max-h-60 grid-cols-1 gap-3 overflow-y-auto pr-2 sm:grid-cols-2">
                   {team.players.map((player, index) => (

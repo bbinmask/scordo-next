@@ -77,7 +77,6 @@ const teamStatsData = {
 };
 
 const TeamsStatsPage = () => {
-  console.log("Error");
   alert("I'm here");
 
   return (

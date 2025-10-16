@@ -262,9 +262,11 @@ const ExplorePage = () => {
     enabled: query.trim().length > 0,
   });
 
+  const debouncedSetQuery = useMemo(() => debounce((value) => setQuery(value), 500), []);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
-    setQuery(term);
+    debouncedSetQuery(term);
   };
 
   const clearSearch = () => {
@@ -277,7 +279,6 @@ const ExplorePage = () => {
       <div className="relative mx-auto p-2">
         <div className="relative">
           <Input
-            value={query}
             onChange={handleChange}
             placeholder="Search..."
             className="rounded-full border border-gray-400 p-4 pr-12 font-[poppins] text-base ring-green-600 focus:ring-2 lg:p-6 lg:text-lg"

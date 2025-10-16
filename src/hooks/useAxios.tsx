@@ -23,8 +23,6 @@ const useAxios = () => {
         ...options,
       });
 
-      console.log(response.data);
-
       return response.data as ResponseData;
     } catch (err: any) {
       return err?.response?.data as ResponseData;

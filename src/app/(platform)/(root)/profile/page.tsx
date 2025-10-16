@@ -17,7 +17,7 @@ const ProfilePage = async () => {
     where: { clerkId: clerkUser?.id },
   });
 
-  console.log(user);
+  user;
 
   if (!user) {
     return notFound();

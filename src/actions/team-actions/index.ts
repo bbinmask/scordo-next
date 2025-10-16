@@ -81,7 +81,6 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
         error: "Failed to create team",
       };
   } catch (error: any) {
-    console.log(error);
     return {
       error: error.message || "Failed to create",
     };
