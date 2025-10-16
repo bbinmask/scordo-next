@@ -229,7 +229,7 @@ const ExplorePage = () => {
     tournaments: [],
   });
   const { isLoading: isUsersLoading } = useQuery({
-    queryKey: ["search-users"],
+    queryKey: ["search-users", query],
     queryFn: async () => {
       const res = await axios.get(`/api/search/users?query=${query}`);
 
@@ -240,7 +240,7 @@ const ExplorePage = () => {
     enabled: query.trim().length > 0,
   });
   const { isLoading: isTeamsLoading } = useQuery({
-    queryKey: ["search-teams"],
+    queryKey: ["search-teams", query],
     queryFn: async () => {
       const res = await axios.get(`/api/search/teams?query=${query}`);
 
@@ -251,7 +251,7 @@ const ExplorePage = () => {
     enabled: query.trim().length > 0,
   });
   const { isLoading: isTournamentsLoading } = useQuery({
-    queryKey: ["search-tournaments"],
+    queryKey: ["search-tournaments", query],
     queryFn: async () => {
       const res = await axios.get(`/api/search/tournaments?query=${query}`);
 
@@ -273,6 +273,8 @@ const ExplorePage = () => {
     setQuery("");
     router.replace(pathname);
   };
+
+  console.log(isUsersLoading, isTeamsLoading, isTournamentsLoading);
 
   return (
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
@@ -312,7 +314,12 @@ const ExplorePage = () => {
           {/* Your default home content */}
         </div>
       ) : (
-        <AfterSearch results={results} query={query} clearSearch={clearSearch} />
+        <AfterSearch
+          isLoading={isUsersLoading || isTeamsLoading || isTournamentsLoading}
+          results={results}
+          query={query}
+          clearSearch={clearSearch}
+        />
       )}
     </div>
   );

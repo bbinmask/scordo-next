@@ -1,3 +1,5 @@
+import NotFoundParagraph from "@/components/NotFoundParagraph";
+import Spinner from "@/components/Spinner";
 import { Team, Tournament, User as UserProps } from "@/generated/prisma";
 import { ArrowRight, LucideProps, Shield, Trophy, User, X } from "lucide-react";
 import Link from "next/link";
@@ -10,6 +12,7 @@ interface AfterSearchProps {
     tournaments: Tournament[];
   };
   query: string;
+  isLoading: boolean;
   clearSearch: () => void;
 }
 
@@ -20,11 +23,11 @@ interface SearchResultItemProps {
   href?: string;
 }
 
-const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
+const AfterSearch = ({ results, isLoading = true, query, clearSearch }: AfterSearchProps) => {
   const { tournaments, teams, users } = results;
   const totalResults = tournaments?.length + teams?.length + users?.length;
   return (
-    <div className="rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6 dark:bg-white/10">
+    <div className="min-h-[400px] rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6 dark:bg-white/10">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
           Results for "{query}" ({totalResults})
@@ -37,10 +40,13 @@ const AfterSearch = ({ results, query, clearSearch }: AfterSearchProps) => {
           Clear
         </button>
       </div>
-      {totalResults === 0 ? (
-        <p className="py-8 text-center text-gray-600 dark:text-gray-400">
-          No results found. Try Link different search term.
-        </p>
+      {isLoading ? (
+        <Spinner className="mx-auto" />
+      ) : totalResults === 0 ? (
+        <NotFoundParagraph
+          description="
+          No results found. Try Link different search term."
+        />
       ) : (
         <div className="space-y-4">
           {users.length > 0 && (
