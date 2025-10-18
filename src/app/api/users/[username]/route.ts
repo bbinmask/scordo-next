@@ -6,7 +6,7 @@ interface Params {
 }
 
 export async function GET(req: Request, { params }: Params) {
-  const { username } = params;
+  const { username } = await params;
 
   try {
     if (!username || username.trim() === "") return NextResponse.error();

@@ -1,89 +1,22 @@
 "use client";
 import { sendFriendRequest } from "@/actions/user-actions";
 import Spinner from "@/components/Spinner";
-import { Availability, User } from "@/generated/prisma";
+import { Availability, Team, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import {
-  CheckCircle,
-  UserPlus,
-  UserCheck,
-  Clock,
-  Calendar,
-  MapPin,
-  Shield,
-  Info,
-} from "lucide-react";
+import { CheckCircle, UserPlus, UserCheck, Clock, Calendar, MapPin, Info } from "lucide-react";
+import { FaSuperpowers } from "react-icons/fa6";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
+import NotFoundParagraph from "@/components/NotFoundParagraph";
 
 interface UserIdProps {}
-
-const mockUser = {
-  id: "user_1a2b3c4d5e",
-  clerkId: "clerk_abc123",
-  name: "Virat Kohli",
-  username: "kingkohli18",
-  email: "virat.k@example.com",
-  contact: "+919876543210",
-  gender: "male",
-  role: "player",
-  dob: new Date("1988-11-05T00:00:00.000Z"),
-  availability: "available",
-  avatar: "https://placehold.co/200x200/2563EB/FFFFFF?text=VK",
-  isVerified: true,
-  bio: "Right-hand bat, passionate cricketer. Fueled by dedication and a relentless drive to win. Chasing greatness one match at a time.",
-  address: {
-    city: "Delhi",
-    state: "Delhi",
-    country: "India",
-  },
-  teamsOwned: [
-    {
-      id: "team_alpha",
-      name: "Delhi Dominators",
-      logo: "https://placehold.co/100x100/4F46E5/FFFFFF?text=DD",
-      type: "club",
-      captainId: "user_1a2b3c4d5e",
-    },
-  ],
-  captainOf: [
-    {
-      id: "team_alpha",
-      name: "Delhi Dominators",
-      logo: "https://placehold.co/100x100/4F46E5/FFFFFF?text=DD",
-      type: "club",
-      ownerId: "user_1a2b3c4d5e",
-    },
-  ],
-  players: [
-    {
-      team: {
-        id: "team_beta",
-        name: "Royal Challengers",
-        logo: "https://placehold.co/100x100/DC2626/FFFFFF?text=RC",
-        type: "corporate",
-        ownerId: "user_someone_else",
-      },
-    },
-    {
-      team: {
-        id: "team_gamma",
-        name: "India Internationals",
-        logo: "https://placehold.co/100x100/1D4ED8/FFFFFF?text=IN",
-        type: "local",
-        ownerId: "user_another_one",
-      },
-    },
-  ],
-  createdAt: new Date("2020-01-15T10:30:00.000Z"),
-};
 
 const UserIdPage = ({}: UserIdProps) => {
   const [friendshipStatus, setFriendshipStatus] = useState("none");
   const { userId } = useParams();
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading } = useQuery<User>({
     queryKey: ["userId"],
     queryFn: async () => {
       const res = await axios.get(`/api/users/${userId}`);
@@ -94,6 +27,8 @@ const UserIdPage = ({}: UserIdProps) => {
     },
   });
 
+  if (!user && !isLoading) return null;
+
   const { execute, data } = useAction(sendFriendRequest, {
     onSuccess: (data) => {},
     onError: (err) => {
@@ -103,46 +38,46 @@ const UserIdPage = ({}: UserIdProps) => {
 
   const handleFriendRequest = () => {};
 
-  const userTeams = useMemo(() => {
-    const teamsMap = new Map();
+  // const userTeams = useMemo(() => {
+  //   const teamsMap = new Map();
 
-    mockUser.teamsOwned.forEach((team) => {
-      if (!teamsMap.has(team.id)) {
-        teamsMap.set(team.id, { ...team, role: "Owner" });
-      }
-    });
+  //   user.teamsOwned.forEach((team) => {
+  //     if (!teamsMap.has(team.id)) {
+  //       teamsMap.set(team.id, { ...team, role: "Owner" });
+  //     }
+  //   });
 
-    mockUser.captainOf.forEach((team) => {
-      if (teamsMap.has(team.id)) {
-        const existing = teamsMap.get(team.id);
-        if (!existing.role.includes("Captain")) {
-          existing.role += ", Captain";
-        }
-      } else {
-        teamsMap.set(team.id, { ...team, role: "Captain" });
-      }
-    });
+  //   user.captainOf.forEach((team) => {
+  //     if (teamsMap.has(team.id)) {
+  //       const existing = teamsMap.get(team.id);
+  //       if (!existing.role.includes("Captain")) {
+  //         existing.role += ", Captain";
+  //       }
+  //     } else {
+  //       teamsMap.set(team.id, { ...team, role: "Captain" });
+  //     }
+  //   });
 
-    mockUser.players.forEach((playerEntry) => {
-      const team = playerEntry.team;
-      if (!teamsMap.has(team.id)) {
-        teamsMap.set(team.id, { ...team, role: "Player" });
-      }
-    });
+  //   user.players.forEach((playerEntry) => {
+  //     const team = playerEntry.team;
+  //     if (!teamsMap.has(team.id)) {
+  //       teamsMap.set(team.id, { ...team, role: "Player" });
+  //     }
+  //   });
 
-    return Array.from(teamsMap.values());
-  }, [mockUser]);
-
+  //   return Array.from(teamsMap.values());
+  // }, [user]);
+  const userTeams: Team[] = [];
   const [activeTab, setActiveTab] = useState("about");
 
   const renderTabContent = () => {
     switch (activeTab) {
       case "about":
-        return <AboutTab user={mockUser} />;
+        return <AboutCard user={user} />;
       case "teams":
-        return <TeamsTab teams={userTeams} />;
+        return <TeamsCard teams={userTeams} />;
       case "stats":
-        return <StatsTab />;
+        return <StatsCard />;
       default:
         return null;
     }
@@ -153,24 +88,26 @@ const UserIdPage = ({}: UserIdProps) => {
       onClick={() => setActiveTab(name)}
       className={`relative rounded-md px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
         activeTab === name
-          ? "text-indigo-600 dark:text-white"
+          ? "text-green-600 dark:text-white"
           : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
       }`}
     >
       {label}
       {activeTab === name && (
-        <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-t-full bg-indigo-500"></span>
+        <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-t-full bg-green-500"></span>
       )}
     </button>
   );
 
   return (
-    <div className="min-h-[400px] w-full">
+    <div className="min-h-[400px] w-full pt-2">
       {isLoading ? (
         <Spinner />
+      ) : !user ? (
+        <NotFoundParagraph />
       ) : (
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
-          <ProfileSidebar
+          <ProfileCard
             user={user}
             friendshipStatus={friendshipStatus}
             onFriendRequest={handleFriendRequest}
@@ -185,7 +122,7 @@ const UserIdPage = ({}: UserIdProps) => {
                   <TabButton name="stats" label="Career Stats" />
                 </nav>
               </div>
-              <div className="p-6">{renderTabContent()}</div>
+              <div className="p-6 font-[poppins]">{renderTabContent()}</div>
             </div>
           </div>
         </div>
@@ -194,13 +131,13 @@ const UserIdPage = ({}: UserIdProps) => {
   );
 };
 
-interface ProfileSidebarProps {
+interface ProfileCardProps {
   user: User;
   friendshipStatus: string;
   onFriendRequest: () => void;
 }
 
-const ProfileSidebar = ({ user, friendshipStatus, onFriendRequest }: ProfileSidebarProps) => {
+const ProfileCard = ({ user, friendshipStatus, onFriendRequest }: ProfileCardProps) => {
   const getAvailabilityClass = (availability: Availability) => {
     switch (availability) {
       case "available":
@@ -222,12 +159,12 @@ const ProfileSidebar = ({ user, friendshipStatus, onFriendRequest }: ProfileSide
   return (
     <div className="lg:col-span-1">
       <div className="sticky top-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
-        <div className="h-24 bg-gradient-to-r from-indigo-500 to-blue-500"></div>
-        <div className="-mt-16 p-6 text-center">
+        <div className="h-24 bg-gradient-to-r from-green-600 via-emerald-700 to-green-700"></div>
+        <div className="-mt-16 p-6 text-center font-[poppins]">
           <div className="relative mx-auto h-32 w-32">
             <img
               id="avatar"
-              src={user.avatar || undefined}
+              src={user.avatar || "/user.svg"}
               alt={user.name}
               className="h-full w-full rounded-full object-cover shadow-lg ring-4 ring-white dark:ring-slate-800"
             />
@@ -240,42 +177,48 @@ const ProfileSidebar = ({ user, friendshipStatus, onFriendRequest }: ProfileSide
               </div>
             )}
           </div>
-          <h2 id="userName" className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">
+          <h2
+            id="userName"
+            className="mt-4 font-[cal_sans] text-lg font-semibold text-slate-900 dark:text-white"
+          >
             {user.name}
           </h2>
-          <p id="userUsername" className="text-md mb-2 text-slate-500 dark:text-slate-400">
+          <p
+            id="userUsername"
+            className="font-[urbanist] text-sm font-semibold tracking-wide text-slate-500 dark:text-slate-400"
+          >
             @{user.username}
           </p>
           <div
-            className={`status-badge inline-flex items-center gap-1.5 ${getAvailabilityClass(user.availability)}`}
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs ${getAvailabilityClass(user.availability)}`}
           >
             <span
-              className={`h-2 w-2 rounded-full ${user.availability === "available" ? "bg-green-500" : user.availability === "injured" ? "bg-red-500" : "bg-yellow-500"}`}
+              className={`h-1 w-1 rounded-full ${user.availability === "available" ? "animate-ping bg-green-500" : user.availability === "injured" ? "bg-red-500" : "bg-yellow-500"}`}
             ></span>
             <span id="availabilityStatus" className="capitalize">
               {user.availability.replace("_", " ")}
             </span>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col">
+          <div className="absolute top-28 right-2">
             <button
               id="friendRequestBtn"
               onClick={onFriendRequest}
               disabled={friendshipStatus !== "none"}
-              className={`btn w-full transform transition-all duration-300 hover:scale-105 ${
+              className={`primary-btn center flex transform cursor-pointer gap-1 rounded-full py-2 transition-all duration-300 hover:scale-105 ${
                 friendshipStatus === "none"
-                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md hover:from-blue-600 hover:to-indigo-700"
+                  ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50"
                   : friendshipStatus === "pending"
                     ? "cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
                     : "cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white"
               }`}
             >
-              {friendshipStatus === "none" && <UserPlus className="h-5 w-5" />}
-              {friendshipStatus === "pending" && <Clock className="h-5 w-5" />}
-              {friendshipStatus === "accepted" && <UserCheck className="h-5 w-5" />}
-              <span className="font-semibold">
+              {friendshipStatus === "none" && <UserPlus className="h-4 w-4" />}
+              {friendshipStatus === "pending" && <Clock className="h-4 w-4" />}
+              {friendshipStatus === "accepted" && <UserCheck className="h-4 w-4" />}
+              <span className="text-sm">
                 {friendshipStatus === "none"
-                  ? "Send Friend Request"
+                  ? "Add"
                   : friendshipStatus === "pending"
                     ? "Request Sent"
                     : "Friends"}
@@ -283,9 +226,9 @@ const ProfileSidebar = ({ user, friendshipStatus, onFriendRequest }: ProfileSide
             </button>
           </div>
 
-          <div className="mt-8 space-y-4 border-t border-slate-200 pt-6 text-left dark:border-slate-700">
+          <div className="mt-6 space-y-4 border-t border-slate-200 pt-4 text-left dark:border-slate-700">
             <InfoItem
-              icon={<Shield className="h-5 w-5 text-slate-400" />}
+              icon={<FaSuperpowers className="h-5 w-5 text-slate-400" />}
               label="Role"
               value={user.role}
               id="userRole"
@@ -299,7 +242,7 @@ const ProfileSidebar = ({ user, friendshipStatus, onFriendRequest }: ProfileSide
             <InfoItem
               icon={<Calendar className="h-5 w-5 text-slate-400" />}
               label="Joined"
-              value={formatDate(user.createdAt)}
+              value={formatDate(new Date(user.createdAt))}
               id="userJoinedDate"
             />
           </div>
@@ -321,7 +264,7 @@ const InfoItem = ({ icon, label, value, id }: any) => (
   </div>
 );
 
-const AboutTab = ({ user }: any) => {
+const AboutCard = ({ user }: any) => {
   const calculateAge = (dob: string) => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -387,7 +330,7 @@ const AboutTab = ({ user }: any) => {
   );
 };
 
-const TeamsTab = ({ teams }: any) => {
+const TeamsCard = ({ teams }: any) => {
   if (teams.length === 0) {
     return (
       <p className="text-slate-500 dark:text-slate-400">This user is not a part of any team yet.</p>
@@ -419,7 +362,7 @@ const TeamsTab = ({ teams }: any) => {
   );
 };
 
-const StatsTab = () => {
+const StatsCard = () => {
   return (
     <div className="py-10 text-center">
       <Info className="mx-auto mb-4 h-12 w-12 text-slate-400 dark:text-slate-500" />
