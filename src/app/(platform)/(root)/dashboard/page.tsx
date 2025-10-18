@@ -39,7 +39,7 @@ const DashboardPage = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const { data } = await AxiosRequest.get("/api/user/profile");
+      const { data } = await AxiosRequest.get("/api/users/profile");
       return data;
     },
   });

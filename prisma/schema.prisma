@@ -148,7 +148,7 @@ model Team {
   name         String
   logo         String?
   banner       String?
-  abbreviation String
+  abbreviation String @unique 
   address      Address?
   type         TeamType @default(others)
   isRecruiting Boolean  @default(false)

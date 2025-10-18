@@ -1,5 +1,10 @@
 "use client";
+import { sendFriendRequest } from "@/actions/user-actions";
+import Spinner from "@/components/Spinner";
 import { Availability, User } from "@/generated/prisma";
+import { useAction } from "@/hooks/useAction";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import {
   CheckCircle,
   UserPlus,
@@ -10,6 +15,7 @@ import {
   Shield,
   Info,
 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
 interface UserIdProps {}
@@ -76,20 +82,27 @@ const mockUser = {
 
 const UserIdPage = ({}: UserIdProps) => {
   const [friendshipStatus, setFriendshipStatus] = useState("none");
-  const handleFriendRequest = () => {
-    if (friendshipStatus === "none") {
-      setFriendshipStatus("pending");
-      console.log("Friend request sent to", mockUser.username);
-      // Simulate API call
-      setTimeout(() => {
-        // In a real app, you'd handle success/failure here.
-        // For demo, we'll assume it's always successful.
-        console.log("Friend request successfully processed (mock).");
-      }, 1500);
-    }
-  };
+  const { userId } = useParams();
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["userId"],
+    queryFn: async () => {
+      const res = await axios.get(`/api/users/${userId}`);
 
-  // Consolidate user's teams from different relations in the schema
+      console.log(res.data);
+
+      return res.data;
+    },
+  });
+
+  const { execute, data } = useAction(sendFriendRequest, {
+    onSuccess: (data) => {},
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const handleFriendRequest = () => {};
+
   const userTeams = useMemo(() => {
     const teamsMap = new Map();
 
@@ -152,25 +165,31 @@ const UserIdPage = ({}: UserIdProps) => {
   );
 
   return (
-    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
-      <ProfileSidebar
-        user={mockUser}
-        friendshipStatus={friendshipStatus}
-        onFriendRequest={handleFriendRequest}
-      />
+    <div className="min-h-[400px] w-full">
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
+          <ProfileSidebar
+            user={user}
+            friendshipStatus={friendshipStatus}
+            onFriendRequest={handleFriendRequest}
+          />
 
-      <div className="lg:col-span-2">
-        <div className="card overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-          <div className="border-b border-slate-200 px-6 pt-2 dark:border-slate-700">
-            <nav className="flex space-x-2">
-              <TabButton name="about" label="About" />
-              <TabButton name="teams" label="Teams" />
-              <TabButton name="stats" label="Career Stats" />
-            </nav>
+          <div className="lg:col-span-2">
+            <div className="card overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+              <div className="border-b border-slate-200 px-6 pt-2 dark:border-slate-700">
+                <nav className="flex space-x-2">
+                  <TabButton name="about" label="About" />
+                  <TabButton name="teams" label="Teams" />
+                  <TabButton name="stats" label="Career Stats" />
+                </nav>
+              </div>
+              <div className="p-6">{renderTabContent()}</div>
+            </div>
           </div>
-          <div className="p-6">{renderTabContent()}</div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

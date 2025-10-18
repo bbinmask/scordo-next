@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   if (!userId) {
     return NextResponse.error();
   }
-
+  if (!query) return NextResponse.error();
   try {
     const users = await db.user.findMany({
       where: {
