@@ -21,22 +21,11 @@ const UserIdPage = ({}: UserIdProps) => {
     queryFn: async () => {
       const res = await axios.get(`/api/users/${userId}`);
 
-      console.log(res.data);
-
       return res.data;
     },
   });
 
   if (!user && !isLoading) return null;
-
-  const { execute, data } = useAction(sendFriendRequest, {
-    onSuccess: (data) => {},
-    onError: (err) => {
-      console.log(err);
-    },
-  });
-
-  const handleFriendRequest = () => {};
 
   // const userTeams = useMemo(() => {
   //   const teamsMap = new Map();
@@ -107,11 +96,7 @@ const UserIdPage = ({}: UserIdProps) => {
         <NotFoundParagraph />
       ) : (
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
-          <ProfileCard
-            user={user}
-            friendshipStatus={friendshipStatus}
-            onFriendRequest={handleFriendRequest}
-          />
+          <ProfileCard user={user} friendshipStatus={friendshipStatus} />
 
           <div className="lg:col-span-2">
             <div className="card overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-lg dark:border-slate-700 dark:bg-slate-800">
@@ -134,10 +119,18 @@ const UserIdPage = ({}: UserIdProps) => {
 interface ProfileCardProps {
   user: User;
   friendshipStatus: string;
-  onFriendRequest: () => void;
 }
 
-const ProfileCard = ({ user, friendshipStatus, onFriendRequest }: ProfileCardProps) => {
+const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
+  const { execute, isLoading } = useAction(sendFriendRequest, {
+    onSuccess: (data) => {},
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const handleFriendRequest = () => {};
+
   const getAvailabilityClass = (availability: Availability) => {
     switch (availability) {
       case "available":
@@ -203,8 +196,8 @@ const ProfileCard = ({ user, friendshipStatus, onFriendRequest }: ProfileCardPro
           <div className="absolute top-28 right-2">
             <button
               id="friendRequestBtn"
-              onClick={onFriendRequest}
-              disabled={friendshipStatus !== "none"}
+              onClick={handleFriendRequest}
+              disabled={friendshipStatus !== "none" || isLoading}
               className={`primary-btn center flex transform cursor-pointer gap-1 rounded-full py-2 transition-all duration-300 hover:scale-105 ${
                 friendshipStatus === "none"
                   ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50"
