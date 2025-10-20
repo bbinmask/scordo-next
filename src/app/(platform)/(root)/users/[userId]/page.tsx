@@ -107,7 +107,7 @@ const UserIdPage = ({}: UserIdProps) => {
                   <TabButton name="stats" label="Career Stats" />
                 </nav>
               </div>
-              <div className="p-6 font-[poppins]">{renderTabContent()}</div>
+              <div className="min-h-[300px] p-6 font-[poppins]">{renderTabContent()}</div>
             </div>
           </div>
         </div>
@@ -123,13 +123,26 @@ interface ProfileCardProps {
 
 const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
   const { execute, isLoading } = useAction(sendFriendRequest, {
-    onSuccess: (data) => {},
+    onSuccess: (data) => {
+      console.log(data);
+    },
     onError: (err) => {
       console.log(err);
     },
   });
 
-  const handleFriendRequest = () => {};
+  const { data: friendRequest } = useQuery({
+    queryKey: ["friend-requests", user.id],
+    queryFn: async () => {
+      const res = await axios.get(`/api/users/friends/requests/${user.id}`);
+
+      return res.data;
+    },
+  });
+
+  const handleFriendRequest = () => {
+    execute({ addresseeId: user.id });
+  };
 
   const getAvailabilityClass = (availability: Availability) => {
     switch (availability) {
@@ -143,6 +156,8 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
         return "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200";
     }
   };
+
+  console.log(friendRequest);
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(
@@ -206,16 +221,22 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
                     : "cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white"
               }`}
             >
-              {friendshipStatus === "none" && <UserPlus className="h-4 w-4" />}
-              {friendshipStatus === "pending" && <Clock className="h-4 w-4" />}
-              {friendshipStatus === "accepted" && <UserCheck className="h-4 w-4" />}
-              <span className="text-sm">
-                {friendshipStatus === "none"
-                  ? "Add"
-                  : friendshipStatus === "pending"
-                    ? "Request Sent"
-                    : "Friends"}
-              </span>
+              {isLoading ? (
+                <Spinner />
+              ) : (
+                <>
+                  {friendshipStatus === "none" && <UserPlus className="h-4 w-4" />}
+                  {friendshipStatus === "pending" && <Clock className="h-4 w-4" />}
+                  {friendshipStatus === "accepted" && <UserCheck className="h-4 w-4" />}
+                  <span className="text-sm">
+                    {friendshipStatus === "none"
+                      ? "Add"
+                      : friendshipStatus === "pending"
+                        ? "Request Sent"
+                        : "Friends"}
+                  </span>
+                </>
+              )}
             </button>
           </div>
 
@@ -229,7 +250,9 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
             <InfoItem
               icon={<MapPin className="h-5 w-5 text-slate-400" />}
               label="Location"
-              value={`${user.address?.city}, ${user.address?.country}`}
+              value={
+                user.address ? `${user.address?.city}, ${user.address?.country}` : "Not provided"
+              }
               id="userLocation"
             />
             <InfoItem

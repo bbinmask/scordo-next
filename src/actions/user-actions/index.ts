@@ -9,7 +9,7 @@ import {
 } from "./types";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { createSafeAction, ActionState } from "@/lib/create-safe-action";
-import { CreateUser } from "./schema";
+import { CreateUser, SendRequest } from "./schema";
 import { User } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -68,7 +68,7 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
   }
 };
 
-export const sendFriendRequest = async (
+export const sendFriendRequestHandler = async (
   data: InputSendRequestType
 ): Promise<ReturnSendRequestType> => {
   const { userId } = await auth();
@@ -77,6 +77,12 @@ export const sendFriendRequest = async (
 
   if (!userId) {
     return { error: "Unauthorized. Please sign in." };
+  }
+
+  if (!addresseeId) {
+    return {
+      error: "User not found",
+    };
   }
 
   let requester: User | null;
@@ -137,4 +143,5 @@ export const sendFriendRequest = async (
   }
 };
 
+export const sendFriendRequest = createSafeAction(SendRequest, sendFriendRequestHandler);
 export const createUser = createSafeAction(CreateUser, createUserHandler);

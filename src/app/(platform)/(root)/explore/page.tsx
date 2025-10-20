@@ -274,8 +274,6 @@ const ExplorePage = () => {
     router.replace(pathname);
   };
 
-  console.log(isUsersLoading, isTeamsLoading, isTournamentsLoading);
-
   return (
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
       <div className="relative mx-auto p-2">
