@@ -157,7 +157,6 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
     }
   };
 
-  console.log(friendRequest);
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(
