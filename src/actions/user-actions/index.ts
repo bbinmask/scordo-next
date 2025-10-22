@@ -126,17 +126,17 @@ export const sendFriendRequestHandler = async (
       return { error: "A friend request is already pending." };
     }
 
-    await db.friendship.create({
+    const friendship = await db.friendship.create({
       data: {
         requesterId: requester.id,
-        addresseeId: addresseeId,
+        addresseeId,
         status: "PENDING",
       },
     });
 
-    revalidatePath(`/profile/${addresseeId}`);
+    revalidatePath(`/users/${addresseeId}`);
 
-    return { data: "Friend request sent!" };
+    return { data: { data: friendship, message: "Friend request sent!" } };
   } catch (err) {
     console.error("Error sending friend request:", err);
     return { error: "An unexpected error occurred. Please try again." };

@@ -1,127 +1,24 @@
 "use client";
+
 import { sendFriendRequest } from "@/actions/user-actions";
 import Spinner from "@/components/Spinner";
-import { Availability, Team, User } from "@/generated/prisma";
+import { Availability, Friendship, Team, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { CheckCircle, UserPlus, UserCheck, Clock, Calendar, MapPin, Info } from "lucide-react";
-import { FaSuperpowers } from "react-icons/fa6";
-import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import NotFoundParagraph from "@/components/NotFoundParagraph";
-
-interface UserIdProps {}
-
-const UserIdPage = ({}: UserIdProps) => {
-  const [friendshipStatus, setFriendshipStatus] = useState("none");
-  const { userId } = useParams();
-  const { data: user, isLoading } = useQuery<User>({
-    queryKey: ["userId"],
-    queryFn: async () => {
-      const res = await axios.get(`/api/users/${userId}`);
-
-      return res.data;
-    },
-  });
-
-  if (!user && !isLoading) return null;
-
-  // const userTeams = useMemo(() => {
-  //   const teamsMap = new Map();
-
-  //   user.teamsOwned.forEach((team) => {
-  //     if (!teamsMap.has(team.id)) {
-  //       teamsMap.set(team.id, { ...team, role: "Owner" });
-  //     }
-  //   });
-
-  //   user.captainOf.forEach((team) => {
-  //     if (teamsMap.has(team.id)) {
-  //       const existing = teamsMap.get(team.id);
-  //       if (!existing.role.includes("Captain")) {
-  //         existing.role += ", Captain";
-  //       }
-  //     } else {
-  //       teamsMap.set(team.id, { ...team, role: "Captain" });
-  //     }
-  //   });
-
-  //   user.players.forEach((playerEntry) => {
-  //     const team = playerEntry.team;
-  //     if (!teamsMap.has(team.id)) {
-  //       teamsMap.set(team.id, { ...team, role: "Player" });
-  //     }
-  //   });
-
-  //   return Array.from(teamsMap.values());
-  // }, [user]);
-  const userTeams: Team[] = [];
-  const [activeTab, setActiveTab] = useState("about");
-
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "about":
-        return <AboutCard user={user} />;
-      case "teams":
-        return <TeamsCard teams={userTeams} />;
-      case "stats":
-        return <StatsCard />;
-      default:
-        return null;
-    }
-  };
-
-  const TabButton = ({ name, label }: any) => (
-    <button
-      onClick={() => setActiveTab(name)}
-      className={`relative rounded-md px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
-        activeTab === name
-          ? "text-green-600 dark:text-white"
-          : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-      }`}
-    >
-      {label}
-      {activeTab === name && (
-        <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-t-full bg-green-500"></span>
-      )}
-    </button>
-  );
-
-  return (
-    <div className="min-h-[400px] w-full pt-2">
-      {isLoading ? (
-        <Spinner />
-      ) : !user ? (
-        <NotFoundParagraph />
-      ) : (
-        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
-          <ProfileCard user={user} friendshipStatus={friendshipStatus} />
-
-          <div className="lg:col-span-2">
-            <div className="card overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-              <div className="border-b border-slate-200 px-6 pt-2 dark:border-slate-700">
-                <nav className="flex space-x-2">
-                  <TabButton name="about" label="About" />
-                  <TabButton name="teams" label="Teams" />
-                  <TabButton name="stats" label="Career Stats" />
-                </nav>
-              </div>
-              <div className="min-h-[300px] p-6 font-[poppins]">{renderTabContent()}</div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+import { FaSuperpowers } from "react-icons/fa6";
+import { CheckCircle, UserPlus, UserCheck, Clock, Calendar, MapPin, Info } from "lucide-react";
 
 interface ProfileCardProps {
   user: User;
-  friendshipStatus: string;
+  currentUser: User;
 }
 
-const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
+interface DescriptionProps {
+  user: User;
+}
+export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
   const { execute, isLoading } = useAction(sendFriendRequest, {
     onSuccess: (data) => {
       console.log(data);
@@ -131,7 +28,7 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
     },
   });
 
-  const { data: friendRequest } = useQuery({
+  const { data: friendRequest } = useQuery<Friendship[]>({
     queryKey: ["friend-requests", user.id],
     queryFn: async () => {
       const res = await axios.get(`/api/users/friends/requests/${user.id}`);
@@ -144,6 +41,28 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
     execute({ addresseeId: user.id });
   };
 
+  const friendshipStatus: "none" | "pending" | "declined" | "blocked" | "accepted" = useMemo(() => {
+    if (!friendRequest || friendRequest.length === 0) return "none";
+
+    const req = friendRequest.find((r) => r.requesterId === currentUser.id);
+    if (!req) return "none";
+
+    switch (req.status) {
+      case "PENDING":
+        return "pending";
+      case "DECLINED":
+        return "declined";
+      case "BLOCKED":
+        return "blocked";
+      case "ACCEPTED":
+        return "accepted";
+      default:
+        return "none";
+    }
+  }, [friendRequest, currentUser.id]);
+
+  console.log({ friendshipStatus });
+  console.log(friendRequest);
   const getAvailabilityClass = (availability: Availability) => {
     switch (availability) {
       case "available":
@@ -156,7 +75,6 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
         return "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200";
     }
   };
-
 
   const formatDate = (date: Date) =>
     new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(
@@ -207,7 +125,7 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
             </span>
           </div>
 
-          <div className="absolute top-28 right-2">
+          <abbr title={friendshipStatus} className="absolute top-28 right-2">
             <button
               id="friendRequestBtn"
               onClick={handleFriendRequest}
@@ -231,13 +149,13 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
                     {friendshipStatus === "none"
                       ? "Add"
                       : friendshipStatus === "pending"
-                        ? "Request Sent"
-                        : "Friends"}
+                        ? "Sent"
+                        : ""}
                   </span>
                 </>
               )}
             </button>
-          </div>
+          </abbr>
 
           <div className="mt-6 space-y-4 border-t border-slate-200 pt-4 text-left dark:border-slate-700">
             <InfoItem
@@ -267,7 +185,53 @@ const ProfileCard = ({ user, friendshipStatus }: ProfileCardProps) => {
   );
 };
 
-const InfoItem = ({ icon, label, value, id }: any) => (
+export const Description = ({ user }: DescriptionProps) => {
+  const [activeTab, setActiveTab] = useState("about");
+  const userTeams: any = [];
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "about":
+        return <AboutCard user={user} />;
+      case "teams":
+        return <TeamsCard teams={userTeams} />;
+      case "stats":
+        return <StatsCard />;
+      default:
+        return null;
+    }
+  };
+
+  const TabButton = ({ name, label }: any) => (
+    <button
+      onClick={() => setActiveTab(name)}
+      className={`relative rounded-md px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
+        activeTab === name
+          ? "text-green-600 dark:text-white"
+          : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+      }`}
+    >
+      {label}
+      {activeTab === name && (
+        <span className="absolute right-0 bottom-0 left-0 h-0.5 rounded-t-full bg-green-500"></span>
+      )}
+    </button>
+  );
+
+  return (
+    <div className="card overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+      <div className="border-b border-slate-200 px-6 pt-2 dark:border-slate-700">
+        <nav className="flex space-x-2">
+          <TabButton name="about" label="About" />
+          <TabButton name="teams" label="Teams" />
+          <TabButton name="stats" label="Career Stats" />
+        </nav>
+      </div>
+      <div className="min-h-[300px] p-6 font-[poppins]">{renderTabContent()}</div>
+    </div>
+  );
+};
+
+export const InfoItem = ({ icon, label, value, id }: any) => (
   <div className="flex items-start">
     <div className="w-8 flex-shrink-0 pt-1">{icon}</div>
     <div className="ml-2">
@@ -279,7 +243,7 @@ const InfoItem = ({ icon, label, value, id }: any) => (
   </div>
 );
 
-const AboutCard = ({ user }: any) => {
+export const AboutCard = ({ user }: any) => {
   const calculateAge = (dob: string) => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -345,7 +309,7 @@ const AboutCard = ({ user }: any) => {
   );
 };
 
-const TeamsCard = ({ teams }: any) => {
+export const TeamsCard = ({ teams }: any) => {
   if (teams.length === 0) {
     return (
       <p className="text-slate-500 dark:text-slate-400">This user is not a part of any team yet.</p>
@@ -377,7 +341,7 @@ const TeamsCard = ({ teams }: any) => {
   );
 };
 
-const StatsCard = () => {
+export const StatsCard = () => {
   return (
     <div className="py-10 text-center">
       <Info className="mx-auto mb-4 h-12 w-12 text-slate-400 dark:text-slate-500" />
@@ -388,5 +352,3 @@ const StatsCard = () => {
     </div>
   );
 };
-
-export default UserIdPage;
