@@ -3,15 +3,17 @@
 import { db } from "@/lib/db";
 import {
   InputCreateUserType,
-  InputSendRequestType,
+  InputFriendRequestType,
   ReturnCreateUserType,
-  ReturnSendRequestType,
+  ReturnFriendRequestType,
 } from "./types";
+import Error from "http-errors";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { createSafeAction, ActionState } from "@/lib/create-safe-action";
-import { CreateUser, SendRequest } from "./schema";
+import { CreateUser, FriendRequest } from "./schema";
 import { User } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
+import { currentUser } from "@/lib/currentUser";
 
 const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreateUserType> => {
   const { userId } = await auth();
@@ -68,12 +70,12 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
   }
 };
 
-export const sendFriendRequestHandler = async (
-  data: InputSendRequestType
-): Promise<ReturnSendRequestType> => {
+const sendFriendRequestHandler = async (
+  data: InputFriendRequestType
+): Promise<ReturnFriendRequestType> => {
   const { userId } = await auth();
 
-  const { addresseeId } = data;
+  const { addresseeId, username } = data;
 
   if (!userId) {
     return { error: "Unauthorized. Please sign in." };
@@ -88,11 +90,7 @@ export const sendFriendRequestHandler = async (
   let requester: User | null;
 
   try {
-    requester = await db.user.findUnique({
-      where: {
-        clerkId: userId,
-      },
-    });
+    requester = await currentUser();
   } catch (error: any) {
     return {
       error: error.message || "User not found",
@@ -134,7 +132,7 @@ export const sendFriendRequestHandler = async (
       },
     });
 
-    revalidatePath(`/users/${addresseeId}`);
+    revalidatePath(`/users/${username}`);
 
     return { data: { data: friendship, message: "Friend request sent!" } };
   } catch (err) {
@@ -143,5 +141,69 @@ export const sendFriendRequestHandler = async (
   }
 };
 
-export const sendFriendRequest = createSafeAction(SendRequest, sendFriendRequestHandler);
+const widthdrawRequestHanlder = async (
+  data: InputFriendRequestType
+): Promise<ReturnFriendRequestType> => {
+  const { addresseeId, username } = data;
+  const user = await currentUser();
+  console.log(Error.BadRequest);
+  console.log("Error");
+
+  if (!addresseeId || !user) return { error: Error.BadRequest as unknown as string };
+
+  let requests;
+  try {
+    requests = await db.friendship.delete({
+      where: {
+        requesterId_addresseeId: {
+          addresseeId,
+          requesterId: user.id,
+        },
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Something went wrong",
+    };
+  }
+
+  revalidatePath(`/users/${username}`);
+  return { data: requests };
+};
+
+const removeFriendHandler = async (
+  data: InputFriendRequestType
+): Promise<ReturnFriendRequestType> => {
+  const { addresseeId, username } = data;
+  const user = await currentUser();
+  console.log(Error.BadRequest);
+
+  if (!addresseeId || !user) return { error: Error.BadRequest as unknown as string };
+
+  let friends;
+  try {
+    friends = await db.friendship.deleteMany({
+      where: {
+        OR: [
+          { requesterId: user.id, addresseeId: addresseeId },
+          { requesterId: addresseeId, addresseeId: user.id },
+        ],
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Something went wrong",
+    };
+  }
+
+  revalidatePath(`/users/${username}`);
+  return { data: friends };
+};
+
 export const createUser = createSafeAction(CreateUser, createUserHandler);
+
+export const sendFriendRequest = createSafeAction(FriendRequest, sendFriendRequestHandler);
+
+export const widthdrawFriendRequest = createSafeAction(FriendRequest, widthdrawRequestHanlder);
+
+export const removeFriend = createSafeAction(FriendRequest, removeFriendHandler);

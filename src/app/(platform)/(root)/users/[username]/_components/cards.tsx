@@ -1,10 +1,10 @@
 "use client";
 
-import { sendFriendRequest } from "@/actions/user-actions";
+import { removeFriend, sendFriendRequest, widthdrawFriendRequest } from "@/actions/user-actions";
 import Spinner from "@/components/Spinner";
 import { Availability, Friendship, Team, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useMemo, useState } from "react";
 import { FaSuperpowers } from "react-icons/fa6";
@@ -18,29 +18,46 @@ interface ProfileCardProps {
 interface DescriptionProps {
   user: User;
 }
+
 export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
-  const { execute, isLoading } = useAction(sendFriendRequest, {
+  const queryClient = useQueryClient();
+
+  // ✅ Send friend request
+  const { execute: sendReq, isLoading } = useAction(sendFriendRequest, {
     onSuccess: (data) => {
-      console.log(data);
+      console.log("Request sent:", data);
+      queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
-    onError: (err) => {
-      console.log(err);
+    onError: (err) => console.error(err),
+  });
+
+  // ✅ Remove friend
+  const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
+    onSuccess: (data) => {
+      console.log("Friend removed:", data);
+      queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
   });
 
+  // ✅ Withdraw friend request
+  const { execute: widthdrawReq, isLoading: isWidthdrawing } = useAction(widthdrawFriendRequest, {
+    onSuccess: (data) => {
+      console.log("Request withdrawn:", data);
+      queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
+    },
+    onError: (err) => console.error(err),
+  });
+
+  // ✅ Fetch friend request data
   const { data: friendRequest } = useQuery<Friendship[]>({
     queryKey: ["friend-requests", user.id],
     queryFn: async () => {
       const res = await axios.get(`/api/users/friends/requests/${user.id}`);
-
       return res.data;
     },
   });
 
-  const handleFriendRequest = () => {
-    execute({ addresseeId: user.id });
-  };
-
+  // ✅ Determine friendship status
   const friendshipStatus: "none" | "pending" | "declined" | "blocked" | "accepted" = useMemo(() => {
     if (!friendRequest || friendRequest.length === 0) return "none";
 
@@ -61,8 +78,16 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     }
   }, [friendRequest, currentUser.id]);
 
-  console.log({ friendshipStatus });
-  console.log(friendRequest);
+  const handleFriendRequest = () => {
+    if (friendshipStatus === "none" || friendshipStatus === "declined") {
+      sendReq({ addresseeId: user.id, username: user.username });
+    } else if (friendshipStatus === "pending") {
+      widthdrawReq({ addresseeId: user.id, username: user.username });
+    } else if (friendshipStatus === "accepted") {
+      deleteFriend({ addresseeId: user.id, username: user.username });
+    }
+  };
+
   const getAvailabilityClass = (availability: Availability) => {
     switch (availability) {
       case "available":
@@ -77,15 +102,18 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
   };
 
   const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat("en-US", { year: "numeric", month: "long", day: "numeric" }).format(
-      date
-    );
+    new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
 
   return (
     <div className="lg:col-span-1">
       <div className="sticky top-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
         <div className="h-24 bg-gradient-to-r from-green-600 via-emerald-700 to-green-700"></div>
         <div className="-mt-16 p-6 text-center font-[poppins]">
+          {/* Avatar */}
           <div className="relative mx-auto h-32 w-32">
             <img
               id="avatar"
@@ -102,6 +130,8 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
               </div>
             )}
           </div>
+
+          {/* Name & Username */}
           <h2
             id="userName"
             className="mt-4 font-[cal_sans] text-lg font-semibold text-slate-900 dark:text-white"
@@ -114,49 +144,67 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
           >
             @{user.username}
           </p>
+
+          {/* Availability */}
           <div
             className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs ${getAvailabilityClass(user.availability)}`}
           >
             <span
-              className={`h-1 w-1 rounded-full ${user.availability === "available" ? "animate-ping bg-green-500" : user.availability === "injured" ? "bg-red-500" : "bg-yellow-500"}`}
+              className={`h-1 w-1 rounded-full ${
+                user.availability === "available"
+                  ? "animate-ping bg-green-500"
+                  : user.availability === "injured"
+                    ? "bg-red-500"
+                    : "bg-yellow-500"
+              }`}
             ></span>
             <span id="availabilityStatus" className="capitalize">
               {user.availability.replace("_", " ")}
             </span>
           </div>
 
+          {/* ✅ Friendship Button */}
           <abbr title={friendshipStatus} className="absolute top-28 right-2">
-            <button
-              id="friendRequestBtn"
-              onClick={handleFriendRequest}
-              disabled={friendshipStatus !== "none" || isLoading}
-              className={`primary-btn center flex transform cursor-pointer gap-1 rounded-full py-2 transition-all duration-300 hover:scale-105 ${
-                friendshipStatus === "none"
-                  ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50"
-                  : friendshipStatus === "pending"
-                    ? "cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                    : "cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white"
-              }`}
-            >
-              {isLoading ? (
-                <Spinner />
-              ) : (
-                <>
-                  {friendshipStatus === "none" && <UserPlus className="h-4 w-4" />}
-                  {friendshipStatus === "pending" && <Clock className="h-4 w-4" />}
-                  {friendshipStatus === "accepted" && <UserCheck className="h-4 w-4" />}
-                  <span className="text-sm">
-                    {friendshipStatus === "none"
-                      ? "Add"
-                      : friendshipStatus === "pending"
-                        ? "Sent"
-                        : ""}
-                  </span>
-                </>
-              )}
-            </button>
+            {(friendshipStatus === "none" ||
+              friendshipStatus === "pending" ||
+              friendshipStatus === "declined" ||
+              friendshipStatus === "accepted") && (
+              <button
+                id="friendRequestBtn"
+                onClick={handleFriendRequest}
+                disabled={isLoading || isDeleting || isWidthdrawing}
+                className={`center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300 ${
+                  friendshipStatus === "none"
+                    ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50"
+                    : friendshipStatus === "pending"
+                      ? "cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                      : friendshipStatus === "accepted"
+                        ? "bg-red-600 px-4 text-white hover:bg-red-700"
+                        : "cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white"
+                }`}
+              >
+                {isLoading || isDeleting || isWidthdrawing ? (
+                  <Spinner />
+                ) : (
+                  <>
+                    {friendshipStatus === "none" && <UserPlus className="h-4 w-4" />}
+                    {friendshipStatus === "pending" && <Clock className="h-4 w-4" />}
+                    <span className="text-sm">
+                      {friendshipStatus === "none"
+                        ? "Add"
+                        : friendshipStatus === "pending"
+                          ? "Sent"
+                          : friendshipStatus === "accepted"
+                            ? "Remove"
+                            : ""}
+                    </span>
+                  </>
+                )}
+              </button>
+            )}
           </abbr>
 
+          {/* Info Section */}
           <div className="mt-6 space-y-4 border-t border-slate-200 pt-4 text-left dark:border-slate-700">
             <InfoItem
               icon={<FaSuperpowers className="h-5 w-5 text-slate-400" />}

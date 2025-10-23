@@ -20,6 +20,7 @@ export const CreateUser = z.object({
   availability: z.enum(["available", "injured", "on_break"]).default("available"),
 });
 
-export const SendRequest = z.object({
+export const FriendRequest = z.object({
   addresseeId: z.string({ error: "AddresseeId is required" }),
+  username: z.string({ error: "Required parameter is missing" }),
 });
