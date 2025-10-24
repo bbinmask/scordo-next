@@ -22,7 +22,6 @@ interface DescriptionProps {
 export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
   const queryClient = useQueryClient();
 
-  // ✅ Send friend request
   const { execute: sendReq, isLoading } = useAction(sendFriendRequest, {
     onSuccess: (data) => {
       console.log("Request sent:", data);
@@ -31,7 +30,6 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     onError: (err) => console.error(err),
   });
 
-  // ✅ Remove friend
   const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
     onSuccess: (data) => {
       console.log("Friend removed:", data);
@@ -39,7 +37,6 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     },
   });
 
-  // ✅ Withdraw friend request
   const { execute: widthdrawReq, isLoading: isWidthdrawing } = useAction(widthdrawFriendRequest, {
     onSuccess: (data) => {
       console.log("Request withdrawn:", data);
@@ -48,7 +45,6 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     onError: (err) => console.error(err),
   });
 
-  // ✅ Fetch friend request data
   const { data: friendRequest } = useQuery<Friendship[]>({
     queryKey: ["friend-requests", user.id],
     queryFn: async () => {
@@ -57,7 +53,6 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     },
   });
 
-  // ✅ Determine friendship status
   const friendshipStatus: "none" | "pending" | "declined" | "blocked" | "accepted" = useMemo(() => {
     if (!friendRequest || friendRequest.length === 0) return "none";
 

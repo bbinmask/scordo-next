@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/generated/prisma";
+import { Friendship, User } from "@/generated/prisma";
 import { checkAvailability, getFullAddress } from "@/utils";
 import { capitalize } from "lodash";
 import { CalendarIcon, MailIcon, UserIcon, Verified } from "lucide-react";
@@ -11,6 +11,7 @@ import StatsChart from "./StatsChart";
 import MatchStats from "./MatchStats";
 import TournamentStats from "./TournamentStats";
 import Tabs from "../../_components/Tabs";
+import FriendRequests from "./FriendRequests";
 
 interface InfoCardProps {
   label: string;
@@ -30,7 +31,15 @@ const InfoCard = ({ label, value, icon }: InfoCardProps) => (
   </div>
 );
 
-const PersonalDetails = ({ user }: { user: User }) => {
+const PersonalDetails = ({
+  user,
+  friendRequests,
+  friends,
+}: {
+  user: User;
+  friendRequests: Friendship[];
+  friends: Friendship[];
+}) => {
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
   const [currentTab, setCurrentTab] = useState("statschart");
@@ -83,7 +92,7 @@ const PersonalDetails = ({ user }: { user: User }) => {
   // });
 
   return (
-    <>
+    <div className="relative">
       <div className="container-bg mb-6 grid grid-cols-1 gap-6 rounded-xl p-4 shadow-lg md:grid-cols-3">
         <div className="h-full rounded-xl p-6 transition-all duration-300 md:col-span-1">
           <div className="mb-6 md:hidden">
@@ -143,7 +152,7 @@ const PersonalDetails = ({ user }: { user: User }) => {
               <p className="font-[poppins] text-base font-medium">{`@${user.username}`}</p>
               <div className="my-3 flex justify-center gap-6 text-base">
                 <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm">
-                  Friends: {user?.friends?.length || 0}
+                  Friends: {friends?.length || 0}
                 </span>
               </div>
             </div>
@@ -157,7 +166,7 @@ const PersonalDetails = ({ user }: { user: User }) => {
             <div className="flex flex-col gap-12 md:flex-row">
               <section className="w-full">
                 <div className="">
-                  <h2 className="mb-2 font-[cal_sans] text-3xl">Personal information</h2>
+                  <h2 className="mb-2 font-[cal_sans] text-3xl">Personal Information</h2>
                   <p className="mb-10 font-[urbanist] text-sm text-gray-500">
                     Manage your personal information, including phone numers and email adress where
                     you can be contacted
@@ -212,7 +221,9 @@ const PersonalDetails = ({ user }: { user: User }) => {
         {currentTab === "match-stats" && <MatchStats user={user} />}
         {currentTab === "tournament-stats" && <TournamentStats user={user} />}
       </div>
-    </>
+
+      <FriendRequests requests={friendRequests} />
+    </div>
   );
 };
 

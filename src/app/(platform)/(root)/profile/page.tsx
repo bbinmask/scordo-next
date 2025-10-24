@@ -17,15 +17,27 @@ const ProfilePage = async () => {
     where: { clerkId: clerkUser?.id },
   });
 
-  user;
-
   if (!user) {
     return notFound();
   }
 
+  const friendRequests = await db.friendship.findMany({
+    where: {
+      addresseeId: user.id,
+      status: "PENDING",
+    },
+  });
+
+  const friends = await db.friendship.findMany({
+    where: {
+      OR: [{ addresseeId: user.id }, { requesterId: user.id }],
+      status: "ACCEPTED",
+    },
+  });
+
   return (
     <div className="font-inter container mx-auto min-h-screen p-4">
-      <PersonalDetails user={user} />
+      <PersonalDetails user={user} friendRequests={friendRequests} friends={friends} />
     </div>
   );
 };
