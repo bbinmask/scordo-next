@@ -222,7 +222,7 @@ const PersonalDetails = ({
         {currentTab === "tournament-stats" && <TournamentStats user={user} />}
       </div>
 
-      <FriendRequests requests={friendRequests} />
+      <FriendRequests className="absolute top-8 right-2" requests={friendRequests} />
     </div>
   );
 };
