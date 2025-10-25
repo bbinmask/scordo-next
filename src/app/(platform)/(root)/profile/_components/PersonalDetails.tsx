@@ -12,6 +12,8 @@ import MatchStats from "./MatchStats";
 import TournamentStats from "./TournamentStats";
 import Tabs from "../../_components/Tabs";
 import FriendRequests from "./FriendRequests";
+import { useForm } from "react-hook-form";
+import { ProfileFormData } from "../page";
 
 interface InfoCardProps {
   label: string;
@@ -65,31 +67,17 @@ const PersonalDetails = ({
     },
   ];
 
-  // const {
-  //   control,
-  //   handleUsername,
-  //   handleSubmit,
-  //   submitChanges,
-  //   isEdit,
-  //   toggleEdit,
-  //   errorMessage,
-  //   loading,
-  // } = useProfileForm(profile);
-
-  // const { isEditProfile, setIsEditProfile, uploadAvatar, setFile } =
-  //   useProfileAvatarUpload(profile);
-
-  // const {
-  //   reset,
-  //   formState: { errors },
-  // } = useForm<ProfileFormData>({
-  //   defaultValues: {
-  //     newUsername: profile?.username || "",
-  //     newName: profile?.name || "",
-  //     newEmail: profile?.email || "",
-  //     newPhone: profile?.phone || "",
-  //   },
-  // });
+  const {
+    reset,
+    formState: { errors },
+  } = useForm<ProfileFormData>({
+    defaultValues: {
+      newUsername: user?.username || "",
+      newName: user?.name || "",
+      newEmail: user?.email || "",
+      newPhone: user?.contact || "",
+    },
+  });
 
   return (
     <div className="relative">
