@@ -35,6 +35,16 @@ const ProfilePage = async () => {
     },
   });
 
+  const teams = await db.team.findMany({
+    where: {
+      players: {
+        some: {
+          userId: user.id,
+        },
+      },
+    },
+  });
+
   return (
     <div className="font-inter container mx-auto min-h-screen p-4">
       <PersonalDetails user={user} friendRequests={friendRequests} friends={friends} />
