@@ -1,6 +1,5 @@
 import { Prisma } from "@/generated/prisma";
 
-// Re-use the validator from Step 1
 const teamWithPlayerCountAndOwner = Prisma.validator<Prisma.TeamDefaultArgs>()({
   select: {
     id: true,
@@ -19,6 +18,15 @@ const teamWithPlayerCountAndOwner = Prisma.validator<Prisma.TeamDefaultArgs>()({
     },
   },
 });
+
+const friendshipWithBoth = Prisma.validator<Prisma.FriendshipDefaultArgs>()({
+  include: {
+    requester: true,
+    addressee: true,
+  },
+});
+
+export type FriendshipWithBoth = Prisma.FriendshipGetPayload<typeof friendshipWithBoth>;
 
 export type TeamForListComponent = Prisma.TeamGetPayload<typeof teamWithPlayerCountAndOwner>;
 

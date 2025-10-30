@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import PersonalDetails from "./_components/PersonalDetails";
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
+import { getFriends } from "@/utils/helper/getFriends";
 
 export interface ProfileFormData {
   newUsername: string;
@@ -28,12 +29,18 @@ const ProfilePage = async () => {
     },
   });
 
-  const friends = await db.friendship.findMany({
+  const friendships = await db.friendship.findMany({
     where: {
       OR: [{ addresseeId: user.id }, { requesterId: user.id }],
       status: "ACCEPTED",
     },
+    include: {
+      requester: true,
+      addressee: true,
+    },
   });
+
+  const friends = getFriends(friendships, user.id);
 
   const teams = await db.team.findMany({
     where: {
@@ -45,6 +52,15 @@ const ProfilePage = async () => {
     },
   });
 
+  const teamRequests = await db.teamRequest.findMany({
+    where: {
+      toId: user.id,
+    },
+    include: {
+      team: true,
+      from: true,
+    },
+  });
   const tournaments = await db.tournament.findMany({
     where: {
       participatingTeams: {
@@ -78,9 +94,15 @@ const ProfilePage = async () => {
     },
   });
 
+  console.log(teams, tournaments, tournamentRequests);
+
   return (
     <div className="font-inter container mx-auto min-h-screen p-4">
-      <PersonalDetails user={user} friendRequests={friendRequests} friends={friends} />
+      <PersonalDetails
+        user={user}
+        requests={{ friendRequests, tournamentRequests, teamRequests }}
+        friends={friends}
+      />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { Friendship, User } from "@/generated/prisma";
+import { Friendship, TeamRequest, TournamentRequest, User } from "@/generated/prisma";
 import { checkAvailability, getFullAddress } from "@/utils";
 import { capitalize } from "lodash";
 import { CalendarIcon, MailIcon, UserIcon, Verified } from "lucide-react";
@@ -35,12 +35,16 @@ const InfoCard = ({ label, value, icon }: InfoCardProps) => (
 
 const PersonalDetails = ({
   user,
-  friendRequests,
+  requests,
   friends,
 }: {
   user: User;
-  friendRequests: Friendship[];
-  friends: Friendship[];
+  requests: {
+    friendRequests: Friendship[];
+    tournamentRequests: TournamentRequest[];
+    teamRequests: TeamRequest[];
+  };
+  friends: User[];
 }) => {
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
@@ -210,7 +214,7 @@ const PersonalDetails = ({
         {currentTab === "tournament-stats" && <TournamentStats user={user} />}
       </div>
 
-      <FriendRequests className="absolute top-8 right-2" requests={friendRequests} />
+      <FriendRequests className="absolute top-8 right-6" requests={requests} />
     </div>
   );
 };
