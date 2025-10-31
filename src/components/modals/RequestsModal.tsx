@@ -2,7 +2,17 @@
 
 import { TeamRequest, TournamentRequest } from "@/generated/prisma";
 import { FriendshipWithBoth } from "@/lib/types";
-import { Check, Inbox, Shield, Trophy, UserPlus, X, ChevronLeft, ChevronUp } from "lucide-react";
+import {
+  Check,
+  Inbox,
+  Shield,
+  Trophy,
+  UserPlus,
+  X,
+  ChevronLeft,
+  ChevronUp,
+  ShieldPlus,
+} from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { useNotificationModal } from "@/hooks/store/use-profile-notifications";
@@ -368,11 +378,14 @@ export default function RequestsModal() {
         className="mx-4 w-full max-w-md rounded-lg bg-white shadow-xl"
       >
         <DialogTitle />
-        <DialogContent className="h-[60vh] overflow-y-auto p-4">
+        <DialogContent className="overflow-y-auto p-4">
+          <DialogHeader>
+            <DialogTitle>Requests</DialogTitle>
+          </DialogHeader>
           {pendingCount === 0 ? (
             <NotFoundParagraph description="You have no pending requests." />
           ) : (
-            <div className="">
+            <div className="h-[50vh] items-start justify-start font-[poppins]">
               {requests.friendRequests.length !== 0 && (
                 <>
                   <ToggleButton
@@ -381,7 +394,7 @@ export default function RequestsModal() {
                     onClick={() => setToggle((prev) => ({ ...prev, friend: !prev.friend }))}
                   />
                   {toggle.friend && (
-                    <ul className="space-y-4">
+                    <ul className="mb-2 space-y-4">
                       {requests.friendRequests.map((request) => {
                         const user = request.addressee || request.requester;
                         return (
@@ -400,7 +413,7 @@ export default function RequestsModal() {
                               <p className="text-sm font-medium text-gray-800">{user.name}</p>
                               <p className="flex items-center text-sm text-gray-500">
                                 <span className="mr-1.5">
-                                  <UserPlus />
+                                  <UserPlus className="h-4 w-4" />
                                 </span>
                                 sent you a friend request.
                               </p>
@@ -415,6 +428,113 @@ export default function RequestsModal() {
                               </button>
                               <button
                                 onClick={() => handleFriendDecline(user.id)}
+                                className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
+                                title="Decline"
+                              >
+                                <X className="h-5 w-5" />
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </>
+              )}
+              {requests.teamRequests.length !== 0 && (
+                <>
+                  <ToggleButton
+                    state={toggle}
+                    name="team"
+                    onClick={() => setToggle((prev) => ({ ...prev, team: !prev.team }))}
+                  />
+                  {toggle.team && (
+                    <ul className="mb-2 space-y-4">
+                      {requests.teamRequests.map((request) => {
+                        return (
+                          <li key={request.id} className="flex items-center space-x-3">
+                            <img
+                              src={
+                                request.team.logo ||
+                                "https://placehold.co/40x40/E0E7FF/4F46E5?text=Avatar"
+                              }
+                              alt={`${request.team.name}'s avatar`}
+                              width={40}
+                              height={40}
+                              className="rounded-full"
+                            />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-800">
+                                {request.team.name}
+                              </p>
+                              <p className="flex items-center text-sm text-gray-500">
+                                <span className="mr-1.5">
+                                  <ShieldPlus className="h-4 w-4" />
+                                </span>
+                                sent you a team request.
+                              </p>
+                            </div>
+                            <div className="flex shrink-0 space-x-2">
+                              <button
+                                onClick={() => handleFriendAccept(request.id)}
+                                className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
+                                title="Accept"
+                              >
+                                <Check className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => handleFriendDecline(request.id)}
+                                className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
+                                title="Decline"
+                              >
+                                <X className="h-5 w-5" />
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </>
+              )}
+              {requests.tournamentRequests.length !== 0 && (
+                <>
+                  <ToggleButton
+                    state={toggle}
+                    name="tournament"
+                    onClick={() =>
+                      setToggle((prev) => ({ ...prev, tournament: !toggle.tournament }))
+                    }
+                  />
+                  {toggle.tournament && (
+                    <ul className="mb-2 space-y-4">
+                      {requests.tournamentRequests.map((request) => {
+                        return (
+                          <li key={request.id} className="flex items-center space-x-3">
+                            {/* <Trophy className="h-6 w-6 rounded-full" />
+                             */}
+                            <img src="/trophy.svg" alt="" width={40} height={40} />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-800">
+                                {request.tournament.name}
+                              </p>
+                              <p className="flex items-center text-sm text-gray-500">
+                                <span className="mr-1.5">
+                                  <Trophy className="h-4 w-4" />
+                                </span>
+                                sent you a tournament request.
+                              </p>
+                            </div>
+                            <div className="flex shrink-0 space-x-2">
+                              <button
+                                onClick={() => handleFriendAccept(request.id)}
+                                className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
+                                title="Accept"
+                              >
+                                <Check className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => handleFriendDecline(request.id)}
                                 className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
                                 title="Decline"
                               >
