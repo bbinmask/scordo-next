@@ -146,8 +146,6 @@ const widthdrawRequestHanlder = async (
 ): Promise<ReturnFriendRequestType> => {
   const { addresseeId, username } = data;
   const user = await currentUser();
-  console.log(Error.BadRequest);
-  console.log("Error");
 
   if (!addresseeId || !user) return { error: Error.BadRequest as unknown as string };
 
@@ -176,7 +174,6 @@ const removeFriendHandler = async (
 ): Promise<ReturnFriendRequestType> => {
   const { addresseeId, username } = data;
   const user = await currentUser();
-  console.log(Error.BadRequest);
 
   if (!addresseeId || !user) return { error: Error.BadRequest as unknown as string };
 

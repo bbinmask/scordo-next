@@ -24,7 +24,6 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
 
   const { execute: sendReq, isLoading } = useAction(sendFriendRequest, {
     onSuccess: (data) => {
-      console.log("Request sent:", data);
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
     onError: (err) => console.error(err),
@@ -32,14 +31,12 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
 
   const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
     onSuccess: (data) => {
-      console.log("Friend removed:", data);
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
   });
 
   const { execute: widthdrawReq, isLoading: isWidthdrawing } = useAction(widthdrawFriendRequest, {
     onSuccess: (data) => {
-      console.log("Request withdrawn:", data);
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
     onError: (err) => console.error(err),

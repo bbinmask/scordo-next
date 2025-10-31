@@ -14,6 +14,9 @@ import Tabs from "../../_components/Tabs";
 import FriendRequests from "./FriendRequests";
 import { useForm } from "react-hook-form";
 import { ProfileFormData } from "../page";
+import { Button } from "@/components/ui/button";
+import { useFriendsModal } from "@/hooks/store/use-friends";
+import FriendsModal from "@/components/modals/FriendsModal";
 
 interface InfoCardProps {
   label: string;
@@ -83,6 +86,8 @@ const PersonalDetails = ({
     },
   });
 
+  const { onOpen: openFriends } = useFriendsModal();
+
   return (
     <div className="relative">
       <div className="container-bg mb-6 grid grid-cols-1 gap-6 rounded-xl p-4 shadow-lg md:grid-cols-3">
@@ -143,9 +148,12 @@ const PersonalDetails = ({
               )}
               <p className="font-[poppins] text-base font-medium">{`@${user.username}`}</p>
               <div className="my-3 flex justify-center gap-6 text-base">
-                <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm">
+                <Button
+                  onClick={openFriends}
+                  className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm"
+                >
                   Friends: {friends?.length || 0}
-                </span>
+                </Button>
               </div>
             </div>
 
@@ -215,6 +223,7 @@ const PersonalDetails = ({
       </div>
 
       <FriendRequests className="absolute top-8 right-6" requests={requests} />
+      <FriendsModal friends={friends} />
     </div>
   );
 };

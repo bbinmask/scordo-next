@@ -14,7 +14,6 @@ import ApiError from "http-errors";
 
 export const searchForTeams = async (data: InputType): Promise<ReturnTypeForTeams> => {
   const { query } = data;
-  console.log(query);
   let teams;
   try {
     teams = await db.team.findMany({
@@ -46,7 +45,6 @@ export const searchForTeams = async (data: InputType): Promise<ReturnTypeForTeam
 
 export const searchForTournaments = async (data: InputType): Promise<ReturnTypeForTournaments> => {
   const { query } = data;
-  console.log(query);
 
   let tournaments;
   try {
@@ -84,7 +82,6 @@ export const searchForTournaments = async (data: InputType): Promise<ReturnTypeF
 
 export const searchForUsers = async (data: InputType): Promise<ReturnTypeForUsers> => {
   const { query } = data;
-  console.log(query);
 
   const loggedInUser = await currentUser();
 

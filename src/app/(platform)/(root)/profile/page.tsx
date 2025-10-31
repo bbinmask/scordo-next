@@ -94,8 +94,6 @@ const ProfilePage = async () => {
     },
   });
 
-  console.log({ friendRequests, tournamentRequests, teamRequests });
-
   return (
     <div className="font-inter container mx-auto min-h-screen p-4">
       <PersonalDetails
