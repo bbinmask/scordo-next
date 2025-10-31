@@ -321,6 +321,8 @@ export default function RequestsModal() {
   const handleFriendAccept = (requestId: string) => {
     const filteredRequests = requests.friendRequests.filter((prev) => prev.id !== requestId);
 
+    console.log(filteredRequests);
+
     setRequests((prev) => ({ ...prev, friendRequests: filteredRequests }));
   };
 
@@ -420,14 +422,14 @@ export default function RequestsModal() {
                             </div>
                             <div className="flex shrink-0 space-x-2">
                               <button
-                                onClick={() => handleFriendAccept(user.id)}
+                                onClick={() => handleFriendAccept(request.id)}
                                 className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
                                 title="Accept"
                               >
                                 <Check className="h-5 w-5" />
                               </button>
                               <button
-                                onClick={() => handleFriendDecline(user.id)}
+                                onClick={() => handleFriendDecline(request.id)}
                                 className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
                                 title="Decline"
                               >
@@ -476,14 +478,14 @@ export default function RequestsModal() {
                             </div>
                             <div className="flex shrink-0 space-x-2">
                               <button
-                                onClick={() => handleFriendAccept(request.id)}
+                                onClick={() => handleTeamAccept(request.id)}
                                 className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
                                 title="Accept"
                               >
                                 <Check className="h-5 w-5" />
                               </button>
                               <button
-                                onClick={() => handleFriendDecline(request.id)}
+                                onClick={() => handleTeamDecline(request.id)}
                                 className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
                                 title="Decline"
                               >
@@ -527,14 +529,14 @@ export default function RequestsModal() {
                             </div>
                             <div className="flex shrink-0 space-x-2">
                               <button
-                                onClick={() => handleFriendAccept(request.id)}
+                                onClick={() => handleTournamentAccept(request.id)}
                                 className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
                                 title="Accept"
                               >
                                 <Check className="h-5 w-5" />
                               </button>
                               <button
-                                onClick={() => handleFriendDecline(request.id)}
+                                onClick={() => handleTournamentDecline(request.id)}
                                 className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
                                 title="Decline"
                               >
