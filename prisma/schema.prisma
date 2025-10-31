@@ -97,51 +97,7 @@ type TournamentDetails {
   location       Address?
 }
 
-model User {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId      String       @unique
-  name         String
-  username     String       @unique
-  email        String       @unique
-  contact      String?
-  gender       Gender?
-  role         Role         @default(fan)
-  dob          DateTime
-  availability Availability @default(available)
-  avatar       String?
-  isVerified   Boolean      @default(false)
-  bio          String?
-  address      Address?
 
-  teamsOwned       Team[]        @relation("UserTeams")
-  captainOf        Team[]        @relation("TeamCaptain")
-  tournaments      Tournament[]  @relation("TournamentOrganizer")
-  players          Player[]      @relation("UserPlayerEntries")
-  sentRequests     TeamRequest[] @relation("SentRequests")
-  receivedRequests TeamRequest[] @relation("ReceivedRequests")
-
-  sentFriendRequests     Friendship[] @relation("SentFriendRequests")
-  receivedFriendRequests Friendship[] @relation("ReceivedFriendRequests")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Friendship {
-  id     String           @id @default(auto()) @map("_id") @db.ObjectId
-  status FriendshipStatus @default(PENDING)
-
-  requesterId String @db.ObjectId
-  requester   User   @relation("SentFriendRequests", fields: [requesterId], references: [id])
-
-  addresseeId String @db.ObjectId
-  addressee   User   @relation("ReceivedFriendRequests", fields: [addresseeId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([requesterId, addresseeId])
-}
 
 model Team {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -190,6 +146,52 @@ model Tournament {
   endDate            DateTime
 }
 
+model User {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId      String       @unique
+  name         String
+  username     String       @unique
+  email        String       @unique
+  contact      String?
+  gender       Gender?
+  role         Role         @default(fan)
+  dob          DateTime
+  availability Availability @default(available)
+  avatar       String?
+  isVerified   Boolean      @default(false)
+  bio          String?
+  address      Address?
+
+  teamsOwned       Team[]        @relation("UserTeams")
+  captainOf        Team[]        @relation("TeamCaptain")
+  tournaments      Tournament[]  @relation("TournamentOrganizer")
+  players          Player[]      @relation("UserPlayerEntries")
+  sentRequests     TeamRequest[] @relation("SentRequests")
+  receivedRequests TeamRequest[] @relation("ReceivedRequests")
+
+  sentFriendRequests     Friendship[] @relation("SentFriendRequests")
+  receivedFriendRequests Friendship[] @relation("ReceivedFriendRequests")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Friendship {
+  id     String           @id @default(auto()) @map("_id") @db.ObjectId
+  status FriendshipStatus @default(PENDING)
+
+  requesterId String @db.ObjectId
+  requester   User   @relation("SentFriendRequests", fields: [requesterId], references: [id])
+
+  addresseeId String @db.ObjectId
+  addressee   User   @relation("ReceivedFriendRequests", fields: [addresseeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([requesterId, addresseeId])
+}
+
 model TournamentRequest {
   id           String @id @default(auto()) @map("_id") @db.ObjectId
   teamId       String @db.ObjectId
@@ -204,20 +206,6 @@ model TournamentRequest {
 
   @@unique([teamId, tournamentId])
 }
-
-model TournamentTeam {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
-  teamId       String @db.ObjectId
-  tournamentId String @db.ObjectId
-
-  team       Team       @relation("TeamParticipants", fields: [teamId], references: [id])
-  tournament Tournament @relation("TournamentParticipants", fields: [tournamentId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  @@unique([teamId, tournamentId])
-}
-
 model TeamRequest {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
   toId   String @db.ObjectId
@@ -234,6 +222,20 @@ model TeamRequest {
 
   @@unique([toId, fromId, teamId])
 }
+
+model TournamentTeam {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  teamId       String @db.ObjectId
+  tournamentId String @db.ObjectId
+
+  team       Team       @relation("TeamParticipants", fields: [teamId], references: [id])
+  tournament Tournament @relation("TournamentParticipants", fields: [tournamentId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([teamId, tournamentId])
+}
+
 
 model Match {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId

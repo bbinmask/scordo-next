@@ -1,5 +1,8 @@
 import { Toaster } from "sonner";
 import { ClerkProvider } from "@clerk/nextjs";
+import { getMetadata } from "@/utils/helper/getMetadata";
+
+export const metadata = getMetadata();
 
 const PlatformLayout = ({ children }: { children: React.ReactNode }) => {
   return (

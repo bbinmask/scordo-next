@@ -14,9 +14,9 @@ const FriendsModal = ({ friends }: FriendsModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogTitle title="Your Friends" />
 
-      <DialogContent onClick={(e) => e.stopPropagation()} className="max-w-md overflow-hidden p-0">
+      <DialogContent onClick={(e) => e.stopPropagation()} className="max-w-md overflow-hidden">
         <div className="flex items-center justify-between border-b p-4">
-          <h2 className="flex items-center text-xl font-semibold text-gray-800">
+          <h2 className="flex items-center text-xl font-semibold">
             <Users className="mr-2 h-6 w-6" />
             Friends
           </h2>
@@ -39,7 +39,7 @@ const FriendsModal = ({ friends }: FriendsModalProps) => {
                     className="flex items-center rounded-md p-2 transition hover:bg-gray-100"
                   >
                     <img
-                      src={friend.avatar || "https://placehold.co/40x40/E0E7FF/4F46E5?text=Avatar"}
+                      src={friend.avatar || "/user.svg"}
                       alt={`${friend.name}'s avatar`}
                       width={40}
                       height={40}

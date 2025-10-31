@@ -148,12 +148,12 @@ const PersonalDetails = ({
               )}
               <p className="font-[poppins] text-base font-medium">{`@${user.username}`}</p>
               <div className="my-3 flex justify-center gap-6 text-base">
-                <Button
+                <button
                   onClick={openFriends}
-                  className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm"
+                  className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm dark:bg-gray-700 dark:text-blue-300"
                 >
                   Friends: {friends?.length || 0}
-                </Button>
+                </button>
               </div>
             </div>
 
