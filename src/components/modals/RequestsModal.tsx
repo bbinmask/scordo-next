@@ -14,10 +14,11 @@ import {
   ShieldPlus,
 } from "lucide-react";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { useNotificationModal } from "@/hooks/store/use-profile-notifications";
 import NotFoundParagraph from "../NotFoundParagraph";
 import { capitalize } from "lodash";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface RequestsModalProps {
   initialRequests: {
@@ -316,6 +317,25 @@ export default function RequestsModal() {
     team: true,
     tournament: true,
   });
+
+  interface ConfirmModalState {
+    isOpen: boolean;
+    title: string;
+    description: string;
+    confirmText: string;
+    confirmVariant: "primary" | "destructive";
+    onConfirm: () => void;
+  }
+
+  const [confirmModalState, setConfirmModalState] = useState<ConfirmModalState>({
+    isOpen: false,
+    title: "",
+    description: "",
+    confirmText: "Confirm",
+    confirmVariant: "primary",
+    onConfirm: () => {},
+  });
+
   const { isOpen, onClose } = useNotificationModal();
 
   const handleFriendAccept = (requestId: string) => {
@@ -368,26 +388,33 @@ export default function RequestsModal() {
     }));
   };
 
+  const closeConfirmModal = () => {
+    setConfirmModalState({ ...confirmModalState, isOpen: false });
+  };
+
   const pendingCount =
     requests.friendRequests.length ||
     requests.teamRequests.length ||
     requests.tournamentRequests.length;
 
+  const variants = {
+    hidden: { height: 0, opacity: 0 },
+    visible: { height: "auto", opacity: 1 },
+    exit: { height: 0, opacity: 0 },
+  };
   return (
-    <Dialog onOpenChange={onClose} open={isOpen}>
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="mx-4 w-full max-w-md rounded-lg bg-white shadow-xl"
-      >
+    <>
+      <Dialog onOpenChange={onClose} open={isOpen}>
         <DialogTitle />
-        <DialogContent className="overflow-y-auto p-4">
+        <DialogContent className="mx-4 w-full max-w-md overflow-y-auto rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
           <DialogHeader>
             <DialogTitle>Requests</DialogTitle>
           </DialogHeader>
           {pendingCount === 0 ? (
             <NotFoundParagraph description="You have no pending requests." />
           ) : (
-            <div className="h-[50vh] items-start justify-start font-[poppins]">
+            <div className="h-[50vh] items-start justify-start overflow-y-auto pr-2 font-[poppins]">
+              {/* FRIEND REQUESTS */}
               {requests.friendRequests.length !== 0 && (
                 <>
                   <ToggleButton
@@ -395,54 +422,84 @@ export default function RequestsModal() {
                     name="friend"
                     onClick={() => setToggle((prev) => ({ ...prev, friend: !prev.friend }))}
                   />
-                  {toggle.friend && (
-                    <ul className="mb-2 space-y-4">
-                      {requests.friendRequests.map((request) => {
-                        const user = request.addressee || request.requester;
-                        return (
-                          <li key={user.id} className="flex items-center space-x-3">
-                            <img
-                              src={
-                                user.avatar ||
-                                "https://placehold.co/40x40/E0E7FF/4F46E5?text=Avatar"
-                              }
-                              alt={`${user.name}'s avatar`}
-                              width={40}
-                              height={40}
-                              className="rounded-full"
-                            />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-800">{user.name}</p>
-                              <p className="flex items-center text-sm text-gray-500">
-                                <span className="mr-1.5">
-                                  <UserPlus className="h-4 w-4" />
-                                </span>
-                                sent you a friend request.
-                              </p>
-                            </div>
-                            <div className="flex shrink-0 space-x-2">
-                              <button
-                                onClick={() => handleFriendAccept(request.id)}
-                                className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
-                                title="Accept"
-                              >
-                                <Check className="h-5 w-5" />
-                              </button>
-                              <button
-                                onClick={() => handleFriendDecline(request.id)}
-                                className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
-                                title="Decline"
-                              >
-                                <X className="h-5 w-5" />
-                              </button>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {toggle.friend && (
+                      <motion.ul
+                        key="friend-list"
+                        variants={variants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="mb-2 space-y-4 overflow-hidden"
+                      >
+                        {requests.friendRequests.map((request) => {
+                          const user = request.addressee || request.requester;
+                          return (
+                            <li key={user.id} className="flex items-center space-x-3">
+                              <img
+                                src={
+                                  user.avatar ||
+                                  "https://placehold.co/40x40/E0E7FF/4F46E5?text=Avatar"
+                                }
+                                alt={`${user.name}'s avatar`}
+                                width={40}
+                                height={40}
+                                className="rounded-full"
+                              />
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-800">{user.name}</p>
+                                <p className="flex items-center text-xs text-gray-500">
+                                  <span className="mr-1">
+                                    <UserPlus className="h-4 w-4" />
+                                  </span>
+                                  sent you a friend request.
+                                </p>
+                              </div>
+                              <div className="flex shrink-0 space-x-2">
+                                <button
+                                  onClick={() => {
+                                    setConfirmModalState({
+                                      isOpen: true,
+                                      title: "Accept Friend Request",
+                                      description: `Are you sure you want to accept ${user.name}'s request?`,
+                                      confirmText: "Accept",
+                                      confirmVariant: "primary",
+                                      onConfirm: () => handleFriendAccept(request.id),
+                                    });
+                                  }}
+                                  className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
+                                  title="Accept"
+                                >
+                                  <Check className="h-5 w-5" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setConfirmModalState({
+                                      isOpen: true,
+                                      title: "Decline Friend Request",
+                                      description: `Are you sure you want to decline ${user.name}'s request?`,
+                                      confirmText: "Decline",
+                                      confirmVariant: "destructive",
+                                      onConfirm: () => handleFriendDecline(request.id),
+                                    });
+                                  }}
+                                  className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
+                                  title="Decline"
+                                >
+                                  <X className="h-5 w-5" />
+                                </button>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
+
+              {/* TEAM REQUESTS */}
               {requests.teamRequests.length !== 0 && (
                 <>
                   <ToggleButton
@@ -450,10 +507,18 @@ export default function RequestsModal() {
                     name="team"
                     onClick={() => setToggle((prev) => ({ ...prev, team: !prev.team }))}
                   />
-                  {toggle.team && (
-                    <ul className="mb-2 space-y-4">
-                      {requests.teamRequests.map((request) => {
-                        return (
+                  <AnimatePresence initial={false}>
+                    {toggle.team && (
+                      <motion.ul
+                        key="team-list"
+                        variants={variants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="mb-2 space-y-4 overflow-hidden"
+                      >
+                        {requests.teamRequests.map((request) => (
                           <li key={request.id} className="flex items-center space-x-3">
                             <img
                               src={
@@ -469,8 +534,8 @@ export default function RequestsModal() {
                               <p className="text-sm font-medium text-gray-800">
                                 {request.team.name}
                               </p>
-                              <p className="flex items-center text-sm text-gray-500">
-                                <span className="mr-1.5">
+                              <p className="flex items-center text-xs text-gray-500">
+                                <span className="mr-1">
                                   <ShieldPlus className="h-4 w-4" />
                                 </span>
                                 sent you a team request.
@@ -478,14 +543,32 @@ export default function RequestsModal() {
                             </div>
                             <div className="flex shrink-0 space-x-2">
                               <button
-                                onClick={() => handleTeamAccept(request.id)}
+                                onClick={() => {
+                                  setConfirmModalState({
+                                    isOpen: true,
+                                    title: "Accept Team Request",
+                                    description: `Are you sure you want to accept ${request.team.name}'s request?`,
+                                    confirmText: "Accept",
+                                    confirmVariant: "primary",
+                                    onConfirm: () => handleTeamAccept(request.id),
+                                  });
+                                }}
                                 className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
                                 title="Accept"
                               >
                                 <Check className="h-5 w-5" />
                               </button>
                               <button
-                                onClick={() => handleTeamDecline(request.id)}
+                                onClick={() => {
+                                  setConfirmModalState({
+                                    isOpen: true,
+                                    title: "Decline Team Request",
+                                    description: `Are you sure you want to decline ${request.team.name}'s request?`,
+                                    confirmText: "Decline",
+                                    confirmVariant: "destructive",
+                                    onConfirm: () => handleTeamDecline(request.id),
+                                  });
+                                }}
                                 className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
                                 title="Decline"
                               >
@@ -493,35 +576,41 @@ export default function RequestsModal() {
                               </button>
                             </div>
                           </li>
-                        );
-                      })}
-                    </ul>
-                  )}
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
+
+              {/* TOURNAMENT REQUESTS */}
               {requests.tournamentRequests.length !== 0 && (
                 <>
                   <ToggleButton
                     state={toggle}
                     name="tournament"
-                    onClick={() =>
-                      setToggle((prev) => ({ ...prev, tournament: !toggle.tournament }))
-                    }
+                    onClick={() => setToggle((prev) => ({ ...prev, tournament: !prev.tournament }))}
                   />
-                  {toggle.tournament && (
-                    <ul className="mb-2 space-y-4">
-                      {requests.tournamentRequests.map((request) => {
-                        return (
+                  <AnimatePresence initial={false}>
+                    {toggle.tournament && (
+                      <motion.ul
+                        key="tournament-list"
+                        variants={variants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="mb-2 space-y-4 overflow-hidden"
+                      >
+                        {requests.tournamentRequests.map((request) => (
                           <li key={request.id} className="flex items-center space-x-3">
-                            {/* <Trophy className="h-6 w-6 rounded-full" />
-                             */}
                             <img src="/trophy.svg" alt="" width={40} height={40} />
                             <div className="flex-1">
                               <p className="text-sm font-medium text-gray-800">
                                 {request.tournament.name}
                               </p>
-                              <p className="flex items-center text-sm text-gray-500">
-                                <span className="mr-1.5">
+                              <p className="flex items-center text-xs text-gray-500">
+                                <span className="mr-1">
                                   <Trophy className="h-4 w-4" />
                                 </span>
                                 sent you a tournament request.
@@ -529,14 +618,32 @@ export default function RequestsModal() {
                             </div>
                             <div className="flex shrink-0 space-x-2">
                               <button
-                                onClick={() => handleTournamentAccept(request.id)}
+                                onClick={() => {
+                                  setConfirmModalState({
+                                    isOpen: true,
+                                    title: "Accept Tournament Request",
+                                    description: `Are you sure you want to accept ${request.tournament.name}'s request?`,
+                                    confirmText: "Accept",
+                                    confirmVariant: "primary",
+                                    onConfirm: () => handleTournamentAccept(request.id),
+                                  });
+                                }}
                                 className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
                                 title="Accept"
                               >
                                 <Check className="h-5 w-5" />
                               </button>
                               <button
-                                onClick={() => handleTournamentDecline(request.id)}
+                                onClick={() => {
+                                  setConfirmModalState({
+                                    isOpen: true,
+                                    title: "Decline Tournament Request",
+                                    description: `Are you sure you want to decline ${request.tournament.name}'s request?`,
+                                    confirmText: "Decline",
+                                    confirmVariant: "destructive",
+                                    onConfirm: () => handleTournamentDecline(request.id),
+                                  });
+                                }}
                                 className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
                                 title="Decline"
                               >
@@ -544,17 +651,26 @@ export default function RequestsModal() {
                               </button>
                             </div>
                           </li>
-                        );
-                      })}
-                    </ul>
-                  )}
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
             </div>
           )}
         </DialogContent>
-      </div>
-    </Dialog>
+      </Dialog>
+      <ConfirmModal
+        isOpen={confirmModalState.isOpen}
+        title={confirmModalState.title}
+        description={confirmModalState.description}
+        confirmText={confirmModalState.confirmText}
+        confirmVariant={confirmModalState.confirmVariant}
+        onConfirm={confirmModalState.onConfirm}
+        onClose={closeConfirmModal}
+      />
+    </>
   );
 }
 
@@ -570,9 +686,67 @@ interface ToggleButtonProps {
 
 const ToggleButton = ({ state, name, onClick }: ToggleButtonProps) => {
   return (
-    <button onClick={onClick} className="mb-2 flex w-full items-center justify-between">
+    <button
+      onClick={onClick}
+      className="mb-2 flex w-full items-center justify-between transition-all duration-200"
+    >
       <h3 className="font-[cal_sans]">{capitalize(`${name} Requests`)}</h3>
       {state[name] ? <ChevronUp /> : <ChevronLeft />}
     </button>
   );
 };
+
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  confirmText?: string;
+  confirmVariant?: "primary" | "destructive";
+}
+
+function ConfirmModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  confirmText = "Confirm",
+  confirmVariant = "primary",
+}: ConfirmModalProps) {
+  if (!isOpen) return null;
+
+  const confirmButtonClass =
+    confirmVariant === "destructive"
+      ? "rounded-md bg-red-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-red-700"
+      : "rounded-md bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-700";
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="w-full max-w-sm rounded-lg bg-white p-6 font-[poppins] dark:bg-gray-800">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
+          <DialogDescription className="text-gray-500">{description}</DialogDescription>
+        </DialogHeader>
+        <div className="mt-4 flex justify-end space-x-3">
+          <button
+            onClick={onClose}
+            className="rounded-md border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className={confirmButtonClass}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
