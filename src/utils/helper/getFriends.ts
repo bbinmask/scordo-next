@@ -10,3 +10,14 @@ export const getFriends = (friendships: FriendshipWithBoth[], userId: string): U
   });
   return friends;
 };
+
+export const getFriendRequests = (friendships: FriendshipWithBoth[], userId: string) => {
+  if (friendships.length === 0) return [];
+
+  const requests = friendships.map((fr) => {
+    if (fr.addresseeId === userId) return { ...fr, addressee: null };
+    else return { ...fr, requester: null };
+  });
+
+  return requests;
+};

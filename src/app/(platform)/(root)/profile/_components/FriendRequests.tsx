@@ -1,15 +1,19 @@
-import { Friendship, TeamRequest, TournamentRequest } from "@/generated/prisma";
 import { cn } from "@/lib/utils";
 import { FaUser } from "react-icons/fa6";
 import { BiSolidMessage } from "react-icons/bi";
 import { Bell, BellDot } from "lucide-react";
 import { useNotificationModal } from "@/hooks/store/use-profile-notifications";
 import RequestsModal from "@/components/modals/RequestsModal";
+import {
+  FriendshipWithBoth,
+  TeamRequestWithDetails,
+  TournamentRequestWithDetails,
+} from "@/lib/types";
 interface FriendRequestsProps {
   requests: {
-    friendRequests: Friendship[];
-    tournamentRequests: TournamentRequest[];
-    teamRequests: TeamRequest[];
+    friendRequests: FriendshipWithBoth[];
+    tournamentRequests: TournamentRequestWithDetails[];
+    teamRequests: TeamRequestWithDetails[];
   };
   className?: string;
 }
@@ -36,7 +40,7 @@ const FriendRequests = ({ className, requests }: FriendRequestsProps) => {
           {requests?.length > 9 ? "9+" : requests?.length || 0}
         </span> */}
       </div>
-      <RequestsModal />
+      <RequestsModal initialRequests={requests} />
     </div>
   );
 };

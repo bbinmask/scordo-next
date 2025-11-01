@@ -2,15 +2,17 @@
 
 import { db } from "@/lib/db";
 import {
+  InputRecievedRequestType,
   InputCreateUserType,
-  InputFriendRequestType,
+  InputSentRequestType,
+  ReturnAcceptRequestType,
   ReturnCreateUserType,
-  ReturnFriendRequestType,
+  ReturnSentRequestType,
 } from "./types";
 import Error from "http-errors";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { createSafeAction, ActionState } from "@/lib/create-safe-action";
-import { CreateUser, FriendRequest } from "./schema";
+import { RecievedRequest, CreateUser, SentRequest } from "./schema";
 import { User } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@/lib/currentUser";
@@ -71,8 +73,8 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
 };
 
 const sendFriendRequestHandler = async (
-  data: InputFriendRequestType
-): Promise<ReturnFriendRequestType> => {
+  data: InputSentRequestType
+): Promise<ReturnSentRequestType> => {
   const { userId } = await auth();
 
   const { addresseeId, username } = data;
@@ -141,9 +143,47 @@ const sendFriendRequestHandler = async (
   }
 };
 
+const acceptRequestHandler = async (
+  data: InputRecievedRequestType
+): Promise<ReturnAcceptRequestType> => {
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Unauthorized",
+    };
+
+  const { reqId } = data;
+
+  if (reqId.trim() === "")
+    return {
+      error: "Request not found",
+    };
+
+  let request;
+  try {
+    request = await db.friendship.update({
+      where: {
+        id: reqId,
+      },
+      data: {
+        status: "ACCEPTED",
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Something went wrong",
+    };
+  }
+
+  revalidatePath(`/profile`);
+
+  return { data: request };
+};
+
 const widthdrawRequestHanlder = async (
-  data: InputFriendRequestType
-): Promise<ReturnFriendRequestType> => {
+  data: InputSentRequestType
+): Promise<ReturnSentRequestType> => {
   const { addresseeId, username } = data;
   const user = await currentUser();
 
@@ -169,9 +209,7 @@ const widthdrawRequestHanlder = async (
   return { data: requests };
 };
 
-const removeFriendHandler = async (
-  data: InputFriendRequestType
-): Promise<ReturnFriendRequestType> => {
+const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSentRequestType> => {
   const { addresseeId, username } = data;
   const user = await currentUser();
 
@@ -197,10 +235,14 @@ const removeFriendHandler = async (
   return { data: friends };
 };
 
+const declineRequestHandler = async () => {};
+
 export const createUser = createSafeAction(CreateUser, createUserHandler);
 
-export const sendFriendRequest = createSafeAction(FriendRequest, sendFriendRequestHandler);
+export const sendFriendRequest = createSafeAction(SentRequest, sendFriendRequestHandler);
 
-export const widthdrawFriendRequest = createSafeAction(FriendRequest, widthdrawRequestHanlder);
+export const acceptRequest = createSafeAction(RecievedRequest, acceptRequestHandler);
 
-export const removeFriend = createSafeAction(FriendRequest, removeFriendHandler);
+export const widthdrawFriendRequest = createSafeAction(SentRequest, widthdrawRequestHanlder);
+
+export const removeFriend = createSafeAction(SentRequest, removeFriendHandler);

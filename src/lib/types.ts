@@ -26,6 +26,24 @@ const friendshipWithBoth = Prisma.validator<Prisma.FriendshipDefaultArgs>()({
   },
 });
 
+const teamRequestWithDetails = Prisma.validator<Prisma.TeamRequestDefaultArgs>()({
+  include: {
+    team: true,
+    from: true,
+  },
+});
+const tournamentRequestWithDetails = Prisma.validator<Prisma.TournamentRequestDefaultArgs>()({
+  include: {
+    tournament: true,
+  },
+});
+
+export type TeamRequestWithDetails = Prisma.TeamRequestGetPayload<typeof teamRequestWithDetails>;
+
+export type TournamentRequestWithDetails = Prisma.TournamentRequestGetPayload<
+  typeof tournamentRequestWithDetails
+>;
+
 export type FriendshipWithBoth = Prisma.FriendshipGetPayload<typeof friendshipWithBoth>;
 
 export type TeamForListComponent = Prisma.TeamGetPayload<typeof teamWithPlayerCountAndOwner>;

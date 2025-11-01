@@ -1,6 +1,6 @@
 "use client";
 
-import { Friendship, TeamRequest, TournamentRequest, User } from "@/generated/prisma";
+import { User } from "@/generated/prisma";
 import { checkAvailability, getFullAddress } from "@/utils";
 import { capitalize } from "lodash";
 import { CalendarIcon, MailIcon, UserIcon, Verified } from "lucide-react";
@@ -14,9 +14,13 @@ import Tabs from "../../_components/Tabs";
 import FriendRequests from "./FriendRequests";
 import { useForm } from "react-hook-form";
 import { ProfileFormData } from "../page";
-import { Button } from "@/components/ui/button";
 import { useFriendsModal } from "@/hooks/store/use-friends";
 import FriendsModal from "@/components/modals/FriendsModal";
+import {
+  FriendshipWithBoth,
+  TeamRequestWithDetails,
+  TournamentRequestWithDetails,
+} from "@/lib/types";
 
 interface InfoCardProps {
   label: string;
@@ -43,9 +47,9 @@ const PersonalDetails = ({
 }: {
   user: User;
   requests: {
-    friendRequests: Friendship[];
-    tournamentRequests: TournamentRequest[];
-    teamRequests: TeamRequest[];
+    friendRequests: FriendshipWithBoth[];
+    tournamentRequests: TournamentRequestWithDetails[];
+    teamRequests: TeamRequestWithDetails[];
   };
   friends: User[];
 }) => {

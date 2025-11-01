@@ -25,18 +25,18 @@ const FriendsModal = ({ friends }: FriendsModalProps) => {
         {/* Body (Friend List) */}
         <div className="max-h-[60vh] overflow-y-auto p-4">
           {friends.length === 0 ? (
-            <p className="py-4 text-center text-gray-500">You don't have any friends yet.</p>
+            <p className="py-4 text-center">You don't have any friends yet.</p>
           ) : (
             <ul className="space-y-3">
               {friends.map((friend) => (
-                <li key={friend.id}>
+                <li key={friend.id} className="bg-gray-50 hover:opacity-80 dark:bg-gray-800">
                   <a
-                    href={`/profile/${friend.id}`}
+                    href={`/users/${friend.username}`}
                     onClick={(e) => {
                       e.preventDefault();
                       onClose();
                     }}
-                    className="flex items-center rounded-md p-2 transition hover:bg-gray-100"
+                    className="flex items-center rounded-md p-2 transition"
                   >
                     <img
                       src={friend.avatar || "/user.svg"}
@@ -45,8 +45,8 @@ const FriendsModal = ({ friends }: FriendsModalProps) => {
                       height={40}
                       className="rounded-full"
                     />
-                    <div className="ml-3">
-                      <p className="font-medium text-gray-800">{friend.name}</p>
+                    <div className="ml-3 font-[poppins]">
+                      <p className="primary-text font-medium">{friend.name}</p>
                       <p className="text-sm text-gray-500">@{friend.username}</p>
                     </div>
                   </a>

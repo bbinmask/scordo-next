@@ -178,6 +178,14 @@
   @apply text-green-800 dark:text-lime-300;
 }
 
+.primary-text {
+  @apply text-black dark:text-gray-50;
+}
+
+.secondary-text {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
 .hide_scrollbar::-webkit-scrollbar {
   display: none;
 }

@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import PersonalDetails from "./_components/PersonalDetails";
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
-import { getFriends } from "@/utils/helper/getFriends";
+import { getFriendRequests, getFriends } from "@/utils/helper/getFriends";
 
 export interface ProfileFormData {
   newUsername: string;
@@ -22,10 +22,14 @@ const ProfilePage = async () => {
     return notFound();
   }
 
-  const friendRequests = await db.friendship.findMany({
+  const friendReqs = await db.friendship.findMany({
     where: {
       addresseeId: user.id,
       status: "PENDING",
+    },
+    include: {
+      requester: true,
+      addressee: true,
     },
   });
 
@@ -41,6 +45,8 @@ const ProfilePage = async () => {
   });
 
   const friends = getFriends(friendships, user.id);
+
+  const friendRequests: any = getFriendRequests(friendReqs, user.id);
 
   const teams = await db.team.findMany({
     where: {
@@ -91,6 +97,10 @@ const ProfilePage = async () => {
           },
         },
       ],
+    },
+    include: {
+      tournament: true,
+      team: true,
     },
   });
 
