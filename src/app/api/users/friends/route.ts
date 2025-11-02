@@ -1,18 +1,20 @@
+import { currentUser } from "@/lib/currentUser";
 import { db } from "@/lib/db";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
-    const { requesterId }: { requesterId?: string } = await req.json();
+    const user = await currentUser();
 
-    if (!requesterId) return NextResponse.error();
+    if (!user) return NextResponse.error();
 
-    const friends = db.friendship.findMany({
+    const friends = await db.friendship.findMany({
       where: {
-        requesterId,
         status: "ACCEPTED",
+        OR: [{ addresseeId: user.id }, { requesterId: user.id }],
       },
-      select: {
+      include: {
         addressee: {
           select: {
             name: true,
@@ -20,9 +22,13 @@ export async function GET(req: Request) {
             id: true,
           },
         },
-        status: true,
-        createdAt: true,
-        updatedAt: true,
+        requester: {
+          select: {
+            name: true,
+            username: true,
+            id: true,
+          },
+        },
       },
     });
 

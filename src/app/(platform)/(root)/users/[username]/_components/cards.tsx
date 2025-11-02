@@ -9,7 +9,7 @@ import axios from "axios";
 import { useMemo, useState } from "react";
 import { FaSuperpowers } from "react-icons/fa6";
 import { CheckCircle, UserPlus, UserCheck, Clock, Calendar, MapPin, Info } from "lucide-react";
-
+import { calculateAge } from "@/utils/helper/calculateAge";
 interface ProfileCardProps {
   user: User;
   currentUser: User;
@@ -42,6 +42,14 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     onError: (err) => console.error(err),
   });
 
+  const { data: friends } = useQuery<Friendship[]>({
+    queryKey: ["friends"],
+    queryFn: async () => {
+      const res = await axios.get(`/api/users/friends`);
+      return res.data;
+    },
+  });
+
   const { data: friendRequest } = useQuery<Friendship[]>({
     queryKey: ["friend-requests", user.id],
     queryFn: async () => {
@@ -50,10 +58,12 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     },
   });
 
-  const friendshipStatus: "none" | "pending" | "declined" | "blocked" | "accepted" = useMemo(() => {
-    if (!friendRequest || friendRequest.length === 0) return "none";
+  const requestStatus: "none" | "pending" | "declined" | "blocked" | "accepted" = useMemo(() => {
+    if ((!friendRequest || friendRequest.length === 0) && (!friends || friends.length === 0))
+      return "none";
 
-    const req = friendRequest.find((r) => r.requesterId === currentUser.id);
+    const req = friendRequest?.find((r) => r.requesterId === currentUser.id);
+
     if (!req) return "none";
 
     switch (req.status) {
@@ -70,12 +80,20 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     }
   }, [friendRequest, currentUser.id]);
 
+  const friendshipStatus: "accepted" | "none" = useMemo(() => {
+    const friend = friends?.find(
+      (fr) => fr.requesterId === currentUser.id || fr.addresseeId === currentUser.id
+    );
+
+    return friend ? "accepted" : "none";
+  }, [friends, currentUser]);
+
   const handleFriendRequest = () => {
-    if (friendshipStatus === "none" || friendshipStatus === "declined") {
+    if (requestStatus === "none" || requestStatus === "declined") {
       sendReq({ addresseeId: user.id, username: user.username });
-    } else if (friendshipStatus === "pending") {
+    } else if (requestStatus === "pending") {
       widthdrawReq({ addresseeId: user.id, username: user.username });
-    } else if (friendshipStatus === "accepted") {
+    } else if (requestStatus === "accepted") {
       deleteFriend({ addresseeId: user.id, username: user.username });
     }
   };
@@ -132,7 +150,7 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
           </h2>
           <p
             id="userUsername"
-            className="font-[urbanist] text-sm font-semibold tracking-wide text-slate-500 dark:text-slate-400"
+            className="secondary-text font-[urbanist] text-sm font-semibold tracking-wide"
           >
             @{user.username}
           </p>
@@ -156,44 +174,60 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
           </div>
 
           {/* ✅ Friendship Button */}
-          <abbr title={friendshipStatus} className="absolute top-28 right-2">
-            {(friendshipStatus === "none" ||
-              friendshipStatus === "pending" ||
-              friendshipStatus === "declined" ||
-              friendshipStatus === "accepted") && (
-              <button
-                id="friendRequestBtn"
-                onClick={handleFriendRequest}
-                disabled={isLoading || isDeleting || isWidthdrawing}
-                className={`center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300 ${
-                  friendshipStatus === "none"
-                    ? "bg-gradient-to-r from-emerald-700 to-green-900 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50"
-                    : friendshipStatus === "pending"
-                      ? "cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
-                      : friendshipStatus === "accepted"
-                        ? "bg-red-600 px-4 text-white hover:bg-red-700"
-                        : "cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white"
-                }`}
-              >
-                {isLoading || isDeleting || isWidthdrawing ? (
-                  <Spinner />
-                ) : (
-                  <>
-                    {friendshipStatus === "none" && <UserPlus className="h-4 w-4" />}
-                    {friendshipStatus === "pending" && <Clock className="h-4 w-4" />}
-                    <span className="text-sm">
-                      {friendshipStatus === "none"
-                        ? "Add"
-                        : friendshipStatus === "pending"
-                          ? "Sent"
-                          : friendshipStatus === "accepted"
-                            ? "Remove"
-                            : ""}
-                    </span>
-                  </>
-                )}
-              </button>
-            )}
+          <abbr title={requestStatus || friendshipStatus} className="absolute top-28 right-2">
+            {(() => {
+              const status = requestStatus === "pending" ? "pending" : friendshipStatus;
+
+              const base =
+                "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
+              const classes =
+                status === "none"
+                  ? `${base} bg-gradient-to-r from-emerald-700 to-green-900 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50`
+                  : status === "pending"
+                    ? `${base} cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
+                    : status === "accepted"
+                      ? `${base} bg-red-600 px-4 text-white hover:bg-red-700`
+                      : status === "blocked"
+                        ? `${base} cursor-default bg-gray-400 text-white`
+                        : `${base} cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white`;
+
+              // Define button label and icon
+              const icon =
+                status === "none" ? (
+                  <UserPlus className="h-4 w-4" />
+                ) : status === "pending" ? (
+                  <Clock className="h-4 w-4" />
+                ) : null;
+
+              const label =
+                status === "none"
+                  ? "Add"
+                  : status === "pending"
+                    ? "Sent"
+                    : status === "accepted"
+                      ? "Remove"
+                      : status === "blocked"
+                        ? "Blocked"
+                        : "";
+
+              return (
+                <button
+                  id="friendRequestBtn"
+                  onClick={handleFriendRequest}
+                  disabled={isLoading || isDeleting || isWidthdrawing || status === "pending"}
+                  className={classes}
+                >
+                  {isLoading || isDeleting || isWidthdrawing ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      {icon}
+                      <span className="text-sm">{label}</span>
+                    </>
+                  )}
+                </button>
+              );
+            })()}
           </abbr>
 
           {/* Info Section */}
@@ -275,7 +309,7 @@ export const InfoItem = ({ icon, label, value, id }: any) => (
   <div className="flex items-start">
     <div className="w-8 flex-shrink-0 pt-1">{icon}</div>
     <div className="ml-2">
-      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</p>
+      <p className="secondary-text text-sm font-medium">{label}</p>
       <p id={id} className="text-sm text-slate-800 capitalize dark:text-slate-200">
         {value}
       </p>
@@ -284,57 +318,41 @@ export const InfoItem = ({ icon, label, value, id }: any) => (
 );
 
 export const AboutCard = ({ user }: any) => {
-  const calculateAge = (dob: string) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
   return (
     <div className="space-y-8">
-      <div>
-        <h3 className="mb-2 text-lg font-semibold text-slate-800 dark:text-slate-100">Bio</h3>
-        <p className="prose prose-sm dark:prose-invert leading-relaxed text-slate-600 dark:text-slate-300">
-          {user.bio}
-        </p>
-      </div>
-      <div className="border-t border-slate-200 pt-6 dark:border-slate-700">
-        <h3 className="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">
-          Personal Information
-        </h3>
+      {user.bio && (
+        <div className="border-b pb-4 text-slate-800 dark:text-slate-100">
+          <h3 className="primary-text mb-2 text-lg font-semibold">Bio</h3>
+          <p className="prose prose-sm dark:prose-invert secondary-text leading-relaxed">
+            {user.bio}
+          </p>
+        </div>
+      )}
+
+      <div className="">
+        <h3 className="primary-text mb-4 text-lg font-semibold">Personal Information</h3>
         <dl className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Full Name</dt>
-            <dd className="mt-1 text-sm text-slate-900 dark:text-slate-100">{user.name}</dd>
+            <dt className="secondary-text text-sm font-medium">Full Name</dt>
+            <dd className="primary-text mt-1 text-sm">{user.name}</dd>
           </div>
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">
-              Email Address
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900 dark:text-slate-100">{user.email}</dd>
+            <dt className="secondary-text text-sm font-medium">Email Address</dt>
+            <dd className="primary-text mt-1 text-sm">{user.email}</dd>
           </div>
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Contact</dt>
-            <dd className="mt-1 text-sm text-slate-900 dark:text-slate-100">
-              {user.contact || "Not provided"}
-            </dd>
+            <dt className="secondary-text text-sm font-medium">Contact</dt>
+            <dd className="primary-text mt-1 text-sm">{user.contact || "Not provided"}</dd>
           </div>
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">Gender</dt>
+            <dt className="secondary-text text-sm font-medium">Gender</dt>
             <dd className="mt-1 text-sm text-slate-900 capitalize dark:text-slate-100">
               {user.gender}
             </dd>
           </div>
           <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">
-              Date of Birth
-            </dt>
-            <dd className="mt-1 text-sm text-slate-900 dark:text-slate-100">
+            <dt className="secondary-text text-sm font-medium">Date of Birth</dt>
+            <dd className="primary-text mt-1 text-sm">
               {new Date(user.dob).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
@@ -351,9 +369,7 @@ export const AboutCard = ({ user }: any) => {
 
 export const TeamsCard = ({ teams }: any) => {
   if (teams.length === 0) {
-    return (
-      <p className="text-slate-500 dark:text-slate-400">This user is not a part of any team yet.</p>
-    );
+    return <p className="secondary-text">This user is not a part of any team yet.</p>;
   }
 
   return (
@@ -386,9 +402,7 @@ export const StatsCard = () => {
     <div className="py-10 text-center">
       <Info className="mx-auto mb-4 h-12 w-12 text-slate-400 dark:text-slate-500" />
       <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Coming Soon!</h3>
-      <p className="mt-1 text-slate-500 dark:text-slate-400">
-        Detailed career statistics will be available here soon.
-      </p>
+      <p className="secondary-text mt-1">Detailed career statistics will be available here soon.</p>
     </div>
   );
 };
