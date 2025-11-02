@@ -153,9 +153,9 @@ const acceptRequestHandler = async (
       error: "Unauthorized",
     };
 
-  const { reqId } = data;
+  const { reqId, reqUsername } = data;
 
-  if (reqId.trim() === "")
+  if (reqId.trim() === "" || reqUsername.trim() === "")
     return {
       error: "Request not found",
     };
@@ -177,6 +177,7 @@ const acceptRequestHandler = async (
   }
 
   revalidatePath(`/profile`);
+  revalidatePath(`/users/${reqUsername}`);
 
   return { data: request };
 };
@@ -232,6 +233,7 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
   }
 
   revalidatePath(`/users/${username}`);
+  revalidatePath(`/profile`);
   return { data: friends };
 };
 

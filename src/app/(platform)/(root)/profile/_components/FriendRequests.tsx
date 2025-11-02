@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { FaUser } from "react-icons/fa6";
 import { BiSolidMessage } from "react-icons/bi";

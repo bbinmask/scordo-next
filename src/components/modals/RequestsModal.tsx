@@ -27,6 +27,9 @@ import { useAction } from "@/hooks/useAction";
 import { acceptRequest } from "@/actions/user-actions";
 import { toast } from "sonner";
 
+import { ConfirmModal } from "./ConfirmModal";
+import { useConfirmModal } from "@/hooks/useConfirmModal";
+
 interface RequestsModalProps {
   initialRequests: {
     friendRequests: FriendshipWithBoth[];
@@ -52,18 +55,11 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
     onConfirm: () => void;
   }
 
-  const [confirmModalState, setConfirmModalState] = useState<ConfirmModalState>({
-    isOpen: false,
-    title: "",
-    description: "",
-    confirmText: "Confirm",
-    confirmVariant: "primary",
-    onConfirm: () => {},
-  });
+  const { confirmModalState, closeConfirmModal, openConfirmModal } = useConfirmModal();
 
   const { isOpen, onClose } = useNotificationModal();
 
-  const { execute: acceptFriendRequest } = useAction(acceptRequest, {
+  const { execute: acceptFriendRequest, isLoading } = useAction(acceptRequest, {
     onSuccess: (data) => {
       toast.success("You are now friends");
     },
@@ -79,8 +75,8 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
 
   //
 
-  const handleFriendAccept = (requestId: string) => {
-    acceptFriendRequest({ reqId: requestId });
+  const handleFriendAccept = (requestId: string, reqUsername: string) => {
+    acceptFriendRequest({ reqId: requestId, reqUsername });
 
     const filteredRequests = requests.friendRequests.filter((prev) => prev.id !== requestId);
 
@@ -105,7 +101,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
     }));
   };
 
-  const handleFriendDecline = (requestId: string) => {
+  const handleFriendDecline = (requestId: string, reqUsername: string) => {
     const filteredRequests = requests.friendRequests.filter((prev) => prev.id !== requestId);
 
     setRequests((prev) => ({ ...prev, friendRequests: filteredRequests }));
@@ -127,10 +123,6 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
       ...prev,
       tournamentRequests: filteredRequests,
     }));
-  };
-
-  const closeConfirmModal = () => {
-    setConfirmModalState({ ...confirmModalState, isOpen: false });
   };
 
   const pendingCount =
@@ -179,18 +171,15 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                           return (
                             <li key={user.id} className="flex items-center space-x-3">
                               <img
-                                src={
-                                  user.avatar ||
-                                  "https://placehold.co/40x40/E0E7FF/4F46E5?text=Avatar"
-                                }
+                                src={user.avatar || "/user.svg"}
                                 alt={`${user.name}'s avatar`}
                                 width={40}
                                 height={40}
                                 className="rounded-full"
                               />
                               <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-800">{user.name}</p>
-                                <p className="flex items-center text-xs text-gray-500">
+                                <p className="primary-text text-sm font-medium">{user.name}</p>
+                                <p className="secondary-text flex items-center text-xs">
                                   <span className="mr-1">
                                     <UserPlus className="h-4 w-4" />
                                   </span>
@@ -200,13 +189,13 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                               <div className="flex shrink-0 space-x-2">
                                 <button
                                   onClick={() => {
-                                    setConfirmModalState({
-                                      isOpen: true,
+                                    openConfirmModal({
                                       title: "Accept Friend Request",
                                       description: `Are you sure you want to accept ${user.name}'s request?`,
                                       confirmText: "Accept",
                                       confirmVariant: "primary",
-                                      onConfirm: () => handleFriendAccept(request.id),
+                                      onConfirm: () =>
+                                        handleFriendAccept(request.id, user.username),
                                     });
                                   }}
                                   className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
@@ -216,13 +205,13 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                                 </button>
                                 <button
                                   onClick={() => {
-                                    setConfirmModalState({
-                                      isOpen: true,
+                                    openConfirmModal({
                                       title: "Decline Friend Request",
                                       description: `Are you sure you want to decline ${user.name}'s request?`,
                                       confirmText: "Decline",
                                       confirmVariant: "destructive",
-                                      onConfirm: () => handleFriendDecline(request.id),
+                                      onConfirm: () =>
+                                        handleFriendDecline(request.id, user.username),
                                     });
                                   }}
                                   className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
@@ -272,10 +261,10 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                               className="rounded-full"
                             />
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-800">
+                              <p className="primary-text text-sm font-medium">
                                 {request.from.name}
                               </p>
-                              <p className="flex items-center text-xs text-gray-500">
+                              <p className="secondary-text flex items-center text-xs">
                                 <span className="mr-1">
                                   <ShieldPlus className="h-4 w-4" />
                                 </span>
@@ -285,8 +274,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                             <div className="flex shrink-0 space-x-2">
                               <button
                                 onClick={() => {
-                                  setConfirmModalState({
-                                    isOpen: true,
+                                  openConfirmModal({
                                     title: "Accept Team Request",
                                     description: `Are you sure you want to accept ${request.team.name}'s request?`,
                                     confirmText: "Accept",
@@ -301,8 +289,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                               </button>
                               <button
                                 onClick={() => {
-                                  setConfirmModalState({
-                                    isOpen: true,
+                                  openConfirmModal({
                                     title: "Decline Team Request",
                                     description: `Are you sure you want to decline ${request.team.name}'s request?`,
                                     confirmText: "Decline",
@@ -347,10 +334,10 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                           <li key={request.id} className="flex items-center space-x-3">
                             <img src="/trophy.svg" alt="" width={40} height={40} />
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-800">
+                              <p className="primary-text text-sm font-medium">
                                 {request.tournament.title}
                               </p>
-                              <p className="flex items-center text-xs text-gray-500">
+                              <p className="secondary-text flex items-center text-xs">
                                 <span className="mr-1">
                                   <Trophy className="h-4 w-4" />
                                 </span>
@@ -360,8 +347,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                             <div className="flex shrink-0 space-x-2">
                               <button
                                 onClick={() => {
-                                  setConfirmModalState({
-                                    isOpen: true,
+                                  openConfirmModal({
                                     title: "Accept Tournament Request",
                                     description: `Are you sure you want to accept ${request.tournament.title}'s request?`,
                                     confirmText: "Accept",
@@ -376,8 +362,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                               </button>
                               <button
                                 onClick={() => {
-                                  setConfirmModalState({
-                                    isOpen: true,
+                                  openConfirmModal({
                                     title: "Decline Tournament Request",
                                     description: `Are you sure you want to decline ${request.tournament.title}'s request?`,
                                     confirmText: "Decline",
@@ -402,15 +387,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
           )}
         </DialogContent>
       </Dialog>
-      <ConfirmModal
-        isOpen={confirmModalState.isOpen}
-        title={confirmModalState.title}
-        description={confirmModalState.description}
-        confirmText={confirmModalState.confirmText}
-        confirmVariant={confirmModalState.confirmVariant}
-        onConfirm={confirmModalState.onConfirm}
-        onClose={closeConfirmModal}
-      />
+      <ConfirmModal {...confirmModalState} isLoading={isLoading} onClose={closeConfirmModal} />
     </>
   );
 }
@@ -436,58 +413,3 @@ const ToggleButton = ({ state, name, onClick }: ToggleButtonProps) => {
     </button>
   );
 };
-
-interface ConfirmModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  description: string;
-  confirmText?: string;
-  confirmVariant?: "primary" | "destructive";
-}
-
-function ConfirmModal({
-  isOpen,
-  onClose,
-  onConfirm,
-  title,
-  description,
-  confirmText = "Confirm",
-  confirmVariant = "primary",
-}: ConfirmModalProps) {
-  if (!isOpen) return null;
-
-  const confirmButtonClass =
-    confirmVariant === "destructive"
-      ? "rounded-md bg-red-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-red-700"
-      : "rounded-md bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-700";
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-sm rounded-lg bg-white p-6 font-[poppins] dark:bg-gray-800">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
-          <DialogDescription className="text-gray-500">{description}</DialogDescription>
-        </DialogHeader>
-        <div className="mt-4 flex justify-end space-x-3">
-          <button
-            onClick={onClose}
-            className="rounded-md border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => {
-              debounce(onConfirm, 500)();
-              onClose();
-            }}
-            className={confirmButtonClass}
-          >
-            {confirmText}
-          </button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}

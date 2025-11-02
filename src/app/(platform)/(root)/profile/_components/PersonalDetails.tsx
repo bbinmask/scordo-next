@@ -227,7 +227,7 @@ const PersonalDetails = ({
       </div>
 
       <FriendRequests className="absolute top-8 right-6" requests={requests} />
-      <FriendsModal friends={friends} />
+      <FriendsModal friends={friends} isOwnProfile />
     </div>
   );
 };
