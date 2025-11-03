@@ -172,8 +172,8 @@ const PersonalDetails = ({
                 <div className="">
                   <h2 className="mb-2 font-[cal_sans] text-3xl">Personal Information</h2>
                   <p className="mb-10 font-[urbanist] text-sm text-gray-500">
-                    Manage your personal information, including phone numers and email adress where
-                    you can be contacted
+                    Manage your personal information, including phone numbers and email address
+                    where you can be contacted
                   </p>
 
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

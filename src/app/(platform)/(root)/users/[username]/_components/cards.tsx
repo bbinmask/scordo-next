@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useMemo, useState } from "react";
 import { FaSuperpowers } from "react-icons/fa6";
-import { CheckCircle, UserPlus, UserCheck, Clock, Calendar, MapPin, Info } from "lucide-react";
+import { CheckCircle, UserPlus, Clock, Calendar, MapPin, Info, UserCheck2 } from "lucide-react";
 import { calculateAge } from "@/utils/helper/calculateAge";
 interface ProfileCardProps {
   user: User;
@@ -31,6 +31,7 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
 
   const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
     onSuccess: (data) => {
+      console.log(data);
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
   });
@@ -42,7 +43,7 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     onError: (err) => console.error(err),
   });
 
-  const { data: friends } = useQuery<Friendship[]>({
+  const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
     queryKey: ["friends"],
     queryFn: async () => {
       const res = await axios.get(`/api/users/friends`);
@@ -50,7 +51,7 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     },
   });
 
-  const { data: friendRequest } = useQuery<Friendship[]>({
+  const { data: friendRequest, isLoading: requestsLoading } = useQuery<Friendship[]>({
     queryKey: ["friend-requests", user.id],
     queryFn: async () => {
       const res = await axios.get(`/api/users/friends/requests/${user.id}`);
@@ -85,15 +86,17 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
       (fr) => fr.requesterId === currentUser.id || fr.addresseeId === currentUser.id
     );
 
+    console.log(friend);
+
     return friend ? "accepted" : "none";
   }, [friends, currentUser]);
 
-  const handleFriendRequest = () => {
-    if (requestStatus === "none" || requestStatus === "declined") {
+  const handleFriendRequest = (status: string) => {
+    if (status === "none" || status === "declined") {
       sendReq({ addresseeId: user.id, username: user.username });
-    } else if (requestStatus === "pending") {
+    } else if (status === "pending") {
       widthdrawReq({ addresseeId: user.id, username: user.username });
-    } else if (requestStatus === "accepted") {
+    } else if (status === "accepted") {
       deleteFriend({ addresseeId: user.id, username: user.username });
     }
   };
@@ -117,6 +120,8 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
       month: "long",
       day: "numeric",
     }).format(date);
+
+  console.log({ friendshipStatus, requestStatus });
 
   return (
     <div className="lg:col-span-1">
@@ -174,9 +179,13 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
           </div>
 
           {/* ✅ Friendship Button */}
-          <abbr title={requestStatus || friendshipStatus} className="absolute top-28 right-2">
+
+          <div title={requestStatus || friendshipStatus} className="absolute top-28 right-2">
             {(() => {
-              const status = requestStatus === "pending" ? "pending" : friendshipStatus;
+              const status = requestStatus === "none" ? friendshipStatus : requestStatus;
+
+              const loading =
+                isLoading || isDeleting || isWidthdrawing || friendsLoading || requestsLoading;
 
               const base =
                 "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
@@ -186,17 +195,18 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
                   : status === "pending"
                     ? `${base} cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
                     : status === "accepted"
-                      ? `${base} bg-red-600 px-4 text-white hover:bg-red-700`
+                      ? `${base} bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
                       : status === "blocked"
                         ? `${base} cursor-default bg-gray-400 text-white`
                         : `${base} cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white`;
 
-              // Define button label and icon
               const icon =
                 status === "none" ? (
                   <UserPlus className="h-4 w-4" />
                 ) : status === "pending" ? (
                   <Clock className="h-4 w-4" />
+                ) : status === "accepted" ? (
+                  <UserCheck2 className="h-4 w-4" />
                 ) : null;
 
               const label =
@@ -213,22 +223,22 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
               return (
                 <button
                   id="friendRequestBtn"
-                  onClick={handleFriendRequest}
-                  disabled={isLoading || isDeleting || isWidthdrawing || status === "pending"}
-                  className={classes}
+                  onClick={() => handleFriendRequest(status)}
+                  disabled={isLoading || isDeleting || isWidthdrawing}
+                  className={`${classes} center flex`}
                 >
-                  {isLoading || isDeleting || isWidthdrawing ? (
+                  {loading ? (
                     <Spinner />
                   ) : (
                     <>
                       {icon}
-                      <span className="text-sm">{label}</span>
+                      <span className="text-[10px]">{label}</span>
                     </>
                   )}
                 </button>
               );
             })()}
-          </abbr>
+          </div>
 
           {/* Info Section */}
           <div className="mt-6 space-y-4 border-t border-slate-200 pt-4 text-left dark:border-slate-700">

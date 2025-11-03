@@ -217,6 +217,15 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
   if (!addresseeId || !user) return { error: Error.BadRequest as unknown as string };
 
   let friends;
+
+  const friend = await db.friendship.findFirst({
+    where: {
+      OR: [
+        { requesterId: user.id, addresseeId: addresseeId },
+        { requesterId: addresseeId, addresseeId: user.id },
+      ],
+    },
+  });
   try {
     friends = await db.friendship.deleteMany({
       where: {
@@ -231,6 +240,8 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
       error: "Something went wrong",
     };
   }
+
+  console.log(friend);
 
   revalidatePath(`/users/${username}`);
   revalidatePath(`/profile`);
