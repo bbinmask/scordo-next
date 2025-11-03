@@ -1,6 +1,6 @@
 "use client";
 
-import { removeFriend, sendFriendRequest, widthdrawFriendRequest } from "@/actions/user-actions";
+import { removeFriend, sendFriendRequest, cancelFriendRequest } from "@/actions/user-actions";
 import Spinner from "@/components/Spinner";
 import { Availability, Friendship, Team, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
@@ -10,6 +10,9 @@ import { useMemo, useState } from "react";
 import { FaSuperpowers } from "react-icons/fa6";
 import { CheckCircle, UserPlus, Clock, Calendar, MapPin, Info, UserCheck2 } from "lucide-react";
 import { calculateAge } from "@/utils/helper/calculateAge";
+import { useConfirmModal } from "@/hooks/useConfirmModal";
+import { capitalize } from "lodash";
+import { toast } from "sonner";
 interface ProfileCardProps {
   user: User;
   currentUser: User;
@@ -22,8 +25,11 @@ interface DescriptionProps {
 export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
   const queryClient = useQueryClient();
 
+  const { confirmModalState, openConfirmModal } = useConfirmModal();
+
   const { execute: sendReq, isLoading } = useAction(sendFriendRequest, {
     onSuccess: (data) => {
+      toast.success("Request sent");
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
     onError: (err) => console.error(err),
@@ -31,22 +37,22 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
 
   const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
     onSuccess: (data) => {
-      console.log(data);
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
   });
 
-  const { execute: widthdrawReq, isLoading: isWidthdrawing } = useAction(widthdrawFriendRequest, {
+  const { execute: cancelReq, isLoading: isCanceling } = useAction(cancelFriendRequest, {
     onSuccess: (data) => {
+      toast.success("Request Cancelled");
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
     onError: (err) => console.error(err),
   });
 
   const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
-    queryKey: ["friends"],
+    queryKey: ["friends", user],
     queryFn: async () => {
-      const res = await axios.get(`/api/users/friends`);
+      const res = await axios.get(`/api/users/friends/${user.id}`);
       return res.data;
     },
   });
@@ -86,8 +92,6 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
       (fr) => fr.requesterId === currentUser.id || fr.addresseeId === currentUser.id
     );
 
-    console.log(friend);
-
     return friend ? "accepted" : "none";
   }, [friends, currentUser]);
 
@@ -95,7 +99,7 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     if (status === "none" || status === "declined") {
       sendReq({ addresseeId: user.id, username: user.username });
     } else if (status === "pending") {
-      widthdrawReq({ addresseeId: user.id, username: user.username });
+      cancelReq({ addresseeId: user.id, username: user.username });
     } else if (status === "accepted") {
       deleteFriend({ addresseeId: user.id, username: user.username });
     }
@@ -120,8 +124,6 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
       month: "long",
       day: "numeric",
     }).format(date);
-
-  console.log({ friendshipStatus, requestStatus });
 
   return (
     <div className="lg:col-span-1">
@@ -185,7 +187,7 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
               const status = requestStatus === "none" ? friendshipStatus : requestStatus;
 
               const loading =
-                isLoading || isDeleting || isWidthdrawing || friendsLoading || requestsLoading;
+                isLoading || isDeleting || isCanceling || friendsLoading || requestsLoading;
 
               const base =
                 "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
@@ -223,8 +225,20 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
               return (
                 <button
                   id="friendRequestBtn"
-                  onClick={() => handleFriendRequest(status)}
-                  disabled={isLoading || isDeleting || isWidthdrawing}
+                  onClick={() => {
+                    if (status === "none") {
+                      handleFriendRequest(status);
+                    } else if (status !== "declined" && status !== "blocked") {
+                      const action =
+                        status === "accepted" ? "remove this friend" : "cancel the request";
+                      openConfirmModal({
+                        title: capitalize(status),
+                        description: `Are you want to ${action}?`,
+                        onConfirm: () => handleFriendRequest(status),
+                      });
+                    }
+                  }}
+                  disabled={isLoading || isDeleting || isCanceling}
                   className={`${classes} center flex`}
                 >
                   {loading ? (

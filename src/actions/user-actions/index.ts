@@ -182,7 +182,7 @@ const acceptRequestHandler = async (
   return { data: request };
 };
 
-const widthdrawRequestHanlder = async (
+const cancelFriendRequestHandler = async (
   data: InputSentRequestType
 ): Promise<ReturnSentRequestType> => {
   const { addresseeId, username } = data;
@@ -241,8 +241,6 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
     };
   }
 
-  console.log(friend);
-
   revalidatePath(`/users/${username}`);
   revalidatePath(`/profile`);
   return { data: friends };
@@ -256,6 +254,6 @@ export const sendFriendRequest = createSafeAction(SentRequest, sendFriendRequest
 
 export const acceptRequest = createSafeAction(RecievedRequest, acceptRequestHandler);
 
-export const widthdrawFriendRequest = createSafeAction(SentRequest, widthdrawRequestHanlder);
+export const cancelFriendRequest = createSafeAction(SentRequest, cancelFriendRequestHandler);
 
 export const removeFriend = createSafeAction(SentRequest, removeFriendHandler);

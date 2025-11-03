@@ -36,6 +36,7 @@ export async function GET(_: Request, { params }: Params) {
         updatedAt: true,
       },
     });
+
     return NextResponse.json(requests);
   } catch (error) {
     return NextResponse.error();

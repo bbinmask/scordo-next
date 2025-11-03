@@ -1,18 +1,16 @@
-import { currentUser } from "@/lib/currentUser";
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET(req: Request, { params }: { params: Promise<{ userId?: string }> }) {
+  const { userId } = await params;
   try {
-    const user = await currentUser();
-
-    if (!user) return NextResponse.error();
+    console.log(userId);
+    if (!userId) return NextResponse.error();
 
     const friends = await db.friendship.findMany({
       where: {
         status: "ACCEPTED",
-        OR: [{ addresseeId: user.id }, { requesterId: user.id }],
+        OR: [{ addresseeId: userId }, { requesterId: userId }],
       },
       include: {
         addressee: {
