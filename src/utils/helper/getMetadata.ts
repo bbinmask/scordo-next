@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export function getMetadata(
   title = "Scordo",
   description = "Scordo app is to manage your cricket scores.",
-  image: string | undefined = undefined
+  image: string | undefined = "/logo.svg"
 ): Metadata {
   return {
     title,

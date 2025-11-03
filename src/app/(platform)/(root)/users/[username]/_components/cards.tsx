@@ -8,21 +8,62 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useMemo, useState } from "react";
 import { FaSuperpowers } from "react-icons/fa6";
-import { CheckCircle, UserPlus, Clock, Calendar, MapPin, Info, UserCheck2 } from "lucide-react";
+import {
+  CheckCircle,
+  UserPlus,
+  Clock,
+  Calendar,
+  MapPin,
+  Info,
+  UserCheck2,
+  Users,
+} from "lucide-react";
 import { calculateAge } from "@/utils/helper/calculateAge";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { capitalize } from "lodash";
 import { toast } from "sonner";
+import FriendsModal from "@/components/modals/FriendsModal";
+import { useFriendsModal } from "@/hooks/store/use-friends";
+import { FriendshipWithBoth } from "@/lib/types";
+import { getFriends } from "@/utils/helper/getFriends";
+
 interface ProfileCardProps {
+  user: User;
+  currentUser: User;
+  friends: Friendship[] | [];
+}
+
+interface UserProfilePage {
   user: User;
   currentUser: User;
 }
 
 interface DescriptionProps {
   user: User;
+  friends: any;
+  currentUser: User;
 }
 
-export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
+export default function UserProfile({ user, currentUser }: UserProfilePage) {
+  const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
+    queryKey: ["friends", user],
+    queryFn: async () => {
+      const res = await axios.get(`/api/users/friends/${user.id}`);
+      return res.data;
+    },
+  });
+
+  return (
+    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
+      <ProfileCard friends={friends || []} currentUser={currentUser} user={user} />
+      <div className="lg:col-span-2">
+        <Description currentUser={currentUser} user={user} friends={friends} />
+      </div>
+    </div>
+  );
+}
+
+export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) => {
   const queryClient = useQueryClient();
 
   const { confirmModalState, openConfirmModal } = useConfirmModal();
@@ -49,13 +90,13 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
     onError: (err) => console.error(err),
   });
 
-  const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
-    queryKey: ["friends", user],
-    queryFn: async () => {
-      const res = await axios.get(`/api/users/friends/${user.id}`);
-      return res.data;
-    },
-  });
+  // const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
+  //   queryKey: ["friends", user],
+  //   queryFn: async () => {
+  //     const res = await axios.get(`/api/users/friends/${user.id}`);
+  //     return res.data;
+  //   },
+  // });
 
   const { data: friendRequest, isLoading: requestsLoading } = useQuery<Friendship[]>({
     queryKey: ["friend-requests", user.id],
@@ -186,8 +227,7 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
             {(() => {
               const status = requestStatus === "none" ? friendshipStatus : requestStatus;
 
-              const loading =
-                isLoading || isDeleting || isCanceling || friendsLoading || requestsLoading;
+              const loading = isLoading || isDeleting || isCanceling || requestsLoading;
 
               const base =
                 "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
@@ -233,7 +273,7 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
                         status === "accepted" ? "remove this friend" : "cancel the request";
                       openConfirmModal({
                         title: capitalize(status),
-                        description: `Are you want to ${action}?`,
+                        description: `Are you sure you want to ${action}?`,
                         onConfirm: () => handleFriendRequest(status),
                       });
                     }
@@ -283,8 +323,11 @@ export const ProfileCard = ({ user, currentUser }: ProfileCardProps) => {
   );
 };
 
-export const Description = ({ user }: DescriptionProps) => {
-  const [activeTab, setActiveTab] = useState("about");
+type TabProps = "about" | "teams" | "stats" | "friends";
+
+export const Description = ({ currentUser, user, friends }: DescriptionProps) => {
+  const [activeTab, setActiveTab] = useState<TabProps>("about");
+  const { onOpen } = useFriendsModal();
   const userTeams: any = [];
   const renderTabContent = () => {
     switch (activeTab) {
@@ -294,14 +337,21 @@ export const Description = ({ user }: DescriptionProps) => {
         return <TeamsCard teams={userTeams} />;
       case "stats":
         return <StatsCard />;
+      case "friends":
+        return <FriendsCard user={user} friendships={friends} currentUser={currentUser} />;
       default:
         return null;
     }
   };
 
-  const TabButton = ({ name, label }: any) => (
+  const TabButton = ({ name, label }: { name: TabProps; label: string }) => (
     <button
-      onClick={() => setActiveTab(name)}
+      onClick={() => {
+        if (name === "friends") {
+          onOpen();
+        }
+        setActiveTab(name);
+      }}
       className={`relative rounded-md px-4 py-2 text-sm font-semibold transition-colors duration-200 ${
         activeTab === name
           ? "text-green-600 dark:text-white"
@@ -322,6 +372,7 @@ export const Description = ({ user }: DescriptionProps) => {
           <TabButton name="about" label="About" />
           <TabButton name="teams" label="Teams" />
           <TabButton name="stats" label="Career Stats" />
+          <TabButton name="friends" label="Friends List" />
         </nav>
       </div>
       <div className="min-h-[300px] p-6 font-[poppins]">{renderTabContent()}</div>
@@ -427,6 +478,75 @@ export const StatsCard = () => {
       <Info className="mx-auto mb-4 h-12 w-12 text-slate-400 dark:text-slate-500" />
       <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Coming Soon!</h3>
       <p className="secondary-text mt-1">Detailed career statistics will be available here soon.</p>
+    </div>
+  );
+};
+
+export const FriendsCard = ({
+  friendships,
+  currentUser,
+  user,
+}: {
+  friendships: FriendshipWithBoth[];
+  currentUser: User;
+  user: User;
+}) => {
+  const friends = getFriends(friendships, user.id);
+
+  return (
+    <div onClick={(e) => e.stopPropagation()} className="overflow-hidden">
+      <div className="border-b p-4">
+        <h1 className="flex items-center text-xl font-semibold">
+          <Users className="mr-2 h-6 w-6" />
+          Friends
+        </h1>
+      </div>
+
+      {/* Friend List */}
+      <div className="w-full overflow-y-auto p-4">
+        {friends.length === 0 ? (
+          <p className="py-4 text-center">You don't have any friends yet.</p>
+        ) : (
+          <ul className="space-y-3">
+            {friends.map((friend) => {
+              const you = currentUser.id === friend.id;
+              console.log({ friend }, { currentUser });
+
+              return (
+                <li
+                  key={friend.id}
+                  className="flex w-full items-center justify-between bg-gray-50 hover:opacity-80 dark:bg-gray-800"
+                >
+                  <a
+                    href={you ? "/profile" : `/users/${friend.username}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                    }}
+                    className="relative flex items-center rounded-md p-2 transition"
+                  >
+                    <img
+                      src={friend.avatar || "/user.svg"}
+                      alt={`${friend.name}'s avatar`}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                    <div className="ml-3 font-[poppins]">
+                      <p className="primary-text font-medium">{friend.name}</p>
+                      <p className="text-sm text-gray-500">@{friend.username}</p>
+                    </div>
+                    {you && (
+                      <span className="primary-text absolute top-4 -right-4 text-[8px]">
+                        {"(You)"}
+                      </span>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

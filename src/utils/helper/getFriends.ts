@@ -12,7 +12,7 @@ export const getFriends = (friendships: FriendshipWithBoth[], userId: string): U
 };
 
 export const getFriendRequests = (friendships: FriendshipWithBoth[], userId: string) => {
-  if (friendships.length === 0) return [];
+  if (friendships.length === 0 || !friendships) return [];
 
   const requests = friendships.map((fr) => {
     if (fr.addresseeId === userId) return { ...fr, addressee: null };

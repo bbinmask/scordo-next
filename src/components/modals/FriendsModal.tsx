@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 interface FriendsModalProps {
   friends: User[];
-  isOwnProfile: boolean;
+  isOwnProfile?: boolean;
 }
 const FriendsModal = ({ friends, isOwnProfile }: FriendsModalProps) => {
   const { isOpen, onClose } = useFriendsModal();
