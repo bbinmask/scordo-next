@@ -218,14 +218,6 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
 
   let friends;
 
-  const friend = await db.friendship.findFirst({
-    where: {
-      OR: [
-        { requesterId: user.id, addresseeId: addresseeId },
-        { requesterId: addresseeId, addresseeId: user.id },
-      ],
-    },
-  });
   try {
     friends = await db.friendship.deleteMany({
       where: {

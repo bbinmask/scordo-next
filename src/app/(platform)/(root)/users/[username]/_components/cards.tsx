@@ -6,7 +6,7 @@ import { Availability, Friendship, Team, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaSuperpowers } from "react-icons/fa6";
 import {
   CheckCircle,
@@ -22,11 +22,12 @@ import { calculateAge } from "@/utils/helper/calculateAge";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { capitalize } from "lodash";
 import { toast } from "sonner";
-import FriendsModal from "@/components/modals/FriendsModal";
 import { useFriendsModal } from "@/hooks/store/use-friends";
 import { FriendshipWithBoth } from "@/lib/types";
 import { getFriends } from "@/utils/helper/getFriends";
-
+import { formatDate } from "@/utils/helper/formatDate";
+import ConfirmModal from "@/components/modals/ConfirmModal";
+import { getAvailabilityClass } from "@/utils/helper/classes";
 interface ProfileCardProps {
   user: User;
   currentUser: User;
@@ -46,12 +47,14 @@ interface DescriptionProps {
 
 export default function UserProfile({ user, currentUser }: UserProfilePage) {
   const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
-    queryKey: ["friends", user],
+    queryKey: ["friends"],
     queryFn: async () => {
       const res = await axios.get(`/api/users/friends/${user.id}`);
       return res.data;
     },
   });
+
+  console.log(friends);
 
   return (
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
@@ -66,7 +69,7 @@ export default function UserProfile({ user, currentUser }: UserProfilePage) {
 export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) => {
   const queryClient = useQueryClient();
 
-  const { confirmModalState, openConfirmModal } = useConfirmModal();
+  const { confirmModalState, openConfirmModal, closeConfirmModal } = useConfirmModal();
 
   const { execute: sendReq, isLoading } = useAction(sendFriendRequest, {
     onSuccess: (data) => {
@@ -77,11 +80,10 @@ export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) =>
   });
 
   const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
+    onSuccess: (_) => {
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
   });
-
   const { execute: cancelReq, isLoading: isCanceling } = useAction(cancelFriendRequest, {
     onSuccess: (data) => {
       toast.success("Request Cancelled");
@@ -128,13 +130,7 @@ export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) =>
     }
   }, [friendRequest, currentUser.id]);
 
-  const friendshipStatus: "accepted" | "none" = useMemo(() => {
-    const friend = friends?.find(
-      (fr) => fr.requesterId === currentUser.id || fr.addresseeId === currentUser.id
-    );
-
-    return friend ? "accepted" : "none";
-  }, [friends, currentUser]);
+  const [friendshipStatus, setFriendshipStatus] = useState<"accepted" | "none">("none");
 
   const handleFriendRequest = (status: string) => {
     if (status === "none" || status === "declined") {
@@ -146,25 +142,13 @@ export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) =>
     }
   };
 
-  const getAvailabilityClass = (availability: Availability) => {
-    switch (availability) {
-      case "available":
-        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300";
-      case "injured":
-        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300";
-      case "on_break":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300";
-      default:
-        return "bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200";
-    }
-  };
+  useEffect(() => {
+    const friend = friends?.find(
+      (fr) => fr.requesterId === currentUser.id || fr.addresseeId === currentUser.id
+    );
 
-  const formatDate = (date: Date) =>
-    new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(date);
+    setFriendshipStatus(friend ? "accepted" : "none");
+  }, [friends, currentUser]);
 
   return (
     <div className="lg:col-span-1">
@@ -266,9 +250,9 @@ export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) =>
                 <button
                   id="friendRequestBtn"
                   onClick={() => {
-                    if (status === "none") {
+                    if (status === "none" || status === "declined") {
                       handleFriendRequest(status);
-                    } else if (status !== "declined" && status !== "blocked") {
+                    } else if (status !== "blocked") {
                       const action =
                         status === "accepted" ? "remove this friend" : "cancel the request";
                       openConfirmModal({
@@ -319,6 +303,7 @@ export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) =>
           </div>
         </div>
       </div>
+      <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
     </div>
   );
 };

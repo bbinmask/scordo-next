@@ -7,7 +7,7 @@ import UserProfile, {
   TeamsCard,
 } from "./_components/cards";
 import { db } from "@/lib/db";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { currentUser as getCurrentUser } from "@/lib/currentUser";
 
 interface UserIdProps {
@@ -31,6 +31,10 @@ const UserIdPage = async ({ params }: UserIdProps) => {
   const currentUser = await getCurrentUser();
 
   if (!user || !currentUser) return notFound();
+
+  if (user.id === currentUser.id) {
+    redirect("/profile");
+  }
 
   return (
     <div className="min-h-[400px] w-full pt-2">
