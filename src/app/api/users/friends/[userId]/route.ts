@@ -18,6 +18,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ userId?:
             name: true,
             username: true,
             id: true,
+            avatar: true,
           },
         },
         requester: {
@@ -25,6 +26,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ userId?:
             name: true,
             username: true,
             id: true,
+            avatar: true,
           },
         },
       },

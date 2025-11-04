@@ -54,8 +54,6 @@ export default function UserProfile({ user, currentUser }: UserProfilePage) {
     },
   });
 
-  console.log(friends);
-
   return (
     <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
       <ProfileCard friends={friends || []} currentUser={currentUser} user={user} />
@@ -76,7 +74,7 @@ export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) =>
       toast.success("Request sent");
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
-    onError: (err) => console.error(err),
+    onError: (err) => toast.error(err),
   });
 
   const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
@@ -89,16 +87,8 @@ export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) =>
       toast.success("Request Cancelled");
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
-    onError: (err) => console.error(err),
+    onError: (err) => toast.error(err),
   });
-
-  // const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
-  //   queryKey: ["friends", user],
-  //   queryFn: async () => {
-  //     const res = await axios.get(`/api/users/friends/${user.id}`);
-  //     return res.data;
-  //   },
-  // });
 
   const { data: friendRequest, isLoading: requestsLoading } = useQuery<Friendship[]>({
     queryKey: ["friend-requests", user.id],
@@ -360,7 +350,9 @@ export const Description = ({ currentUser, user, friends }: DescriptionProps) =>
           <TabButton name="friends" label="Friends List" />
         </nav>
       </div>
-      <div className="min-h-[300px] p-6 font-[poppins]">{renderTabContent()}</div>
+      <div className="min-h-[300px] overflow-y-auto p-6 font-[poppins] lg:max-h-[450px]">
+        {renderTabContent()}
+      </div>
     </div>
   );
 };
@@ -476,7 +468,129 @@ export const FriendsCard = ({
   currentUser: User;
   user: User;
 }) => {
-  const friends = getFriends(friendships, user.id);
+  // const friends = getFriends(friendships, user.id);
+  const friends = [
+    {
+      name: "Irfanul Madar",
+      username: "irfanulmadar",
+      id: "68bfff1352d145237486a875",
+      avatar: "https://localhost/api/portraits/men/1.jpg",
+    },
+    {
+      name: "Ayaan Khan",
+      username: "ayaankhan",
+      id: "a14c2bfc93c5462a9d2a33a1",
+      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
+    },
+    {
+      name: "Sofia Rahman",
+      username: "sofiarahman",
+      id: "b52a99f27e9c478ab7d0213c",
+      avatar: "https://randomuser.me/api/portraits/women/3.jpg",
+    },
+    {
+      name: "Hamza Ali",
+      username: "hamzaali",
+      id: "cf96b112e8a84e729d66f009",
+      avatar: "https://randomuser.me/api/portraits/men/4.jpg",
+    },
+    {
+      name: "Fatima Noor",
+      username: "fatimanoor",
+      id: "db8f38c22f53422a9121d56b",
+      avatar: "https://randomuser.me/api/portraits/women/5.jpg",
+    },
+    {
+      name: "Omar Siddiqui",
+      username: "omarsiddiqui",
+      id: "e62f932c38b64a6bb2a3b765",
+      avatar: "https://randomuser.me/api/portraits/men/6.jpg",
+    },
+    {
+      name: "Aisha Patel",
+      username: "aishapatel",
+      id: "f431b9c04a7b47f19a21e892",
+      avatar: "https://randomuser.me/api/portraits/women/7.jpg",
+    },
+    {
+      name: "Yusuf Ahmed",
+      username: "yusufahmed",
+      id: "012f67dc28a44d2b8b79c1a4",
+      avatar: "https://randomuser.me/api/portraits/men/8.jpg",
+    },
+    {
+      name: "Zara Sheikh",
+      username: "zarasheikh",
+      id: "1a8e25cf94b948ce9de215f0",
+      avatar: "https://randomuser.me/api/portraits/women/9.jpg",
+    },
+    {
+      name: "Bilal Khan",
+      username: "bilalkhan",
+      id: "2e6cba0d03d14abbb03f33d7",
+      avatar: "https://randomuser.me/api/portraits/men/10.jpg",
+    },
+    {
+      name: "Maryam Ali",
+      username: "maryamali",
+      id: "34f8b1f52e024ba19d5d9084",
+      avatar: "https://randomuser.me/api/portraits/women/11.jpg",
+    },
+    {
+      name: "Imran Hussain",
+      username: "imranhussain",
+      id: "4c9f6e0d5bca45f4a234765d",
+      avatar: "https://randomuser.me/api/portraits/men/12.jpg",
+    },
+    {
+      name: "Layla Ahmed",
+      username: "laylaahmed",
+      id: "59de32bf18e641c9b765aa12",
+      avatar: "https://randomuser.me/api/portraits/women/13.jpg",
+    },
+    {
+      name: "Salman Qureshi",
+      username: "salmanqureshi",
+      id: "6f3b7e29ab7f47b98ac2ff09",
+      avatar: "https://randomuser.me/api/portraits/men/14.jpg",
+    },
+    {
+      name: "Hiba Ansari",
+      username: "hibaansari",
+      id: "7d41e62c3e3e4581b2bba894",
+      avatar: "https://randomuser.me/api/portraits/women/15.jpg",
+    },
+    {
+      name: "Rayan Malik",
+      username: "rayanmalik",
+      id: "8e2f5d7b4c8b4292c9a1bda7",
+      avatar: "https://randomuser.me/api/portraits/men/16.jpg",
+    },
+    {
+      name: "Nadia Khan",
+      username: "nadiakhan",
+      id: "9bdf1a5a43f44b1cb82dce42",
+      avatar: "https://randomuser.me/api/portraits/women/17.jpg",
+    },
+    {
+      name: "Tariq Mahmood",
+      username: "tariqmahmood",
+      id: "a8e4f7b23b9242d1a75f0041",
+      avatar: "https://randomuser.me/api/portraits/men/18.jpg",
+    },
+    {
+      name: "Sara Iqbal",
+      username: "saraiqbal",
+      id: "b5c7a0e99e9b4708a09dd664",
+      avatar: "https://randomuser.me/api/portraits/women/19.jpg",
+    },
+    {
+      name: "Farhan Sheikh",
+      username: "farhansheikh",
+      id: "c3b42e1d5c3843f0b7d84f91",
+      avatar: "https://randomuser.me/api/portraits/men/20.jpg",
+    },
+  ];
 
   return (
     <div onClick={(e) => e.stopPropagation()} className="overflow-hidden">
@@ -495,7 +609,6 @@ export const FriendsCard = ({
           <ul className="space-y-3">
             {friends.map((friend) => {
               const you = currentUser.id === friend.id;
-              console.log({ friend }, { currentUser });
 
               return (
                 <li
@@ -510,10 +623,14 @@ export const FriendsCard = ({
                     className="relative flex items-center rounded-md p-2 transition"
                   >
                     <img
-                      src={friend.avatar || "/user.svg"}
+                      src={friend?.avatar || "/user.svg"}
                       alt={`${friend.name}'s avatar`}
                       width={40}
                       height={40}
+                      onError={(e) => {
+                        e.currentTarget.src = "/user.svg";
+                        e.currentTarget.onerror = null;
+                      }}
                       className="rounded-full"
                     />
                     <div className="ml-3 font-[poppins]">
