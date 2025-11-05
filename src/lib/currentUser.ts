@@ -12,6 +12,9 @@ export const currentUser = async () => {
     where: {
       clerkId: userId,
     },
+    include: {
+      teamsOwned: true,
+    },
   });
 
   if (!user) return null;
