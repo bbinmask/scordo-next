@@ -19,8 +19,9 @@ import { Role, Team } from "@/generated/prisma";
 import { FriendshipWithBoth, TeamRequestWithDetails } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import Spinner from "@/components/Spinner";
+import { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
+import { ActionButton } from "@/components/ActionButton";
 
 const TeamType = {
   local: "local",
@@ -109,7 +110,7 @@ const mockDashboardData = {
 
 function TeamCard({ team, role }: { team: Team; role: Role }) {
   const roleColors = {
-    Owner: "bg-blue-100 text-blue-800",
+    Owner: "bg-green-100 text-green-800",
     Captain: "bg-green-100 text-green-800",
     Player: " text-gray-800",
   };
@@ -144,7 +145,7 @@ function TeamCard({ team, role }: { team: Team; role: Role }) {
         </span>
         <button
           onClick={handleViewTeam}
-          className="flex items-center text-sm font-semibold text-blue-600 transition-colors hover:text-blue-800"
+          className="flex items-center text-sm font-semibold text-green-600 transition-colors hover:text-green-800"
         >
           View Team
           <ArrowRight size={16} className="ml-1" />
@@ -165,16 +166,16 @@ function YourTeamsSection({
   const playerTeams = [...teamsAsPlayer];
 
   return (
-    <div className="rounded-lg p-6 shadow-lg">
+    <div className="p-6">
       <h2 className="mb-5 flex items-center text-2xl font-bold text-gray-800">
-        <Users size={24} className="mr-3 text-blue-600" />
+        <Users size={24} className="mr-3 text-green-600" />
         Your Teams
       </h2>
 
       {/* Managed Teams */}
       {managedTeams.length > 0 && (
         <div className="mb-6">
-          <h3 className="mb-3 text-lg font-semibold text-gray-700">Managed by You</h3>
+          <h3 className="secondary-text mb-3 text-lg font-semibold">Managed by You</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {managedTeams.map((team) => (
               <TeamCard key={team.id} team={team} role={team.role} />
@@ -186,7 +187,7 @@ function YourTeamsSection({
       {/* Player Teams */}
       {playerTeams.length > 0 && (
         <div>
-          <h3 className="mb-3 text-lg font-semibold text-gray-700">Your Player Hub</h3>
+          <h3 className="secondary-text mb-3 text-lg font-semibold">Your Player Hub</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {playerTeams.map((team) => (
               <TeamCard key={team.id} team={team} role={team.role} />
@@ -209,20 +210,19 @@ function CreateTeamCard() {
   };
 
   return (
-    <div className="rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 p-6 text-white shadow-lg">
-      <h2 className="mb-3 flex items-center text-xl font-bold">
+    <div className="rounded-lg bg-gradient-to-br from-green-600 to-emerald-800 p-6 text-white shadow-lg">
+      <h2 className="mb-2 flex items-center font-[cal_sans] text-xl font-bold text-gray-50">
         <PlusCircle size={22} className="mr-2" />
         Create a New Team
       </h2>
-      <p className="mb-4 text-sm text-blue-100">
+      <p className="mb-4 font-[urbanist] text-sm font-medium tracking-wide text-green-100">
         Start your own legacy. Build a team from the ground up and recruit players.
       </p>
-      <button
+      <ActionButton
+        title="Get Started"
         onClick={handleCreateTeam}
-        className="hover: w-full rounded-lg px-4 py-2 font-bold text-blue-700 shadow transition"
-      >
-        Get Started
-      </button>
+        className="w-full rounded-lg bg-transparent px-4 py-2 text-center font-[urbanist] font-bold shadow transition hover:shadow-md"
+      />
     </div>
   );
 }
@@ -365,51 +365,52 @@ const TeamsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Spinner />
+      <div className="min-h flex items-center justify-center">
+        <DefaultLoader className="primary-heading" />
       </div>
     );
   }
 
   if (!dashboardData) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="min-h flex items-center justify-center">
         <NotFoundParagraph description="Could not load dashboard data." />
       </div>
     );
   }
 
   return (
-    <div className="font-inter min-h-screen p-4 md:p-8">
-      <div className="mx-auto max-w-7xl">
-        {/* Dashboard Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Teams Dashboard</h1>
-          <p className="text-lg text-gray-600">Welcome back, {dashboardData.user.name}!</p>
+    <div className="mx-auto mt-4">
+      {/* Dashboard Header */}
+      <div className="mb-6">
+        <h1 className="font-[poppins] text-4xl font-extrabold">
+          <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
+            Teams
+          </span>
+        </h1>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="container-bg grid grid-cols-1 gap-6 rounded-xl lg:grid-cols-3">
+        {/* Main Column */}
+        <div className="space-y-6 lg:col-span-2">
+          <YourTeamsSection
+            teamsAsOwner={dashboardData.teamsAsOwner}
+            teamsAsPlayer={dashboardData.teamsAsPlayer}
+          />
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Main Column */}
-          <div className="space-y-6 lg:col-span-2">
-            <YourTeamsSection
-              teamsAsOwner={dashboardData.teamsAsOwner}
-              teamsAsPlayer={dashboardData.teamsAsPlayer}
-            />
-          </div>
-
-          {/* Sidebar Column */}
-          <div className="space-y-6 lg:col-span-1">
-            <CreateTeamCard />
-            <InvitationsWidget
-              teamInvites={dashboardData.teamInvitations}
-              friendRequests={dashboardData.friendRequests}
-              onAccept={handleAcceptInvite}
-              onDecline={handleDeclineInvite}
-              onAcceptFriend={handleAcceptFriend}
-              onDeclineFriend={handleDeclineFriend}
-            />
-          </div>
+        {/* Sidebar Column */}
+        <div className="space-y-6 lg:col-span-1">
+          <CreateTeamCard />
+          <InvitationsWidget
+            teamInvites={dashboardData.teamInvitations}
+            friendRequests={dashboardData.friendRequests}
+            onAccept={handleAcceptInvite}
+            onDecline={handleDeclineInvite}
+            onAcceptFriend={handleAcceptFriend}
+            onDeclineFriend={handleDeclineFriend}
+          />
         </div>
       </div>
     </div>

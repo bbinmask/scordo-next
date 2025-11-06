@@ -146,6 +146,10 @@
   }
 }
 
+.min-h {
+  @apply min-h-[calc(100vh-200px)];
+}
+
 .primary-background {
   @apply bg-gradient-to-r from-emerald-700 to-green-900 dark:from-gray-900 dark:to-emerald-950;
 }

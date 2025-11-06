@@ -1,6 +1,5 @@
 "use client";
 
-import { MoonLoader } from "react-spinners";
 import { NewCard } from "./_components/Card";
 import { CarouselSpacing } from "./_components/CarouselSpacing";
 import { BarChart2, Newspaper, Users, Video } from "lucide-react";
@@ -12,6 +11,7 @@ import { VideoList } from "../_components/VideoList";
 import HeroSection from "../_components/Hero";
 import AxiosRequest from "@/utils/AxiosResponse";
 import { useQuery } from "@tanstack/react-query";
+import { DefaultLoader } from "@/components/Spinner";
 
 const cardData = [
   {
@@ -45,7 +45,7 @@ const DashboardPage = () => {
   });
 
   if (isLoading) {
-    return <MoonLoader className="animate-spin text-black" />;
+    return <DefaultLoader />;
   }
 
   return (

@@ -1,27 +1,10 @@
+import { ActionButton } from "@/components/ActionButton";
 import { UserWithTeamsProps } from "@/lib/types";
 import AxiosRequest from "@/utils/AxiosResponse";
 import { useQuery } from "@tanstack/react-query";
 import { LucideProps, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
-
-interface QuickActionButtonProps {
-  title: string;
-  icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
-  href: string;
-}
-
-const QuickActionButton = ({ title, icon: Icon, href }: QuickActionButtonProps) => {
-  return (
-    <Link
-      href={href}
-      className="group flex items-center justify-between rounded-xl bg-slate-100 p-4 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:scale-[1.03] hover:bg-slate-200/60 hover:shadow-md dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-teal-500/10 dark:hover:ring-slate-600"
-    >
-      <span className="font-sans tracking-wide text-slate-700 dark:text-slate-300">{title}</span>
-      <Icon className="h-5 w-5 text-slate-500 transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400" />
-    </Link>
-  );
-};
 
 interface HeroSectionProps {
   user?: UserWithTeamsProps;
@@ -100,12 +83,8 @@ const HeroSection = ({ user }: HeroSectionProps) => {
 
           {/* Quick Actions */}
           <div className="flex flex-col justify-center space-y-4 md:col-span-2">
-            <QuickActionButton
-              title="Create a New Match"
-              icon={PlusCircle}
-              href="/matches/create"
-            />
-            <QuickActionButton title="Find a Player" icon={Search} href="/explore" />
+            <ActionButton title="Create a New Match" icon={PlusCircle} href="/matches/create" />
+            <ActionButton title="Find a Player" icon={Search} href="/explore" />
           </div>
         </div>
       </div>
