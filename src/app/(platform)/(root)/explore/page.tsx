@@ -29,6 +29,7 @@ import { searchTeams, searchTournaments, searchUsers } from "@/actions/search-ac
 import { useQuery } from "@tanstack/react-query";
 import AxiosRequest from "@/utils/AxiosResponse";
 import axios from "axios";
+import { ViewTeamCard } from "../_components/ViewTeamCard";
 
 const mockTournaments = [
   {
@@ -188,24 +189,6 @@ const PlayerCard = ({ player }: any) => (
   </div>
 );
 
-const TeamCard = ({ team }: any) => (
-  <div className="flex transform flex-col items-center rounded-xl border border-white/20 bg-white/30 p-4 text-center shadow-lg backdrop-blur-lg transition-transform duration-300 hover:-translate-y-2 dark:bg-white/10">
-    <img
-      src={team.logo}
-      alt={team.name}
-      className="h-24 w-24 rounded-full border-4 border-yellow-500 object-cover"
-    />
-    <h3 className="mt-4 text-lg font-bold text-gray-900 dark:text-white">{team.name}</h3>
-    <div className="mt-1 flex items-center text-sm text-gray-600 dark:text-gray-300">
-      <MapPin className="mr-1 h-4 w-4 text-yellow-500" />
-      <span>{team.location}</span>
-    </div>
-    <button className="mt-4 w-full rounded-full bg-green-500 px-4 py-2 text-center text-xs font-bold text-white transition-colors hover:bg-green-600">
-      View Team
-    </button>
-  </div>
-);
-
 const filters = [
   { label: "All", icon: Search },
   { label: "Users", icon: Users },
@@ -274,6 +257,119 @@ const ExplorePage = () => {
     router.replace(pathname);
   };
 
+  const teams = [
+    {
+      id: "t1a93b51e23d4f87bca1",
+      name: "Thunder Strikers",
+      description: "A fast-paced cricket team known for their aggressive batting.",
+      avatar: "https://i.pravatar.cc/150?img=11",
+      owner: {
+        id: "u1",
+        name: "Irfanul Madar",
+        username: "irfanulmadar",
+      },
+    },
+    {
+      id: "t2b84c62f34e5a98dcb2",
+      name: "Royal Challengers",
+      description: "Strong team with balanced players and fearless attitude.",
+      avatar: "https://i.pravatar.cc/150?img=12",
+      owner: {
+        id: "u2",
+        name: "Ayaan Khan",
+        username: "ayaankhan",
+      },
+    },
+    {
+      id: "t3c75d73g45f6b09edc3",
+      name: "Golden Warriors",
+      description: "Focused on teamwork and precision bowling.",
+      avatar: "https://i.pravatar.cc/150?img=13",
+      owner: {
+        id: "u3",
+        name: "Rahul Sharma",
+        username: "rahulsharma",
+      },
+    },
+    {
+      id: "t4d86e84h56g7c10fed4",
+      name: "Crimson Hawks",
+      description: "A team of young talents with unstoppable energy.",
+      avatar: "https://i.pravatar.cc/150?img=14",
+      owner: {
+        id: "u4",
+        name: "Adil Sheikh",
+        username: "adilsheikh",
+      },
+    },
+    {
+      id: "t5e97f95i67h8d21gfe5",
+      name: "Desert Kings",
+      description: "Champions of the desert with dominating spin attack.",
+      avatar: "https://i.pravatar.cc/150?img=15",
+      owner: {
+        id: "u5",
+        name: "Mohammed Saif",
+        username: "msaif",
+      },
+    },
+    {
+      id: "t6f08g06j78i9e32hgf6",
+      name: "Urban Titans",
+      description: "Smart strategies and consistent performance define this squad.",
+      avatar: "https://i.pravatar.cc/150?img=16",
+      owner: {
+        id: "u6",
+        name: "Rehan Ali",
+        username: "rehanali",
+      },
+    },
+    {
+      id: "t7g19h17k89j0f43ihg7",
+      name: "Storm Breakers",
+      description: "Fast bowlers who rule the game with sheer pace.",
+      avatar: "https://i.pravatar.cc/150?img=17",
+      owner: {
+        id: "u7",
+        name: "Naveed Ansari",
+        username: "naveedansari",
+      },
+    },
+    {
+      id: "t8h20i28l90k1g54jih8",
+      name: "Blue Panthers",
+      description: "Known for aggressive fielding and smart batting order.",
+      avatar: "https://i.pravatar.cc/150?img=18",
+      owner: {
+        id: "u8",
+        name: "Harish Mehta",
+        username: "harishmehta",
+      },
+    },
+    {
+      id: "t9i31j39m01l2h65kji9",
+      name: "Emerald Eagles",
+      description: "Focused on discipline, patience, and consistent growth.",
+      avatar: "https://i.pravatar.cc/150?img=19",
+      owner: {
+        id: "u9",
+        name: "Shoaib Malik",
+        username: "shoaibmalik",
+      },
+    },
+    {
+      id: "t10j42k40n12m3i76lkj0",
+      name: "Shadow Wolves",
+      description: "Silent but deadly — a team of unpredictable finishers.",
+      avatar: "https://i.pravatar.cc/150?img=20",
+      owner: {
+        id: "u10",
+        name: "Imran Qureshi",
+        username: "imranqureshi",
+      },
+    },
+  ];
+
   return (
     <div className="min-h-full rounded-xl font-sans transition-colors duration-500">
       <div className="relative mx-auto p-2">
@@ -304,6 +400,12 @@ const ExplorePage = () => {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        {teams.map((team) => (
+          <ViewTeamCard team={team} key={team.id} />
+        ))}
       </div>
 
       {query.trim() === "" ? (

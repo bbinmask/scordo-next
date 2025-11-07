@@ -12,7 +12,7 @@ interface TeamIdProps {
 }
 
 const TeamIdPage: React.FC<TeamIdProps> = () => {
-  const params: { teamId: string } = useParams();
+  const params: { abbr: string } = useParams();
 
   const {
     data: team,
@@ -21,7 +21,7 @@ const TeamIdPage: React.FC<TeamIdProps> = () => {
   } = useQuery({
     queryKey: ["team"],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/teams/${params.teamId}`);
+      const { data } = await axios.get(`/api/teams/${params.abbr}`);
       return data;
     },
   });

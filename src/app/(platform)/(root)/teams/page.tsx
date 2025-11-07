@@ -122,19 +122,19 @@ function TeamCard({ team, role }: { team: Team; role: Role }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl">
+    <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-gray-300 duration-300 hover:shadow-xl dark:ring-gray-600">
       <div className="flex items-center space-x-4 p-5">
         <img
           src={team?.logo || undefined}
           alt={`${team.name} logo`}
           className="h-20 w-20 rounded-full border-2 border-gray-100"
-          onError={(e) =>
-            (e.currentTarget.src = "https://placehold.co/100x100/CCCCCC/FFFFFF?text=T")
-          }
+          onError={(e) => (e.currentTarget.src = "/team.svg")}
         />
         <div>
-          <h3 className="text-xl font-bold text-gray-800">{team.name}</h3>
-          <p className="text-sm text-gray-500">@{team.abbreviation}</p>
+          <h3 className="primary-text font-[urbanist] text-lg font-black tracking-tight">
+            {team.name}
+          </h3>
+          <p className="secondary-text font-[poppins] text-sm">@{team.abbreviation}</p>
         </div>
       </div>
       <div className="flex items-center justify-between px-5 pb-4">
@@ -221,7 +221,8 @@ function CreateTeamCard() {
       <ActionButton
         title="Get Started"
         onClick={handleCreateTeam}
-        className="w-full rounded-lg bg-transparent px-4 py-2 text-center font-[urbanist] font-bold shadow transition hover:shadow-md"
+        className="w-full rounded-lg bg-green-100 px-4 py-2 text-center font-[urbanist] font-bold shadow ring-0 transition hover:shadow-md dark:bg-gray-200 dark:hover:bg-gray-200"
+        spanClasses="text-gray-800 dark:text-gray-800"
       />
     </div>
   );
