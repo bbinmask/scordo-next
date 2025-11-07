@@ -22,6 +22,7 @@ import axios from "axios";
 import { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { ActionButton } from "@/components/ActionButton";
+import { ViewTeamCard } from "../_components/ViewTeamCard";
 
 const TeamType = {
   local: "local",
@@ -108,53 +109,6 @@ const mockDashboardData = {
   friendRequests: mockFriendRequests,
 };
 
-function TeamCard({ team, role }: { team: Team; role: Role }) {
-  const roleColors = {
-    Owner: "bg-green-100 text-green-800",
-    Captain: "bg-green-100 text-green-800",
-    Player: " text-gray-800",
-  };
-
-  const handleViewTeam = () => {
-    // In a real app, this would use a router:
-    // navigate(`/teams/${team.id}`);
-    alert(`Navigating to ${team.name}'s page...`);
-  };
-
-  return (
-    <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-gray-300 duration-300 hover:shadow-xl dark:ring-gray-600">
-      <div className="flex items-center space-x-4 p-5">
-        <img
-          src={team?.logo || undefined}
-          alt={`${team.name} logo`}
-          className="h-20 w-20 rounded-full border-2 border-gray-100"
-          onError={(e) => (e.currentTarget.src = "/team.svg")}
-        />
-        <div>
-          <h3 className="primary-text font-[urbanist] text-lg font-black tracking-tight">
-            {team.name}
-          </h3>
-          <p className="secondary-text font-[poppins] text-sm">@{team.abbreviation}</p>
-        </div>
-      </div>
-      <div className="flex items-center justify-between px-5 pb-4">
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${roleColors[role] || roleColors.Player}`}
-        >
-          {role}
-        </span>
-        <button
-          onClick={handleViewTeam}
-          className="flex items-center text-sm font-semibold text-green-600 transition-colors hover:text-green-800"
-        >
-          View Team
-          <ArrowRight size={16} className="ml-1" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function YourTeamsSection({
   teamsAsOwner,
   teamsAsPlayer,
@@ -167,7 +121,7 @@ function YourTeamsSection({
 
   return (
     <div className="p-6">
-      <h2 className="mb-5 flex items-center text-2xl font-bold text-gray-800">
+      <h2 className="primary-text mb-5 flex items-center text-2xl font-bold">
         <Users size={24} className="mr-3 text-green-600" />
         Your Teams
       </h2>
@@ -178,7 +132,7 @@ function YourTeamsSection({
           <h3 className="secondary-text mb-3 text-lg font-semibold">Managed by You</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {managedTeams.map((team) => (
-              <TeamCard key={team.id} team={team} role={team.role} />
+              <ViewTeamCard key={team.id} team={team} />
             ))}
           </div>
         </div>
@@ -187,10 +141,10 @@ function YourTeamsSection({
       {/* Player Teams */}
       {playerTeams.length > 0 && (
         <div>
-          <h3 className="secondary-text mb-3 text-lg font-semibold">Your Player Hub</h3>
+          <h3 className="secondary-text mb-3 text-lg font-semibold">All Teams</h3>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {playerTeams.map((team) => (
-              <TeamCard key={team.id} team={team} role={team.role} />
+              <ViewTeamCard key={team.id} team={team} role={team.role} />
             ))}
           </div>
         </div>

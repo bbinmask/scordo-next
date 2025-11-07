@@ -30,6 +30,7 @@ import { useQuery } from "@tanstack/react-query";
 import AxiosRequest from "@/utils/AxiosResponse";
 import axios from "axios";
 import { ViewTeamCard } from "../_components/ViewTeamCard";
+import { TeamForListComponent } from "@/lib/types";
 
 const mockTournaments = [
   {
@@ -267,6 +268,9 @@ const ExplorePage = () => {
         id: "u1",
         name: "Irfanul Madar",
         username: "irfanulmadar",
+      },
+      _count: {
+        players: 0,
       },
     },
     {
