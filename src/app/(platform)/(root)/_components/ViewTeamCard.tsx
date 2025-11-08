@@ -11,7 +11,7 @@ export function ViewTeamCard({ team }: ViewTeamCardProps) {
   return (
     <Link
       href={`/teams/${team.abbreviation}`}
-      className="group container-bg border-input transform cursor-pointer overflow-hidden rounded-lg border shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl"
+      className="group container-bg border-input transform cursor-pointer overflow-hidden rounded-lg border transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg"
     >
       {/* Card Content */}
       <div className="p-5">
@@ -21,7 +21,7 @@ export function ViewTeamCard({ team }: ViewTeamCardProps) {
             <img
               src={team?.logo || "/team.svg"}
               alt={`${team.name} logo`}
-              className="border-input h-20 w-20 rounded-full border-2 shadow-md"
+              className="border-input h-20 w-20 rounded-full border-2"
               onError={(e) =>
                 (e.currentTarget.src = "https://placehold.co/100x100/CCCCCC/FFFFFF?text=T")
               }
@@ -29,11 +29,14 @@ export function ViewTeamCard({ team }: ViewTeamCardProps) {
           </div>
           {/* Team Name */}
           <div className="min-w-0 flex-1">
-            <h3 className="primary-text truncate font-[cal_sans] text-xl font-bold tracking-wide">
+            <h3
+              title={team.name}
+              className="primary-text truncate font-[cal_sans] text-xl font-bold tracking-wide"
+            >
               {team.name}
             </h3>
             <p className="secondary-text font-[urbanist] text-sm tracking-wide">
-              @{team.abbreviation} Hey
+              @{team.abbreviation}
             </p>
           </div>
         </div>
@@ -41,7 +44,7 @@ export function ViewTeamCard({ team }: ViewTeamCardProps) {
         {/* Team Info */}
         <div className="mt-4 space-y-2">
           {team.address && (
-            <div className="secondary-text flex items-center text-sm">
+            <div className="secondary-text flex items-center font-[urbanist] text-sm font-semibold">
               <MapPin size={16} className="mr-2 text-green-600" />
               <span>
                 {team?.address?.city} {team?.address?.state}
@@ -49,14 +52,14 @@ export function ViewTeamCard({ team }: ViewTeamCardProps) {
             </div>
           )}
           {(team?._count?.players !== undefined || team?._count?.players !== null) && (
-            <div className="secondary-text flex items-center text-sm">
+            <div className="secondary-text flex items-center font-[urbanist] text-sm font-semibold">
               <Users size={16} className="mr-2 text-green-600" />
               <span>{team?._count?.players} Players</span>
             </div>
           )}
         </div>
       </div>
-      <div className="flex items-center justify-between p-4 text-sm font-semibold text-green-600">
+      <div className="flex items-center justify-between p-4 font-[inter] text-sm font-semibold text-green-600">
         <span>View Team</span>
         <ArrowRight
           size={16}
