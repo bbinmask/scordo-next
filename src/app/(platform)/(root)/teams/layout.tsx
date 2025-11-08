@@ -1,7 +1,6 @@
 import React from "react";
-import Menu from "../_components/Menu";
-import { ListIcon, PlusCircle, Search, Shield, Users } from "lucide-react";
-import { BreadcrumbDemo } from "../_components/BreadScrumb";
+import { ListIcon, PlusCircle, Search, Shield } from "lucide-react";
+import { Metadata } from "next";
 import { getMetadata } from "@/utils/helper/getMetadata";
 
 export const metadata = getMetadata("Teams | Scordo");

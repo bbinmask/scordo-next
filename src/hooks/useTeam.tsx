@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import useAxios from "./useAxios";
 import { AxiosResponse } from "axios";
-import { Team } from "@/generated/prisma";
+import { Team, User } from "@/generated/prisma";
 
 export const useTeam = () => {
   const [loading, setLoading] = useState(false);
@@ -92,31 +92,27 @@ export const useTeam = () => {
   };
 };
 
-export const useIsTeamOwner = (team: Team, user: { id: string }) => {
-  const isOwner = Boolean(
-    user &&
-      team &&
-      String(user.id) === String(typeof team.owner === "object" ? team.owner.id : team.owner)
-  );
+export const useIsTeamOwner = (team: Team, userId?: string) => {
+  const isOwner = Boolean(userId && team && userId === team.ownerId);
   return { isOwner };
 };
 
-export const useTeamRequest = (team: Team, user: { id: string }) => {
+export const useTeamRequest = (team: Team, user?: User) => {
   const { fetchData } = useAxios();
   const [isAlreadyRequested, setIsAlreadyRequested] = useState(false);
   const [isAlreadyInTeam, setIsAlreadyInTeam] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!team || !user) return;
-    const isInTeam = team.players.some((p) => String(p.id) === String(user.id));
-    const isRequested = team.pendingRequests?.some(
-      (p) => typeof p !== "string" && String(p.id) === String(user.id)
-    );
-    setIsAlreadyInTeam(isInTeam);
-    setIsAlreadyRequested(isRequested);
-  }, [team, user]);
+  // useEffect(() => {
+  //   if (!team || !user) return;
+  //   const isInTeam = team.players.some((p) => String(p.id) === String(user.id));
+  //   const isRequested = team.pendingRequests?.some(
+  //     (p) => typeof p !== "string" && String(p.id) === String(user.id)
+  //   );
+  //   setIsAlreadyInTeam(isInTeam);
+  //   setIsAlreadyRequested(isRequested);
+  // }, [team, user]);
 
   const runRequest = async (fn: () => Promise<any>) => {
     setLoading(true);

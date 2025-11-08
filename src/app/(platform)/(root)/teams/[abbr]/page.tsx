@@ -7,6 +7,8 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import Spinner from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
+import { currentUser } from "@/lib/currentUser";
+import { User } from "@/generated/prisma";
 interface TeamIdProps {
   params?: any;
 }
@@ -26,6 +28,15 @@ const TeamIdPage: React.FC<TeamIdProps> = () => {
     },
   });
 
+  const { data: user, isLoading: isUserLoading } = useQuery<User>({
+    queryKey: ["me"],
+    queryFn: async () => {
+      const res = await axios.get("/api/me");
+
+      return res.data;
+    },
+  });
+
   return (
     <div className="center flex w-full">
       <div className="container-bg w-full rounded-2xl border">
@@ -34,7 +45,7 @@ const TeamIdPage: React.FC<TeamIdProps> = () => {
         ) : !team && !isLoading && error?.message ? (
           <NotFoundParagraph description={error.message} />
         ) : (
-          <TeamDetails team={team} />
+          <TeamDetails team={team} user={user} />
         )}
       </div>
     </div>

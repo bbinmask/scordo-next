@@ -1,13 +1,7 @@
 import { Prisma } from "@/generated/prisma";
 
 const teamWithPlayerCountAndOwner = Prisma.validator<Prisma.TeamDefaultArgs>()({
-  select: {
-    id: true,
-    name: true,
-    logo: true,
-    banner: true,
-    abbreviation: true,
-    address: true,
+  include: {
     owner: {
       select: {
         id: true,
@@ -17,6 +11,22 @@ const teamWithPlayerCountAndOwner = Prisma.validator<Prisma.TeamDefaultArgs>()({
     },
     _count: {
       select: { players: true },
+    },
+  },
+});
+const teamWithPlayers = Prisma.validator<Prisma.TeamDefaultArgs>()({
+  include: {
+    owner: {
+      select: {
+        id: true,
+        username: true,
+        name: true,
+      },
+    },
+    players: {
+      include: {
+        user: true,
+      },
     },
   },
 });
@@ -34,6 +44,7 @@ const teamRequestWithDetails = Prisma.validator<Prisma.TeamRequestDefaultArgs>()
     from: true,
   },
 });
+
 const tournamentRequestWithDetails = Prisma.validator<Prisma.TournamentRequestDefaultArgs>()({
   include: {
     tournament: true,
@@ -47,6 +58,8 @@ export type TournamentRequestWithDetails = Prisma.TournamentRequestGetPayload<
 >;
 
 export type FriendshipWithBoth = Prisma.FriendshipGetPayload<typeof friendshipWithBoth>;
+
+export type TeamWithPlayers = Prisma.TeamGetPayload<typeof teamWithPlayers>;
 
 export type TeamForListComponent = Prisma.TeamGetPayload<typeof teamWithPlayerCountAndOwner>;
 

@@ -4,6 +4,7 @@ import {
   BuildingIcon,
   GitBranchPlusIcon,
   Info,
+  Lock,
   MapPinIcon,
   PencilIcon,
   SparklesIcon,
@@ -13,12 +14,11 @@ import {
   UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import Requests from "../_components/Requests";
 import Spinner from "@/components/Spinner";
 import { notFound } from "next/navigation";
-import { useIsTeamOwner, useTeam, useTeamRequest } from "@/hooks/useTeam";
-import { user } from "@/constants";
+import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
 import { Player, Team as TeamProps, User, TeamRequest, Team } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
 
@@ -32,9 +32,21 @@ function TeamHeader({
   isOwner: boolean;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg bg-white shadow-lg">
+    <div className="container-bg relative mt-2 overflow-hidden rounded-lg shadow-sm">
+      <div className="absolute top-4 right-4 z-20">
+        {isOwner && (
+          <abbr title="Edit team details">
+            <button
+              className="cursor-pointer rounded-full bg-black/40 p-2 text-white shadow-xl transition-colors hover:bg-black/60"
+              // onClick={() => setIsEdit(true)}
+            >
+              <PencilIcon size={20} />
+            </button>
+          </abbr>
+        )}
+      </div>
       {/* Banner Image */}
-      <div className="relative h-48 bg-gray-200 md:h-64">
+      <div className="relative h-40 md:h-44">
         <img
           src={team?.banner || undefined}
           alt={`${team.name} banner`}
@@ -52,7 +64,7 @@ function TeamHeader({
           <img
             src={team?.logo || "/team.svg"}
             alt={`${team.name} logo`}
-            className="h-32 w-32 rounded-full border-4 border-white bg-gray-100 shadow-md md:h-40 md:w-40"
+            className="h-32 w-32 rounded-full border-4 border-white shadow-md md:h-40 md:w-40"
             onError={(e) =>
               (e.currentTarget.src = "https://placehold.co/150x150/667EEA/FFFFFF?text=Logo")
             }
@@ -60,9 +72,13 @@ function TeamHeader({
 
           {/* Team Name & Actions */}
           <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
-            <h1 className="text-3xl font-bold text-gray-800 md:text-4xl">{team.name}</h1>
-            <p className="secondary-text text-lg">@{team.abbreviation}</p>
-            <p className="secondary-text font-[urbanist] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
+            <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold md:text-4xl">
+              {team.name}
+            </h1>
+            <p className="secondary-text font-[urbanist] text-lg font-medium">
+              @{team.abbreviation}
+            </p>
+            <p className="secondary-text font-[inter] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
           </div>
 
           {/* Join Button */}
@@ -76,8 +92,8 @@ function TeamHeader({
                 Join Team
               </button>
             ) : (
-              <span className="inline-block rounded-lg bg-gray-200 px-6 py-2 font-semibold text-gray-600">
-                Not Recruiting
+              <span className="secondary-text flex items-center gap-1 rounded-lg bg-gray-700 px-3 py-1 font-[inter] text-sm font-medium">
+                Private <Lock className="h-4 w-4" />
               </span>
             )}
           </div>
@@ -98,10 +114,10 @@ interface TeamDetailsProp extends TeamProps {
   players: PlayerProps[];
   joinRequests: TeamRequest[];
 }
-const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
+const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => {
   const [isEdit, setIsEdit] = useState(false);
 
-  const { isOwner } = useIsTeamOwner(team, user);
+  const { isOwner } = useIsTeamOwner(team, user?.id);
 
   const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
@@ -111,21 +127,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
       {!team && notFound()}
 
       {team && !isEdit && (
-        <div className="relative w-full transform overflow-hidden transition-all duration-300 ease-in-out">
-          {/* Banner and Header Section */}
-          <div className="absolute top-4 right-4 z-20">
-            {isOwner && (
-              <abbr title="Edit team details">
-                <button
-                  className="cursor-pointer rounded-full bg-black/40 p-2 text-white shadow-xl transition-colors hover:bg-black/60"
-                  onClick={() => setIsEdit(true)}
-                >
-                  <PencilIcon size={20} />
-                </button>
-              </abbr>
-            )}
-          </div>
-
+        <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
           <TeamHeader isOwner={false} team={team} onJoinTeam={() => {}} />
           {/* Main Content Area */}
           <div className="relative grid grid-cols-1 gap-8 p-6 md:grid-cols-3 md:p-8">
