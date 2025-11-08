@@ -20,8 +20,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const formSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters."),
@@ -45,9 +52,11 @@ const formSchema = z.object({
 
 interface TeamUpdateModalProps {
   team: TeamWithPlayers;
+  isOpen: boolean;
+  onOpenChange: () => void;
 }
 
-const TeamUpdateModal = ({ team }: TeamUpdateModalProps) => {
+export const TeamUpdateForm = ({ team }: { team: TeamWithPlayers }) => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -264,4 +273,17 @@ const TeamUpdateModal = ({ team }: TeamUpdateModalProps) => {
   );
 };
 
-export default TeamUpdateModal;
+export const TeamUpdateModal = ({ team, isOpen, onOpenChange }: TeamUpdateModalProps) => {
+  return (
+    <Dialog onOpenChange={onOpenChange} open>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Update Team</DialogTitle>
+          <DialogDescription>Update your team.</DialogDescription>
+        </DialogHeader>
+
+        <TeamUpdateForm team={team} />
+      </DialogContent>
+    </Dialog>
+  );
+};
