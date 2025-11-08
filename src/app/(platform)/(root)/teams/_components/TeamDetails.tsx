@@ -1,6 +1,5 @@
 "use client";
 
-import { formatDate } from "date-fns";
 import {
   BuildingIcon,
   GitBranchPlusIcon,
@@ -10,6 +9,7 @@ import {
   SparklesIcon,
   TrophyIcon,
   UserIcon,
+  UserPlus,
   UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -19,9 +19,73 @@ import Spinner from "@/components/Spinner";
 import { notFound } from "next/navigation";
 import { useIsTeamOwner, useTeam, useTeamRequest } from "@/hooks/useTeam";
 import { user } from "@/constants";
-import { Player, Team as TeamProps, User, TeamRequest } from "@/generated/prisma";
-import { useQuery } from "@tanstack/react-query";
-import AxiosRequest from "@/utils/AxiosResponse";
+import { Player, Team as TeamProps, User, TeamRequest, Team } from "@/generated/prisma";
+import { formatDate } from "@/utils/helper/formatDate";
+
+function TeamHeader({
+  team,
+  onJoinTeam,
+  isOwner,
+}: {
+  team: Team;
+  onJoinTeam: () => void;
+  isOwner: boolean;
+}) {
+  return (
+    <div className="overflow-hidden rounded-lg bg-white shadow-lg">
+      {/* Banner Image */}
+      <div className="relative h-48 bg-gray-200 md:h-64">
+        <img
+          src={team?.banner || undefined}
+          alt={`${team.name} banner`}
+          className="h-full w-full object-cover"
+          onError={(e) =>
+            (e.currentTarget.src = "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
+          }
+        />
+      </div>
+
+      {/* Header Content */}
+      <div className="p-6">
+        <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
+          {/* Team Logo */}
+          <img
+            src={team?.logo || "/team.svg"}
+            alt={`${team.name} logo`}
+            className="h-32 w-32 rounded-full border-4 border-white bg-gray-100 shadow-md md:h-40 md:w-40"
+            onError={(e) =>
+              (e.currentTarget.src = "https://placehold.co/150x150/667EEA/FFFFFF?text=Logo")
+            }
+          />
+
+          {/* Team Name & Actions */}
+          <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
+            <h1 className="text-3xl font-bold text-gray-800 md:text-4xl">{team.name}</h1>
+            <p className="secondary-text text-lg">@{team.abbreviation}</p>
+            <p className="secondary-text font-[urbanist] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
+          </div>
+
+          {/* Join Button */}
+          <div className="mt-4 sm:mt-0">
+            {team.isRecruiting ? (
+              <button
+                onClick={onJoinTeam}
+                className="flex transform items-center rounded-lg bg-blue-600 px-6 py-2 font-bold text-white shadow-md transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700"
+              >
+                <UserPlus size={20} className="mr-2" />
+                Join Team
+              </button>
+            ) : (
+              <span className="inline-block rounded-lg bg-gray-200 px-6 py-2 font-semibold text-gray-600">
+                Not Recruiting
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface PlayerProps extends Player {
   user: User;
@@ -62,28 +126,7 @@ const TeamDetails = ({ team }: { team: TeamDetailsProp }) => {
             )}
           </div>
 
-          <div
-            className="relative aspect-video rounded-t-2xl bg-cover bg-center sm:aspect-auto sm:h-60 md:h-72 lg:h-80 xl:h-96"
-            style={{ backgroundImage: `url(${team.banner})` }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 flex items-end p-4 md:p-6">
-              <img
-                src={team.logo || "./user.svg"}
-                alt={`${team.name} Logo`}
-                className="aspect-square w-24 rounded-full border-4 border-blue-500 bg-white object-cover shadow-lg md:h-32 md:w-32 dark:border-blue-400"
-              />
-              <div className="ml-4">
-                <h1 className="text-3xl font-extrabold text-white drop-shadow-lg md:text-5xl">
-                  {team.name}
-                </h1>
-                <p className="mt-1 text-sm text-gray-200 md:text-base">
-                  {typeof team.owner !== "string" && team.owner?.name} - Est.{" "}
-                  {team?.createdAt && formatDate(new Date(team.createdAt), "MMMM d, yyyy")}
-                </p>
-              </div>
-            </div>
-          </div>
+          <TeamHeader isOwner={false} team={team} onJoinTeam={() => {}} />
           {/* Main Content Area */}
           <div className="relative grid grid-cols-1 gap-8 p-6 md:grid-cols-3 md:p-8">
             {/* Requests */}
