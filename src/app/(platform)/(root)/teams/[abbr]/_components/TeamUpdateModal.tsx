@@ -7,7 +7,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Team, TeamType } from "@/generated/prisma";
-import { TeamForListComponent, TeamRequestWithDetails, TeamWithPlayers } from "@/lib/types";
+import { TeamWithPlayers } from "@/lib/types";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -281,7 +281,6 @@ export const TeamUpdateModal = ({ team, isOpen, onOpenChange }: TeamUpdateModalP
           <DialogTitle>Update Team</DialogTitle>
           <DialogDescription>Update your team.</DialogDescription>
         </DialogHeader>
-
         <TeamUpdateForm team={team} />
       </DialogContent>
     </Dialog>
