@@ -50,8 +50,6 @@ const formSchema = z.object({
   captainId: z.string().optional().or(z.literal("")),
 });
 
-// comment
-
 interface TeamUpdateModalProps {
   team: TeamWithPlayers;
   isOpen: boolean;
