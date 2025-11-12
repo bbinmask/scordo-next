@@ -22,6 +22,8 @@ import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
 import { Player, Team as TeamProps, User, TeamRequest, Team } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
 
+// Community
+
 function TeamHeader({
   team,
   onJoinTeam,
