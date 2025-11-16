@@ -21,7 +21,7 @@ import { notFound } from "next/navigation";
 import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
 import { Player, Team as TeamProps, User, TeamRequest, Team } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
-// Comment
+
 function TeamHeader({
   team,
   onJoinTeam,
