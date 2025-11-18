@@ -56,7 +56,7 @@ const NavLinkCard = ({
   );
 };
 
-const TournamentsPage = () => {
+const TournamentPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const navigate = useRouter();
@@ -140,4 +140,4 @@ const TournamentsPage = () => {
   );
 };
 
-export default TournamentsPage;
+export default TournamentPage;

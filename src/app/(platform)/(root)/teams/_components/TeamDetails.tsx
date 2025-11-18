@@ -60,7 +60,6 @@ function TeamHeader({
       {/* Header Content */}
       <div className="p-6">
         <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
-          {/* Team Logo */}
           <img
             src={team?.logo || "/team.svg"}
             alt={`${team.name} logo`}
