@@ -45,7 +45,7 @@ function TeamHeader({
           </abbr>
         )}
       </div>
-      {/* Banner Image */}
+      {/* Banner */}
       <div className="relative h-40 md:h-44">
         <img
           src={team?.banner || undefined}
@@ -57,7 +57,7 @@ function TeamHeader({
         />
       </div>
 
-      {/* Header Content */}
+      {/* Header */}
       <div className="p-6">
         <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
           <img
@@ -128,7 +128,7 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
       {team && !isEdit && (
         <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
           <TeamHeader isOwner={false} team={team} onJoinTeam={() => {}} />
-          {/* Main Content Area */}
+          {/* Main Content */}
           <div className="relative grid grid-cols-1 gap-8 p-6 md:grid-cols-3 md:p-8">
             {/* Requests */}
 
