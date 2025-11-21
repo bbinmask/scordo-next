@@ -243,8 +243,8 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
                 <div className="flex justify-around text-center">
                   <div>
                     <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
-                      {/* {team.followers.length} */}
                       12000
+                      {/* It will be total players */}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Followers</p>
                   </div>
