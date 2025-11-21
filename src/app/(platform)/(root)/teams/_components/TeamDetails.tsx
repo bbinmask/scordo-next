@@ -244,7 +244,7 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
                   <div>
                     <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
                       12000
-                      {/* It will be total players */}
+                      {/* players.length */}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Followers</p>
                   </div>
