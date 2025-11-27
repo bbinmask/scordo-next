@@ -252,7 +252,7 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
               </div>
             </div>
 
-            {/* Right Column - Description, Stats, Players, Match History */}
+            {/* Right Column  */}
             <div className="space-y-8 md:col-span-2">
               {/* Description Section */}
               <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
@@ -366,8 +366,6 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
           </div>
         </div>
       )}
-
-      {/* {isEdit && team && team && <TeamForm setEdit={setIsEdit} team={team}></TeamForm>} */}
     </div>
   );
 };
