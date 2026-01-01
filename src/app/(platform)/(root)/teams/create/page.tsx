@@ -1,5 +1,5 @@
 import React from "react";
-import CreateTeamForm from "../_components/CreateTeamForm";
+import TeamForm from "../_components/TeamForm";
 
 const CreateTeamPage = () => {
   return (
@@ -8,7 +8,7 @@ const CreateTeamPage = () => {
         <h2 className="primary-heading mb-6 text-center font-[cal_sans] text-3xl font-black tracking-wide">
           Create Your Team
         </h2>
-        <CreateTeamForm />
+        <TeamForm />
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ import { notFound } from "next/navigation";
 import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
 import { Player, Team as TeamProps, User, TeamRequest, Team } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
+import UpdateTeamModal from "./UpdateTeamModal";
 
 function TeamHeader({
   team,
@@ -31,74 +32,81 @@ function TeamHeader({
   onJoinTeam: () => void;
   isOwner: boolean;
 }) {
-  return (
-    <div className="container-bg relative mt-2 overflow-hidden rounded-lg shadow-sm">
-      <div className="absolute top-4 right-4 z-20">
-        {isOwner && (
-          <abbr title="Edit team details">
-            <button
-              className="cursor-pointer rounded-full bg-black/40 p-2 text-white shadow-xl transition-colors hover:bg-black/60"
-              // onClick={() => setIsEdit(true)}
-            >
-              <PencilIcon size={20} />
-            </button>
-          </abbr>
-        )}
-      </div>
-      {/* Banner */}
-      <div className="relative h-40 md:h-44">
-        <img
-          src={team?.banner || undefined}
-          alt={`${team.name} banner`}
-          className="h-full w-full object-cover"
-          onError={(e) =>
-            (e.currentTarget.src = "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
-          }
-        />
-      </div>
+  const [isEdit, setIsEdit] = useState(false);
 
-      {/* Header */}
-      <div className="p-6">
-        <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
+  return (
+    <>
+      <div className="container-bg relative overflow-hidden rounded-lg shadow-sm">
+        <div className="absolute top-4 right-4 z-20">
+          {isOwner && (
+            <div title="Edit team details">
+              <button
+                className="cursor-pointer rounded-full bg-black/40 p-2 text-white shadow-xl transition-colors hover:bg-black/60"
+                onClick={() => setIsEdit(true)}
+              >
+                <PencilIcon size={20} />
+              </button>
+            </div>
+          )}
+        </div>
+        {/* Banner */}
+        <div className="relative h-40 md:h-44">
           <img
-            src={team?.logo || "/team.svg"}
-            alt={`${team.name} logo`}
-            className="h-32 w-32 rounded-full border-4 border-white shadow-md md:h-40 md:w-40"
+            src={team?.banner || undefined}
+            alt={`${team.name} banner`}
+            className="h-full w-full object-cover"
             onError={(e) =>
-              (e.currentTarget.src = "https://placehold.co/150x150/667EEA/FFFFFF?text=Logo")
+              (e.currentTarget.src = "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
             }
           />
+        </div>
 
-          {/* Team Name & Actions */}
-          <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
-            <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold md:text-4xl">
-              {team.name}
-            </h1>
-            <p className="secondary-text font-[urbanist] text-lg font-medium">
-              @{team.abbreviation}
-            </p>
-            <p className="secondary-text font-[inter] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
-          </div>
+        {/* Header */}
+        <div className="p-6">
+          <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
+            <img
+              src={team?.logo || "/team.svg"}
+              alt={`${team.name} logo`}
+              className="h-32 w-32 rounded-full border-4 border-white shadow-md md:h-40 md:w-40"
+              onError={(e) =>
+                (e.currentTarget.src = "https://placehold.co/150x150/667EEA/FFFFFF?text=Logo")
+              }
+            />
 
-          {/* Join Button */}
-          <div className="mt-4 sm:mt-0">
-            {team.isRecruiting ? (
-              <button
-                onClick={onJoinTeam}
-                className="flex transform items-center rounded-lg bg-blue-600 px-6 py-2 font-bold text-white shadow-md transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700"
-              >
-                <UserPlus size={20} className="mr-2" />
-                Join Team
-              </button>
-            ) : (
-              <span className="secondary-text flex items-center gap-1 rounded-lg bg-gray-700 px-3 py-1 font-[inter] text-sm font-medium">
-                Private <Lock className="h-4 w-4" />
-              </span>
-            )}
+            {/* Team Name & Actions */}
+            <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
+              <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold md:text-4xl">
+                {team.name}
+              </h1>
+              <p className="secondary-text font-[urbanist] text-lg font-medium">
+                @{team.abbreviation}
+              </p>
+              <p className="secondary-text font-[inter] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
+            </div>
+
+            {/* Join Button */}
+            <div className="mt-4 sm:mt-0">
+              {team.isRecruiting ? (
+                <button
+                  onClick={onJoinTeam}
+                  className="flex transform items-center rounded-lg bg-blue-600 px-6 py-2 font-bold text-white shadow-md transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700"
+                >
+                  <UserPlus size={20} className="mr-2" />
+                  Join Team
+                </button>
+              ) : (
+                <span className="secondary-text flex items-center gap-1 rounded-lg bg-gray-700 px-3 py-1 font-[inter] text-sm font-medium">
+                  Private <Lock className="h-4 w-4" />
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {isEdit && (
+        <UpdateTeamModal team={team} isOpen={isEdit} isOwner={isOwner} setIsOpen={setIsEdit} />
+      )}
+    </>
   );
 }
 
@@ -114,29 +122,29 @@ interface TeamDetailsProp extends TeamProps {
   joinRequests: TeamRequest[];
 }
 const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => {
-  const [isEdit, setIsEdit] = useState(false);
-
   const { isOwner } = useIsTeamOwner(team, user?.id);
 
   const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
+  console.log({ team, user });
+
   return (
     <div className="relative flex min-h-screen items-center justify-center">
       {!team && notFound()}
 
-      {team && !isEdit && (
+      {team && (
         <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
-          <TeamHeader isOwner={false} team={team} onJoinTeam={() => {}} />
+          <TeamHeader isOwner={isOwner} team={team} onJoinTeam={() => {}} />
           {/* Main Content */}
           <div className="relative grid grid-cols-1 gap-8 p-6 md:grid-cols-3 md:p-8">
             {/* Requests */}
 
-            <div className="absolute top-8 right-8 z-50">
+            <div className="absolute top-10 right-10 z-50">
               {isOwner ? (
-                <abbr title="Team join requests">
+                <div title="Team join requests">
                   <Requests data={team} />
-                </abbr>
+                </div>
               ) : (
                 <button
                   className={`cursor-pointer rounded-lg border-none px-3 py-2 font-bold ${loading && "cursor-not-allowed opacity-50"} ${isAlreadyRequested ? "bg-gray-300 text-gray-800" : "nline-flex items-center rounded-full border-none bg-green-100 px-3 py-1 text-sm font-semibold text-green-800 dark:bg-green-800 dark:text-green-200"}`}

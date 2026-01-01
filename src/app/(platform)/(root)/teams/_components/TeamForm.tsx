@@ -25,7 +25,7 @@ interface ITeamForm {
   isRecruiting: boolean;
 }
 
-const CreateTeamForm = () => {
+const TeamForm = () => {
   const {
     register,
     handleSubmit,
@@ -275,4 +275,4 @@ const CreateTeamForm = () => {
   );
 };
 
-export default CreateTeamForm;
+export default TeamForm;

@@ -4,6 +4,7 @@ import { debounce } from "lodash";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import Spinner from "../Spinner";
 import { useEffect, useState } from "react";
+import { confirmButtonClass } from "@/styles/buttons";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -29,11 +30,6 @@ export function ConfirmModal({
   if (!isOpen) return null;
 
   const [isConfirm, setIsConfirm] = useState(false);
-
-  const confirmButtonClass =
-    confirmVariant === "destructive"
-      ? "rounded-md bg-red-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-red-700"
-      : "rounded-md bg-blue-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-blue-700";
 
   useEffect(() => {
     if (!isLoading && isConfirm) onClose();
@@ -61,7 +57,7 @@ export function ConfirmModal({
                 debounce(onConfirm, 500)();
                 setIsConfirm(true);
               }}
-              className={confirmButtonClass}
+              className={confirmButtonClass("primary")}
             >
               {confirmText}
             </button>

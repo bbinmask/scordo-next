@@ -1,7 +1,12 @@
+import { Bell } from "lucide-react";
 import React from "react";
 
 const Requests = ({ data }: { data: any }) => {
-  return <div>Requests</div>;
+  return (
+    <div className="">
+      <Bell />
+    </div>
+  );
 };
 
 export default Requests;
