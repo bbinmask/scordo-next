@@ -86,7 +86,7 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  redirect(`/teams/${getTeamUrl(team)}`);
+  redirect(`/teams/${team.abbreviation}}`);
 };
 
 export const createTeam = createSafeAction(CreateTeam, createTeamHandler);

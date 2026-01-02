@@ -11,3 +11,15 @@ export class ApiResponse {
     this.success = status < 400;
   }
 }
+
+export class ApiError extends Error {
+  status: number;
+  success: boolean;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+    this.success = false;
+    this.message = message;
+  }
+}

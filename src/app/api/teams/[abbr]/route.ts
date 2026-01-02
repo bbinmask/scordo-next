@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ abbr: string }> }) {
@@ -32,9 +33,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ abbr
       },
     });
 
-    if (!team) return NextResponse.error();
+    if (!team) return NextResponse.json(new ApiError(404, "Team not found!"));
 
-    return NextResponse.json(team);
+    return NextResponse.json(new ApiResponse(team, 200, "Team found"));
   } catch (error) {
     return NextResponse.error();
   }

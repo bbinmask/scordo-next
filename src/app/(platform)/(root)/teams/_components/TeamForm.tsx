@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,18 +11,24 @@ import { createTeam } from "@/actions/team-actions";
 import { useAction } from "@/hooks/useAction";
 import { EnumFormSelect } from "../../_components/FormSelect";
 import { ITeamForm } from "../types";
+import { debounce } from "lodash";
+import axios from "axios";
+import { Team } from "@/generated/prisma";
 
 interface TeamFormProps {
   children: React.ReactNode;
   onSubmit: SubmitHandler<ITeamForm>;
+  isUpdating: boolean;
+  team: Team;
 }
 
-const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
+const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
+    clearErrors,
     watch,
   } = useForm<ITeamForm>({
     defaultValues: {
@@ -51,12 +57,34 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
     if (fieldName === "logo") setLogoFileName(file?.name || null);
     if (fieldName === "banner") setBannerFileName(file?.name || null);
   };
+
+  const checkAbbreviation = useMemo(
+    () =>
+      debounce(async (value: string) => {
+        try {
+          const res = await axios.get(`/api/teams/${value}`);
+
+          if (res.data.success) {
+            setError("abbreviation", {
+              message: "Abbreviation is not available!",
+            });
+          } else {
+            clearErrors("abbreviation");
+          }
+        } catch (error) {
+          toast.error("Something went wrong!");
+        }
+      }, 500),
+
+    []
+  );
+
   const isRecruiting = watch("isRecruiting");
   const logo = watch("logo");
   const banner = watch("banner");
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 font-[urbanist]">
       <div className="grid gap-4 md:grid-cols-2">
         {/* Team Name */}
         <div className="mb-1">
@@ -70,7 +98,10 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
           </label>
           <Input
             id="team-name"
-            {...register("name", { required: "Team name is required" })}
+            {...register("name", {
+              required: "Team name is required",
+              minLength: 3,
+            })}
             placeholder="Enter your team's name"
             className="text-foreground w-full py-4 font-normal"
           />
@@ -90,6 +121,10 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
             id="abbreviation"
             {...register("abbreviation", {
               required: "Create an abbreviation for the team",
+              onChange: (e) => {
+                e.target.value.trim() !== "" && checkAbbreviation(e.target.value);
+              },
+              // validate: (value) => value.trim() || "Abbreviation cannot be empty",
             })}
             placeholder="Create an abbreviation"
             className="text-foreground w-full py-4 font-normal"
@@ -99,46 +134,53 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
           )}
         </div>
         {/* Logo Upload */}
-        <div>
-          <label htmlFor="team-logo" className="text-foreground mb-1 block text-base font-medium">
-            Team Logo
-          </label>
-          <Input
-            id="team-logo"
-            type="file"
-            accept="image/*"
-            {...register("logo", {
-              onChange: (e) => handleFileChange(e, "logo"),
-            })}
-            className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
-          />
-          {logoFileName && (
-            <div>
-              <img src={URL.createObjectURL(logo[0])} alt="LOGO" className="w-20 object-cover" />
-            </div>
-          )}
-          {errors.logo && <p className="mt-1 text-sm text-red-600">{errors.logo.message}</p>}
-        </div>
+        {!isUpdating && (
+          <div>
+            <label htmlFor="team-logo" className="text-foreground mb-1 block text-base font-medium">
+              Team Logo
+            </label>
+            <Input
+              id="team-logo"
+              type="file"
+              accept="image/*"
+              {...register("logo", {
+                onChange: (e) => handleFileChange(e, "logo"),
+              })}
+              className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
+            />
+            {logoFileName && (
+              <div>
+                <img src={URL.createObjectURL(logo[0])} alt="LOGO" className="w-20 object-cover" />
+              </div>
+            )}
+            {errors.logo && <p className="mt-1 text-sm text-red-600">{errors.logo.message}</p>}
+          </div>
+        )}
 
         {/* Banner Upload */}
-        <div>
-          <label htmlFor="team-banner" className="text-foreground mb-1 block text-base font-medium">
-            Team Banner
-          </label>
-          <Input
-            id="team-banner"
-            type="file"
-            accept="image/*"
-            {...register("banner", {
-              onChange: (e) => handleFileChange(e, "banner"),
-            })}
-            className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
-          />
-          {bannerFileName && (
-            <img src={URL.createObjectURL(banner[0])} alt="" className="w-20 object-cover" />
-          )}
-          {errors.banner && <p className="mt-1 text-sm text-red-600">{errors.banner.message}</p>}
-        </div>
+        {!isUpdating && (
+          <div>
+            <label
+              htmlFor="team-banner"
+              className="text-foreground mb-1 block text-base font-medium"
+            >
+              Team Banner
+            </label>
+            <Input
+              id="team-banner"
+              type="file"
+              accept="image/*"
+              {...register("banner", {
+                onChange: (e) => handleFileChange(e, "banner"),
+              })}
+              className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:text-emerald-700 hover:file:bg-emerald-200"
+            />
+            {bannerFileName && (
+              <img src={URL.createObjectURL(banner[0])} alt="" className="w-20 object-cover" />
+            )}
+            {errors.banner && <p className="mt-1 text-sm text-red-600">{errors.banner.message}</p>}
+          </div>
+        )}
       </div>
 
       <div className="grid items-end gap-4 md:grid-cols-2">
