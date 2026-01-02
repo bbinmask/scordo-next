@@ -10,22 +10,14 @@ import { useRouter } from "next/navigation";
 import { createTeam } from "@/actions/team-actions";
 import { useAction } from "@/hooks/useAction";
 import { EnumFormSelect } from "../../_components/FormSelect";
+import { ITeamForm } from "../types";
 
-interface ITeamForm {
-  name: string;
-  logo: FileList;
-  banner: FileList;
-  type: "local" | "college" | "club" | "corporate" | "others";
-  abbreviation: string;
-  address: {
-    city: string;
-    state: string;
-    country: string;
-  };
-  isRecruiting: boolean;
+interface TeamFormProps {
+  children: React.ReactNode;
+  onSubmit: SubmitHandler<ITeamForm>;
 }
 
-const TeamForm = () => {
+const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
   const {
     register,
     handleSubmit,
@@ -46,16 +38,6 @@ const TeamForm = () => {
     },
   });
 
-  const { execute, error, isLoading } = useAction(createTeam, {
-    onSuccess: (data) => {
-      toast.success(data.name + " is created");
-    },
-    onError: (error) => {
-      console.error(error);
-      toast.error(error);
-    },
-  });
-
   const [logoFileName, setLogoFileName] = useState<string | null>(null);
   const [bannerFileName, setBannerFileName] = useState<string | null>(null);
 
@@ -72,22 +54,6 @@ const TeamForm = () => {
   const isRecruiting = watch("isRecruiting");
   const logo = watch("logo");
   const banner = watch("banner");
-
-  const onSubmit: SubmitHandler<ITeamForm> = async (data) => {
-    const { name, abbreviation, type, address, logo, banner, isRecruiting } = data;
-    const logoFile = logo && logo.length > 0 ? logo[0] : undefined;
-    const bannerFile = banner && banner.length > 0 ? banner[0] : undefined;
-
-    execute({
-      name,
-      abbreviation,
-      type,
-      address,
-      logo: logoFile,
-      banner: bannerFile,
-      isRecruiting,
-    });
-  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -258,19 +224,7 @@ const TeamForm = () => {
           <div className="slider" />
         </div>
       </div>
-
-      {/* Submit */}
-      <div className="center flex w-full">
-        <Button
-          variant="default"
-          type="submit"
-          disabled={isLoading}
-          className={`primary-btn w-full max-w-48`}
-        >
-          {!isLoading && "Create Team"}
-          {isLoading && <CgSpinner className="absolute animate-spin text-white" />}
-        </Button>
-      </div>
+      {children}
     </form>
   );
 };
