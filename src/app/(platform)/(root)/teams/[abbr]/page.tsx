@@ -45,7 +45,7 @@ const TeamIdPage: React.FC<TeamIdProps> = () => {
         ) : !team && !isLoading && error?.message ? (
           <NotFoundParagraph description={error.message} />
         ) : (
-          <TeamDetails team={team} user={user} />
+          <TeamDetails team={team.data} user={user} />
         )}
       </div>
     </div>

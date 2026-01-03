@@ -34,6 +34,8 @@ function TeamHeader({
 }) {
   const [isEdit, setIsEdit] = useState(false);
 
+  console.log(team);
+
   return (
     <>
       <div className="container-bg relative overflow-hidden rounded-lg shadow-sm">

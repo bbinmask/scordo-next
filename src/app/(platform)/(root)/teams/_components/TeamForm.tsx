@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { ChangeEvent, useMemo, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -121,14 +121,39 @@ const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
             id="abbreviation"
             {...register("abbreviation", {
               required: "Create an abbreviation for the team",
-              onChange: (e) => {
-                e.target.value.trim() !== "" && checkAbbreviation(e.target.value);
+              pattern: {
+                value: /^[a-zA-Z0-9_-]+$/,
+                message: "Only letters, numbers, - and _ allowed",
               },
-              validate: (value) =>
-                value.trim() === ""
-                  ? "Abbreviation cannot be empty!"
-                  : `${value} is not available!`,
+
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+
+                if (!/^[a-z0-9_-]*$/.test(value)) {
+                  return;
+                }
+
+                checkAbbreviation(value);
+              },
+
+              validate: (value) => {
+                if (value.trim() === "") return "Abbreviation cannot be empty!";
+              },
             })}
+            onKeyDown={(e) => {
+              const allowedRegex = /^[a-zA-Z0-9_-]$/;
+              const allowedKeys =
+                e.key === "Backspace" ||
+                e.key === "Delete" ||
+                e.key === "ArrowLeft" ||
+                e.key === "ArrowRight" ||
+                e.key === "Tab";
+
+              if (allowedKeys) {
+              } else if (!allowedRegex.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
             placeholder="Create an abbreviation"
             className="text-foreground w-full py-4 font-normal"
           />
