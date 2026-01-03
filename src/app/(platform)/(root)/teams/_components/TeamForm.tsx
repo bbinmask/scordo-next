@@ -66,7 +66,7 @@ const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
 
           if (res.data.success) {
             setError("abbreviation", {
-              message: "Abbreviation is not available!",
+              message: `${value} is not available!`,
             });
           } else {
             clearErrors("abbreviation");
@@ -124,7 +124,10 @@ const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
               onChange: (e) => {
                 e.target.value.trim() !== "" && checkAbbreviation(e.target.value);
               },
-              // validate: (value) => value.trim() || "Abbreviation cannot be empty",
+              validate: (value) =>
+                value.trim() === ""
+                  ? "Abbreviation cannot be empty!"
+                  : `${value} is not available!`,
             })}
             placeholder="Create an abbreviation"
             className="text-foreground w-full py-4 font-normal"
