@@ -11,7 +11,6 @@ export const CreateTeam = z.object({
     country: z.string({ message: "Country is required" }).min(2),
   }),
   type: z.enum(["local", "club", "college", "corporate", "others"]).default("others"),
-  isRecruiting: z.boolean().default(false),
 });
 
 export const UpdateTeam = CreateTeam.extend({
@@ -22,4 +21,5 @@ export const UpdateTeam = CreateTeam.extend({
 export const EditLogoAndBanner = z.object({
   logo: z.file().optional(),
   banner: z.file().optional(),
+  id: z.string({ message: "Auth field is required!" }),
 });

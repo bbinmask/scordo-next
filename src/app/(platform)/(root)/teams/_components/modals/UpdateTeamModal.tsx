@@ -13,6 +13,11 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "sonner";
 import TeamForm from "../TeamForm";
 import { cn } from "@/lib/utils";
+import { SubmitHandler } from "react-hook-form";
+import { ITeamForm } from "../../types";
+import { useAction } from "@/hooks/useAction";
+import { updateTeam } from "@/actions/team-actions";
+import { useRouter } from "next/navigation";
 
 interface UpdateTeamModalProps {
   isOpen: boolean;
@@ -22,16 +27,33 @@ interface UpdateTeamModalProps {
 }
 
 const UpdateTeamModal = ({ isOpen, setIsOpen, team, isOwner }: UpdateTeamModalProps) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const onSubmit = () => {
-    try {
-      setIsLoading(true);
-    } catch (error: any) {
-      toast.error(error.message || "Could not update Team!");
-    } finally {
-      setIsLoading(false);
+  const { execute, isLoading } = useAction(updateTeam, {
+    onSuccess: (data) => {
+      toast.success("Team updated!");
+      onClose();
+      router.push(`/teams/${data.abbreviation}`);
+    },
+    onError: (err) => {
+      toast.error(err);
+    },
+  });
+
+  const onSubmit: SubmitHandler<ITeamForm> = async (data) => {
+    const { abbreviation, address, name, type } = data;
+
+    if (
+      team.abbreviation === abbreviation &&
+      team.address === address &&
+      team.name === name &&
+      team.type === type
+    ) {
+      onClose();
+      return;
     }
+
+    execute({ abbreviation, address, type, name, id: team.id });
   };
 
   const onClose = () => {
@@ -51,29 +73,26 @@ const UpdateTeamModal = ({ isOpen, setIsOpen, team, isOwner }: UpdateTeamModalPr
           </DialogTitle>
           <DialogDescription className="text-gray-500">{}</DialogDescription>
         </DialogHeader>
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <>
-            <TeamForm onSubmit={onSubmit} team={team}>
-              <div className="mt-2 flex justify-end space-x-3">
-                <button
-                  onClick={onClose}
-                  className="rounded-md border border-gray-300 px-4 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  className={
-                    "rounded-md bg-blue-600 px-4 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700"
-                  }
-                >
-                  Update
-                </button>
-              </div>
-            </TeamForm>
-          </>
-        )}
+        <TeamForm onSubmit={onSubmit} team={team}>
+          <div className="mt-2 flex justify-end space-x-3">
+            <button
+              onClick={onClose}
+              type="button"
+              className="rounded-md border border-gray-300 px-4 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={
+                "rounded-md bg-blue-600 px-4 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              }
+            >
+              {isLoading ? <Spinner /> : "Update"}
+            </button>
+          </div>
+        </TeamForm>
       </DialogContent>
     </Dialog>
   );

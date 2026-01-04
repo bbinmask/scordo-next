@@ -31,15 +31,14 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
     watch,
   } = useForm<ITeamForm>({
     defaultValues: {
-      name: "",
-      type: "others",
-      abbreviation: "",
+      name: team?.name || "",
+      type: team?.type || "others",
+      abbreviation: team?.abbreviation || "",
       address: {
-        city: "",
-        state: "",
-        country: "",
+        city: team?.address?.city || "",
+        state: team?.address?.state || "",
+        country: team?.address?.country || "",
       },
-      isRecruiting: false,
     },
   });
 
@@ -78,8 +77,6 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
     []
   );
 
-  const isRecruiting = watch("isRecruiting");
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 font-[urbanist]">
       <div className="grid gap-4 md:grid-cols-2">
@@ -92,7 +89,6 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
               </abbr>
             </label>
             <Input
-              defaultValue={team?.name}
               id="team-name"
               {...register("name", {
                 required: team?.name ? false : "Team name is required",
@@ -142,7 +138,6 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
                     return "Abbreviation cannot be empty!";
                 },
               })}
-              defaultValue={team?.abbreviation}
               onKeyDown={(e) => {
                 const allowedRegex = /^[a-zA-Z0-9_-]$/;
                 const allowedKeys =
@@ -249,7 +244,6 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
             </label>
             <Input
               id="city"
-              defaultValue={team?.address?.city}
               placeholder={team?.address?.city || "Enter your city"}
               {...register("address.city", {
                 required: team?.address?.city ? false : "City is required",
@@ -267,7 +261,6 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
               State:
             </label>
             <Input
-              defaultValue={team?.address?.state}
               id="state"
               {...register("address.state", {
                 required: team?.address?.state ? false : "State is required!",
@@ -286,7 +279,6 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
               Country:
             </label>
             <Input
-              defaultValue={team?.address?.country}
               id="country"
               {...register("address.country", {
                 required: team?.address?.country ? false : "Country is required",
@@ -302,7 +294,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
       </div>
 
       {/* Recruiting */}
-      <div className="between relative flex gap-2">
+      {/* <div className="between relative flex gap-2">
         <label htmlFor="isRecruiting" className="text-accent-foreground text-base font-normal">
           Recruiting new players
         </label>
@@ -317,7 +309,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
           />
           <div className="slider" />
         </div>
-      </div>
+      </div> */}
       {children}
     </form>
   );

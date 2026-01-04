@@ -7,5 +7,4 @@ export interface ITeamForm {
     state: string;
     country: string;
   };
-  isRecruiting: boolean;
 }

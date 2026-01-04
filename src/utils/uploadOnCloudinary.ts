@@ -10,7 +10,7 @@ export async function uploadImage(image: File, folder: FolderProp = "logo") {
 
   imageUrl = await new Promise((resolve, reject) => {
     cloudinary.uploader
-      .upload_stream({ folder: "logos" }, (error, result) => {
+      .upload_stream({ folder: folder }, (error, result) => {
         if (error) return reject(error);
         resolve(result?.secure_url);
       })

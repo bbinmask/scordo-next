@@ -22,14 +22,13 @@ const CreateTeamPage = () => {
   });
 
   const onSubmit: SubmitHandler<ITeamForm> = async (data) => {
-    const { name, abbreviation, type, address, isRecruiting } = data;
+    const { name, abbreviation, type, address } = data;
 
     execute({
       name,
       abbreviation,
       type,
       address,
-      isRecruiting,
     });
   };
 
