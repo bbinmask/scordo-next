@@ -2,8 +2,6 @@ import { z } from "zod";
 
 export const CreateTeam = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters long" }),
-  logo: z.file().optional(),
-  banner: z.file().optional(),
   abbreviation: z
     .string({ message: "Abbreviation is required!" })
     .min(2, { message: "Abbreviation must be atleast 2 characters long" }),
@@ -14,4 +12,14 @@ export const CreateTeam = z.object({
   }),
   type: z.enum(["local", "club", "college", "corporate", "others"]).default("others"),
   isRecruiting: z.boolean().default(false),
+});
+
+export const UpdateTeam = CreateTeam.extend({
+  id: z.string({ message: "Team ID is required" }),
+  updatedAt: z.date().optional(),
+});
+
+export const EditLogoAndBanner = z.object({
+  logo: z.file().optional(),
+  banner: z.file().optional(),
 });

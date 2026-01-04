@@ -21,7 +21,7 @@ interface TeamFormProps {
   team?: Team;
 }
 
-const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
+const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
   const {
     register,
     handleSubmit,
@@ -84,79 +84,83 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 font-[urbanist]">
       <div className="grid gap-4 md:grid-cols-2">
         {/* Team Name */}
-        <div className="mb-1">
-          <label
-            htmlFor="team-name"
-            className="text-foreground noun mb-1 block text-base font-medium"
-          >
-            <abbr className="" title="Enter your team's name">
-              Name
-            </abbr>
-          </label>
-          <Input
-            id="team-name"
-            {...register("name", {
-              required: "Team name is required",
-              minLength: 3,
-            })}
-            placeholder="Enter your team's name"
-            className="text-foreground w-full py-4 font-normal"
-          />
+        <div>
+          <div className="center mb-1 flex gap-1 lg:block">
+            <label htmlFor="team-name" className="text-foreground mb-1 block text-base font-medium">
+              <abbr className="" title="Enter your team's name">
+                Name:
+              </abbr>
+            </label>
+            <Input
+              defaultValue={team?.name}
+              id="team-name"
+              {...register("name", {
+                required: team?.name ? false : "Team name is required",
+                minLength: 3,
+              })}
+              placeholder={team?.name || "Enter your team's name"}
+              className="text-foreground w-full py-1 text-sm font-normal"
+            />
+          </div>
           {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
         </div>
 
-        <div className="center mb-1 flex">
-          <label
-            htmlFor="abbreviation"
-            className="text-foreground noun mb-1 block text-base font-medium"
-          >
-            <abbr className="" title="A short name for your team (eg. IND for INDIA)">
-              Abbreviation
-            </abbr>
-          </label>
-          <input
-            id="abbreviation"
-            {...register("abbreviation", {
-              required: "Create an abbreviation for the team",
-              pattern: {
-                value: /^[a-zA-Z0-9_-]+$/,
-                message: "Only letters, numbers, - and _ allowed",
-              },
+        <div>
+          <div className="center mb-1 flex gap-1 lg:block">
+            <label
+              htmlFor="abbreviation"
+              className="text-foreground mb-1 block text-base font-medium"
+            >
+              <abbr className="" title="A short name for your team (eg. IND for INDIA)">
+                Abbreviation:
+              </abbr>
+            </label>
+            <Input
+              id="abbreviation"
+              {...register("abbreviation", {
+                required: team?.abbreviation ? false : "Create an abbreviation for the team",
+                pattern: {
+                  value: /^[a-zA-Z0-9_-]+$/,
+                  message: "Only letters, numbers, - and _ allowed",
+                },
 
-              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                const value = e.target.value;
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const value = e.target.value;
 
-                if (!/^[a-z0-9_-]*$/.test(value)) {
-                  setError("abbreviation", {
-                    message: "This type of abbreviation is not available!",
-                  });
-                  return;
+                  if (!/^[a-z0-9_-]*$/.test(value)) {
+                    setError("abbreviation", {
+                      message: "This type of abbreviation is not available!",
+                    });
+                    return;
+                  }
+                  clearErrors("abbreviation");
+                  checkAbbreviation(value);
+                },
+
+                validate: (value) => {
+                  if (value.trim() === "" && !team?.abbreviation)
+                    return "Abbreviation cannot be empty!";
+                },
+              })}
+              defaultValue={team?.abbreviation}
+              onKeyDown={(e) => {
+                const allowedRegex = /^[a-zA-Z0-9_-]$/;
+                const allowedKeys =
+                  e.key === "Backspace" ||
+                  e.key === "Delete" ||
+                  e.key === "ArrowLeft" ||
+                  e.key === "ArrowRight" ||
+                  e.key === "Tab";
+
+                if (allowedKeys) {
+                } else if (!allowedRegex.test(e.key)) {
+                  e.preventDefault();
                 }
-                clearErrors("abbreviation");
-                checkAbbreviation(value);
-              },
-
-              validate: (value) => {
-                if (value.trim() === "") return "Abbreviation cannot be empty!";
-              },
-            })}
-            onKeyDown={(e) => {
-              const allowedRegex = /^[a-zA-Z0-9_-]$/;
-              const allowedKeys =
-                e.key === "Backspace" ||
-                e.key === "Delete" ||
-                e.key === "ArrowLeft" ||
-                e.key === "ArrowRight" ||
-                e.key === "Tab";
-
-              if (allowedKeys) {
-              } else if (!allowedRegex.test(e.key)) {
-                e.preventDefault();
-              }
-            }}
-            placeholder="Create an abbreviation"
-            className="text-foreground w-full rounded-md font-normal outline-2 focus:outline-blue-500"
-          />
+              }}
+              placeholder={team?.abbreviation || "Create an abbreviation"}
+              className="text-foreground w-full py-1 text-sm font-normal"
+            />
+          </div>
           {errors.abbreviation && (
             <p className="mt-1 text-sm text-red-600">{errors.abbreviation.message}</p>
           )}
@@ -214,65 +218,84 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
 
       <div className="grid items-end gap-4 md:grid-cols-2">
         {/* Team Type */}
-        <EnumFormSelect
-          data={[
-            { label: "Local", value: "local" },
-            { label: "College", value: "college" },
-            { label: "Club", value: "club" },
-            { label: "Corporate", value: "corporate" },
-            { label: "Others", value: "other" },
-          ]}
-          name="type"
-          register={register}
-          label="Team Type"
-          placeholder="Select your team's type"
-          rules={{ required: "Type is required" }}
-        />
 
-        {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>}
-
+        <div>
+          <div className="center mb-1 flex gap-1 lg:block">
+            <label htmlFor="type" className="text-foreground mb-1 block text-base font-medium">
+              <abbr title="Team Type">Type: </abbr>
+            </label>
+            <EnumFormSelect
+              data={[
+                { label: "Local", value: "local" },
+                { label: "College", value: "college" },
+                { label: "Club", value: "club" },
+                { label: "Corporate", value: "corporate" },
+                { label: "Others", value: "other" },
+              ]}
+              name="type"
+              register={register}
+              label="Team Type"
+              placeholder={team?.type || "Select your team's type"}
+              rules={{ required: team?.type ? false : "Type is required" }}
+            />
+          </div>
+          {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>}
+        </div>
         {/* Location */}
         <div>
-          <label htmlFor="city" className="text-foreground mb-1 block text-base font-medium">
-            City
-          </label>
-          <Input
-            id="city"
-            placeholder="Enter your city"
-            {...register("address.city", { required: "City is required" })}
-            className="text-foreground w-full py-4 font-normal"
-          />
-          {errors.address?.city && (
+          <div className="center mb-1 flex gap-1 lg:block">
+            <label htmlFor="city" className="text-foreground mb-1 block text-base font-medium">
+              City:
+            </label>
+            <Input
+              id="city"
+              defaultValue={team?.address?.city}
+              placeholder={team?.address?.city || "Enter your city"}
+              {...register("address.city", {
+                required: team?.address?.city ? false : "City is required",
+              })}
+              className="text-foreground w-full py-1 text-sm font-normal"
+            />
+          </div>
+          {errors?.address?.city && (
             <p className="mt-1 text-sm text-red-600">{errors.address.city.message}</p>
           )}
         </div>
-        <div>
-          <label htmlFor="state" className="text-foreground mb-1 block text-base font-medium">
-            State
-          </label>
-          <Input
-            id="state"
-            {...register("address.state")}
-            placeholder="Enter your state"
-            className="text-foreground w-full py-4 font-normal"
-          />
+        <div className="">
+          <div className="center mb-1 flex gap-1 lg:block">
+            <label htmlFor="state" className="text-foreground mb-1 block text-base font-medium">
+              State:
+            </label>
+            <Input
+              defaultValue={team?.address?.state}
+              id="state"
+              {...register("address.state", {
+                required: team?.address?.state ? false : "State is required!",
+              })}
+              placeholder={team?.address?.state || "Enter your state"}
+              className="text-foreground w-full py-1 text-sm font-normal"
+            />
+          </div>
           {errors.address?.state && (
             <p className="mt-1 text-sm text-red-600">{errors.address.state.message}</p>
           )}
         </div>
-        <div className="">
-          <label htmlFor="country" className="text-foreground mb-1 block text-base font-medium">
-            Country
-          </label>
-          <Input
-            id="country"
-            {...register("address.country", {
-              required: "Country is required",
-            })}
-            placeholder="Enter your country"
-            className="text-foreground w-full py-4 font-normal"
-          />
-          {errors.address?.country && (
+        <div>
+          <div className="center mb-1 flex gap-1 lg:block">
+            <label htmlFor="country" className="text-foreground mb-1 block text-base font-medium">
+              Country:
+            </label>
+            <Input
+              defaultValue={team?.address?.country}
+              id="country"
+              {...register("address.country", {
+                required: team?.address?.country ? false : "Country is required",
+              })}
+              placeholder={team?.address?.country || "Enter your country"}
+              className="text-foreground w-full py-1 text-sm font-normal"
+            />
+          </div>
+          {errors?.address?.country && (
             <p className="mt-1 text-sm text-red-600">{errors.address.country.message}</p>
           )}
         </div>

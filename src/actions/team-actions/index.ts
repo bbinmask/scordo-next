@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { InputType, ReturnType } from "./types";
+import { InputType, InputTypeForUpdateTeam, ReturnType, ReturnTypeForUpdateTeam } from "./types";
 import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
 import { CreateTeam } from "./schema";
@@ -19,8 +19,6 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
   }
 
   const { name, abbreviation, address, isRecruiting, type } = data;
-
-  let logoUrl, bannerUrl;
 
   let user: User | null = null;
   try {
@@ -87,4 +85,56 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
   redirect(`/teams/${team.abbreviation}`);
 };
 
+const updateTeamHandler = async (
+  data: InputTypeForUpdateTeam
+): Promise<ReturnTypeForUpdateTeam> => {
+  const { name, abbreviation, address, isRecruiting, type, id } = data;
+  let user: User | null = null;
+  let team;
+
+  try {
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return { error: "Unauthorized" };
+    }
+    user =
+      (await prisma?.user.findUnique({
+        where: {
+          clerkId,
+        },
+      })) ?? null;
+  } catch (error: any) {
+    return {
+      error: error.message || "User not found!",
+    };
+  }
+  try {
+    if (!user) {
+      return {
+        error: "User not found!",
+      };
+    }
+
+    team = await prisma?.team.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name,
+        abbreviation,
+        address,
+        isRecruiting,
+        type,
+      },
+    });
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+  revalidatePath(`/teams/${abbreviation}`);
+  return {
+    data: team,
+  };
+};
 export const createTeam = createSafeAction(CreateTeam, createTeamHandler);

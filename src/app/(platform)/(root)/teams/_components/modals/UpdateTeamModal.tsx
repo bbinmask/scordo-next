@@ -12,6 +12,7 @@ import { debounce } from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "sonner";
 import TeamForm from "../TeamForm";
+import { cn } from "@/lib/utils";
 
 interface UpdateTeamModalProps {
   isOpen: boolean;
@@ -38,16 +39,15 @@ const UpdateTeamModal = ({ isOpen, setIsOpen, team, isOwner }: UpdateTeamModalPr
   };
 
   if (!isOwner) {
-    toast.error("Only team owner can update team!");
     setIsOpen(false);
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-sm overflow-y-auto rounded-lg bg-white p-6 font-[poppins] dark:bg-gray-800">
+      <DialogContent className="w-full max-w-sm rounded-lg bg-white font-[poppins] dark:bg-gray-800">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
-            {team.abbreviation.toUpperCase()} Details
+            {`Update ${team.abbreviation.toUpperCase()} Details`}
           </DialogTitle>
           <DialogDescription className="text-gray-500">{}</DialogDescription>
         </DialogHeader>
@@ -55,15 +55,21 @@ const UpdateTeamModal = ({ isOpen, setIsOpen, team, isOwner }: UpdateTeamModalPr
           <Spinner />
         ) : (
           <>
-            <TeamForm onSubmit={onSubmit}>
-              <div className="mt-4 flex justify-end space-x-3">
+            <TeamForm onSubmit={onSubmit} team={team}>
+              <div className="mt-2 flex justify-end space-x-3">
                 <button
                   onClick={onClose}
-                  className="rounded-md border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                  className="rounded-md border border-gray-300 px-4 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
-                <button className={confirmButtonClass("primary")}>Update</button>
+                <button
+                  className={
+                    "rounded-md bg-blue-600 px-4 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                  }
+                >
+                  Update
+                </button>
               </div>
             </TeamForm>
           </>
