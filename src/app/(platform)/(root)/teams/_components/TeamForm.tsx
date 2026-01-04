@@ -18,11 +18,10 @@ import { Team } from "@/generated/prisma";
 interface TeamFormProps {
   children: React.ReactNode;
   onSubmit: SubmitHandler<ITeamForm>;
-  isUpdating: boolean;
-  team: Team;
+  team?: Team;
 }
 
-const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
+const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
   const {
     register,
     handleSubmit,
@@ -49,14 +48,14 @@ const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
 
   const navigate = useRouter();
 
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    fieldName: "logo" | "banner"
-  ) => {
-    const file = e.target.files?.[0];
-    if (fieldName === "logo") setLogoFileName(file?.name || null);
-    if (fieldName === "banner") setBannerFileName(file?.name || null);
-  };
+  // const handleFileChange = (
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   fieldName: "logo" | "banner"
+  // ) => {
+  //   const file = e.target.files?.[0];
+  //   if (fieldName === "logo") setLogoFileName(file?.name || null);
+  //   if (fieldName === "banner") setBannerFileName(file?.name || null);
+  // };
 
   const checkAbbreviation = useMemo(
     () =>
@@ -80,8 +79,6 @@ const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
   );
 
   const isRecruiting = watch("isRecruiting");
-  const logo = watch("logo");
-  const banner = watch("banner");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 font-[urbanist]">
@@ -161,8 +158,9 @@ const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
             <p className="mt-1 text-sm text-red-600">{errors.abbreviation.message}</p>
           )}
         </div>
-        {/* Logo Upload */}
-        {!isUpdating && (
+        {/* Logo And Banner Upload */}
+        {/*
+         {!isUpdating && (
           <div>
             <label htmlFor="team-logo" className="text-foreground mb-1 block text-base font-medium">
               Team Logo
@@ -185,7 +183,6 @@ const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
           </div>
         )}
 
-        {/* Banner Upload */}
         {!isUpdating && (
           <div>
             <label
@@ -209,6 +206,7 @@ const TeamForm = ({ children, onSubmit, isUpdating }: TeamFormProps) => {
             {errors.banner && <p className="mt-1 text-sm text-red-600">{errors.banner.message}</p>}
           </div>
         )}
+        */}
       </div>
 
       <div className="grid items-end gap-4 md:grid-cols-2">

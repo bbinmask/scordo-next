@@ -22,17 +22,13 @@ const CreateTeamPage = () => {
   });
 
   const onSubmit: SubmitHandler<ITeamForm> = async (data) => {
-    const { name, abbreviation, type, address, logo, banner, isRecruiting } = data;
-    const logoFile = logo && logo.length > 0 ? logo[0] : undefined;
-    const bannerFile = banner && banner.length > 0 ? banner[0] : undefined;
+    const { name, abbreviation, type, address, isRecruiting } = data;
 
     execute({
       name,
       abbreviation,
       type,
       address,
-      logo: logoFile,
-      banner: bannerFile,
       isRecruiting,
     });
   };
@@ -54,7 +50,7 @@ const CreateTeamPage = () => {
               {!isLoading && "Create Team"}
               {isLoading && <CgSpinner className="absolute animate-spin text-white" />}
             </Button>
-          </div>{" "}
+          </div>
         </TeamForm>
       </div>
     </div>

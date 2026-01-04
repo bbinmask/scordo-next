@@ -18,7 +18,7 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
     return { error: "Unauthorized" };
   }
 
-  const { name, abbreviation, address, logo, banner, isRecruiting, type } = data;
+  const { name, abbreviation, address, isRecruiting, type } = data;
 
   let logoUrl, bannerUrl;
 
@@ -42,12 +42,12 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  if (logo) {
-    logoUrl = (await uploadImage(logo, "team-logo")).imageUrl;
-  }
-  if (banner) {
-    bannerUrl = (await uploadImage(banner, "team-banner")).imageUrl;
-  }
+  // if (logo) {
+  //   logoUrl = (await uploadImage(logo, "team-logo")).imageUrl;
+  // }
+  // if (banner) {
+  //   bannerUrl = (await uploadImage(banner, "team-banner")).imageUrl;
+  // }
 
   let team;
   try {
@@ -56,8 +56,6 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
         name,
         abbreviation: abbreviation.toLowerCase(),
         address,
-        logo: (logoUrl as string) || null,
-        banner: (bannerUrl as string) || null,
         isRecruiting,
         captain: { connect: { id: user.id } },
         players: {

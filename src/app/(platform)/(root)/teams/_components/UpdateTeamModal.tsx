@@ -63,9 +63,7 @@ const UpdateTeamModal = ({ isOpen, setIsOpen, team, isOwner }: UpdateTeamModalPr
                 >
                   Cancel
                 </button>
-                <button onClick={onSubmit} className={confirmButtonClass("primary")}>
-                  Update
-                </button>
+                <button className={confirmButtonClass("primary")}>Update</button>
               </div>
             </TeamForm>
           </>
