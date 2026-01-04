@@ -11,7 +11,7 @@ import { confirmButtonClass } from "@/styles/buttons";
 import { debounce } from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "sonner";
-import TeamForm from "./TeamForm";
+import TeamForm from "../TeamForm";
 
 interface UpdateTeamModalProps {
   isOpen: boolean;

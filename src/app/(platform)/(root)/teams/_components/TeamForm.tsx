@@ -105,7 +105,7 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
           {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
         </div>
 
-        <div className="mb-1">
+        <div className="center mb-1 flex">
           <label
             htmlFor="abbreviation"
             className="text-foreground noun mb-1 block text-base font-medium"
@@ -114,7 +114,7 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
               Abbreviation
             </abbr>
           </label>
-          <Input
+          <input
             id="abbreviation"
             {...register("abbreviation", {
               required: "Create an abbreviation for the team",
@@ -127,9 +127,12 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
                 const value = e.target.value;
 
                 if (!/^[a-z0-9_-]*$/.test(value)) {
+                  setError("abbreviation", {
+                    message: "This type of abbreviation is not available!",
+                  });
                   return;
                 }
-
+                clearErrors("abbreviation");
                 checkAbbreviation(value);
               },
 
@@ -152,7 +155,7 @@ const TeamForm = ({ children, onSubmit }: TeamFormProps) => {
               }
             }}
             placeholder="Create an abbreviation"
-            className="text-foreground w-full py-4 font-normal"
+            className="text-foreground w-full rounded-md font-normal outline-2 focus:outline-blue-500"
           />
           {errors.abbreviation && (
             <p className="mt-1 text-sm text-red-600">{errors.abbreviation.message}</p>

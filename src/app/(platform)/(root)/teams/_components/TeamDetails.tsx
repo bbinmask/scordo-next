@@ -21,7 +21,7 @@ import { notFound } from "next/navigation";
 import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
 import { Player, Team as TeamProps, User, TeamRequest, Team } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
-import UpdateTeamModal from "./UpdateTeamModal";
+import UpdateTeamModal from "./modals/UpdateTeamModal";
 
 function TeamHeader({
   team,
@@ -32,19 +32,26 @@ function TeamHeader({
   onJoinTeam: () => void;
   isOwner: boolean;
 }) {
-  const [isEdit, setIsEdit] = useState(false);
-
-  console.log(team);
-
+  const [isEditingImg, setIsEditingImg] = useState(false);
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [hide, setHide] = useState(false);
   return (
     <>
-      <div className="container-bg relative overflow-hidden rounded-lg shadow-sm">
+      <div
+        onMouseEnter={(e) => {
+          isOwner && setHide(true);
+        }}
+        onMouseLeave={(e) => {
+          setHide(false);
+        }}
+        className="container-bg relative overflow-hidden rounded-t-lg shadow-sm"
+      >
         <div className="absolute top-4 right-4 z-20">
-          {isOwner && (
-            <div title="Edit team details">
+          {isOwner && hide && (
+            <div title="Edit Profile details" className="">
               <button
                 className="cursor-pointer rounded-full bg-black/40 p-2 text-white shadow-xl transition-colors hover:bg-black/60"
-                onClick={() => setIsEdit(true)}
+                onClick={() => setIsEditingImg(true)}
               >
                 <PencilIcon size={20} />
               </button>
@@ -53,14 +60,17 @@ function TeamHeader({
         </div>
         {/* Banner */}
         <div className="relative h-40 md:h-44">
-          <img
-            src={team?.banner || undefined}
-            alt={`${team.name} banner`}
-            className="h-full w-full object-cover"
-            onError={(e) =>
-              (e.currentTarget.src = "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
-            }
-          />
+          {team.banner && (
+            <img
+              src={team?.banner || undefined}
+              alt={`${team.name} banner`}
+              className="h-full w-full object-cover"
+              onError={(e) =>
+                (e.currentTarget.src =
+                  "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
+              }
+            />
+          )}
         </div>
 
         {/* Header */}
@@ -97,7 +107,7 @@ function TeamHeader({
                   Join Team
                 </button>
               ) : (
-                <span className="secondary-text flex items-center gap-1 rounded-lg bg-gray-700 px-3 py-1 font-[inter] text-sm font-medium">
+                <span className="flex items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
                   Private <Lock className="h-4 w-4" />
                 </span>
               )}
@@ -105,9 +115,13 @@ function TeamHeader({
           </div>
         </div>
       </div>
-      {isEdit && (
-        <UpdateTeamModal team={team} isOpen={isEdit} isOwner={isOwner} setIsOpen={setIsEdit} />
-      )}
+
+      <UpdateTeamModal
+        team={team}
+        isOpen={isEditingImg}
+        isOwner={isOwner}
+        setIsOpen={setIsEditingImg}
+      />
     </>
   );
 }
@@ -129,7 +143,7 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
   const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team, user);
 
-  console.log({ team, user });
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center">
@@ -139,7 +153,16 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
         <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
           <TeamHeader isOwner={isOwner} team={team} onJoinTeam={() => {}} />
           {/* Main Content */}
-          <div className="relative grid grid-cols-1 gap-8 p-6 md:grid-cols-3 md:p-8">
+          <div className="secondary-text flex justify-end px-4 py-2 font-[poppins] text-sm font-light hover:underline md:px-6">
+            <button
+              onClick={() => {
+                setIsEditingDetails(true);
+              }}
+            >
+              Edit
+            </button>
+          </div>
+          <div className="relative grid grid-cols-1 gap-8 px-4 md:grid-cols-3 md:px-6">
             {/* Requests */}
 
             <div className="absolute top-10 right-10 z-50">
@@ -185,6 +208,7 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
                 </button>
               )}
             </div>
+
             {/* Left Column - General Info & Recruitment */}
             <div className="space-y-6 md:col-span-1">
               {/* Quick Info */}
@@ -289,9 +313,9 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
                   Season Statistics
                 </Link>
                 {/* <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {team.matches.map((stat, index) => (
+                  {team.matches.map((stat, i) => (
                     <div
-                      key={index}
+                      key={i}
                       className="transform rounded-xl bg-gray-100 p-4 text-center shadow-sm transition-transform duration-200 hover:scale-105 dark:bg-gray-600"
                     >
                       <p className="text-xl font-bold text-blue-600 dark:text-blue-300">{stat}</p>
@@ -310,18 +334,18 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
                   Members
                 </h2>
                 <ul className="custom-scrollbar grid max-h-60 grid-cols-1 gap-3 overflow-y-auto pr-2 sm:grid-cols-2">
-                  {team.players.map((player, index) => (
+                  {team.players.map((player, i) => (
                     <li
-                      key={index}
+                      key={i}
                       className="flex items-center rounded-lg bg-gray-100 p-3 shadow-sm dark:bg-gray-600"
                     >
                       <span className="mr-2 font-semibold text-blue-600 dark:text-blue-300">
-                        #{index + 1}
+                        {i + 1}•
                       </span>
                       {typeof player !== "string" ? (
                         <Link
-                          href={`/profile/${player.user.username}`}
-                          className="text-gray-800 dark:text-gray-200"
+                          href={`/users/${player.user.username}`}
+                          className="text-gray-800 hover:underline dark:text-gray-200"
                         >
                           {player.user.name}
                         </Link>
@@ -359,9 +383,9 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
                   Recent Matches
                 </h2>
                 {/* <ul className="space-y-2">
-                  {team.matchHistory.map((match, index) => (
+                  {team.matchHistory.map((match, i) => (
                     <li
-                      key={index}
+                      key={i}
                       className={`flex items-center rounded-lg p-3 ${match.startsWith("W") ? "bg-green-50 dark:bg-green-900/40" : match.startsWith("L") ? "bg-red-50 dark:bg-red-900/40" : "bg-yellow-50 dark:bg-yellow-900/40"} text-sm font-medium text-gray-800 dark:text-gray-200`}
                     >
                       <span
@@ -376,6 +400,12 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
           </div>
         </div>
       )}
+      <UpdateTeamModal
+        team={team}
+        isOpen={isEditingDetails}
+        isOwner={isOwner}
+        setIsOpen={setIsEditingDetails}
+      />
     </div>
   );
 };
