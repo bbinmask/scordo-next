@@ -6,20 +6,22 @@ import {
   Info,
   Lock,
   MapPinIcon,
+  MinusCircle,
   PencilIcon,
   SparklesIcon,
   TrophyIcon,
   UserIcon,
+  UserMinus,
   UserPlus,
   UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Requests from "../_components/Requests";
 import Spinner from "@/components/Spinner";
 import { notFound } from "next/navigation";
 import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
-import { Player, Team as TeamProps, User, TeamRequest, Team } from "@/generated/prisma";
+import { Player, Team as TeamProps, User, TeamRequest } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
 import UpdateTeamModal from "./modals/UpdateTeamModal";
 
@@ -27,14 +29,26 @@ function TeamHeader({
   team,
   onJoinTeam,
   isOwner,
+  user,
 }: {
-  team: Team;
+  team: TeamDetailsProp;
   onJoinTeam: () => void;
   isOwner: boolean;
+  user?: User;
 }) {
   const [isEditingImg, setIsEditingImg] = useState(false);
-  const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [isAlreadyInTeam, setIsAlreadyInTeam] = useState(false);
   const [hide, setHide] = useState(false);
+
+  const onLeaveTeam = () => {};
+
+  useEffect(() => {
+    if (user) {
+      const index = team.players.findIndex((pl) => pl.user.username === user?.username);
+      if (index !== -1) setIsAlreadyInTeam(true);
+    }
+  }, [user]);
+
   return (
     <>
       <div
@@ -98,13 +112,20 @@ function TeamHeader({
 
             {/* Join Button */}
             <div className="mt-4 sm:mt-0">
-              {team.isRecruiting ? (
+              {isAlreadyInTeam ? (
+                <button
+                  onClick={onLeaveTeam}
+                  className="flex items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+                >
+                  <MinusCircle size={20} className="mr-1" /> Leave
+                </button>
+              ) : team.isRecruiting ? (
                 <button
                   onClick={onJoinTeam}
-                  className="flex transform items-center rounded-lg bg-blue-600 px-6 py-2 font-bold text-white shadow-md transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700"
+                  className="flex transform items-center rounded-lg bg-blue-600 px-4 py-2 font-[urbanist] text-sm font-semibold text-white shadow-md transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700"
                 >
-                  <UserPlus size={20} className="mr-2" />
-                  Join Team
+                  <UserPlus size={20} className="mr-1" />
+                  Join
                 </button>
               ) : (
                 <span className="flex items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
@@ -151,7 +172,7 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
 
       {team && (
         <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
-          <TeamHeader isOwner={isOwner} team={team} onJoinTeam={() => {}} />
+          <TeamHeader user={user} isOwner={isOwner} team={team} onJoinTeam={() => {}} />
           {/* Main Content */}
           <div className="secondary-text flex justify-end px-4 py-2 font-[poppins] text-sm font-light hover:underline md:px-6">
             <button
