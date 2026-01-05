@@ -5,7 +5,7 @@ import TeamDetails, { TeamHeader } from "../_components/TeamDetails";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { notFound, useParams } from "next/navigation";
-import Spinner from "@/components/Spinner";
+import Spinner, { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { currentUser } from "@/lib/currentUser";
 import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
@@ -69,7 +69,7 @@ const TeamIdPage = () => {
   const [isEditingDetails, setIsEditingDetails] = useState(false);
 
   return (
-    <div className="min-h-screen w-full pt-4">
+    <div className="w-full pt-4">
       {team ? (
         <div className="container-bg relative flex rounded-2xl border pb-6">
           {!team && notFound()}
@@ -334,7 +334,7 @@ const TeamIdPage = () => {
           />
         </div>
       ) : isLoading ? (
-        <Spinner />
+        <DefaultLoader />
       ) : (
         <NotFoundParagraph description={error?.message || "Team not found!"} />
       )}

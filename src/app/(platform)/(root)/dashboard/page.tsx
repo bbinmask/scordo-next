@@ -44,62 +44,62 @@ const DashboardPage = () => {
     },
   });
 
-  if (isLoading) {
-    return <DefaultLoader />;
-  }
-
   return (
     <div className="block w-full items-center">
-      <div className="py-4">
-        <section className="px-4" title="Dashboard">
-          <div className="mb-6 text-left">
-            <h1 className="font-[poppins] text-4xl font-extrabold">
-              <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
-                Dashboard
-              </span>
-            </h1>
-          </div>
+      {isLoading ? (
+        <DefaultLoader className="text-white" />
+      ) : (
+        <div className="py-4">
+          <section className="px-4" title="Dashboard">
+            <div className="mb-6 text-left">
+              <h1 className="font-[poppins] text-4xl font-extrabold">
+                <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
+                  Dashboard
+                </span>
+              </h1>
+            </div>
 
-          <HeroSection user={data.user} />
-          <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {cardData.map((item, i) => (
-              <NewCard
-                icon={item.icon}
-                key={i}
-                title={item.title}
-                desc={item.desc}
-                link={item.link}
-              />
-            ))}
-          </div>
-        </section>
-        <section title="matches" className="">
-          <div className="mb-8">
-            <TypographyHeading className="mb-4 px-4" content="Live on Scordo" />
-            <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Live" />{" "}
-          </div>
-          <div className="mb-8">
-            <TypographyHeading className="mb-4 px-4" content="Upcoming on Scordo" />
+            <HeroSection user={data.user} />
+            <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
+              {cardData.map((item, i) => (
+                <NewCard
+                  icon={item.icon}
+                  key={i}
+                  title={item.title}
+                  desc={item.desc}
+                  link={item.link}
+                />
+              ))}
+            </div>
+          </section>
+          <section title="matches" className="">
+            <div className="mb-8">
+              <TypographyHeading className="mb-4 px-4" content="Live on Scordo" />
+              <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Live" />{" "}
+            </div>
+            <div className="mb-8">
+              <TypographyHeading className="mb-4 px-4" content="Upcoming on Scordo" />
 
-            <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Upcoming" />
-          </div>
-        </section>
-        <section className="px-4" title="Featured">
-          <div className="mb-6 text-center md:text-left">
-            <h2 className="font-[poppins] text-4xl font-extrabold text-gray-800 dark:text-white">
-              <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
-                Featured
-              </span>
-            </h2>
-          </div>
-          <div className="container-bg w-full rounded-xl p-4 sm:p-6">
-            <Tabs setCurrentTab={setCurrentTab} currentTab={currentTab} tabs={contentTabs} />
+              <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Upcoming" />
+            </div>
+          </section>
+          <section className="px-4" title="Featured">
+            <div className="mb-6 text-center md:text-left">
+              <h2 className="font-[poppins] text-4xl font-extrabold text-gray-800 dark:text-white">
+                <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
+                  Featured
+                </span>
+              </h2>
+            </div>
+            <div className="container-bg w-full rounded-xl p-4 sm:p-6">
+              <Tabs setCurrentTab={setCurrentTab} currentTab={currentTab} tabs={contentTabs} />
 
-            {currentTab === "updates" && <UpdatesList />}
-            {currentTab === "videos" && <VideoList />}
-          </div>
-        </section>
-      </div>
+              {currentTab === "updates" && <UpdatesList />}
+              {currentTab === "videos" && <VideoList />}
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 };
