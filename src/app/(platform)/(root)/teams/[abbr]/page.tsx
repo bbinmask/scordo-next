@@ -68,8 +68,6 @@ const TeamIdPage = () => {
 
   const [isEditingDetails, setIsEditingDetails] = useState(false);
 
-  console.log(team);
-
   return (
     <div className="min-h-screen w-full pt-4">
       {team ? (

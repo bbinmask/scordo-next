@@ -24,6 +24,7 @@ import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
 import { Player, Team as TeamProps, User, TeamRequest } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
 import UpdateTeamModal from "./modals/UpdateTeamModal";
+import UpdateTeamImgModal from "./modals/UpdateTeamImgModal";
 
 export function TeamHeader({
   team,
@@ -137,10 +138,10 @@ export function TeamHeader({
         </div>
       </div>
 
-      <UpdateTeamModal
+      <UpdateTeamImgModal
         team={team}
         isOpen={isEditingImg}
-        isOwner={isOwner}
+        // isOwner={isOwner}
         setIsOpen={setIsEditingImg}
       />
     </>
