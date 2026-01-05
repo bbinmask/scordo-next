@@ -25,7 +25,7 @@ import { Player, Team as TeamProps, User, TeamRequest } from "@/generated/prisma
 import { formatDate } from "@/utils/helper/formatDate";
 import UpdateTeamModal from "./modals/UpdateTeamModal";
 
-function TeamHeader({
+export function TeamHeader({
   team,
   onJoinTeam,
   isOwner,
@@ -167,7 +167,7 @@ const TeamDetails = ({ team, user }: { team: TeamDetailsProp; user?: User }) => 
   const [isEditingDetails, setIsEditingDetails] = useState(false);
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center">
+    <div className="container-bg relative flex min-h-screen items-center justify-center pb-6">
       {!team && notFound()}
 
       {team && (

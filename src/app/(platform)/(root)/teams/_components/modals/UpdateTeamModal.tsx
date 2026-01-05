@@ -9,7 +9,7 @@ import {
 import { Team } from "@/generated/prisma";
 import { confirmButtonClass } from "@/styles/buttons";
 import { debounce } from "lodash";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 import TeamForm from "../TeamForm";
 import { cn } from "@/lib/utils";
@@ -60,9 +60,11 @@ const UpdateTeamModal = ({ isOpen, setIsOpen, team, isOwner }: UpdateTeamModalPr
     setIsOpen(false);
   };
 
-  if (!isOwner) {
-    setIsOpen(false);
-  }
+  useEffect(() => {
+    if (!isOwner) {
+      setIsOpen(false);
+    }
+  }, [isOwner]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
