@@ -96,6 +96,7 @@ export function UploadImg({ type, onSave, isActive, setIsActive }: UploadImgProp
 
     onSave(file, type);
     setIsActive({ logo: false, banner: false });
+    console.log("handleSaveImage");
     handleClose();
   };
 
@@ -103,21 +104,37 @@ export function UploadImg({ type, onSave, isActive, setIsActive }: UploadImgProp
 
   return (
     <div className="h-full w-full space-y-4">
-      {(isActive.logo && type == "logo") ||
-        (isActive.banner && type === "banner" && (
-          <>
-            <input
-              type="file"
-              accept="image/*"
-              className="absolute top-0 left-0 z-40 h-full w-full opacity-0"
-              onChange={onSelectFile}
-            />
+      {type === "logo" && isActive.logo && (
+        <>
+          <input
+            type="file"
+            accept="image/*"
+            className="absolute inset-0 z-40 h-full w-full cursor-pointer opacity-0"
+            onChange={onSelectFile}
+            onClick={(e) => e.stopPropagation()}
+          />
 
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <ImageIcon className="h-8 w-8 text-gray-300" />
-            </div>
-          </>
-        ))}
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <ImageIcon className="h-8 w-8 text-gray-300" />
+          </div>
+        </>
+      )}
+
+      {type === "banner" && isActive.banner && (
+        <>
+          <input
+            type="file"
+            accept="image/*"
+            className="absolute inset-0 z-40 h-full w-full cursor-pointer opacity-0"
+            onChange={onSelectFile}
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <ImageIcon className="h-8 w-8 text-gray-300" />
+          </div>
+        </>
+      )}
 
       {imageSrc && (
         <>
@@ -184,14 +201,18 @@ export function UpdateLogoAndBanner({
   };
 
   useOnClickOutside(wrapperRef, () => {
+    console.log("wrapperRef");
     setIsActive({ logo: false, banner: false });
   });
 
   useOnClickOutside(logoRef, () => {
+    console.log("logoRef");
     setIsActive((prev) => ({ ...prev, logo: false }));
   });
 
   useOnClickOutside(bannerRef, () => {
+    console.log("bannerRef");
+
     setIsActive((prev) => ({ ...prev, banner: false }));
   });
 
@@ -203,7 +224,10 @@ export function UpdateLogoAndBanner({
           <label className="secondary-text block font-[poppins] text-sm font-semibold">Logo</label>
           <div className="flex flex-col items-center space-y-4">
             <ImagePreview
-              onClick={() => setIsActive((prev) => ({ ...prev, logo: true }))}
+              onClick={() => {
+                console.log("LOGO onClick");
+                setIsActive((prev) => ({ ...prev, logo: true }));
+              }}
               url={logo}
               type="logo"
             >
@@ -214,18 +238,6 @@ export function UpdateLogoAndBanner({
                 type="logo"
               />
             </ImagePreview>
-            {/* <ImagePreview
-              onClick={() => setIsActive((prev) => ({ ...prev, logo: true }))}
-              url={logo}
-              type="logo"
-            >
-              <UploadImg
-                isActive={isActive}
-                setIsActive={setIsActive}
-                onSave={handleSave}
-                type="logo"
-              />
-            </ImagePreview> */}
           </div>
         </div>
 
@@ -234,7 +246,10 @@ export function UpdateLogoAndBanner({
           <label className="secondary-text block text-sm font-semibold">Team Banner</label>
           <div className="space-y-4">
             <ImagePreview
-              onClick={() => setIsActive((prev) => ({ ...prev, banner: true }))}
+              onClick={() => {
+                console.log("BANNER onClick");
+                setIsActive((prev) => ({ ...prev, banner: true }));
+              }}
               url={banner}
               type="banner"
             >
