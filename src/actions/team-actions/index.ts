@@ -18,7 +18,6 @@ import { CreateTeam, UpdateLogoAndBanner, UpdateRecruiting, UpdateTeam } from ".
 import { uploadImage } from "@/utils/uploadOnCloudinary";
 import { User } from "@/generated/prisma";
 import { redirect } from "next/navigation";
-import { getTeamUrl } from "@/utils/getURL";
 
 const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
   const { userId: clerkId } = await auth();

@@ -292,6 +292,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
           )}
         </div>
       </div>
+
       {children}
     </form>
   );
