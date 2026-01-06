@@ -50,7 +50,7 @@ const UpdateTeamImgModal = ({ isOpen, setIsOpen, team }: UpdateTeamImgModalProps
 
 interface UploadImgProps {
   type: "logo" | "banner";
-  onSave: (formData: FormData) => void;
+  onSave: (file: File, type: "logo" | "banner") => void;
 }
 
 export function UploadImg({ type, onSave }: UploadImgProps) {
@@ -78,10 +78,11 @@ export function UploadImg({ type, onSave }: UploadImgProps) {
 
     const file = await getCroppedImage(imageSrc, cropArea, `${type}.jpg`);
 
-    const formData = new FormData();
-    formData.append("file", file);
+    // const formData = new FormData();
+    // formData.append("file", file);
 
-    onSave(formData);
+    onSave(file, type);
+    handleClose();
   };
 
   return (
@@ -89,7 +90,7 @@ export function UploadImg({ type, onSave }: UploadImgProps) {
       <input
         type="file"
         accept="image/*"
-        className="absolute top-0 left-0 h-full w-full"
+        className="absolute top-0 left-0 h-full w-full opacity-0"
         onChange={onSelectFile}
       />
 
@@ -120,25 +121,22 @@ export function UpdateLogoAndBanner({
   initialBanner,
   onSave,
 }: UpdateLogoAndBannerProps) {
-  const [logo, setLogo] = useState(initialLogo || "");
+  const [logo, setLogo] = useState(initialLogo || "./team.svg");
   const [banner, setBanner] = useState(initialBanner || "");
   const [isSaving, setIsSaving] = useState(false);
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
-  const handleSave = async (formData: FormData) => {
-    setIsSaving(true);
+  const handleSave = async (file: File, type: "logo" | "banner") => {
+    const url = URL.createObjectURL(file);
 
-    console.log(formData);
-
-    try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      onSave({ logo, banner });
-    } catch (error) {
-    } finally {
-      setIsSaving(false);
+    if (type === "logo") {
+      setLogo(url);
+      setLogoFile(file);
+    } else {
+      setBanner(url);
+      setBannerFile(file);
     }
   };
 
@@ -148,7 +146,7 @@ export function UpdateLogoAndBanner({
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+    <div className="mx-auto max-w-4xl space-y-8 rounded-2xl shadow-sm">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Team Branding</h2>
         <p className="text-gray-500">Update your team's visual identity on the platform.</p>
