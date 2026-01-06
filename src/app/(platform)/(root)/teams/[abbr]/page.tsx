@@ -78,7 +78,7 @@ const TeamIdPage = () => {
             <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
               <TeamHeader user={user} isOwner={isOwner} team={team as any} onJoinTeam={() => {}} />
               {/* Main Content */}
-              <div className="secondary-text flex justify-end px-4 py-2 font-[poppins] text-sm font-light hover:underline md:px-6">
+              <div className="secondary-text flex justify-end px-4 py-2 font-[poppins] text-sm font-light hover:underline lg:px-6">
                 <button
                   onClick={() => {
                     setIsEditingDetails(true);
@@ -87,7 +87,7 @@ const TeamIdPage = () => {
                   Edit
                 </button>
               </div>
-              <div className="relative grid grid-cols-1 gap-8 px-4 md:grid-cols-3 md:px-6">
+              <div className="relative grid grid-cols-1 gap-8 px-4 lg:grid-cols-3 lg:px-6">
                 {/* Requests */}
 
                 <div className="absolute top-10 right-10 z-50">
@@ -135,7 +135,7 @@ const TeamIdPage = () => {
                 </div>
 
                 {/* Left Column - General Info & Recruitment */}
-                <div className="space-y-6 md:col-span-1">
+                <div className="space-y-6 lg:col-span-1">
                   {/* Quick Info */}
                   <div className="rounded-xl bg-gray-50 p-5 font-[poppins] shadow-sm dark:bg-gray-700">
                     <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
@@ -213,10 +213,10 @@ const TeamIdPage = () => {
                 </div>
 
                 {/* Right Column  */}
-                <div className="space-y-8 md:col-span-2">
+                <div className="space-y-8 lg:col-span-2">
                   {/* Description Section */}
                   <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                    <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 md:text-2xl dark:text-white">
+                    <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
                       <span className="mr-2 text-blue-500 dark:text-blue-400">
                         <Info />
                       </span>
@@ -231,7 +231,7 @@ const TeamIdPage = () => {
                   <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
                     <Link
                       href={`/teams/${team.abbreviation}/stats`}
-                      className="mb-3 flex items-center text-xl font-bold text-gray-900 md:text-2xl dark:text-white"
+                      className="mb-3 flex items-center text-xl font-bold text-gray-900 lg:text-2xl dark:text-white"
                     >
                       <span className="mr-2 text-green-500 dark:text-green-400">
                         <TrophyIcon />
@@ -253,7 +253,7 @@ const TeamIdPage = () => {
 
                   {/* Players Section */}
                   <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                    <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 md:text-2xl dark:text-white">
+                    <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
                       <span className="mr-2 text-purple-500 dark:text-purple-400">
                         <UsersIcon />
                       </span>
@@ -285,7 +285,7 @@ const TeamIdPage = () => {
 
                   {/* Match History Section */}
                   <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                    <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 md:text-2xl dark:text-white">
+                    <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
                       <span className="mr-2 text-orange-500 dark:text-orange-400">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

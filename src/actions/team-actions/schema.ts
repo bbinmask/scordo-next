@@ -18,7 +18,7 @@ export const UpdateTeam = CreateTeam.extend({
   updatedAt: z.date().optional(),
 });
 
-export const EditLogoAndBanner = z.object({
+export const UpdateLogoAndBanner = z.object({
   logo: z.file().optional(),
   banner: z.file().optional(),
   id: z.string({ message: "Auth field is required!" }),

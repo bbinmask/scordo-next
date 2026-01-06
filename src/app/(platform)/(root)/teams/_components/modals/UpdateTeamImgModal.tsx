@@ -16,6 +16,9 @@ import { AlertCircle, CheckCircle, ImageIcon, Save, X } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { cn } from "@/lib/utils";
 import { useOnClickOutside } from "usehooks-ts";
+import { useAction } from "@/hooks/useAction";
+import { updateTeamLogoAndBanner } from "@/actions/team-actions";
+import { toast } from "sonner";
 
 interface UpdateTeamImgModalProps {
   isOpen: boolean;
@@ -41,11 +44,14 @@ const UpdateTeamImgModal = ({ isOpen, setIsOpen, team }: UpdateTeamImgModalProps
           </DialogDescription>
 
           <div>
-            {/* <UploadImg type="banner" onSave={() => {}} /> */}
             <UpdateLogoAndBanner
-              initialBanner={team.banner}
-              onSave={({ a, b }: any) => {}}
-              initialLogo={team.logo}
+              data={{
+                id: team.id,
+                banner: team.banner,
+                logo: team.logo,
+                abbreviation: team.abbreviation,
+              }}
+              onClose={onClose}
             />
           </div>
         </DialogHeader>
@@ -96,11 +102,8 @@ export function UploadImg({ type, onSave, isActive, setIsActive }: UploadImgProp
 
     onSave(file, type);
     setIsActive({ logo: false, banner: false });
-    console.log("handleSaveImage");
     handleClose();
   };
-
-  // console.log({ isActive: isActive.logo && type === "logo" });
 
   return (
     <div className="h-full w-full space-y-4">
@@ -153,29 +156,37 @@ export function UploadImg({ type, onSave, isActive, setIsActive }: UploadImgProp
 }
 
 interface UpdateLogoAndBannerProps {
-  initialLogo: string | null;
-  initialBanner: string | null;
-  onSave: ({ logo, banner }: { logo: string; banner: string }) => void;
+  data: { id: string; banner: string | null; logo: string | null; abbreviation: string };
+  onClose: () => void;
 }
 
 export function UpdateLogoAndBanner({
-  initialLogo,
-  initialBanner,
-  onSave,
+  data,
+
+  onClose,
 }: UpdateLogoAndBannerProps) {
-  const [logo, setLogo] = useState(initialLogo || "./team.svg");
-  const [banner, setBanner] = useState(initialBanner || "");
-  const [isSaving, setIsSaving] = useState(false);
+  const [logo, setLogo] = useState(data.logo || "./team.svg");
+  const [banner, setBanner] = useState(data.banner || "");
   const [isActive, setIsActive] = useState({
     logo: false,
     banner: false,
   });
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File>();
+  const [bannerFile, setBannerFile] = useState<File>();
 
   const logoRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const bannerRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
   const wrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+
+  const { execute, isLoading } = useAction(updateTeamLogoAndBanner, {
+    onSuccess: (data) => {
+      toast.success("Changes successfull.");
+      onClose();
+    },
+    onError: (err) => {
+      toast.error(err);
+    },
+  });
 
   const handleSave = async (file: File, type: "logo" | "banner") => {
     const url = URL.createObjectURL(file);
@@ -191,41 +202,52 @@ export function UpdateLogoAndBanner({
 
   const handleReset = (type: "logo" | "banner") => {
     if (type === "logo") {
-      setLogoFile(null);
-      setLogo(initialLogo || "");
+      setLogoFile(undefined);
+      setLogo(data.logo || "");
     }
     if (type === "banner") {
-      setLogoFile(null);
-      setBanner(initialBanner || "");
+      setLogoFile(undefined);
+      setBanner(data.banner || "");
     }
   };
 
+  const handleUpdate = () => {
+    if (data.banner === banner) {
+      setBannerFile(undefined);
+    }
+    if (data.logo === logo) {
+      setLogoFile(undefined);
+    }
+
+    if (data.banner === banner && data.logo === logo) {
+      onClose();
+      return;
+    }
+
+    execute({ id: data.id, logo: logoFile, banner: bannerFile, abbreviation: data.abbreviation });
+  };
+
   useOnClickOutside(wrapperRef, () => {
-    console.log("wrapperRef");
     setIsActive({ logo: false, banner: false });
   });
 
-  useOnClickOutside(logoRef, () => {
-    console.log("logoRef");
-    setIsActive((prev) => ({ ...prev, logo: false }));
+  useOnClickOutside(bannerRef, () => {
+    setIsActive((prev) => ({ ...prev, banner: false }));
   });
 
-  useOnClickOutside(bannerRef, () => {
-    console.log("bannerRef");
-
-    setIsActive((prev) => ({ ...prev, banner: false }));
+  useOnClickOutside(logoRef, () => {
+    setIsActive((prev) => ({ ...prev, logo: false }));
   });
 
   return (
     <div className="mx-auto max-w-4xl space-y-8" ref={wrapperRef}>
-      <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+      <div className="grid grid-cols-3 gap-8">
         {/* Logo Section */}
-        <div className="space-y-4" ref={logoRef}>
+        <div className="grid justify-center space-y-4" ref={logoRef}>
           <label className="secondary-text block font-[poppins] text-sm font-semibold">Logo</label>
           <div className="flex flex-col items-center space-y-4">
             <ImagePreview
               onClick={() => {
-                console.log("LOGO onClick");
                 setIsActive((prev) => ({ ...prev, logo: true }));
               }}
               url={logo}
@@ -242,12 +264,11 @@ export function UpdateLogoAndBanner({
         </div>
 
         {/* Banner Section */}
-        <div className="space-y-4 md:col-span-2" ref={bannerRef}>
+        <div className="col-span-2 grid justify-center space-y-4" ref={bannerRef}>
           <label className="secondary-text block text-sm font-semibold">Team Banner</label>
           <div className="space-y-4">
             <ImagePreview
               onClick={() => {
-                console.log("BANNER onClick");
                 setIsActive((prev) => ({ ...prev, banner: true }));
               }}
               url={banner}
@@ -272,22 +293,24 @@ export function UpdateLogoAndBanner({
               handleReset("logo");
               handleReset("banner");
             }}
-            disabled={isSaving}
+            disabled={isLoading}
             className="secondary-btn flex-1 px-4 py-2 text-sm font-semibold transition-colors hover:text-gray-900 disabled:opacity-50 sm:flex-none"
           >
             Reset
           </button>
           <button
-            onClick={() => {}}
-            disabled={isSaving}
+            onClick={handleUpdate}
+            // disabled={isLoading}
             className={`primary-btn flex flex-1 items-center justify-center rounded-md px-6 py-2 text-sm font-bold text-white hover:opacity-80 active:scale-95 disabled:opacity-70 sm:flex-none`}
           >
-            {isSaving ? (
-              <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            {isLoading ? (
+              <Spinner />
             ) : (
-              <Save size={18} className="mr-2" />
+              <>
+                <Save size={18} className="mr-2" />
+                Update
+              </>
             )}
-            {isSaving ? <Spinner /> : "Update"}
           </button>
         </div>
       </div>
