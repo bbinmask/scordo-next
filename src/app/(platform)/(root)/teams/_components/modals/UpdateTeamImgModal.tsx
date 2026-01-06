@@ -11,8 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Team } from "@/generated/prisma";
-import { ComponentRef, Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
-import { AlertCircle, CheckCircle, ImageIcon, Save, X } from "lucide-react";
+import { Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
+import { ImageIcon, Save } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { cn } from "@/lib/utils";
 import { useOnClickOutside } from "usehooks-ts";

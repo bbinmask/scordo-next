@@ -292,24 +292,6 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
           )}
         </div>
       </div>
-
-      {/* Recruiting */}
-      {/* <div className="between relative flex gap-2">
-        <label htmlFor="isRecruiting" className="text-accent-foreground text-base font-normal">
-          Recruiting new players
-        </label>
-        <div
-          className={`switch bg-gradient-to-r ${isRecruiting ? "from-lime-500 via-green-600 to-emerald-600" : "from-teal-900 via-green-900/80 to-gray-400/70"}`}
-        >
-          <Input
-            id="isRecruiting"
-            type="checkbox"
-            {...register("isRecruiting")}
-            className="relative z-20 h-full w-full rounded border-gray-300 text-emerald-600"
-          />
-          <div className="slider" />
-        </div>
-      </div> */}
       {children}
     </form>
   );

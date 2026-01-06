@@ -24,3 +24,8 @@ export const UpdateLogoAndBanner = z.object({
   abbreviation: z.string({ message: "Required parameter is missing!" }),
   id: z.string({ message: "Auth field is required!" }),
 });
+
+export const UpdateRecruiting = z.object({
+  recruiting: z.boolean({ message: "Required parameter is missing!" }),
+  abbreviation: z.string({ message: "Required parameter is missing!" }),
+});
