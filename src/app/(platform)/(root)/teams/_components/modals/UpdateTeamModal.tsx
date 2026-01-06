@@ -21,12 +21,11 @@ import { useRouter } from "next/navigation";
 
 interface UpdateTeamModalProps {
   isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  onClose: () => void;
   team: Team;
-  isOwner: boolean;
 }
 
-const UpdateTeamModal = ({ isOpen, setIsOpen, team, isOwner }: UpdateTeamModalProps) => {
+const UpdateTeamModal = ({ isOpen, onClose, team }: UpdateTeamModalProps) => {
   const router = useRouter();
 
   const { execute, isLoading } = useAction(updateTeam, {
@@ -55,16 +54,6 @@ const UpdateTeamModal = ({ isOpen, setIsOpen, team, isOwner }: UpdateTeamModalPr
 
     execute({ abbreviation, address, type, name, id: team.id });
   };
-
-  const onClose = () => {
-    setIsOpen(false);
-  };
-
-  useEffect(() => {
-    if (!isOwner) {
-      setIsOpen(false);
-    }
-  }, [isOwner]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

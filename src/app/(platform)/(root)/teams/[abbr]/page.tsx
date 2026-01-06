@@ -1,28 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
-import TeamDetails, { TeamHeader } from "../_components/TeamDetails";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { notFound, useParams } from "next/navigation";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
-import { currentUser } from "@/lib/currentUser";
 import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
-import UpdateTeamModal from "../_components/modals/UpdateTeamModal";
 import Link from "next/link";
 import {
   BuildingIcon,
   GitBranchPlusIcon,
   Info,
+  Lock,
   MapPinIcon,
+  MinusCircle,
   SparklesIcon,
   TrophyIcon,
   UserIcon,
+  UserPlus,
   UsersIcon,
 } from "lucide-react";
 import Requests from "../_components/Requests";
-import { Player as IPlayer, Team as ITeam, User, TeamRequest } from "@/generated/prisma";
+import { Player as IPlayer, Team as ITeam, User } from "@/generated/prisma";
+import { useUpdateTeam } from "@/hooks/store/use-team";
+import OptionsPopover from "../_components/OptionsPopover";
+import { formatDate } from "@/utils/helper/formatDate";
+import UpdateTeamImgModal from "../_components/modals/UpdateTeamImgModal";
+import { useNotificationModal } from "@/hooks/store/use-profile-notifications";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -63,29 +68,20 @@ const TeamIdPage = () => {
 
   const { isOwner } = useIsTeamOwner(team as any, user?.id);
 
+  const { isOpen, onClose, onOpen } = useUpdateTeam();
   const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
     useTeamRequest(team as any, user);
 
-  const [isEditingDetails, setIsEditingDetails] = useState(false);
-
   return (
     <div className="w-full pt-4">
-      {!team && notFound()}
+      {!team && !isLoading && notFound()}
       {team ? (
-        <div className="container-bg relative flex rounded-2xl border pb-6">
+        <div className="container-bg relative flex rounded-lg border pb-6">
           <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
             <TeamHeader user={user} isOwner={isOwner} team={team as any} onJoinTeam={() => {}} />
             {/* Main Content */}
-            <div className="secondary-text flex justify-end px-4 py-2 font-[poppins] text-sm font-light hover:underline lg:px-6">
-              <button
-                onClick={() => {
-                  setIsEditingDetails(true);
-                }}
-              >
-                Edit
-              </button>
-            </div>
-            <div className="relative grid grid-cols-1 gap-8 px-4 lg:grid-cols-3 lg:px-6">
+
+            <div className="relative mt-4 grid grid-cols-1 gap-8 px-4 lg:grid-cols-3 lg:px-6">
               {/* Requests */}
 
               <div className="absolute top-10 right-10 z-50">
@@ -322,12 +318,6 @@ const TeamIdPage = () => {
               </div>
             </div>
           </div>
-          <UpdateTeamModal
-            team={team}
-            isOpen={isEditingDetails}
-            isOwner={isOwner}
-            setIsOpen={setIsEditingDetails}
-          />
         </div>
       ) : isLoading ? (
         <DefaultLoader />
@@ -337,5 +327,114 @@ const TeamIdPage = () => {
     </div>
   );
 };
+
+export function TeamHeader({
+  team,
+  onJoinTeam,
+  isOwner,
+  user,
+}: {
+  team: TeamDetailsProp;
+  onJoinTeam: () => void;
+  isOwner: boolean;
+  user?: User;
+}) {
+  const [isAlreadyInTeam, setIsAlreadyInTeam] = useState(false);
+  const [hide, setHide] = useState(false);
+
+  const onLeaveTeam = () => {};
+
+  useEffect(() => {
+    if (user) {
+      const index = team.players.findIndex((pl) => pl.user.username === user?.username);
+      if (index !== -1) setIsAlreadyInTeam(true);
+    }
+  }, [user]);
+
+  return (
+    <>
+      <div
+        onMouseEnter={(e) => {
+          isOwner && setHide(true);
+        }}
+        onMouseLeave={(e) => {
+          setHide(false);
+        }}
+        className="container-bg relative overflow-hidden rounded-t-lg shadow-sm"
+      >
+        <div className="absolute top-4 right-4 z-20">
+          {isOwner && hide && (
+            <div title="Edit Profile details" className="">
+              <OptionsPopover team={team} />
+            </div>
+          )}
+        </div>
+        {/* Banner */}
+        <div className="relative h-40 md:h-44">
+          {team.banner && (
+            <img
+              src={team?.banner || undefined}
+              alt={`${team.name} banner`}
+              className="h-full w-full object-cover"
+              onError={(e) =>
+                (e.currentTarget.src =
+                  "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
+              }
+            />
+          )}
+        </div>
+
+        {/* Header */}
+        <div className="p-6">
+          <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
+            <img
+              src={team?.logo || "/team.svg"}
+              alt={`${team.name} logo`}
+              className="h-32 w-32 rounded-full border-4 border-white shadow-md md:h-40 md:w-40"
+              onError={(e) =>
+                (e.currentTarget.src = "https://placehold.co/150x150/667EEA/FFFFFF?text=Logo")
+              }
+            />
+
+            {/* Team Name & Actions */}
+            <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
+              <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold md:text-4xl">
+                {team.name}
+              </h1>
+              <p className="secondary-text font-[urbanist] text-lg font-medium">
+                @{team.abbreviation}
+              </p>
+              <p className="secondary-text font-[inter] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
+            </div>
+
+            {/* Join Button */}
+            <div className="mt-4 sm:mt-0">
+              {isAlreadyInTeam ? (
+                <button
+                  onClick={onLeaveTeam}
+                  className="flex items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+                >
+                  <MinusCircle size={20} className="mr-1" /> Leave
+                </button>
+              ) : team.isRecruiting ? (
+                <button
+                  onClick={onJoinTeam}
+                  className="flex transform items-center rounded-lg bg-blue-600 px-4 py-2 font-[urbanist] text-sm font-semibold text-white shadow-md transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700"
+                >
+                  <UserPlus size={20} className="mr-1" />
+                  Join
+                </button>
+              ) : (
+                <span className="flex items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+                  Private <Lock className="h-4 w-4" />
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
 
 export default TeamIdPage;

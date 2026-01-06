@@ -22,15 +22,11 @@ import { toast } from "sonner";
 
 interface UpdateTeamImgModalProps {
   isOpen: boolean;
-  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  onClose: () => void;
   team: Team;
 }
 
-const UpdateTeamImgModal = ({ isOpen, setIsOpen, team }: UpdateTeamImgModalProps) => {
-  const onClose = () => {
-    setIsOpen(false);
-  };
-
+const UpdateTeamImgModal = ({ isOpen, onClose, team }: UpdateTeamImgModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-full max-w-sm rounded-lg font-[poppins]">
