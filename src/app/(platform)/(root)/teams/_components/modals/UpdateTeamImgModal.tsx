@@ -11,8 +11,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Team } from "@/generated/prisma";
-import { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import { ComponentRef, Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
 import { AlertCircle, CheckCircle, ImageIcon, Save, X } from "lucide-react";
+import Spinner from "@/components/Spinner";
+import { cn } from "@/lib/utils";
+import { useOnClickOutside } from "usehooks-ts";
 
 interface UpdateTeamImgModalProps {
   isOpen: boolean;
@@ -27,12 +30,15 @@ const UpdateTeamImgModal = ({ isOpen, setIsOpen, team }: UpdateTeamImgModalProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-sm rounded-lg bg-white font-[poppins] dark:bg-gray-800">
+      <DialogContent className="w-full max-w-sm rounded-lg font-[poppins]">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">
-            {`Update ${team.abbreviation.toUpperCase()} Details`}
+          <DialogTitle className="p-0 font-[cal_sans] text-2xl font-normal tracking-wide">
+            {`Update`}
+            <span className="primary-heading ml-1">{team.abbreviation.toUpperCase()}</span>
           </DialogTitle>
-          <DialogDescription className="text-gray-500">{}</DialogDescription>
+          <DialogDescription className="text-gray-500">
+            {`Update ${team.abbreviation}'s logo and banner.`}
+          </DialogDescription>
 
           <div>
             {/* <UploadImg type="banner" onSave={() => {}} /> */}
@@ -50,10 +56,17 @@ const UpdateTeamImgModal = ({ isOpen, setIsOpen, team }: UpdateTeamImgModalProps
 
 interface UploadImgProps {
   type: "logo" | "banner";
+  isActive: { logo: boolean; banner: boolean };
+  setIsActive: Dispatch<
+    SetStateAction<{
+      logo: boolean;
+      banner: boolean;
+    }>
+  >;
   onSave: (file: File, type: "logo" | "banner") => void;
 }
 
-export function UploadImg({ type, onSave }: UploadImgProps) {
+export function UploadImg({ type, onSave, isActive, setIsActive }: UploadImgProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [cropArea, setCropArea] = useState<Area | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -82,17 +95,29 @@ export function UploadImg({ type, onSave }: UploadImgProps) {
     // formData.append("file", file);
 
     onSave(file, type);
+    setIsActive({ logo: false, banner: false });
     handleClose();
   };
 
+  // console.log({ isActive: isActive.logo && type === "logo" });
+
   return (
     <div className="h-full w-full space-y-4">
-      <input
-        type="file"
-        accept="image/*"
-        className="absolute top-0 left-0 h-full w-full opacity-0"
-        onChange={onSelectFile}
-      />
+      {(isActive.logo && type == "logo") ||
+        (isActive.banner && type === "banner" && (
+          <>
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute top-0 left-0 z-40 h-full w-full opacity-0"
+              onChange={onSelectFile}
+            />
+
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <ImageIcon className="h-8 w-8 text-gray-300" />
+            </div>
+          </>
+        ))}
 
       {imageSrc && (
         <>
@@ -124,9 +149,16 @@ export function UpdateLogoAndBanner({
   const [logo, setLogo] = useState(initialLogo || "./team.svg");
   const [banner, setBanner] = useState(initialBanner || "");
   const [isSaving, setIsSaving] = useState(false);
-
+  const [isActive, setIsActive] = useState({
+    logo: false,
+    banner: false,
+  });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
+
+  const logoRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const bannerRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
+  const wrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
 
   const handleSave = async (file: File, type: "logo" | "banner") => {
     const url = URL.createObjectURL(file);
@@ -141,103 +173,77 @@ export function UpdateLogoAndBanner({
   };
 
   const handleReset = (type: "logo" | "banner") => {
-    if (type === "logo") setLogo(initialLogo || "");
-    if (type === "banner") setBanner(initialBanner || "");
+    if (type === "logo") {
+      setLogoFile(null);
+      setLogo(initialLogo || "");
+    }
+    if (type === "banner") {
+      setLogoFile(null);
+      setBanner(initialBanner || "");
+    }
   };
 
+  useOnClickOutside(wrapperRef, () => {
+    setIsActive({ logo: false, banner: false });
+  });
+
+  useOnClickOutside(logoRef, () => {
+    setIsActive((prev) => ({ ...prev, logo: false }));
+  });
+
+  useOnClickOutside(bannerRef, () => {
+    setIsActive((prev) => ({ ...prev, banner: false }));
+  });
+
   return (
-    <div className="mx-auto max-w-4xl space-y-8 rounded-2xl shadow-sm">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">Team Branding</h2>
-        <p className="text-gray-500">Update your team's visual identity on the platform.</p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+    <div className="mx-auto max-w-4xl space-y-8" ref={wrapperRef}>
+      <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
         {/* Logo Section */}
-        <div className="space-y-4">
-          <label className="block text-sm font-semibold text-gray-700">Team Logo</label>
+        <div className="space-y-4" ref={logoRef}>
+          <label className="secondary-text block font-[poppins] text-sm font-semibold">Logo</label>
           <div className="flex flex-col items-center space-y-4">
-            <ImagePreview url={logo} type="logo">
-              {/* <div className="absolute w-full space-y-2">
-                <input
-                  type="file"
-                  onChange={(e) => {
-                    if (!e.target.files?.[0]) return;
-                    setLogoFile(e.target.files[0]);
-                    setLogo(e.target.files[0].name);
-                  }}
-                  placeholder="Select"
-                  className="w-full rounded-lg border border-gray-300 py-2 pr-10 pl-3 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                />
-                {logo && (
-                  <button
-                    onClick={() => setLogo("")}
-                    className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div> */}
-              <UploadImg onSave={handleSave} type="logo" />
-
-              <p className="text-center text-[10px] text-gray-400 italic">
-                Recommended: 512x512px PNG or JPG
-              </p>
+            <ImagePreview
+              onClick={() => setIsActive((prev) => ({ ...prev, logo: true }))}
+              url={logo}
+              type="logo"
+            >
+              <UploadImg
+                isActive={isActive}
+                setIsActive={setIsActive}
+                onSave={handleSave}
+                type="logo"
+              />
             </ImagePreview>
-            {/* <div className="w-full space-y-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={logo}
-                  onChange={(e) => setLogo(e.target.value)}
-                  placeholder="Logo Image URL"
-                  className="w-full rounded-lg border border-gray-300 py-2 pr-10 pl-3 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                />
-                {logo && (
-                  <button
-                    onClick={() => setLogo("")}
-                    className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
-              <p className="text-center text-[10px] text-gray-400 italic">
-                Recommended: 512x512px PNG or JPG
-              </p>
-            </div> */}
+            {/* <ImagePreview
+              onClick={() => setIsActive((prev) => ({ ...prev, logo: true }))}
+              url={logo}
+              type="logo"
+            >
+              <UploadImg
+                isActive={isActive}
+                setIsActive={setIsActive}
+                onSave={handleSave}
+                type="logo"
+              />
+            </ImagePreview> */}
           </div>
         </div>
 
         {/* Banner Section */}
-        <div className="space-y-4 md:col-span-2">
-          <label className="block text-sm font-semibold text-gray-700">Team Banner</label>
+        <div className="space-y-4 md:col-span-2" ref={bannerRef}>
+          <label className="secondary-text block text-sm font-semibold">Team Banner</label>
           <div className="space-y-4">
-            <ImagePreview url={banner} type="banner">
-              {/* <div className="absolute top-0 right-0 h-full w-full space-y-2">
-                <input
-                  type="file"
-                  onChange={(e) => {
-                    if (!e.target.files?.[0]) return alert("Image type is not supported!");
-                    setBannerFile(e.target.files[0]);
-                    setBanner(e.target.files[0].name);
-                  }}
-                  placeholder="Banner Image URL"
-                  className="h-full w-full rounded-lg border border-gray-300 py-2 pr-10 pl-3 text-sm transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                />
-                {banner && (
-                  <button
-                    onClick={() => setBanner("")}
-                    className="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-                <p className="text-[10px] text-gray-400 italic">
-                  Recommended: 1200x400px high-resolution landscape
-                </p>
-              </div> */}
-              <UploadImg onSave={handleSave} type="banner" />
+            <ImagePreview
+              onClick={() => setIsActive((prev) => ({ ...prev, banner: true }))}
+              url={banner}
+              type="banner"
+            >
+              <UploadImg
+                isActive={isActive}
+                setIsActive={setIsActive}
+                onSave={handleSave}
+                type="banner"
+              />
             </ImagePreview>
           </div>
         </div>
@@ -252,23 +258,21 @@ export function UpdateLogoAndBanner({
               handleReset("banner");
             }}
             disabled={isSaving}
-            className="flex-1 px-4 py-2 text-sm font-semibold text-gray-600 transition-colors hover:text-gray-900 disabled:opacity-50 sm:flex-none"
+            className="secondary-btn flex-1 px-4 py-2 text-sm font-semibold transition-colors hover:text-gray-900 disabled:opacity-50 sm:flex-none"
           >
             Reset
           </button>
           <button
             onClick={() => {}}
             disabled={isSaving}
-            className={`flex flex-1 items-center justify-center rounded-xl px-6 py-2 text-sm font-bold text-white shadow-lg transition-all active:scale-95 disabled:opacity-70 sm:flex-none ${
-              isSaving ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700 hover:shadow-blue-200"
-            }`}
+            className={`primary-btn flex flex-1 items-center justify-center rounded-md px-6 py-2 text-sm font-bold text-white hover:opacity-80 active:scale-95 disabled:opacity-70 sm:flex-none`}
           >
             {isSaving ? (
               <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
             ) : (
               <Save size={18} className="mr-2" />
             )}
-            {isSaving ? "Saving..." : "Update Branding"}
+            {isSaving ? <Spinner /> : "Update"}
           </button>
         </div>
       </div>
@@ -280,19 +284,29 @@ const ImagePreview = ({
   url,
   type,
   children,
+  className,
+  onClick,
 }: {
   url: string;
   type: "logo" | "banner";
   children: ReactNode;
+  className?: string;
+  onClick: () => void;
 }) => {
   const isLogo = type === "logo";
-  const fallback = `https://placehold.co/${isLogo ? "200x200" : "800x200"}/f3f4f6/a1a1aa?text=No+${type}+set`;
+  const fallback = `https://placehold.co/${isLogo ? "200x200" : "800x200"}/f3f4f6/a1a1aa?text=${type}`;
 
   return (
     <div
-      className={`relative overflow-hidden border-2 border-dashed border-gray-200 bg-gray-100 ${
-        isLogo ? "h-32 w-32 rounded-full" : "h-40 w-full rounded-xl"
-      }`}
+      onClick={onClick}
+      className={cn(
+        `border-input relative overflow-hidden border-2 border-dashed bg-gray-600 dark:border-gray-200 dark:bg-gray-100 ${
+          isLogo
+            ? "aspect-square h-24 rounded-full lg:h-32"
+            : "aspect-video h-24 rounded-xl lg:h-40"
+        }`,
+        className
+      )}
     >
       <img
         src={url || fallback}
@@ -302,11 +316,6 @@ const ImagePreview = ({
           (e.target as HTMLImageElement).src = fallback;
         }}
       />
-      {!url && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <ImageIcon className="h-8 w-8 text-gray-300" />
-        </div>
-      )}
       {children}
     </div>
   );

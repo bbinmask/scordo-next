@@ -11,7 +11,10 @@ const Spinner = ({ className }: LoaderSizeProps) => {
 export const DefaultLoader = ({ className }: LoaderSizeProps) => {
   return (
     <div className="center flex min-h-[calc(100vh-9rem)]">
-      <MoonLoader className={cn("animate-spin", className)} />
+      <span className="relative h-[78px] w-[78px] animate-spin">
+        <span className="absolute top-[25px] h-[10px] w-[10px] animate-spin rounded-full bg-black dark:bg-white" />
+        <span className="absolute box-content h-[60px] w-[60px] rounded-full border-[9px] border-black opacity-30 dark:border-white" />
+      </span>
     </div>
   );
 };
