@@ -165,7 +165,7 @@ const updateLogoAndBannerHandler = async (
     return { error: error.message };
   }
 
-  revalidatePath(`/teams/${id}`);
+  revalidatePath(`/teams/${abbreviation}`);
 
   return { data: team };
 };

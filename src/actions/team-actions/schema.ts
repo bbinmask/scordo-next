@@ -21,5 +21,6 @@ export const UpdateTeam = CreateTeam.extend({
 export const UpdateLogoAndBanner = z.object({
   logo: z.file().optional(),
   banner: z.file().optional(),
+  abbreviation: z.string({ message: "Required parameter is missing!" }),
   id: z.string({ message: "Auth field is required!" }),
 });
