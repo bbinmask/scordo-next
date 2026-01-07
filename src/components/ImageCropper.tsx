@@ -32,7 +32,7 @@ export default function ImageCropper({
           <DialogTitle>Crop the image</DialogTitle>
           <DialogDescription>Description</DialogDescription>
         </DialogHeader>
-        <div className="relative min-h-[300px] w-full bg-black">
+        <div className="relative min-h-[300px] w-full bg-transparent">
           <Cropper
             image={image}
             crop={crop}

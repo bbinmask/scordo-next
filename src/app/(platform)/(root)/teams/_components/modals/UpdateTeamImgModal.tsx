@@ -235,6 +235,8 @@ export function UpdateLogoAndBanner({
     setIsActive((prev) => ({ ...prev, logo: false }));
   });
 
+  console.log({ logo, banner });
+
   return (
     <div className="mx-auto max-w-4xl space-y-8" ref={wrapperRef}>
       <div className="grid grid-cols-3 gap-8">

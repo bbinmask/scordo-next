@@ -82,52 +82,6 @@ const TeamIdPage = () => {
             {/* Main Content */}
 
             <div className="relative mt-4 grid grid-cols-1 gap-8 px-4 lg:grid-cols-3 lg:px-6">
-              {/* Requests */}
-
-              <div className="absolute top-10 right-10 z-50">
-                {isOwner ? (
-                  <div title="Team join requests">
-                    <Requests data={team} />
-                  </div>
-                ) : (
-                  <button
-                    className={`cursor-pointer rounded-lg border-none px-3 py-2 font-bold ${loading && "cursor-not-allowed opacity-50"} ${isAlreadyRequested ? "bg-gray-300 text-gray-800" : "nline-flex items-center rounded-full border-none bg-green-100 px-3 py-1 text-sm font-semibold text-green-800 dark:bg-green-800 dark:text-green-200"}`}
-                    onClick={() => {
-                      const confirm = window.confirm(
-                        isAlreadyInTeam
-                          ? "Are you sure you want to leave this team?"
-                          : isAlreadyRequested
-                            ? "Do you want to withdraw your join request?"
-                            : "Do you want to send a join request to this team?"
-                      );
-
-                      if (!confirm) return;
-
-                      if (isAlreadyInTeam) {
-                        leaveTeam();
-                      } else if (isAlreadyRequested) {
-                        withdrawJoinRequest();
-                      } else {
-                        joinTeam();
-                      }
-                    }}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <Spinner />
-                    ) : isAlreadyRequested ? (
-                      "sent"
-                    ) : isAlreadyInTeam ? (
-                      "Joined"
-                    ) : team.isRecruiting ? (
-                      "+ Join"
-                    ) : (
-                      "Full"
-                    )}
-                  </button>
-                )}
-              </div>
-
               {/* Left Column - General Info & Recruitment */}
               <div className="space-y-6 lg:col-span-1">
                 {/* Quick Info */}
@@ -353,17 +307,9 @@ export function TeamHeader({
 
   return (
     <>
-      <div
-        onMouseEnter={(e) => {
-          isOwner && setHide(true);
-        }}
-        onMouseLeave={(e) => {
-          setHide(false);
-        }}
-        className="container-bg relative overflow-hidden rounded-t-lg shadow-sm"
-      >
+      <div className="container-bg relative overflow-hidden rounded-t-lg shadow-sm">
         <div className="absolute top-4 right-4 z-20">
-          {isOwner && hide && (
+          {isOwner && (
             <div title="Edit Profile details" className="">
               <OptionsPopover team={team} />
             </div>
