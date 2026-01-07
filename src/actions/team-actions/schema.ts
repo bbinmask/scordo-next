@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const message = "Required parameter is missing";
+
 export const CreateTeam = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters long" }),
   abbreviation: z
@@ -14,18 +16,28 @@ export const CreateTeam = z.object({
 });
 
 export const UpdateTeam = CreateTeam.extend({
-  id: z.string({ message: "Team ID is required" }),
+  id: z.string({ message }),
   updatedAt: z.date().optional(),
 });
 
 export const UpdateLogoAndBanner = z.object({
   logo: z.file().optional(),
   banner: z.file().optional(),
-  abbreviation: z.string({ message: "Required parameter is missing!" }),
-  id: z.string({ message: "Auth field is required!" }),
+  abbreviation: z.string({ message }),
+  id: z.string({ message }),
 });
 
 export const UpdateRecruiting = z.object({
-  recruiting: z.boolean({ message: "Required parameter is missing!" }),
-  abbreviation: z.string({ message: "Required parameter is missing!" }),
+  recruiting: z.boolean({ message }),
+  abbreviation: z.string({ message }),
+});
+
+export const AcceptRequest = z.object({
+  fromId: z.string({ message }),
+  teamId: z.string({ message }),
+  reqId: z.string({ message }),
+});
+
+export const DeclineRequest = z.object({
+  reqId: z.string({ message }),
 });

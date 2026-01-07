@@ -4,20 +4,29 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import {
   InputType,
+  InputTypeForAccept,
   InputTypeForLogoAndBanner,
   InputTypeForRecruiting,
   InputTypeForUpdateTeam,
   ReturnType,
+  ReturnTypeForAccept,
   ReturnTypeForLogoAndBanner,
   ReturnTypeForRecruiting,
   ReturnTypeForUpdateTeam,
 } from "./types";
 import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { CreateTeam, UpdateLogoAndBanner, UpdateRecruiting, UpdateTeam } from "./schema";
+import {
+  AcceptRequest,
+  CreateTeam,
+  UpdateLogoAndBanner,
+  UpdateRecruiting,
+  UpdateTeam,
+} from "./schema";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
-import { User } from "@/generated/prisma";
+import { Player, User } from "@/generated/prisma";
 import { redirect } from "next/navigation";
+import { currentUser } from "@/lib/currentUser";
 
 const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
   const { userId: clerkId } = await auth();
@@ -203,11 +212,73 @@ const recruitingUpdateHanlder = async (
   return { data: team };
 };
 
+const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeForAccept> => {
+  const { fromId, reqId, teamId } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Unauthorized request!",
+    };
+
+  let request, team, player: Player | null;
+
+  try {
+    team = await db.team.findUnique({
+      where: {
+        id: teamId,
+      },
+      include: {
+        players: true,
+      },
+    });
+
+    if (team?.ownerId !== user.id)
+      return {
+        error: "Only owner can accept",
+      };
+
+    player = await db.player.findFirst({
+      where: {
+        userId: fromId,
+      },
+    });
+
+    if (!player)
+      return {
+        error: `The use is not a player!`,
+      };
+
+    if (team.players.findIndex((pl) => pl.id === player?.id))
+      return {
+        error: "Player is already in the team!",
+      };
+
+    team.players.push(player);
+
+    request = await db.teamRequest.delete({
+      where: {
+        id: reqId,
+      },
+    });
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+
+  revalidatePath(`/teams/${team.abbreviation}`);
+
+  return { data: team };
+};
+
 export const createTeam = createSafeAction(CreateTeam, createTeamHandler);
 export const updateTeam = createSafeAction(UpdateTeam, teamUpdateHandler);
 export const updateTeamLogoAndBanner = createSafeAction(
   UpdateLogoAndBanner,
   logoAndBannerUpdateHandler
 );
-
 export const updateRecruiting = createSafeAction(UpdateRecruiting, recruitingUpdateHanlder);
+
+export const acceptRequest = createSafeAction(AcceptRequest, acceptReqHandler);

@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { notFound, useParams } from "next/navigation";
-import Spinner, { DefaultLoader } from "@/components/Spinner";
+import { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
-import { useIsTeamOwner, useTeamRequest } from "@/hooks/useTeam";
+import { useIsTeamOwner } from "@/hooks/useTeam";
 import Link from "next/link";
 import {
   BuildingIcon,
@@ -21,13 +21,11 @@ import {
   UserPlus,
   UsersIcon,
 } from "lucide-react";
-import Requests from "../_components/Requests";
 import { Player as IPlayer, Team as ITeam, User } from "@/generated/prisma";
 import { useUpdateTeam } from "@/hooks/store/use-team";
 import OptionsPopover from "../_components/OptionsPopover";
 import { formatDate } from "@/utils/helper/formatDate";
-import UpdateTeamImgModal from "../_components/modals/UpdateTeamImgModal";
-import { useNotificationModal } from "@/hooks/store/use-profile-notifications";
+import { TeamRequestWithDetails } from "@/lib/types";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -66,11 +64,24 @@ const TeamIdPage = () => {
     },
   });
 
+  const { data: requests, isLoading: reqLoading } = useQuery<TeamRequestWithDetails>({
+    queryKey: ["team-requests", user?.id],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/teams/${params.abbr}/requests`, {
+        params: {
+          isOwner: team?.ownerId,
+        },
+      });
+
+      return data.data;
+    },
+  });
+
   const { isOwner } = useIsTeamOwner(team as any, user?.id);
 
   const { isOpen, onClose, onOpen } = useUpdateTeam();
-  const { joinTeam, leaveTeam, withdrawJoinRequest, loading, isAlreadyInTeam, isAlreadyRequested } =
-    useTeamRequest(team as any, user);
+
+  console.log({ requests });
 
   return (
     <div className="w-full pt-4">
