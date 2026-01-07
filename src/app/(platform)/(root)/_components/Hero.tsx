@@ -18,7 +18,7 @@ const HeroSection = ({ user }: HeroSectionProps) => {
     venue: "City Cricket Ground",
   };
 
-  const banner = user?.players[0].team.banner
+  const banner = user?.players[0]?.team?.banner
     ? user?.players[0].team.banner
     : `/assets/banners/hero-team-banner.png`;
 

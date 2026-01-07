@@ -4,12 +4,13 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { notFound, useParams } from "next/navigation";
-import { DefaultLoader } from "@/components/Spinner";
+import Spinner, { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { useIsTeamOwner } from "@/hooks/useTeam";
 import Link from "next/link";
 import {
   BuildingIcon,
+  Cross,
   GitBranchPlusIcon,
   Info,
   Lock,
@@ -26,6 +27,9 @@ import { useUpdateTeam } from "@/hooks/store/use-team";
 import OptionsPopover from "../_components/OptionsPopover";
 import { formatDate } from "@/utils/helper/formatDate";
 import { TeamRequestWithDetails } from "@/lib/types";
+import { useAction } from "@/hooks/useAction";
+import { sendTeamRequest } from "@/actions/team-actions";
+import { toast } from "sonner";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -75,8 +79,6 @@ const TeamIdPage = () => {
 
   const { isOwner } = useIsTeamOwner(team as any, user?.id);
 
-  const { isOpen, onClose, onOpen } = useUpdateTeam();
-
   console.log({ requests });
 
   return (
@@ -85,7 +87,7 @@ const TeamIdPage = () => {
       {team ? (
         <div className="container-bg relative flex rounded-lg border pb-6">
           <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
-            <TeamHeader user={user} isOwner={isOwner} team={team as any} onJoinTeam={() => {}} />
+            <TeamHeader user={user} isOwner={isOwner} team={team as any} />
             {/* Main Content */}
 
             <div className="relative mt-4 grid grid-cols-1 gap-8 px-4 lg:grid-cols-3 lg:px-6">
@@ -291,24 +293,40 @@ const TeamIdPage = () => {
 
 export function TeamHeader({
   team,
-  onJoinTeam,
   isOwner,
   user,
 }: {
   team: TeamDetailsProp;
-  onJoinTeam: () => void;
   isOwner: boolean;
   user?: User;
 }) {
-  const [isAlreadyInTeam, setIsAlreadyInTeam] = useState(false);
-  const [hide, setHide] = useState(false);
+  const [conditionState, setConditionState] = useState({
+    alreadyInTeam: false,
+    alreadySendRequest: false,
+  });
 
-  const onLeaveTeam = () => {};
+  const { execute, isLoading } = useAction(sendTeamRequest, {
+    onSuccess: (data) => {
+      setConditionState((prev) => ({ ...prev, alreadySendRequest: true }));
+      toast.success("Request sent!");
+    },
+    onError: (err) => {
+      setConditionState((prev) => ({ ...prev, alreadySendRequest: false }));
+      toast.error(err);
+    },
+  });
+
+  const handleLeaveTeam = () => {};
+
+  const handleJoinTeam = () => {
+    if (conditionState.alreadySendRequest || conditionState.alreadyInTeam) return;
+    execute({ teamId: team.id });
+  };
 
   useEffect(() => {
     if (user) {
       const index = team.players.findIndex((pl) => pl.user.username === user?.username);
-      if (index !== -1) setIsAlreadyInTeam(true);
+      if (index !== -1) setConditionState((prev) => ({ ...prev, alreadyInTeam: true }));
     }
   }, [user]);
 
@@ -362,23 +380,30 @@ export function TeamHeader({
 
             {/* Join Button */}
             <div className="mt-4 sm:mt-0">
-              {isAlreadyInTeam ? (
+              {conditionState.alreadyInTeam ? (
                 <button
-                  onClick={onLeaveTeam}
-                  className="flex items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+                  onClick={handleLeaveTeam}
+                  className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
                 >
                   <MinusCircle size={20} className="mr-1" /> Leave
                 </button>
+              ) : conditionState.alreadySendRequest ? (
+                <button
+                  onClick={() => {}}
+                  className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+                >
+                  <Cross size={20} className="mr-1" /> Cancel
+                </button>
               ) : team.isRecruiting ? (
                 <button
-                  onClick={onJoinTeam}
-                  className="flex transform items-center rounded-lg bg-blue-600 px-4 py-2 font-[urbanist] text-sm font-semibold text-white shadow-md transition duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-blue-700"
+                  disabled={isLoading}
+                  onClick={handleJoinTeam}
+                  className="primary-btn flex transform cursor-pointer items-center rounded-3xl px-4 py-2 font-[urbanist] text-sm hover:opacity-80 active:scale-95"
                 >
-                  <UserPlus size={20} className="mr-1" />
-                  Join
+                  {isLoading ? <Spinner /> : "Join"}
                 </button>
               ) : (
-                <span className="flex items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+                <span className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
                   Private <Lock className="h-4 w-4" />
                 </span>
               )}

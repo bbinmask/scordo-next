@@ -43,6 +43,15 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
       },
     });
 
+    if (role === "player") {
+      await db.player.create({
+        data: {
+          userId: user.id,
+          teamId: user.id,
+        },
+      });
+    }
+
     if (!user) {
       return { error: "Failed to create user" };
     }
@@ -70,6 +79,17 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
     console.error(error?.message);
     return { error: error.message || "Failed to create user" };
   }
+};
+
+const createPlayerHandler = async (): Promise<any> => {
+  const user = await currentUser();
+
+  if (!user) return;
+
+  let player;
+
+  try {
+  } catch (error) {}
 };
 
 const sendFriendRequestHandler = async (
