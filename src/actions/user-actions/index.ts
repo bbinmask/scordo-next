@@ -12,7 +12,7 @@ import {
 import Error from "http-errors";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { createSafeAction, ActionState } from "@/lib/create-safe-action";
-import { RecievedRequest, CreateUser, SentRequest } from "./schema";
+import { RecievedRequest, CreateUser, SentRequest, CreatePlayer } from "./schema";
 import { User } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@/lib/currentUser";
@@ -89,7 +89,29 @@ const createPlayerHandler = async (): Promise<any> => {
   let player;
 
   try {
-  } catch (error) {}
+    const alreadyPlayer = await db.player.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (alreadyPlayer) return;
+
+    player = await db.player.create({
+      data: {
+        userId: user.id,
+        teamId: user.id,
+      },
+    });
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+
+  revalidatePath(`/profile`);
+
+  return { data: player };
 };
 
 const sendFriendRequestHandler = async (
@@ -261,6 +283,8 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
 const declineRequestHandler = async () => {};
 
 export const createUser = createSafeAction(CreateUser, createUserHandler);
+
+export const createPlayer = createSafeAction(CreatePlayer, createPlayerHandler);
 
 export const sendFriendRequest = createSafeAction(SentRequest, sendFriendRequestHandler);
 

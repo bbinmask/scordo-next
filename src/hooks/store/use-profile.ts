@@ -1,24 +1,24 @@
 import { create } from "zustand";
 
-type UpdateTeamProps = {
+type ProfileModalProps = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
 };
 
-export const useUpdateTeam = create<UpdateTeamProps>((set) => ({
+export const useRequestModal = create<ProfileModalProps>((set) => ({
   isOpen: false,
   onOpen: () => set({ isOpen: true }),
   onClose: () => set({ isOpen: false }),
 }));
 
-export const useUpdateLogoAndBanner = create<UpdateTeamProps>((set) => ({
+export const useDetailsModal = create<ProfileModalProps>((set) => ({
   isOpen: false,
   onOpen: () => set({ isOpen: true }),
   onClose: () => set({ isOpen: false }),
 }));
 
-export const useNotificationModal = create<UpdateTeamProps>((set) => ({
+export const useProfileModal = create<ProfileModalProps>((set) => ({
   isOpen: false,
   onOpen: () => set({ isOpen: true }),
   onClose: () => set({ isOpen: false }),

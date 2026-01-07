@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { FaUser } from "react-icons/fa6";
 import { BiSolidMessage } from "react-icons/bi";
 import { Bell, BellDot } from "lucide-react";
-import { useNotificationModal } from "@/hooks/store/use-profile-notifications";
+import { useRequestModal } from "@/hooks/store/use-profile";
 import RequestsModal from "@/components/modals/RequestsModal";
 import {
   FriendshipWithBoth,
@@ -26,7 +26,7 @@ const FriendRequests = ({ className, requests }: FriendRequestsProps) => {
       requests.teamRequests.length &&
       requests.tournamentRequests.length) === 0;
 
-  const { onOpen } = useNotificationModal();
+  const { onOpen } = useRequestModal();
 
   return (
     <div className={cn("", className)}>

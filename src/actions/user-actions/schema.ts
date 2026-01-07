@@ -29,3 +29,5 @@ export const RecievedRequest = z.object({
   reqId: z.string({ error: "Request Id is required" }),
   reqUsername: z.string({ error: "Username is required" }),
 });
+
+export const CreatePlayer = z.object({});

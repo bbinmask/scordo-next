@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import { useNotificationModal } from "@/hooks/store/use-profile-notifications";
+import { useRequestModal } from "@/hooks/store/use-profile";
 import NotFoundParagraph from "../NotFoundParagraph";
 import { capitalize, debounce } from "lodash";
 import { AnimatePresence, motion } from "framer-motion";
@@ -57,7 +57,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
 
   const { confirmModalState, closeConfirmModal, openConfirmModal } = useConfirmModal();
 
-  const { isOpen, onClose } = useNotificationModal();
+  const { isOpen, onClose } = useRequestModal();
 
   const { execute: acceptFriendRequest, isLoading } = useAction(acceptRequest, {
     onSuccess: (data) => {

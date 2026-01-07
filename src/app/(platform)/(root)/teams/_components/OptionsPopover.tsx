@@ -18,7 +18,7 @@ interface OptionsPopoverProps {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useUpdateLogoAndBanner, useUpdateTeam } from "@/hooks/store/use-team";
-import { useNotificationModal } from "@/hooks/store/use-profile-notifications";
+import { useNotificationModal } from "@/hooks/store/use-team";
 import UpdateTeamImgModal from "./modals/UpdateTeamImgModal";
 import { Team } from "@/generated/prisma";
 import UpdateTeamModal from "./modals/UpdateTeamModal";
