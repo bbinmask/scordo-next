@@ -38,6 +38,10 @@ export const AcceptRequest = z.object({
   reqId: z.string({ message }),
 });
 
+export const SendRequest = z.object({
+  teamId: z.string({ message }),
+});
+
 export const DeclineRequest = z.object({
   reqId: z.string({ message }),
 });

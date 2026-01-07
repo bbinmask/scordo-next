@@ -7,11 +7,13 @@ import {
   InputTypeForAccept,
   InputTypeForLogoAndBanner,
   InputTypeForRecruiting,
+  InputTypeForSend,
   InputTypeForUpdateTeam,
   ReturnType,
   ReturnTypeForAccept,
   ReturnTypeForLogoAndBanner,
   ReturnTypeForRecruiting,
+  ReturnTypeForSend,
   ReturnTypeForUpdateTeam,
 } from "./types";
 import { auth } from "@clerk/nextjs/server";
@@ -19,6 +21,7 @@ import { createSafeAction } from "@/lib/create-safe-action";
 import {
   AcceptRequest,
   CreateTeam,
+  SendRequest,
   UpdateLogoAndBanner,
   UpdateRecruiting,
   UpdateTeam,
@@ -212,6 +215,59 @@ const recruitingUpdateHanlder = async (
   return { data: team };
 };
 
+const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeForSend> => {
+  const { teamId } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Sign in to join the team!",
+    };
+
+  let player, request, team;
+
+  try {
+    player = await db.player.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (!player)
+      return {
+        error: "You are not a player!",
+      };
+
+    team = await db.team.findUnique({
+      where: {
+        id: teamId,
+      },
+    });
+
+    if (!team)
+      return {
+        error: "Team not found!",
+      };
+
+    request = await db.teamRequest.create({
+      data: {
+        fromId: user.id,
+        toId: team.ownerId,
+        teamId,
+      },
+    });
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+
+  revalidatePath(`/teams/${team.abbreviation}`);
+
+  return { data: request };
+};
+
 const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeForAccept> => {
   const { fromId, reqId, teamId } = data;
 
@@ -281,4 +337,5 @@ export const updateTeamLogoAndBanner = createSafeAction(
 );
 export const updateRecruiting = createSafeAction(UpdateRecruiting, recruitingUpdateHanlder);
 
-export const acceptRequest = createSafeAction(AcceptRequest, acceptReqHandler);
+export const acceptTeamRequest = createSafeAction(AcceptRequest, acceptReqHandler);
+export const sendTeamRequest = createSafeAction(SendRequest, sendRequestHandler);

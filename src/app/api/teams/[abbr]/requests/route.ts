@@ -8,20 +8,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ abbr
 
   const user = await currentUser();
 
-  if (!user) return;
-
-  const searchParams = req.nextUrl.search;
-
-  const teamOwner = searchParams.split("=")[1];
-
-  if (teamOwner !== user.id) return;
+  if (!user) return NextResponse.json(new ApiError(403, "User not found!"));
 
   try {
+    const team = await db.team.findUnique({
+      where: { abbreviation: abbr },
+    });
+
+    if (!team) return NextResponse.json(new ApiError(404, "Team not found!"));
+
     const requests = await db.teamRequest.findMany({
       where: {
-        team: {
-          ownerId: teamOwner,
-        },
+        toId: team.ownerId,
+        teamId: team.id,
       },
       include: {
         from: true,

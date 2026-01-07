@@ -67,11 +67,7 @@ const TeamIdPage = () => {
   const { data: requests, isLoading: reqLoading } = useQuery<TeamRequestWithDetails>({
     queryKey: ["team-requests", user?.id],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/teams/${params.abbr}/requests`, {
-        params: {
-          isOwner: team?.ownerId,
-        },
-      });
+      const { data } = await axios.get(`/api/teams/${params.abbr}/requests`);
 
       return data.data;
     },
