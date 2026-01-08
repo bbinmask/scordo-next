@@ -23,6 +23,8 @@ import {
 } from "@/lib/types";
 import OptionsPopover from "./OptionsPopover";
 import { useDetailsModal, useProfileModal, useRequestModal } from "@/hooks/store/use-profile";
+import UpdateProfileModal from "./UpdateProfileModal";
+import EditDetailsModal from "./EditDetailsModal";
 
 interface InfoCardProps {
   label: string;
@@ -244,8 +246,10 @@ const PersonalDetails = ({
         <OptionsPopover user={user} />
       </div>
 
-      <></>
-      <FriendsModal friends={friends} isOwnProfile />
+      <>
+        <EditDetailsModal />
+        <FriendsModal friends={friends} isOwnProfile />
+      </>
     </div>
   );
 };

@@ -280,9 +280,46 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
   return { data: friends };
 };
 
+const updateUserHandler = async (data: InputCreateUserType): Promise<ReturnCreateUserType> => {
+  const { availability, dob, name, username, address, contact, gender, role } = data;
+
+  const oldUser = await currentUser();
+
+  if (!oldUser) return {};
+
+  let user;
+  try {
+    user = await db.user.update({
+      where: {
+        id: oldUser.id,
+      },
+      data: {
+        availability,
+        address,
+        contact,
+        dob,
+        gender,
+        username,
+        role,
+        name,
+      },
+    });
+  } catch (error: any) {
+    return {
+      error: error?.message,
+    };
+  }
+
+  return {
+    data: user,
+  };
+};
+
 const declineRequestHandler = async () => {};
 
 export const createUser = createSafeAction(CreateUser, createUserHandler);
+
+export const updateUser = createSafeAction(CreateUser, updateUserHandler);
 
 export const createPlayer = createSafeAction(CreatePlayer, createPlayerHandler);
 
