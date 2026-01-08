@@ -20,3 +20,5 @@ export interface BreadScrumbLinkProps {
   href: string;
   name: string;
 }
+
+export type IImageType = "logo" | "banner" | "avatar";
