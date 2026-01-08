@@ -3,7 +3,12 @@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { User } from "@/generated/prisma";
-import { useDetailsModal, useProfileModal, useRequestModal } from "@/hooks/store/use-profile";
+import {
+  useDetailsModal,
+  useProfileModal,
+  useRequestModal,
+  useSettingModal,
+} from "@/hooks/store/use-profile";
 import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 
@@ -15,6 +20,7 @@ const OptionsPopover = ({ user }: OptionsPopoverProps) => {
   const { onOpen: onProfileOpen } = useProfileModal();
   const { onOpen: onDetailOpen } = useDetailsModal();
   const { onOpen: onRequestOpen } = useRequestModal();
+  const { onOpen: onSettingOpen } = useSettingModal();
 
   return (
     <Popover>
@@ -57,6 +63,14 @@ const OptionsPopover = ({ user }: OptionsPopoverProps) => {
           >
             <span className="h-2.5 w-2.5 rounded-full bg-gray-800 dark:bg-gray-500"></span>
             <span className="primary-text font-[urbanist] text-base font-semibold">Requests</span>
+          </li>
+
+          <li
+            onClick={onSettingOpen}
+            className="flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-gray-300 hover:opacity-80 dark:hover:bg-gray-700"
+          >
+            <span className="h-2.5 w-2.5 rounded-full bg-gray-800 dark:bg-gray-500"></span>
+            <span className="primary-text font-[urbanist] text-base font-semibold">Settings</span>
           </li>
         </ul>
         <></>

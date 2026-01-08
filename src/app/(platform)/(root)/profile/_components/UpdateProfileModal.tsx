@@ -21,6 +21,8 @@ interface UpdateProfileModalProps {
 const UpdateProfileModal = ({ user }: UpdateProfileModalProps) => {
   const { isOpen, onClose } = useProfileModal();
 
+  console.log(user);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-full max-w-sm rounded-lg bg-white font-[poppins] dark:bg-gray-800">
