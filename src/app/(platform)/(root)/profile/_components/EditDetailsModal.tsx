@@ -7,12 +7,15 @@ import {
 } from "@/components/ui/dialog";
 import UserDetailsForm from "../../_components/UserDetailsForm";
 import { Separator } from "@/components/ui/separator";
+import { User } from "@/generated/prisma";
+import { useDetailsModal } from "@/hooks/store/use-profile";
 
-interface EditDetailsModalProps {}
+interface EditDetailsModalProps {
+  user: User;
+}
 
-const EditDetailsModal = ({}: EditDetailsModalProps) => {
-  const isOpen = true;
-  const onClose = () => {};
+const EditDetailsModal = ({ user }: EditDetailsModalProps) => {
+  const { isOpen, onClose } = useDetailsModal();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -23,7 +26,7 @@ const EditDetailsModal = ({}: EditDetailsModalProps) => {
           </DialogTitle>
           <Separator />
         </DialogHeader>
-        <UserDetailsForm />
+        <UserDetailsForm user={user} />
       </DialogContent>
     </Dialog>
   );

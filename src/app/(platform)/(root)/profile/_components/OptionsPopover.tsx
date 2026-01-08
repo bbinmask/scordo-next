@@ -12,17 +12,9 @@ interface OptionsPopoverProps {
 }
 
 const OptionsPopover = ({ user }: OptionsPopoverProps) => {
-  const {
-    isOpen: isProfileOpen,
-    onClose: onProfileClose,
-    onOpen: onProfileOpen,
-  } = useProfileModal();
-  const { isOpen: isDetailOpen, onClose: onDetailClose, onOpen: onDetailOpen } = useDetailsModal();
-  const {
-    isOpen: isRequestOpen,
-    onClose: onRequestClose,
-    onOpen: onRequestOpen,
-  } = useRequestModal();
+  const { onOpen: onProfileOpen } = useProfileModal();
+  const { onOpen: onDetailOpen } = useDetailsModal();
+  const { onOpen: onRequestOpen } = useRequestModal();
 
   return (
     <Popover>

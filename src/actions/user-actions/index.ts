@@ -8,11 +8,18 @@ import {
   ReturnAcceptRequestType,
   ReturnCreateUserType,
   ReturnSentRequestType,
+  InputTypeForUpdateUserDetails,
 } from "./types";
 import Error from "http-errors";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { createSafeAction, ActionState } from "@/lib/create-safe-action";
-import { RecievedRequest, CreateUser, SentRequest, CreatePlayer } from "./schema";
+import {
+  RecievedRequest,
+  CreateUser,
+  SentRequest,
+  CreatePlayer,
+  UpdateUserDetails,
+} from "./schema";
 import { User } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@/lib/currentUser";
@@ -280,8 +287,10 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
   return { data: friends };
 };
 
-const updateUserHandler = async (data: InputCreateUserType): Promise<ReturnCreateUserType> => {
-  const { availability, dob, name, username, address, contact, gender, role } = data;
+const updateUserDetailsHandler = async (
+  data: InputTypeForUpdateUserDetails
+): Promise<ReturnCreateUserType> => {
+  const { dob, name, username, contact, gender, bio } = data;
 
   const oldUser = await currentUser();
 
@@ -294,13 +303,11 @@ const updateUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
         id: oldUser.id,
       },
       data: {
-        availability,
-        address,
         contact,
+        bio,
         dob,
         gender,
         username,
-        role,
         name,
       },
     });
@@ -319,7 +326,7 @@ const declineRequestHandler = async () => {};
 
 export const createUser = createSafeAction(CreateUser, createUserHandler);
 
-export const updateUser = createSafeAction(CreateUser, updateUserHandler);
+export const updateUserDetails = createSafeAction(UpdateUserDetails, updateUserDetailsHandler);
 
 export const createPlayer = createSafeAction(CreatePlayer, createPlayerHandler);
 

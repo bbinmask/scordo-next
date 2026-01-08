@@ -247,7 +247,7 @@ const PersonalDetails = ({
       </div>
 
       <>
-        <EditDetailsModal />
+        <EditDetailsModal user={user} />
         <FriendsModal friends={friends} isOwnProfile />
       </>
     </div>

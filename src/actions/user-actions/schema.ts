@@ -30,4 +30,33 @@ export const RecievedRequest = z.object({
   reqUsername: z.string({ error: "Username is required" }),
 });
 
+export const UpdateUserDetails = z.object({
+  username: z
+    .string()
+    .min(2, { message: "Username must be at least 2 characters." })
+    .max(30, { message: "Username must not exceed 30 characters." }),
+
+  name: z.string().min(3, { message: "Name must be at least 3 characters." }),
+
+  gender: z.enum(["male", "female", "other"]).optional().nullable(),
+
+  // role: z.enum(["admin", "user", "manager"]).optional(),
+
+  contact: z
+    .string()
+    .min(10, { message: "Contact number must be at least 10 digits." })
+    .regex(/^\d+$/, { message: "Contact must contain only numbers." })
+    .nullable(),
+
+  bio: z.string().max(50, { message: "Bio must be less than 50 words" }).nullable(),
+
+  dob: z.date(),
+
+  // availability: z.boolean({
+  //   message: "Availability is required.",
+  // }),
+
+  // address: z.string().min(10, { message: "Address must be at least 10 characters." }),
+});
+
 export const CreatePlayer = z.object({});
