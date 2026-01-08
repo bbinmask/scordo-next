@@ -37,8 +37,8 @@ const UserIdPage = async ({ params }: UserIdProps) => {
   }
 
   return (
-    <div className="min-h-[400px] w-full pt-2">
-      <UserProfile user={user} currentUser={currentUser} />
+    <div className="min-h-[400px] w-full">
+      <UserProfile user={user} />
     </div>
   );
 };

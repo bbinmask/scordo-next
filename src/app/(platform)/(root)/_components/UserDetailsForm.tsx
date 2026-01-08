@@ -31,6 +31,7 @@ import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { User } from "@/generated/prisma";
 import { UpdateUserDetails } from "@/actions/user-actions/schema";
+import { useDetailsModal } from "@/hooks/store/use-profile";
 
 interface UserDetailsFormProps {
   user: User;
@@ -49,6 +50,8 @@ const UserDetailsForm = ({ user }: UserDetailsFormProps) => {
     },
   });
 
+  const { onClose } = useDetailsModal();
+
   function onSubmit(values: z.infer<typeof UpdateUserDetails>) {
     execute(values);
   }
@@ -56,6 +59,7 @@ const UserDetailsForm = ({ user }: UserDetailsFormProps) => {
   const { execute, isLoading } = useAction(updateUserDetails, {
     onSuccess: (data) => {
       toast.success("Updated successfully!");
+      onClose();
     },
     onError: (err) => {
       toast.error(err);

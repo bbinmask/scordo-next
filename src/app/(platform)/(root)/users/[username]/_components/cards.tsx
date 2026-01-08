@@ -17,10 +17,22 @@ import {
   Info,
   UserCheck2,
   Users,
+  UserIcon,
+  ShieldCheck,
+  Zap,
+  MoreVertical,
+  BarChart3,
+  Mail,
+  ExternalLink,
+  Gamepad2,
+  Trophy,
+  Plus,
+  LucideProps,
+  LucideIcon,
 } from "lucide-react";
 import { calculateAge } from "@/utils/helper/calculateAge";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
-import { capitalize } from "lodash";
+// import { capitalize } from "lodash";
 import { toast } from "sonner";
 import { useFriendsModal } from "@/hooks/store/use-friends";
 import { FriendshipWithBoth } from "@/lib/types";
@@ -45,7 +57,21 @@ interface DescriptionProps {
   currentUser: User;
 }
 
-export default function UserProfile({ user, currentUser }: UserProfilePage) {
+const capitalize = (str: string) => {
+  if (!str) return "N/A";
+  const label = str.replace(/-/g, " ");
+  return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+};
+
+const getFullAddress = (address: any) => address || "Global / Remote";
+const checkAvailability = (availability: any) =>
+  availability ? "Available for Teams" : "Busy / In-Match";
+
+const ProfilePage = ({ user }: { user: User }) => {
+  const queryClient = useQueryClient();
+
+  const [currentTab, setCurrentTab] = useState("statschart");
+
   const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
     queryKey: ["friends"],
     queryFn: async () => {
@@ -54,15 +80,278 @@ export default function UserProfile({ user, currentUser }: UserProfilePage) {
     },
   });
 
+  const { confirmModalState, openConfirmModal, closeConfirmModal } = useConfirmModal();
+
+  const { execute: sendReq, isLoading } = useAction(sendFriendRequest, {
+    onSuccess: (data) => {
+      toast.success("Request sent");
+      queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
+    },
+    onError: (err) => toast.error(err),
+  });
+
+  const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
+    onSuccess: (_) => {
+      queryClient.invalidateQueries({ queryKey: ["friends"] });
+    },
+  });
+  const { execute: cancelReq, isLoading: isCanceling } = useAction(cancelFriendRequest, {
+    onSuccess: (data) => {
+      toast.success("Request Cancelled");
+      queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
+    },
+    onError: (err) => toast.error(err),
+  });
+
+  // const { data: friendRequest, isLoading: requestsLoading } = useQuery<Friendship[]>({
+  //   queryKey: ["friend-requests", user.id],
+  //   queryFn: async () => {
+  //     const res = await axios.get(`/api/users/friends/requests/${user.id}`);
+  //     return res.data;
+  //   },
+  // });
+
+  // const requestStatus: "none" | "pending" | "declined" | "blocked" | "accepted" = useMemo(() => {
+  //   if ((!friendRequest || friendRequest.length === 0) && (!friends || friends.length === 0))
+  //     return "none";
+
+  //   const req = friendRequest?.find((r) => r.requesterId === currentUser.id);
+
+  //   if (!req) return "none";
+
+  //   switch (req.status) {
+  //     case "PENDING":
+  //       return "pending";
+  //     case "DECLINED":
+  //       return "declined";
+  //     case "BLOCKED":
+  //       return "blocked";
+  //     case "ACCEPTED":
+  //       return "accepted";
+  //     default:
+  //       return "none";
+  //   }
+  // }, [friendRequest, currentUser.id]);
+
+  const [friendshipStatus, setFriendshipStatus] = useState<"accepted" | "none">("none");
+
+  const handleFriendRequest = (status: string) => {
+    if (status === "none" || status === "declined") {
+      sendReq({ addresseeId: user.id, username: user.username });
+    } else if (status === "pending") {
+      cancelReq({ addresseeId: user.id, username: user.username });
+    } else if (status === "accepted") {
+      deleteFriend({ addresseeId: user.id, username: user.username });
+    }
+  };
+
+  // useEffect(() => {
+  //   const friend = friends?.find(
+  //     (fr) => fr.requesterId === currentUser.id || fr.addresseeId === currentUser.id
+  //   );
+
+  //   setFriendshipStatus(friend ? "accepted" : "none");
+  // }, [friends, currentUser]);
+
   return (
-    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
-      <ProfileCard friends={friends || []} currentUser={currentUser} user={user} />
-      <div className="lg:col-span-2">
-        <Description currentUser={currentUser} user={user} friends={friends} />
+    <div className="bg-slate-50 pb-12 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
+      {/* Hero Banner Area */}
+      <div className="relative h-64 w-full overflow-hidden bg-gradient-to-r from-emerald-600 via-green-600 to-green-800 md:h-80">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-50 to-transparent dark:from-[#020617]" />
+      </div>
+
+      <div className="relative z-10 mx-auto -mt-32 max-w-6xl px-4">
+        {/* Top Header Card */}
+        <div className="mb-8 flex flex-col items-start gap-6 md:flex-row">
+          <div className="group relative">
+            <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl border-8 border-white bg-slate-200 shadow-2xl transition-transform duration-300 group-hover:scale-[1.02] md:h-48 md:w-48 dark:border-slate-900 dark:bg-slate-800">
+              {user.avatar ? (
+                <img src={user.avatar} alt="User avatar" className="h-full w-full object-cover" />
+              ) : (
+                <UserIcon className="h-20 w-20 text-slate-400" />
+              )}
+            </div>
+            {user.isVerified && (
+              <div className="absolute -right-2 -bottom-2 rounded-2xl bg-green-500 p-2 text-white shadow-xl ring-4 ring-white dark:ring-slate-900">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+            )}
+          </div>
+          <div className="flex w-full items-center justify-between md:mt-28">
+            <div className="flex-1 pb-2 text-left">
+              <div className="flex flex-wrap items-center justify-start gap-3">
+                <h1 className="font-[cal_sans] text-3xl font-semibold tracking-wide md:text-5xl">
+                  {user.name}
+                </h1>
+              </div>
+              <p className="mt-1 font-[urbanist] text-base font-semibold text-slate-500 dark:text-slate-400">
+                @{user.username}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pb-2 md:w-auto">
+              <button className="primary-btn flex max-w-32 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-base shadow-lg shadow-green-500/30 transition-all active:scale-95 md:flex-none">
+                <Plus className="h-4 w-4 fill-current" />
+                Add
+              </button>
+              <button className="cursor-pointer rounded-2xl border border-slate-200 bg-white p-3 text-slate-500 shadow-sm dark:border-white/10 dark:bg-slate-800">
+                <MoreVertical className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Bento Grid */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
+          {/* Bio - Large Box */}
+          <BentoCard className="md:col-span-8" title="Bio" icon={Info}>
+            <p className="secondary-text font-[urbanist] text-base leading-relaxed font-semibold md:text-lg">
+              {user.bio}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-4">
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <MapPin className="h-4 w-4 text-green-500" />
+                {getFullAddress(user.address)}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Clock className="h-4 w-4 text-green-500" />
+                Member since {formatDate(new Date(user.createdAt))?.split(",")?.[1]}
+              </div>
+            </div>
+          </BentoCard>
+
+          {/* Quick Stats Summary */}
+          <BentoCard
+            className="bg-green-600 !text-white md:col-span-4 dark:bg-green-600"
+            title="Quick Stats"
+            icon={BarChart3}
+          >
+            <div className="grid h-full grid-cols-2 content-center gap-4">
+              <div>
+                <p className="font-[poppins] text-xs font-semibold text-green-600 uppercase dark:text-green-200">
+                  Win Rate
+                </p>
+                {/* <p className="text-3xl font-black">{user.winRate}</p> */}
+              </div>
+              <div>
+                <p className="font-[poppins] text-xs font-semibold text-green-600 uppercase dark:text-green-200">
+                  Matches
+                </p>
+                {/* <p className="text-3xl font-black">{user.matches}</p> */}
+              </div>
+              <div className="col-span-2 pt-4">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-black/20 dark:bg-white/20">
+                  <div className="h-full w-[68%] bg-green-600"></div>
+                </div>
+                <p className="mt-2 font-[urbanist] text-[10px] font-semibold tracking-wide text-green-100 uppercase">
+                  Current Season Progress
+                </p>
+              </div>
+            </div>
+          </BentoCard>
+
+          {/* Personal Info Grid - Columnized */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:col-span-12 lg:grid-cols-4">
+            <BentoCard title="Email Address" icon={Mail}>
+              <p className="truncate font-[urbanist] text-sm font-semibold">{user.email}</p>
+            </BentoCard>
+            <BentoCard title="Date of Birth" icon={Calendar}>
+              <p className="font-[urbanist] text-sm font-semibold">May 15, 1995</p>
+            </BentoCard>
+            <BentoCard title="Availability" icon={Zap}>
+              <p className="font-[urbanist] text-sm font-semibold text-green-500">
+                {checkAvailability(user.availability)}
+              </p>
+            </BentoCard>
+            <BentoCard title="Friends" icon={Users}>
+              <p className="font-[urbanist] text-sm font-semibold">1,248 Connections</p>
+            </BentoCard>
+          </div>
+
+          {/* Main Content Tabs Area */}
+          <div className="mt-4 md:col-span-12">
+            <div className="mb-6 flex flex-col items-center justify-between gap-4 px-2 md:flex-row">
+              <div className="flex w-full gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
+                {["statschart", "match-stats", "tournament-stats"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setCurrentTab(tab)}
+                    className={`rounded-xl px-6 py-2 font-[urbanist] text-sm font-semibold whitespace-nowrap transition-all ${
+                      currentTab === tab
+                        ? "bg-white text-green-600 shadow-sm dark:bg-green-600 dark:text-white"
+                        : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                    }`}
+                  >
+                    {capitalize(tab)}
+                  </button>
+                ))}
+              </div>
+              <button className="flex items-center gap-2 font-[urbanist] text-sm font-semibold text-green-500 hover:underline">
+                View Full History <ExternalLink className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="relative flex min-h-[400px] items-center justify-center overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 dark:border-white/10 dark:bg-slate-900/30">
+              <div className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-5">
+                <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-green-500 blur-[100px]"></div>
+                <div className="absolute right-10 bottom-10 h-64 w-64 rounded-full bg-emerald-500 blur-[100px]"></div>
+              </div>
+
+              <div className="relative z-10 text-center">
+                <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
+                  {currentTab === "statschart" && (
+                    <BarChart3 className="h-12 w-12 text-green-500" />
+                  )}
+                  {currentTab === "match-stats" && (
+                    <Gamepad2 className="h-12 w-12 text-emerald-500" />
+                  )}
+                  {currentTab === "tournament-stats" && (
+                    <Trophy className="h-12 w-12 text-amber-500" />
+                  )}
+                </div>
+                <h3 className="text-2xl font-black tracking-tighter uppercase italic">
+                  Loading {capitalize(currentTab)}...
+                </h3>
+                <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
+                  Synchronizing with match servers
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
+};
+
+interface BentoCardProps {
+  children: React.ReactNode;
+  className?: string;
+  title: string;
+  icon?: LucideIcon;
 }
+
+const BentoCard = ({
+  children,
+  className = "",
+  title = "",
+  icon: IconComponent,
+}: BentoCardProps) => (
+  <div
+    className={`rounded-3xl border border-slate-200 bg-white p-6 shadow-sm backdrop-blur-md transition-all hover:shadow-md dark:border-white/10 dark:bg-slate-900/50 ${className}`}
+  >
+    {title && (
+      <div className="mb-4 flex items-center gap-2 text-sm font-medium tracking-wider text-slate-400 uppercase">
+        {IconComponent && <IconComponent className="h-4 w-4" />}
+        {title}
+      </div>
+    )}
+    {children}
+  </div>
+);
+
+export default ProfilePage;
 
 export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) => {
   const queryClient = useQueryClient();
@@ -440,7 +729,7 @@ export const TeamsCard = ({ teams }: any) => {
             <p className="font-semibold text-slate-800 dark:text-slate-100">{team.name}</p>
             <p className="text-sm text-slate-500 capitalize dark:text-slate-400">{team.type}</p>
           </div>
-          <span className="rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-800 dark:bg-indigo-900/70 dark:text-indigo-200">
+          <span className="rounded-full bg-green-100 px-2.5 py-1 font-[urbanist] text-xs font-semibold text-green-800 dark:bg-green-900/70 dark:text-green-200">
             {team.role}
           </span>
         </div>

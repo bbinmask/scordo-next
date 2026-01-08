@@ -13,6 +13,9 @@ import { IImageType } from "@/types/index.props";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/Spinner";
 import { useProfileModal } from "@/hooks/store/use-profile";
+import { useAction } from "@/hooks/useAction";
+import { updateUserProfile } from "@/actions/user-actions";
+import { toast } from "sonner";
 
 interface UpdateProfileModalProps {
   user: User;
@@ -21,8 +24,6 @@ interface UpdateProfileModalProps {
 const UpdateProfileModal = ({ user }: UpdateProfileModalProps) => {
   const { isOpen, onClose } = useProfileModal();
 
-  console.log(user);
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-full max-w-sm rounded-lg bg-white font-[poppins] dark:bg-gray-800">
@@ -30,7 +31,7 @@ const UpdateProfileModal = ({ user }: UpdateProfileModalProps) => {
           <DialogTitle className="text-lg font-semibold">Update Profile</DialogTitle>
           <DialogDescription className="text-gray-500">{}</DialogDescription>
         </DialogHeader>
-        <UpdateAvatar user={user} />
+        <UpdateAvatar user={user} onClose={onClose} />
       </DialogContent>
     </Dialog>
   );
@@ -38,27 +39,38 @@ const UpdateProfileModal = ({ user }: UpdateProfileModalProps) => {
 
 interface UpdateAvatarProps {
   user: User;
+  onClose: () => void;
 }
 
-const UpdateAvatar = ({ user }: UpdateAvatarProps) => {
+const UpdateAvatar = ({ user, onClose }: UpdateAvatarProps) => {
   const [isActive, setIsActive] = useState(false);
-  const [avatar, setAvatar] = useState(user.avatar || "");
-  const [avatarFile, setAvatarFile] = useState<File>();
+  const [avatarUrl, setAvatarUrl] = useState(user.avatar || "");
+  const [avatar, setAvatar] = useState<File>();
 
   const onDeactive = () => {
     setIsActive(false);
   };
 
-  const isLoading = false;
-
   const handleSave = (file: File, type: IImageType) => {
     const image = URL.createObjectURL(file);
-    setAvatarFile(file);
-    setAvatar(image);
+    setAvatar(file);
+    setAvatarUrl(image);
   };
 
+  const { execute, isLoading } = useAction(updateUserProfile, {
+    onSuccess(data) {
+      toast.success("Profile updated!");
+      onClose();
+    },
+    onError(error) {
+      toast.error(error);
+    },
+  });
+
   const handleUpdate = () => {
-    console.log(avatarFile);
+    if (!avatar) return;
+
+    execute({ avatar: avatar });
   };
 
   return (
@@ -67,7 +79,7 @@ const UpdateAvatar = ({ user }: UpdateAvatarProps) => {
         onClick={() => {
           setIsActive(true);
         }}
-        url={avatar}
+        url={avatarUrl}
         type="avatar"
       >
         <UploadImg isActive={isActive} onDeactive={onDeactive} onSave={handleSave} type="avatar" />
