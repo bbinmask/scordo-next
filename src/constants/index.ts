@@ -494,3 +494,5 @@ export const teams: TeamProps[] = [
     joinRequests: ["user28", "user29"],
   },
 ];
+
+export const message = "Required parameter is missing";

@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-const message = "Required parameter is missing";
+import { message } from "@/constants";
 
 export const CreateTeam = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters long" }),

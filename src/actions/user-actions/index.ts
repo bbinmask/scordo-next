@@ -9,6 +9,8 @@ import {
   ReturnCreateUserType,
   ReturnSentRequestType,
   InputTypeForUpdateUserDetails,
+  ReturnTypeForUpdateProfile,
+  InputTypeForUpdateProfile,
 } from "./types";
 import Error from "http-errors";
 import { auth, clerkClient } from "@clerk/nextjs/server";
@@ -19,10 +21,12 @@ import {
   SentRequest,
   CreatePlayer,
   UpdateUserDetails,
+  UpdateUserProfile,
 } from "./schema";
 import { User } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@/lib/currentUser";
+import { uploadImage } from "@/utils/uploadOnCloudinary";
 
 const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreateUserType> => {
   const { userId } = await auth();
@@ -322,11 +326,53 @@ const updateUserDetailsHandler = async (
   };
 };
 
+const updateUserProfileHandler = async (
+  data: InputTypeForUpdateProfile
+): Promise<ReturnTypeForUpdateProfile> => {
+  const { avatar } = data;
+
+  const existingUser = await currentUser();
+
+  if (!existingUser)
+    return {
+      error: "User not found!",
+    };
+
+  const url = (await uploadImage(avatar, "profile-avatar")).imageUrl;
+
+  if (!url)
+    return {
+      error: "Something went wrong!",
+    };
+
+  let user;
+  try {
+    user = await db.user.update({
+      where: {
+        id: existingUser.id,
+      },
+      data: {
+        avatar: url as string,
+      },
+    });
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+
+  revalidatePath(`/profile`);
+
+  return { data: user };
+};
+
 const declineRequestHandler = async () => {};
 
 export const createUser = createSafeAction(CreateUser, createUserHandler);
 
 export const updateUserDetails = createSafeAction(UpdateUserDetails, updateUserDetailsHandler);
+
+export const updateUserProfile = createSafeAction(UpdateUserProfile, updateUserProfileHandler);
 
 export const createPlayer = createSafeAction(CreatePlayer, createPlayerHandler);
 

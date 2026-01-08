@@ -2,7 +2,13 @@ import { z } from "zod";
 import { User } from "@/generated/prisma";
 
 import { ActionState } from "@/lib/create-safe-action";
-import { RecievedRequest, CreateUser, SentRequest, UpdateUserDetails } from "./schema";
+import {
+  RecievedRequest,
+  CreateUser,
+  SentRequest,
+  UpdateUserDetails,
+  UpdateUserProfile,
+} from "./schema";
 
 export type InputCreateUserType = z.infer<typeof CreateUser>;
 export type ReturnCreateUserType = ActionState<InputCreateUserType, User>;
@@ -14,3 +20,6 @@ export type InputRecievedRequestType = z.infer<typeof RecievedRequest>;
 export type ReturnAcceptRequestType = ActionState<InputRecievedRequestType, any>;
 
 export type InputTypeForUpdateUserDetails = z.infer<typeof UpdateUserDetails>;
+
+export type InputTypeForUpdateProfile = z.infer<typeof UpdateUserProfile>;
+export type ReturnTypeForUpdateProfile = ActionState<InputTypeForUpdateProfile, User>;

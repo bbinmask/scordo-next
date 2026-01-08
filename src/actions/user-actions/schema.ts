@@ -1,5 +1,5 @@
 import { z } from "zod";
-
+import { message } from "@/constants";
 export const CreateUser = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters long" }),
   contact: z.string().optional(),
@@ -57,6 +57,10 @@ export const UpdateUserDetails = z.object({
   // }),
 
   // address: z.string().min(10, { message: "Address must be at least 10 characters." }),
+});
+
+export const UpdateUserProfile = z.object({
+  avatar: z.file({ message }),
 });
 
 export const CreatePlayer = z.object({});
