@@ -71,12 +71,28 @@ const ProfilePage = ({ user }: { user: User }) => {
   const queryClient = useQueryClient();
 
   const [currentTab, setCurrentTab] = useState("statschart");
+  const [friendshipStatus, setFriendshipStatus] = useState<
+    "accepted" | "none" | "declined" | "pending" | "blocked"
+  >("none");
 
   const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
     queryKey: ["friends"],
     queryFn: async () => {
-      const res = await axios.get(`/api/users/friends/${user.id}`);
+      const res = await axios.get(`/api/friends/${user.id}`);
       return res.data;
+    },
+  });
+
+  const { data, isLoading: requestsLoading } = useQuery<Friendship[]>({
+    queryKey: ["friend-requests", user.id],
+    queryFn: async () => {
+      const res = await axios.get(`/api/users/friends/${user.id}/status`);
+
+      if (res.status < 400) {
+        setFriendshipStatus(res.data.data?.status.toLowerCase());
+      }
+
+      return res.data.data;
     },
   });
 
@@ -102,42 +118,6 @@ const ProfilePage = ({ user }: { user: User }) => {
     },
     onError: (err) => toast.error(err),
   });
-
-  const { data: friendRequest, isLoading: requestsLoading } = useQuery<Friendship[]>({
-    queryKey: ["friend-requests", user.id],
-    queryFn: async () => {
-      const res = await axios.get(`/api/friends/requests`);
-      return res.data;
-    },
-  });
-
-  console.log(friendRequest);
-
-  // const requestStatus: "none" | "pending" | "declined" | "blocked" | "accepted" = useMemo(() => {
-  //   if ((!friendRequest || friendRequest.length === 0) && (!friends || friends.length === 0))
-  //     return "none";
-
-  //   const req = friendRequest?.find((r) => r.requesterId === currentUser.id);
-
-  //   if (!req) return "none";
-
-  //   switch (req.status) {
-  //     case "PENDING":
-  //       return "pending";
-  //     case "DECLINED":
-  //       return "declined";
-  //     case "BLOCKED":
-  //       return "blocked";
-  //     case "ACCEPTED":
-  //       return "accepted";
-  //     default:
-  //       return "none";
-  //   }
-  // }, [friendRequest, currentUser.id]);
-
-  const [friendshipStatus, setFriendshipStatus] = useState<
-    "accepted" | "none" | "declined" | "pending" | "blocked"
-  >("none");
 
   const handleFriendRequest = (status: string) => {
     if (status === "none" || status === "declined") {
@@ -195,75 +175,69 @@ const ProfilePage = ({ user }: { user: User }) => {
             </div>
 
             <div className="flex items-center gap-3 pb-2 md:w-auto">
-              {useMemo(() => {
-                const status = friendshipStatus;
+              {!requestsLoading &&
+                (() => {
+                  const status = friendshipStatus;
 
-                const loading = isLoading || isDeleting || isCanceling;
+                  const loading = isLoading || isDeleting || isCanceling;
 
-                const base =
-                  "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
-                const classes =
-                  status === "none"
-                    ? `${base} primary-btn px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50`
-                    : status === "pending"
-                      ? `${base} cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
-                      : status === "accepted"
-                        ? `${base} bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
-                        : status === "blocked"
-                          ? `${base} cursor-default bg-gray-400 text-white`
-                          : `${base} cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white`;
+                  const base =
+                    "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
+                  const classes =
+                    status === "none"
+                      ? `${base} primary-btn px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50`
+                      : status === "pending"
+                        ? `${base} cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
+                        : status === "accepted"
+                          ? `${base} bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
+                          : status === "blocked"
+                            ? `${base} cursor-default bg-gray-400 text-white`
+                            : `${base} cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white`;
 
-                const icon =
-                  status === "none" ? (
-                    <UserPlus className="h-4 w-4" />
-                  ) : status === "pending" ? (
-                    <Clock className="h-4 w-4" />
-                  ) : status === "accepted" ? (
-                    <UserCheck2 className="h-4 w-4" />
-                  ) : null;
+                  const icon =
+                    status === "none" ? (
+                      <UserPlus className="h-4 w-4" />
+                    ) : status === "pending" ? (
+                      <Clock className="h-4 w-4" />
+                    ) : status === "accepted" ? (
+                      <UserCheck2 className="h-4 w-4" />
+                    ) : null;
 
-                const label =
-                  status === "none"
-                    ? "Add"
-                    : status === "pending"
-                      ? "Sent"
-                      : status === "accepted"
-                        ? "Remove"
-                        : status === "blocked"
-                          ? "Blocked"
-                          : "";
-                return (
-                  <button
-                    onClick={() => {
-                      if (status === "none" || status === "declined") {
-                        handleFriendRequest(status);
-                      } else if (status !== "blocked") {
-                        const action =
-                          status === "accepted" ? "remove this friend" : "cancel the request";
-                        openConfirmModal({
-                          title: capitalize(status),
-                          description: `Are you sure you want to ${action}?`,
-                          onConfirm: () => handleFriendRequest(status),
-                        });
-                      }
-                    }}
-                    disabled={loading}
-                    className={`${classes} flex max-w-32 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-base shadow-lg shadow-green-500/30 transition-all active:scale-95 md:flex-none`}
-                  >
-                    {icon}
-                    {label}
-                  </button>
-                );
-              }, [
-                friendshipStatus,
-                isLoading,
-                isDeleting,
-                isCanceling,
-                handleFriendRequest,
-                openConfirmModal,
-              ])}
+                  const label =
+                    status === "none"
+                      ? "Add"
+                      : status === "pending"
+                        ? "Sent"
+                        : status === "accepted"
+                          ? "Remove"
+                          : status === "blocked"
+                            ? "Blocked"
+                            : "";
+                  return (
+                    <button
+                      onClick={() => {
+                        if (status === "none" || status === "declined") {
+                          handleFriendRequest(status);
+                        } else if (status !== "blocked") {
+                          const action =
+                            status === "accepted" ? "remove this friend" : "cancel the request";
+                          openConfirmModal({
+                            title: capitalize(status),
+                            description: `Are you sure you want to ${action}?`,
+                            onConfirm: () => handleFriendRequest(status),
+                          });
+                        }
+                      }}
+                      disabled={loading}
+                      className={`${classes} flex max-w-32 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 font-[urbanist] text-base shadow-lg shadow-green-500/30 transition-all active:scale-95 md:flex-none`}
+                    >
+                      {icon}
+                      {label}
+                    </button>
+                  );
+                })()}
 
-              <button className="cursor-pointer rounded-xl border border-slate-400/50 bg-white p-2 text-slate-50 shadow-sm ring-slate-400 transition-colors duration-300 ease-in-out focus:ring-1 dark:border-white/10 dark:bg-slate-800 dark:ring-slate-400">
+              <button className="primary-text cursor-pointer rounded-xl border border-slate-400/50 bg-white p-2 shadow-sm ring-slate-400 transition-colors duration-300 ease-in-out focus:ring-1 dark:border-white/10 dark:bg-slate-800 dark:ring-slate-400">
                 <MoreVertical className="h-5 w-5" />
               </button>
             </div>
@@ -389,6 +363,7 @@ const ProfilePage = ({ user }: { user: User }) => {
           </div>
         </div>
       </div>
+      <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
     </div>
   );
 };
@@ -600,6 +575,8 @@ export const ProfileCard = ({ user, currentUser, friends }: ProfileCardProps) =>
                       const action =
                         status === "accepted" ? "remove this friend" : "cancel the request";
                       openConfirmModal({
+                        confirmVariant: status === "accepted" ? "destructive" : "primary",
+                        confirmText: status === "accepted" ? "Remove" : "Undo",
                         title: capitalize(status),
                         description: `Are you sure you want to ${action}?`,
                         onConfirm: () => handleFriendRequest(status),

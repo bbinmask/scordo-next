@@ -57,7 +57,7 @@ export function ConfirmModal({
                 debounce(onConfirm, 500)();
                 setIsConfirm(true);
               }}
-              className={confirmButtonClass("primary")}
+              className={confirmButtonClass(confirmVariant)}
             >
               {confirmText}
             </button>

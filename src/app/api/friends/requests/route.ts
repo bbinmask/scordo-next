@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   try {
     const requests = await db.friendship.findMany({
       where: {
-        OR: [{ addresseeId: user.id, requesterId: user.id }],
+        OR: [{ addresseeId: user.id }, { requesterId: user.id }],
         status: "PENDING",
       },
       select: {
