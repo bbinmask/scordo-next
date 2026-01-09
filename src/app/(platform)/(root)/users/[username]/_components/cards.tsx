@@ -40,6 +40,9 @@ import { getFriends } from "@/utils/helper/getFriends";
 import { formatDate } from "@/utils/helper/formatDate";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import { getAvailabilityClass } from "@/utils/helper/classes";
+import OptionsPopover from "@/components/modals/OptionsPopover";
+import { useAskToJoinModal, useJoinTheirTeamModal } from "@/hooks/store/use-user";
+import { AskToJoinTeamModal } from "./modal";
 interface ProfileCardProps {
   user: User;
   currentUser: User;
@@ -69,6 +72,26 @@ const checkAvailability = (availability: any) =>
 
 const ProfilePage = ({ user }: { user: User }) => {
   const queryClient = useQueryClient();
+
+  const { isOpen: isAskJoin, onClose: askJoinClose, onOpen: askJoinOpen } = useAskToJoinModal();
+  const {
+    isOpen: isJoinTheirTeam,
+    onClose: joinTheirTeamClose,
+    onOpen: joinTheirTeamOpen,
+  } = useJoinTheirTeamModal();
+
+  const optionsData = [
+    {
+      onClose: () => {},
+      onOpen: askJoinOpen,
+      label: "Ask to join team",
+    },
+    {
+      onClose: () => {},
+      onOpen: joinTheirTeamOpen,
+      label: "Join their team",
+    },
+  ];
 
   const [currentTab, setCurrentTab] = useState("statschart");
   const [friendshipStatus, setFriendshipStatus] = useState<
@@ -177,7 +200,7 @@ const ProfilePage = ({ user }: { user: User }) => {
                     "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
                   const classes =
                     status === "none"
-                      ? `${base} primary-btn px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50`
+                      ? `${base} primary-btn shadow-lg shadow-green-500/30 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50`
                       : status === "pending"
                         ? `${base} cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
                         : status === "accepted"
@@ -214,6 +237,8 @@ const ProfilePage = ({ user }: { user: User }) => {
                           const action =
                             status === "accepted" ? "remove this friend" : "cancel the request";
                           openConfirmModal({
+                            confirmText: status === "accepted" ? "Remove" : "Undo",
+                            confirmVariant: status === "accepted" ? "destructive" : "secondary",
                             title: capitalize(status),
                             description: `Are you sure you want to ${action}?`,
                             onConfirm: () => handleFriendRequest(status),
@@ -221,7 +246,7 @@ const ProfilePage = ({ user }: { user: User }) => {
                         }
                       }}
                       disabled={loading}
-                      className={`${classes} flex max-w-32 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 font-[urbanist] text-base shadow-lg shadow-green-500/30 transition-all active:scale-95 md:flex-none`}
+                      className={`${classes} flex max-w-32 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 font-[urbanist] text-base transition-all active:scale-95 md:flex-none`}
                     >
                       {icon}
                       {label}
@@ -229,9 +254,7 @@ const ProfilePage = ({ user }: { user: User }) => {
                   );
                 })()}
 
-              <button className="primary-text cursor-pointer rounded-xl border border-slate-400/50 bg-white p-2 shadow-sm ring-slate-400 transition-colors duration-300 ease-in-out focus:ring-1 dark:border-white/10 dark:bg-slate-800 dark:ring-slate-400">
-                <MoreVertical className="h-5 w-5" />
-              </button>
+              <OptionsPopover data={optionsData} />
             </div>
           </div>
         </div>
@@ -291,7 +314,9 @@ const ProfilePage = ({ user }: { user: User }) => {
               <p className="truncate font-[urbanist] text-sm font-semibold">{user.email}</p>
             </BentoCard>
             <BentoCard title="Date of Birth" icon={Calendar}>
-              <p className="font-[urbanist] text-sm font-semibold">May 15, 1995</p>
+              <p className="font-[urbanist] text-sm font-semibold">
+                {formatDate(new Date(user.dob))}
+              </p>
             </BentoCard>
             <BentoCard title="Availability" icon={Zap}>
               <p className="font-[urbanist] text-sm font-semibold text-green-500">
@@ -356,6 +381,7 @@ const ProfilePage = ({ user }: { user: User }) => {
         </div>
       </div>
       <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
+      <AskToJoinTeamModal isOpen={isAskJoin} onClose={askJoinClose} />
     </div>
   );
 };
