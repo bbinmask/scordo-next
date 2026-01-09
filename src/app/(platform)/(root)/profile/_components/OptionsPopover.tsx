@@ -73,7 +73,6 @@ const OptionsPopover = ({ user }: OptionsPopoverProps) => {
             <span className="primary-text font-[urbanist] text-base font-semibold">Settings</span>
           </li>
         </ul>
-        <></>
       </PopoverContent>
     </Popover>
   );

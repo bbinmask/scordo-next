@@ -178,6 +178,10 @@
   @apply transform bg-emerald-600 font-[urbanist] font-semibold text-white shadow-md transition-all duration-300 ease-in-out focus:ring-2 focus:ring-emerald-400 focus:outline-none dark:bg-green-800 dark:text-lime-200 dark:focus:ring-green-500;
 }
 
+.hover-card {
+  @apply bg-gray-100 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:bg-gray-50/80 hover:shadow-md hover:shadow-green-500/30 hover:ring-green-600/40 dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600;
+}
+
 .secondary-btn {
   @apply transform rounded-md bg-gray-600 font-[urbanist] text-gray-100 shadow-md transition-all duration-300 ease-in-out focus:ring-2 focus:ring-gray-200 focus:outline-none dark:focus:ring-gray-500;
 }
@@ -187,7 +191,7 @@
 }
 
 .primary-text {
-  @apply text-black dark:text-gray-50;
+  @apply text-slate-900 dark:text-slate-50;
 }
 
 .secondary-text {

@@ -1,3 +1,4 @@
+import { ERROR_CODES } from "@/constants";
 import { currentUser } from "@/lib/currentUser";
 import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
@@ -8,14 +9,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ abbr
 
   const user = await currentUser();
 
-  if (!user) return NextResponse.json(new ApiError(403, "User not found!"));
+  if (!user) return NextResponse.json(new ApiError(ERROR_CODES.UNAUTHORIZED));
 
   try {
     const team = await db.team.findUnique({
       where: { abbreviation: abbr },
     });
 
-    if (!team) return NextResponse.json(new ApiError(404, "Team not found!"));
+    if (!team) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
 
     const requests = await db.teamRequest.findMany({
       where: {

@@ -7,10 +7,10 @@ import React from "react";
 
 export const LiveMatchCard = ({ className, match }: { className?: string; match: any }) => {
   return (
-    <div className={cn("relative grid", className)}>
+    <div className={cn("group relative grid", className)}>
       <Link
         href="#"
-        className="text-foreground mb-2 w-fit font-[poppins] text-[10px] hover:underline"
+        className="text-foreground mb-2 w-fit font-[urbanist] text-[10px] tracking-wide hover:underline"
       >
         Indian Premier League 2025
       </Link>
@@ -19,7 +19,7 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
         className="block"
       >
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h2 className="primary-heading font-[cal_sans] text-base font-semibold tracking-widest">
+          <h2 className="primary-heading font-[poppins] text-base font-bold">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
@@ -33,7 +33,7 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
           {shortenTeamName("Chennai Super Kings")}:{" "}
           <span className="font-medium">{"105/5 (15 overs)"}</span>
         </p>
-        <p className="text-xs leading-10 font-semibold text-red-500">
+        <p className="font-[urbanist] text-xs leading-10 font-bold text-red-800 dark:text-red-500">
           {`${shortenTeamName("Chennai Super Kings")} needs 101 runs in 30 balls`}
         </p>
         <div className="absolute right-6 bottom-6">
@@ -41,7 +41,7 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
         </div>
       </Link>
       <div className="absolute top-2 right-6">
-        <span className="animate-pulse text-sm font-semibold text-red-500 dark:text-red-400">
+        <span className="animate-pulse text-xs font-semibold text-red-500 group-hover:animate-none hover:animate-none dark:text-red-400">
           ● {"Live"}
         </span>
       </div>
@@ -51,13 +51,16 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
 
 export const UpcomingMatchCard = ({ className, match }: { className?: string; match: any }) => {
   return (
-    <div className={cn("flex flex-row flex-nowrap", className)}>
+    <div className={cn("flex cursor-pointer flex-row flex-nowrap", className)}>
       <div className="w-full">
-        <Link href="#" className="text-foreground mb-2 font-[poppins] text-[10px] hover:underline">
+        <Link
+          href="#"
+          className="text-foreground mb-2 font-[urbanist] text-[10px] tracking-wide hover:underline"
+        >
           Indian Premier League 2025
         </Link>
         <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h2 className="primary-heading font-[cal_sans] text-base font-bold tracking-widest">
+          <h2 className="primary-heading font-[poppins] text-base font-bold">
             {shortenTeamName("Royal Challengers Bangaluru")}
             <span className="mx-2">vs</span>
             {shortenTeamName("Chennai Super Kings")}
@@ -67,7 +70,7 @@ export const UpcomingMatchCard = ({ className, match }: { className?: string; ma
           <span className="mr-1 font-semibold">{"Jul 10, 2025"}</span>at
           <span className="ml-1 font-semibold">{"7:30 PM IST"}</span>
         </p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-xs text-gray-600 dark:text-gray-400">
           Venue: {"Chinnaswami Stadium, Bangaluru"}
         </p>
         <div className="mt-1 flex w-full justify-end">

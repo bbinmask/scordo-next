@@ -26,8 +26,8 @@ export const NewCard = ({
   icon: React.ReactNode;
 }) => {
   return (
-    <a href={link} className="group block">
-      <div className="transform overflow-hidden rounded-2xl border-2 border-transparent bg-white shadow-md transition-all duration-300 ease-in-out hover:-translate-y-2 hover:border-lime-400 hover:shadow-2xl dark:bg-gray-800 dark:hover:border-lime-500">
+    <Link href={link} className="group block">
+      <div className="hover-card rounded-2xl">
         <div className="p-6">
           <div className="flex items-center space-x-4">
             <div className="rounded-full bg-green-100 p-3 text-green-700 dark:bg-green-900/50 dark:text-green-300">
@@ -39,13 +39,13 @@ export const NewCard = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-end bg-gray-50 px-6 py-3 dark:bg-gray-800/50">
+        <div className="flex items-center justify-end px-6 py-3">
           <span className="text-sm font-semibold text-green-700 group-hover:text-green-800 dark:text-green-400 dark:group-hover:text-green-300">
             Go to {title}
           </span>
           <ChevronRight className="ml-1 h-5 w-5 transform text-green-700 transition-transform duration-300 group-hover:translate-x-1 dark:text-green-400" />
         </div>
       </div>
-    </a>
+    </Link>
   );
 };

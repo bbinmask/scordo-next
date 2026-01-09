@@ -67,6 +67,108 @@ export const user = {
   },
 };
 
+export const ERROR_CODES = {
+  BAD_REQUEST: {
+    status: 400,
+    message: "Bad request",
+  },
+
+  UNAUTHORIZED: {
+    status: 401,
+    message: "Unauthorized access",
+  },
+
+  FORBIDDEN: {
+    status: 403,
+    message: "Access forbidden",
+  },
+
+  NOT_FOUND: {
+    status: 404,
+    message: "Resource not found",
+  },
+
+  METHOD_NOT_ALLOWED: {
+    status: 405,
+    message: "Method not allowed",
+  },
+
+  REQUEST_TIMEOUT: {
+    status: 408,
+    message: "Request timeout",
+  },
+
+  CONFLICT: {
+    status: 409,
+    message: "Resource conflict",
+  },
+
+  PAYLOAD_TOO_LARGE: {
+    status: 413,
+    message: "Payload too large",
+  },
+
+  UNSUPPORTED_MEDIA_TYPE: {
+    status: 415,
+    message: "Unsupported media type",
+  },
+
+  UNPROCESSABLE_ENTITY: {
+    status: 422,
+    message: "Unprocessable entity",
+  },
+
+  TOO_MANY_REQUESTS: {
+    status: 429,
+    message: "Too many requests",
+  },
+
+  INTERNAL_SERVER_ERROR: {
+    status: 500,
+    message: "Internal server error",
+  },
+
+  NOT_IMPLEMENTED: {
+    status: 501,
+    message: "Not implemented",
+  },
+
+  BAD_GATEWAY: {
+    status: 502,
+    message: "Bad gateway",
+  },
+
+  SERVICE_UNAVAILABLE: {
+    status: 503,
+    message: "Service unavailable",
+  },
+
+  GATEWAY_TIMEOUT: {
+    status: 504,
+    message: "Gateway timeout",
+  },
+
+  DATABASE_ERROR: {
+    status: 500,
+    message: "Database error",
+  },
+
+  VALIDATION_ERROR: {
+    status: 400,
+    message: "Validation failed",
+  },
+
+  AUTH_TOKEN_EXPIRED: {
+    status: 401,
+    message: "Authentication token expired",
+  },
+
+  PERMISSION_DENIED: {
+    status: 403,
+    message: "Permission denied",
+  },
+};
+
 // const mockPlayers: PlayerProps[] = [
 //   {
 //     id: "p1",
