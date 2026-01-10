@@ -36,13 +36,14 @@ const ProfilePage = async () => {
   const friendships = await db.friendship.findMany({
     where: {
       OR: [{ addresseeId: user.id }, { requesterId: user.id }],
-      status: "ACCEPTED",
     },
     include: {
       requester: true,
       addressee: true,
     },
   });
+
+  console.log({ friendReqs, friendships });
 
   const friends = getFriends(friendships, user.id);
 

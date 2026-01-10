@@ -1,6 +1,11 @@
 "use client";
 
-import { removeFriend, sendFriendRequest, cancelFriendRequest } from "@/actions/user-actions";
+import {
+  removeFriend,
+  sendFriendRequest,
+  cancelFriendRequest,
+  acceptRequest,
+} from "@/actions/user-actions";
 import Spinner from "@/components/Spinner";
 import { Availability, Friendship, Team, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
@@ -29,6 +34,7 @@ import {
   Plus,
   LucideProps,
   LucideIcon,
+  Check,
 } from "lucide-react";
 import { calculateAge } from "@/utils/helper/calculateAge";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
@@ -95,7 +101,7 @@ const ProfilePage = ({ user }: { user: User }) => {
 
   const [currentTab, setCurrentTab] = useState("statschart");
   const [friendshipStatus, setFriendshipStatus] = useState<
-    "accepted" | "none" | "declined" | "pending" | "blocked"
+    "accepted" | "none" | "declined" | "pending" | "recieved" | "blocked"
   >("none");
 
   const { data: friends, isLoading: friendsLoading } = useQuery<Friendship[]>({
@@ -106,8 +112,8 @@ const ProfilePage = ({ user }: { user: User }) => {
     },
   });
 
-  const { data, isLoading: requestsLoading } = useQuery<Friendship[]>({
-    queryKey: ["friend-requests", user.id],
+  const { data: request, isLoading: requestsLoading } = useQuery<Friendship>({
+    queryKey: [],
     queryFn: async () => {
       const res = await axios.get(`/api/users/friends/${user.id}/status`);
 
@@ -118,6 +124,8 @@ const ProfilePage = ({ user }: { user: User }) => {
       return res.data.data;
     },
   });
+
+  console.log({ request, friendshipStatus });
 
   const { confirmModalState, openConfirmModal, closeConfirmModal } = useConfirmModal();
 
@@ -134,6 +142,7 @@ const ProfilePage = ({ user }: { user: User }) => {
       queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
   });
+
   const { execute: cancelReq, isLoading: isCanceling } = useAction(cancelFriendRequest, {
     onSuccess: (data) => {
       toast.success("Request Cancelled");
@@ -142,15 +151,31 @@ const ProfilePage = ({ user }: { user: User }) => {
     onError: (err) => toast.error(err),
   });
 
-  const handleFriendRequest = (status: string) => {
+  const { execute: acceptReq, isLoading: isAccepting } = useAction(acceptRequest, {
+    onSuccess: (data) => {
+      toast.success("Request Accepted");
+      console.log({ data });
+      queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
+    },
+    onError: (err) => toast.error(err),
+  });
+
+  const handleFriendRequest = (status: typeof friendshipStatus) => {
+    if (!request?.id) return;
+
     if (status === "none" || status === "declined") {
       sendReq({ addresseeId: user.id, username: user.username });
+    }
+    if (status === "recieved") {
+      acceptReq({ reqId: request.id, reqUsername: user.username });
     } else if (status === "pending") {
       cancelReq({ addresseeId: user.id, username: user.username });
     } else if (status === "accepted") {
       deleteFriend({ addresseeId: user.id, username: user.username });
     }
   };
+
+  console.log({ friendshipStatus });
 
   return (
     <div className="bg-slate-50 pb-12 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
@@ -212,6 +237,8 @@ const ProfilePage = ({ user }: { user: User }) => {
                   const icon =
                     status === "none" ? (
                       <UserPlus className="h-4 w-4" />
+                    ) : status === "recieved" ? (
+                      <Check className="h-4 w-4" />
                     ) : status === "pending" ? (
                       <Clock className="h-4 w-4" />
                     ) : status === "accepted" ? (
@@ -221,13 +248,16 @@ const ProfilePage = ({ user }: { user: User }) => {
                   const label =
                     status === "none"
                       ? "Add"
-                      : status === "pending"
-                        ? "Sent"
-                        : status === "accepted"
-                          ? "Remove"
-                          : status === "blocked"
-                            ? "Blocked"
-                            : "";
+                      : status === "recieved"
+                        ? "Accept"
+                        : status === "pending"
+                          ? "Sent"
+                          : status === "accepted"
+                            ? "Remove"
+                            : status === "blocked"
+                              ? "Blocked"
+                              : "";
+
                   return (
                     <button
                       onClick={() => {
@@ -235,9 +265,18 @@ const ProfilePage = ({ user }: { user: User }) => {
                           handleFriendRequest(status);
                         } else if (status !== "blocked") {
                           const action =
-                            status === "accepted" ? "remove this friend" : "cancel the request";
+                            status === "accepted"
+                              ? "remove this friend"
+                              : status === "recieved"
+                                ? "accept the request"
+                                : "cancel the request";
                           openConfirmModal({
-                            confirmText: status === "accepted" ? "Remove" : "Undo",
+                            confirmText:
+                              status === "accepted"
+                                ? "Remove"
+                                : status === "recieved"
+                                  ? "Accept"
+                                  : "Undo",
                             confirmVariant: status === "accepted" ? "destructive" : "secondary",
                             title: capitalize(status),
                             description: `Are you sure you want to ${action}?`,
@@ -248,8 +287,14 @@ const ProfilePage = ({ user }: { user: User }) => {
                       disabled={loading}
                       className={`${classes} flex max-w-32 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 font-[urbanist] text-base transition-all active:scale-95 md:flex-none`}
                     >
-                      {icon}
-                      {label}
+                      {loading ? (
+                        <Spinner />
+                      ) : (
+                        <>
+                          {icon}
+                          {label}
+                        </>
+                      )}
                     </button>
                   );
                 })()}

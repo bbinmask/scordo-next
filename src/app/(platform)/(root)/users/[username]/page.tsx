@@ -1,11 +1,5 @@
 import NotFoundParagraph from "@/components/NotFoundParagraph";
-import UserProfile, {
-  AboutCard,
-  Description,
-  ProfileCard,
-  StatsCard,
-  TeamsCard,
-} from "./_components/cards";
+import UserProfile from "./_components/cards";
 import { db } from "@/lib/db";
 import { notFound, redirect } from "next/navigation";
 import { currentUser as getCurrentUser } from "@/lib/currentUser";

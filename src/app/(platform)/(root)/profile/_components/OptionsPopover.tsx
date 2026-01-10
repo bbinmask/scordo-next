@@ -12,11 +12,7 @@ import {
 import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 
-interface OptionsPopoverProps {
-  user: User;
-}
-
-const OptionsPopover = ({ user }: OptionsPopoverProps) => {
+const OptionsPopover = () => {
   const { onOpen: onProfileOpen } = useProfileModal();
   const { onOpen: onDetailOpen } = useDetailsModal();
   const { onOpen: onRequestOpen } = useRequestModal();

@@ -21,10 +21,11 @@ import {
   TeamRequestWithDetails,
   TournamentRequestWithDetails,
 } from "@/lib/types";
-import OptionsPopover from "./OptionsPopover";
+import OptionsPopover from "@/components/modals/OptionsPopover";
 import { useDetailsModal, useProfileModal, useRequestModal } from "@/hooks/store/use-profile";
 import UpdateProfileModal from "./UpdateProfileModal";
 import EditDetailsModal from "./EditDetailsModal";
+import RequestsModal from "@/components/modals/RequestsModal";
 
 interface InfoCardProps {
   label: string;
@@ -107,6 +108,28 @@ const PersonalDetails = ({
     onClose: onRequestClose,
     onOpen: onRequestOpen,
   } = useRequestModal();
+  const optionsData = [
+    {
+      onClose: () => {},
+      onOpen: onDetailOpen,
+      label: "Edit Details",
+    },
+    {
+      onClose: () => {},
+      onOpen: onProfileOpen,
+      label: "Update Profile",
+    },
+    {
+      onClose: () => {},
+      onOpen: onRequestOpen,
+      label: "Requests",
+    },
+    {
+      onClose: () => {},
+      onOpen: () => {},
+      label: "Settings",
+    },
+  ];
 
   return (
     <div className="relative">
@@ -212,13 +235,14 @@ const PersonalDetails = ({
       </div>
 
       <div className="absolute top-8 right-6">
-        <OptionsPopover user={user} />
+        <OptionsPopover data={optionsData} />
       </div>
 
       <>
         <UpdateProfileModal user={user} />
         <EditDetailsModal user={user} />
         <FriendsModal friends={friends} isOwnProfile />
+        <RequestsModal initialRequests={requests} />
       </>
     </div>
   );
