@@ -188,7 +188,6 @@ const TeamsPage = () => {
 
   // --- Invitation Handlers (would call APIs) ---
   const handleAcceptInvite = (inviteId: string) => {
-    console.log("Accepting team invite:", inviteId);
     alert("Team invitation accepted! (Simulation)");
     // setDashboardData((prev) => ({
     //   ...prev,
@@ -198,7 +197,6 @@ const TeamsPage = () => {
   };
 
   const handleDeclineInvite = (inviteId: string) => {
-    console.log("Declining team invite:", inviteId);
     alert("Team invitation declined. (Simulation)");
     // setDashboardData((prev) => ({
     //   ...prev,
@@ -207,7 +205,6 @@ const TeamsPage = () => {
   };
 
   const handleAcceptFriend = (reqId: string) => {
-    console.log("Accepting friend request:", reqId);
     alert("Friend request accepted! (Simulation)");
     // setDashboardData((prev) => ({
     //   ...prev,
@@ -216,7 +213,6 @@ const TeamsPage = () => {
   };
 
   const handleDeclineFriend = (reqId: string) => {
-    console.log("Declining friend request:", reqId);
     alert("Friend request declined. (Simulation)");
     // setDashboardData((prev) => ({
     //   ...prev,

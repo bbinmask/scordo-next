@@ -1,15 +1,30 @@
+import { ERROR_CODES } from "@/constants";
+import { currentUser } from "@/lib/currentUser";
 import { db } from "@/lib/db";
-import { ApiResponse } from "@/utils/ApiResponse";
+import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request, { params }: { params: Promise<{ userId?: string }> }) {
   const { userId } = await params;
-  try {
-    if (!userId) return NextResponse.error();
+  if (!userId) return NextResponse.error();
 
+  const user = await currentUser();
+
+  if (!user) return NextResponse.json(new ApiError(ERROR_CODES.UNAUTHORIZED));
+
+  try {
     const friendship = await db.friendship.findFirst({
       where: {
-        OR: [{ addresseeId: userId }, { requesterId: userId }],
+        OR: [
+          {
+            requesterId: userId,
+            addresseeId: user.id,
+          },
+          {
+            requesterId: user.id,
+            addresseeId: userId,
+          },
+        ],
       },
       select: {
         status: true,

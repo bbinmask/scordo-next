@@ -162,6 +162,8 @@ const sendFriendRequestHandler = async (
     return { error: "You cannot send a friend request to yourself." };
   }
 
+  let friendship;
+
   try {
     const existingFriendship = await db.friendship.findFirst({
       where: {
@@ -179,21 +181,20 @@ const sendFriendRequestHandler = async (
       return { error: "A friend request is already pending." };
     }
 
-    const friendship = await db.friendship.create({
+    friendship = await db.friendship.create({
       data: {
         requesterId: requester.id,
         addresseeId,
         status: "PENDING",
       },
     });
-
-    revalidatePath(`/users/${username}`);
-
-    return { data: { data: friendship, message: "Friend request sent!" } };
   } catch (err) {
     console.error("Error sending friend request:", err);
     return { error: "An unexpected error occurred. Please try again." };
   }
+  revalidatePath(`/users/${username}`);
+
+  return { data: { data: friendship, message: "Friend request sent!" } };
 };
 
 const acceptRequestHandler = async (

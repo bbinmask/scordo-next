@@ -79,8 +79,6 @@ const TeamIdPage = () => {
 
   const { isOwner } = useIsTeamOwner(team as any, user?.id);
 
-  console.log({ requests });
-
   return (
     <div className="w-full pt-4">
       {!team && !isLoading && notFound()}

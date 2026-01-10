@@ -7,14 +7,12 @@ import {
   acceptRequest,
 } from "@/actions/user-actions";
 import Spinner from "@/components/Spinner";
-import { Availability, Friendship, Team, User } from "@/generated/prisma";
+import { Friendship, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
-import { FaSuperpowers } from "react-icons/fa6";
+import { useState } from "react";
 import {
-  CheckCircle,
   UserPlus,
   Clock,
   Calendar,
@@ -25,20 +23,15 @@ import {
   UserIcon,
   ShieldCheck,
   Zap,
-  MoreVertical,
   BarChart3,
   Mail,
   ExternalLink,
   Gamepad2,
   Trophy,
-  Plus,
-  LucideProps,
   LucideIcon,
   Check,
 } from "lucide-react";
-import { calculateAge } from "@/utils/helper/calculateAge";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
-// import { capitalize } from "lodash";
 import { toast } from "sonner";
 import { useFriendsModal } from "@/hooks/store/use-friends";
 import { FriendshipWithBoth } from "@/lib/types";
@@ -53,17 +46,6 @@ interface ProfileCardProps {
   user: User;
   currentUser: User;
   friends: Friendship[] | [];
-}
-
-interface UserProfilePage {
-  user: User;
-  currentUser: User;
-}
-
-interface DescriptionProps {
-  user: User;
-  friends: any;
-  currentUser: User;
 }
 
 const capitalize = (str: string) => {
@@ -113,7 +95,7 @@ const ProfilePage = ({ user }: { user: User }) => {
   });
 
   const { data: request, isLoading: requestsLoading } = useQuery<Friendship>({
-    queryKey: [],
+    queryKey: ["friend-request", user.id],
     queryFn: async () => {
       const res = await axios.get(`/api/users/friends/${user.id}/status`);
 
@@ -125,20 +107,23 @@ const ProfilePage = ({ user }: { user: User }) => {
     },
   });
 
-  console.log({ request, friendshipStatus });
-
   const { confirmModalState, openConfirmModal, closeConfirmModal } = useConfirmModal();
 
   const { execute: sendReq, isLoading } = useAction(sendFriendRequest, {
     onSuccess: (data) => {
       toast.success("Request sent");
+      setFriendshipStatus("pending");
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
-    onError: (err) => toast.error(err),
+    onError: (err) => {
+      toast.error(err);
+    },
   });
 
   const { execute: deleteFriend, isLoading: isDeleting } = useAction(removeFriend, {
     onSuccess: (_) => {
+      toast.success("Removed!");
+      setFriendshipStatus("none");
       queryClient.invalidateQueries({ queryKey: ["friends"] });
     },
   });
@@ -146,6 +131,7 @@ const ProfilePage = ({ user }: { user: User }) => {
   const { execute: cancelReq, isLoading: isCanceling } = useAction(cancelFriendRequest, {
     onSuccess: (data) => {
       toast.success("Request Cancelled");
+      setFriendshipStatus("none");
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
     onError: (err) => toast.error(err),
@@ -154,28 +140,27 @@ const ProfilePage = ({ user }: { user: User }) => {
   const { execute: acceptReq, isLoading: isAccepting } = useAction(acceptRequest, {
     onSuccess: (data) => {
       toast.success("Request Accepted");
-      console.log({ data });
+      setFriendshipStatus("accepted");
+
       queryClient.invalidateQueries({ queryKey: ["friend-requests", user.id] });
     },
     onError: (err) => toast.error(err),
   });
 
   const handleFriendRequest = (status: typeof friendshipStatus) => {
-    if (!request?.id) return;
-
     if (status === "none" || status === "declined") {
       sendReq({ addresseeId: user.id, username: user.username });
     }
-    if (status === "recieved") {
-      acceptReq({ reqId: request.id, reqUsername: user.username });
-    } else if (status === "pending") {
-      cancelReq({ addresseeId: user.id, username: user.username });
-    } else if (status === "accepted") {
-      deleteFriend({ addresseeId: user.id, username: user.username });
+    if (request?.id) {
+      if (status === "recieved") {
+        acceptReq({ reqId: request.id, reqUsername: user.username });
+      } else if (status === "pending") {
+        cancelReq({ addresseeId: user.id, username: user.username });
+      } else if (status === "accepted") {
+        deleteFriend({ addresseeId: user.id, username: user.username });
+      }
     }
   };
-
-  console.log({ friendshipStatus });
 
   return (
     <div className="bg-slate-50 pb-12 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
@@ -215,89 +200,89 @@ const ProfilePage = ({ user }: { user: User }) => {
             </div>
 
             <div className="flex items-center gap-3 pb-2 md:w-auto">
-              {!requestsLoading &&
-                (() => {
-                  const status = friendshipStatus;
+              {(() => {
+                const status = friendshipStatus;
 
-                  const loading = isLoading || isDeleting || isCanceling;
+                const loading =
+                  isLoading || isDeleting || isCanceling || requestsLoading || isAccepting;
 
-                  const base =
-                    "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
-                  const classes =
-                    status === "none"
-                      ? `${base} primary-btn shadow-lg shadow-green-500/30 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50`
+                const base =
+                  "center flex transform cursor-pointer gap-1 rounded-full p-2 transition-all duration-300";
+                const classes =
+                  status === "none"
+                    ? `${base} primary-btn shadow-lg shadow-green-500/30 px-4 text-white shadow-md shadow-emerald-500/50 dark:shadow-emerald-800/50`
+                    : status === "pending"
+                      ? `${base} cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
+                      : status === "accepted"
+                        ? `${base} bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
+                        : status === "blocked"
+                          ? `${base} cursor-default bg-gray-400 text-white`
+                          : `${base} cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white`;
+
+                const icon =
+                  status === "none" ? (
+                    <UserPlus className="h-4 w-4" />
+                  ) : status === "recieved" ? (
+                    <Check className="h-4 w-4" />
+                  ) : status === "pending" ? (
+                    <Clock className="h-4 w-4" />
+                  ) : status === "accepted" ? (
+                    <UserCheck2 className="h-4 w-4" />
+                  ) : null;
+
+                const label =
+                  status === "none"
+                    ? "Add"
+                    : status === "recieved"
+                      ? "Accept"
                       : status === "pending"
-                        ? `${base} cursor-not-allowed bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
+                        ? "Sent"
                         : status === "accepted"
-                          ? `${base} bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300`
+                          ? "Remove"
                           : status === "blocked"
-                            ? `${base} cursor-default bg-gray-400 text-white`
-                            : `${base} cursor-default bg-gradient-to-r from-green-500 to-emerald-600 text-white`;
+                            ? "Blocked"
+                            : "";
 
-                  const icon =
-                    status === "none" ? (
-                      <UserPlus className="h-4 w-4" />
-                    ) : status === "recieved" ? (
-                      <Check className="h-4 w-4" />
-                    ) : status === "pending" ? (
-                      <Clock className="h-4 w-4" />
-                    ) : status === "accepted" ? (
-                      <UserCheck2 className="h-4 w-4" />
-                    ) : null;
-
-                  const label =
-                    status === "none"
-                      ? "Add"
-                      : status === "recieved"
-                        ? "Accept"
-                        : status === "pending"
-                          ? "Sent"
-                          : status === "accepted"
-                            ? "Remove"
-                            : status === "blocked"
-                              ? "Blocked"
-                              : "";
-
-                  return (
-                    <button
-                      onClick={() => {
-                        if (status === "none" || status === "declined") {
-                          handleFriendRequest(status);
-                        } else if (status !== "blocked") {
-                          const action =
+                return (
+                  <button
+                    onClick={() => {
+                      if (status === "none" || status === "declined") {
+                        handleFriendRequest(status);
+                      } else if (status !== "blocked") {
+                        const action =
+                          status === "accepted"
+                            ? "remove this friend"
+                            : status === "recieved"
+                              ? "accept the request"
+                              : "cancel the request";
+                        openConfirmModal({
+                          confirmText:
                             status === "accepted"
-                              ? "remove this friend"
+                              ? "Remove"
                               : status === "recieved"
-                                ? "accept the request"
-                                : "cancel the request";
-                          openConfirmModal({
-                            confirmText:
-                              status === "accepted"
-                                ? "Remove"
-                                : status === "recieved"
-                                  ? "Accept"
-                                  : "Undo",
-                            confirmVariant: status === "accepted" ? "destructive" : "secondary",
-                            title: capitalize(status),
-                            description: `Are you sure you want to ${action}?`,
-                            onConfirm: () => handleFriendRequest(status),
-                          });
-                        }
-                      }}
-                      disabled={loading}
-                      className={`${classes} flex max-w-32 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 font-[urbanist] text-base transition-all active:scale-95 md:flex-none`}
-                    >
-                      {loading ? (
-                        <Spinner />
-                      ) : (
-                        <>
-                          {icon}
-                          {label}
-                        </>
-                      )}
-                    </button>
-                  );
-                })()}
+                                ? "Accept"
+                                : "Undo",
+                          confirmVariant: status === "accepted" ? "destructive" : "secondary",
+                          title: capitalize(status),
+                          description: `Are you sure you want to ${action}?`,
+                          onConfirm: () => handleFriendRequest(status),
+                        });
+                      }
+                    }}
+                    disabled={loading}
+                    className={`${classes} flex max-w-32 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 font-[urbanist] text-base transition-all active:scale-95 md:flex-none`}
+                  >
+                    {loading ? (
+                      <Spinner />
+                    ) : (
+                      <>
+                        {icon}
+                        {label}
+                      </>
+                    )}
+                  </button>
+                );
+              })()}
 
               <OptionsPopover data={optionsData} />
             </div>

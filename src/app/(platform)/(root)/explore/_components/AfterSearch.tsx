@@ -27,7 +27,6 @@ const AfterSearch = ({ results, isLoading = true, query, clearSearch }: AfterSea
   const { tournaments, teams, users } = results;
   const totalResults = tournaments?.length + teams?.length + users?.length;
 
-  console.log({ tournaments, teams, users });
   return (
     <div className="min-h-[400px] rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6 dark:bg-white/10">
       <div className="mb-4 flex items-center justify-between">

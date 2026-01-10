@@ -43,8 +43,6 @@ const ProfilePage = async () => {
     },
   });
 
-  console.log({ friendReqs, friendships });
-
   const friends = getFriends(friendships, user.id);
 
   const friendRequests: any = getFriendRequests(friendReqs, user.id);

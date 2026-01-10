@@ -74,7 +74,6 @@ export const TeamUpdateForm = ({ team }: { team: TeamWithPlayers }) => {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log("Updating team data:", data);
     // In a real app, you'd call your API here
   };
 

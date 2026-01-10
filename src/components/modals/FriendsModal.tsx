@@ -18,7 +18,6 @@ const FriendsModal = ({ friends, isOwnProfile }: FriendsModalProps) => {
   const { isOpen, onClose } = useFriendsModal();
   const { execute, isLoading } = useAction(removeFriend, {
     onSuccess: (data) => {
-      console.log(data);
       toast.success(`Friend is removed`);
     },
     onError: (err) => {
