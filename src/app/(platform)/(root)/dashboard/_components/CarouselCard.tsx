@@ -37,7 +37,7 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
           {`${shortenTeamName("Chennai Super Kings")} needs 101 runs in 30 balls`}
         </p>
         <div className="absolute right-6 bottom-6">
-          <ChevronRight className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          <ChevronRight className="h-5 w-5 text-gray-400 transition-transform duration-500 group-hover:translate-x-2 dark:text-gray-500" />
         </div>
       </Link>
       <div className="absolute top-2 right-6">
@@ -51,7 +51,7 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
 
 export const UpcomingMatchCard = ({ className, match }: { className?: string; match: any }) => {
   return (
-    <div className={cn("flex cursor-pointer flex-row flex-nowrap", className)}>
+    <div className={cn("group flex cursor-pointer flex-row flex-nowrap", className)}>
       <div className="w-full">
         <Link
           href="#"
@@ -73,9 +73,10 @@ export const UpcomingMatchCard = ({ className, match }: { className?: string; ma
         <p className="text-xs text-gray-600 dark:text-gray-400">
           Venue: {"Chinnaswami Stadium, Bangaluru"}
         </p>
-        <div className="mt-1 flex w-full justify-end">
+        <div className="mt-1 flex w-full justify-end pr-2">
           <button className="flex items-center border-none text-sm font-semibold text-green-600 hover:underline dark:text-emerald-400">
-            View Details <ChevronRight className="ml-1 h-4 w-4" />
+            View Details{" "}
+            <ChevronRight className="ml-2 h-4 w-4 transition-transform duration-500 ease-in-out group-hover:translate-x-2" />
           </button>
         </div>
       </div>

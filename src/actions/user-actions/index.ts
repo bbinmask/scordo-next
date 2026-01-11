@@ -177,22 +177,31 @@ const sendFriendRequestHandler = async (
     if (existingFriendship) {
       if (existingFriendship.status === "ACCEPTED") {
         return { error: "You are already friends with this user." };
+      } else if (existingFriendship.status === "DECLINED") {
+        friendship = await db.friendship.update({
+          where: {
+            id: existingFriendship.id,
+          },
+          data: {
+            status: "PENDING",
+          },
+        });
       }
-      return { error: "A friend request is already pending." };
+    } else {
+      friendship = await db.friendship.create({
+        data: {
+          requesterId: requester.id,
+          addresseeId,
+          status: "PENDING",
+        },
+      });
     }
-
-    friendship = await db.friendship.create({
-      data: {
-        requesterId: requester.id,
-        addresseeId,
-        status: "PENDING",
-      },
-    });
   } catch (err) {
-    console.error("Error sending friend request:", err);
     return { error: "An unexpected error occurred. Please try again." };
   }
+
   revalidatePath(`/users/${username}`);
+  revalidatePath(`/users/${requester.username}`);
 
   return { data: { data: friendship, message: "Friend request sent!" } };
 };
@@ -232,6 +241,7 @@ const acceptRequestHandler = async (
 
   revalidatePath(`/profile`);
   revalidatePath(`/users/${reqUsername}`);
+  revalidatePath(`/users/${user.username}`);
 
   return { data: request };
 };
@@ -261,6 +271,8 @@ const cancelFriendRequestHandler = async (
   }
 
   revalidatePath(`/users/${username}`);
+  revalidatePath(`/users/${user.username}`);
+
   return { data: requests };
 };
 
@@ -288,6 +300,7 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
   }
 
   revalidatePath(`/users/${username}`);
+  revalidatePath(`/users/${user.username}`);
   revalidatePath(`/profile`);
   return { data: friends };
 };
