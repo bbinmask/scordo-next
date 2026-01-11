@@ -1,4 +1,3 @@
-import NotFoundParagraph from "@/components/NotFoundParagraph";
 import UserProfile from "./_components/cards";
 import { db } from "@/lib/db";
 import { notFound, redirect } from "next/navigation";

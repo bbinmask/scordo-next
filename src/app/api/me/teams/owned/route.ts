@@ -15,9 +15,20 @@ export async function GET(req: NextRequest) {
       where: {
         OR: [{ captainId: user.id }, { ownerId: user.id }],
       },
+      select: {
+        id: true,
+        name: true,
+        players: {
+          select: {
+            _count: true,
+          },
+        },
+        abbreviation: true,
+        logo: true,
+      },
     });
 
-    return NextResponse.json(new ApiResponse(user, 201));
+    return NextResponse.json(new ApiResponse(teams, 201));
   } catch (error) {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
