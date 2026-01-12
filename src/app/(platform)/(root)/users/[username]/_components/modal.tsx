@@ -1,5 +1,5 @@
 import { inviteInTeam } from "@/actions/invite-acions";
-import Spinner, { DefaultLoader } from "@/components/Spinner";
+import Spinner from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Team, User } from "@/generated/prisma";
+import { Team, TeamRequest, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
 import { TeamWithPlayers } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
@@ -33,6 +33,13 @@ export const AskToJoinTeamModal = ({ user, isOpen, onClose }: AskToJoinTeamModal
       return data.data;
     },
   });
+  const { data: requests } = useQuery({
+    queryKey: [user],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/teams/requests/user/${user.id}`);
+      return data.data;
+    },
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -44,7 +51,11 @@ export const AskToJoinTeamModal = ({ user, isOpen, onClose }: AskToJoinTeamModal
           <DialogDescription className="font-[poppins]">Select a team to invite</DialogDescription>
         </DialogHeader>
 
-        {isLoading ? <DefaultLoader /> : <AskToJoinTeam teams={teams} user={user} />}
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <AskToJoinTeam initialRequests={requests} initialTeams={teams} user={user} />
+        )}
         <DialogFooter>
           <div className="rounded-xl border-t border-slate-100 bg-slate-200 p-4 dark:border-white/5 dark:bg-white/5">
             <div className="flex items-center justify-end text-[11px] font-bold tracking-widest text-slate-400 uppercase">
@@ -72,15 +83,18 @@ export const JoinTheirTeamModal = ({}: JoinTheirTeamProps) => {
 
 interface AskToJoinTeamProps {
   user: User;
-  teams: TeamWithPlayers[];
+  initialRequests: TeamRequest[];
+  initialTeams: TeamWithPlayers[];
 }
 
-const AskToJoinTeam = ({ user, teams }: AskToJoinTeamProps) => {
-  const [invitedTeams, setInvitedTeams] = useState(
-    teams.filter((team) => {
-      return team.players.some((p) => p.user.username === user.username);
+const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamProps) => {
+  const [teams, setTeams] = useState(
+    initialTeams.filter((team) => {
+      return team.players.some((p) => p.user.username !== user.username);
     })
   );
+
+  const [requests, setRequests] = useState(initialRequests);
 
   const [invitingId, setInvitingId] = useState<string | null>();
 
@@ -89,12 +103,12 @@ const AskToJoinTeam = ({ user, teams }: AskToJoinTeamProps) => {
       toast.success("Request sent");
     },
     onError(error) {
+      setInvitingId(null);
       toast.error(error);
     },
   });
 
   const handleInvite = (id: string) => {
-    console.log(id);
     setInvitingId(id);
     execute({ teamId: id, toId: user.id, username: user.username });
   };
@@ -141,16 +155,16 @@ const AskToJoinTeam = ({ user, teams }: AskToJoinTeamProps) => {
               {/* Action Button */}
               <button
                 onClick={() => handleInvite(team.id)}
-                disabled={invitedTeams.findIndex((t) => t.id === team.id) !== -1 || isLoading}
+                disabled={requests.findIndex((t) => t.teamId === team.id) !== -1 || isLoading}
                 className={`relative flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 ${
-                  invitedTeams.findIndex((t) => t.id === team.id)
+                  requests.findIndex((t) => t.teamId === team.id) !== -1
                     ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
                     : "border border-slate-200 bg-white text-slate-400 group-hover:bg-green-50 hover:border-green-500 hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
                 }`}
               >
                 {invitingId === team.id ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
-                ) : invitedTeams.findIndex((t) => t.id === team.id) !== -1 ? (
+                ) : requests.findIndex((t) => t.teamId === team.id) !== -1 ? (
                   <Check className="h-5 w-5" />
                 ) : (
                   <Plus className="h-5 w-5" />
