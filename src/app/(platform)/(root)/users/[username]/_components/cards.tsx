@@ -411,7 +411,7 @@ const ProfilePage = ({ user }: { user: User }) => {
         </div>
       </div>
       <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
-      <AskToJoinTeamModal isOpen={isAskJoin} onClose={askJoinClose} />
+      <AskToJoinTeamModal user={user} isOpen={isAskJoin} onClose={askJoinClose} />
     </div>
   );
 };

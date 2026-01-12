@@ -26,6 +26,7 @@ const teamWithPlayers = Prisma.validator<Prisma.TeamDefaultArgs>()({
     players: {
       include: {
         user: true,
+        _count: true,
       },
     },
   },
