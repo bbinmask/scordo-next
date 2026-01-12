@@ -1,4 +1,5 @@
-import Spinner from "@/components/Spinner";
+import { inviteInTeam } from "@/actions/invite-acions";
+import Spinner, { DefaultLoader } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,12 +10,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Team, User } from "@/generated/prisma";
+import { useAction } from "@/hooks/useAction";
 import { TeamWithPlayers } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { ArrowRight, Check, Loader2, Plus, Search, Shield, Trophy, Users, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface AskToJoinTeamModalProps {
   isOpen: boolean;
@@ -41,8 +44,7 @@ export const AskToJoinTeamModal = ({ user, isOpen, onClose }: AskToJoinTeamModal
           <DialogDescription className="font-[poppins]">Select a team to invite</DialogDescription>
         </DialogHeader>
 
-        <AskToJoinTeam teams={teams} user={user} />
-
+        {isLoading ? <DefaultLoader /> : <AskToJoinTeam teams={teams} user={user} />}
         <DialogFooter>
           <div className="rounded-xl border-t border-slate-100 bg-slate-200 p-4 dark:border-white/5 dark:bg-white/5">
             <div className="flex items-center justify-end text-[11px] font-bold tracking-widest text-slate-400 uppercase">
@@ -74,28 +76,33 @@ interface AskToJoinTeamProps {
 }
 
 const AskToJoinTeam = ({ user, teams }: AskToJoinTeamProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const invitedTeams = teams.filter((team) => {
-    return team.players.some((p) => p.user.username === user.username);
+  const [invitedTeams, setInvitedTeams] = useState(
+    teams.filter((team) => {
+      return team.players.some((p) => p.user.username === user.username);
+    })
+  );
+
+  const [invitingId, setInvitingId] = useState<string | null>();
+
+  const { execute, isLoading } = useAction(inviteInTeam, {
+    onSuccess(data) {
+      toast.success("Request sent");
+    },
+    onError(error) {
+      toast.error(error);
+    },
   });
 
-  console.log(invitedTeams);
-
-  const handleInvite = (id: string) => {};
-
-  const loading = false;
-
-  const invitingId = "";
+  const handleInvite = (id: string) => {
+    console.log(id);
+    setInvitingId(id);
+    execute({ teamId: id, toId: user.id, username: user.username });
+  };
 
   return (
     <div className="hide_scrollbar max-h-[45vh] overflow-hidden overflow-x-hidden overflow-y-auto pb-8">
       <ul className="custom-scrollbar max-h-[400px] space-y-3 overflow-y-auto p-2">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-20 text-slate-400">
-            <Spinner className="h-8 w-8 animate-spin text-green-500" />
-            <p className="text-xs font-bold tracking-widest uppercase">Accessing Team Database</p>
-          </div>
-        ) : teams.length > 0 ? (
+        {teams.length > 0 ? (
           teams.map((team) => (
             <li
               key={team.id}
@@ -133,8 +140,8 @@ const AskToJoinTeam = ({ user, teams }: AskToJoinTeamProps) => {
 
               {/* Action Button */}
               <button
-                disabled={invitedTeams.findIndex((t) => t.id === team.id) === -1}
                 onClick={() => handleInvite(team.id)}
+                disabled={invitedTeams.findIndex((t) => t.id === team.id) !== -1 || isLoading}
                 className={`relative flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 ${
                   invitedTeams.findIndex((t) => t.id === team.id)
                     ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"

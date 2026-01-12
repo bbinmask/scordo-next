@@ -1,7 +1,11 @@
+"use server";
+
 import { currentUser } from "@/lib/currentUser";
 import { InputInviteUserToTeam, ReturnInviteUserToTeam } from "./types";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { createSafeAction } from "@/lib/create-safe-action";
+import { InviteUserToTeam } from "./schema";
 
 const inviteInTeamHandler = async (
   data: InputInviteUserToTeam
@@ -50,3 +54,5 @@ const inviteInTeamHandler = async (
     data: request,
   };
 };
+
+export const inviteInTeam = createSafeAction(InviteUserToTeam, inviteInTeamHandler);
