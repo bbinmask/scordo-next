@@ -167,7 +167,7 @@ interface InvitationsWidgetProps {
 
 function Invitations({ teamInvites, onAccept, onDecline }: InvitationsWidgetProps) {
   return (
-    <div className="rounded-lg bg-gradient-to-br from-green-600 to-emerald-800 p-6 shadow-lg">
+    <div className="hide_scrollbar h-[22rem] overflow-x-hidden overflow-y-auto scroll-smooth rounded-lg bg-gradient-to-br from-green-600 to-emerald-800 p-6 shadow-lg">
       <h2 className="mb-4 flex items-center font-[cal_sans] text-xl text-gray-50">
         <Mail size={22} className="mr-3" />
         Team Invitations
