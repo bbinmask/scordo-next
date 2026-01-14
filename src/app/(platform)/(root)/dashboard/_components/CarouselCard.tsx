@@ -5,9 +5,9 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-export const LiveMatchCard = ({ className, match }: { className?: string; match: any }) => {
+export const LiveMatchCard = ({ match }: { match: any }) => {
   return (
-    <div className={cn("group relative grid", className)}>
+    <div className="group hover-card relative mb-1 grid w-60 flex-shrink-0 rounded-xl bg-white p-4 shadow-md dark:bg-gray-800">
       <Link
         href="#"
         className="text-foreground mb-2 w-fit font-[urbanist] text-[10px] tracking-wide hover:underline"
@@ -49,9 +49,27 @@ export const LiveMatchCard = ({ className, match }: { className?: string; match:
   );
 };
 
-export const UpcomingMatchCard = ({ className, match }: { className?: string; match: any }) => {
+interface MatchListProps {
+  matches: any[];
+  status: "live" | "upcoming";
+}
+
+const MatchList = ({ matches, status }: MatchListProps) => {
+  return matches.length > 0 ? (
+    <>
+      {status === "live" && matches.map((match, i) => <LiveMatchCard key={i} match={match} />)}
+
+      {status === "upcoming" &&
+        matches.map((match, i) => <UpcomingMatchCard key={i} match={match} />)}
+    </>
+  ) : null;
+};
+
+export default MatchList;
+
+export const UpcomingMatchCard = ({ match }: { match: any }) => {
   return (
-    <div className={cn("group flex cursor-pointer flex-row flex-nowrap", className)}>
+    <div className="hover-card group mb-1 flex w-60 flex-shrink-0 transform cursor-pointer flex-row flex-nowrap rounded-xl bg-white p-4 shadow-md transition-transform duration-300 dark:bg-gray-800">
       <div className="w-full">
         <Link
           href="#"

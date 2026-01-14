@@ -1,7 +1,6 @@
 "use client";
 
 import { NewCard } from "./_components/Card";
-import { CarouselSpacing } from "./_components/CarouselSpacing";
 import { BarChart2, Newspaper, Users, Video } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
 import Tabs from "../_components/Tabs";
@@ -12,6 +11,8 @@ import HeroSection from "../_components/Hero";
 import AxiosRequest from "@/utils/AxiosResponse";
 import { useQuery } from "@tanstack/react-query";
 import { DefaultLoader } from "@/components/Spinner";
+import { Carousel } from "@/components/carousel";
+import MatchList, { LiveMatchCard } from "./_components/CarouselCard";
 
 const cardData = [
   {
@@ -75,12 +76,16 @@ const DashboardPage = () => {
           <section title="matches" className="">
             <div className="mb-8">
               <TypographyHeading className="mb-4 px-4" content="Live on Scordo" />
-              <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Live" />{" "}
+              <Carousel>
+                <MatchList matches={Array.from({ length: 10 }).fill(0)} status="live" />
+              </Carousel>
             </div>
             <div className="mb-8">
               <TypographyHeading className="mb-4 px-4" content="Upcoming on Scordo" />
 
-              <CarouselSpacing matches={Array.from({ length: 10 }).fill(0)} status="Upcoming" />
+              <Carousel>
+                <MatchList matches={Array.from({ length: 10 }).fill(0)} status="upcoming" />
+              </Carousel>
             </div>
           </section>
           <section className="px-4" title="Featured">

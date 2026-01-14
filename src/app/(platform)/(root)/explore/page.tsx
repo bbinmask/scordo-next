@@ -6,9 +6,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, Users, Shield, Trophy } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import AfterSearch from "./_components/AfterSearch";
-import { CarouselSpacing } from "../dashboard/_components/CarouselSpacing";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { Carousel } from "@/components/carousel";
 
 /* -------------------- Filters -------------------- */
 
@@ -124,7 +124,7 @@ const ExplorePage = () => {
       {/* Content */}
       {query.trim() === "" ? (
         <div className="mx-auto mt-4 max-w-7xl border p-4 md:p-8">
-          <CarouselSpacing status="Live" matches={[]} />
+          {/* <Carousel status="Live" matches={[]} /> */}
         </div>
       ) : (
         <AfterSearch
