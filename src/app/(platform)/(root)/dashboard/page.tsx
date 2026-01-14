@@ -12,7 +12,7 @@ import AxiosRequest from "@/utils/AxiosResponse";
 import { useQuery } from "@tanstack/react-query";
 import { DefaultLoader } from "@/components/Spinner";
 import { Carousel } from "@/components/carousel";
-import MatchList, { LiveMatchCard } from "./_components/CarouselCard";
+import MatchList from "../_components/MatchList";
 
 const cardData = [
   {

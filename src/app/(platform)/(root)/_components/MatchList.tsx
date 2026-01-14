@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { getMatchUrl } from "@/utils/getURL";
 import { shortenTeamName } from "@/utils/short";
 import { ChevronRight } from "lucide-react";
