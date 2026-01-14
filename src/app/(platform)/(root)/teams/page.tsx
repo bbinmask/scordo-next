@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import {
   Users,
@@ -21,7 +21,6 @@ import axios from "axios";
 import { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { ActionButton } from "@/components/ActionButton";
-import { ViewTeamCard } from "../_components/ViewTeamCard";
 import { Carousel } from "@/components/carousel";
 
 function YourTeamsSection({
@@ -71,6 +70,72 @@ function YourTeamsSection({
         <p className="text-gray-500">You are not a member of any teams yet.</p>
       )}
     </div>
+  );
+}
+interface ViewTeamCardProps {
+  team: TeamForListComponent;
+}
+
+export function ViewTeamCard({ team }: ViewTeamCardProps) {
+  return (
+    <Link
+      href={`/teams/${team.abbreviation}`}
+      className="group hover-card relative mb-1 grid w-60 flex-shrink-0 rounded-xl bg-white shadow-md dark:bg-gray-800"
+    >
+      {/* Card Content */}
+      <div className="px-3 py-4">
+        <div className="flex items-center space-x-2">
+          {/* Team Logo */}
+          <div className="flex-shrink-0">
+            <img
+              src={team?.logo || "/team.svg"}
+              alt={`${team.name} logo`}
+              className="border-input h-12 w-12 rounded-full border-2"
+              onError={(e) =>
+                (e.currentTarget.src = "https://placehold.co/100x100/CCCCCC/FFFFFF?text=T")
+              }
+            />
+          </div>
+          {/* Team Name */}
+          <div className="min-w-0 flex-1">
+            <h3
+              title={team.name}
+              className="primary-text truncate font-[cal_sans] text-[15px] font-bold tracking-wide"
+            >
+              {team.name}
+            </h3>
+            <p className="secondary-text font-[urbanist] text-sm tracking-wide">
+              @{team.abbreviation}
+            </p>
+          </div>
+        </div>
+
+        {/* Team Info */}
+        <div className="mt-3 space-y-1">
+          {team.address && (
+            <div className="secondary-text flex items-center font-[urbanist] text-xs font-semibold">
+              <MapPin size={16} className="mr-2 text-green-600" />
+              <span>
+                {team?.address?.city} {team?.address?.state}
+              </span>
+            </div>
+          )}
+          {(team?._count?.players !== undefined || team?._count?.players !== null) && (
+            <div className="secondary-text flex items-center font-[urbanist] text-xs font-semibold">
+              <Users size={16} className="mr-2 text-green-600" />
+              <span>{team?._count?.players} Players</span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center justify-between px-4 py-2 font-[poppins] text-sm font-medium text-green-600">
+        <span>View Team</span>
+        <ArrowRight
+          size={16}
+          className="transition-transform duration-300 group-hover:translate-x-1"
+        />
+      </div>
+    </Link>
   );
 }
 
