@@ -22,6 +22,7 @@ import { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { ActionButton } from "@/components/ActionButton";
 import { ViewTeamCard } from "../_components/ViewTeamCard";
+import { Carousel } from "@/components/carousel";
 
 function YourTeamsSection({
   teamsAsOwner,
@@ -46,11 +47,11 @@ function YourTeamsSection({
           <h3 className="secondary-text mb-3 font-[poppins] text-lg font-semibold">
             Managed by You
           </h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Carousel>
             {managedTeams.map((team) => (
               <ViewTeamCard key={team.id} team={team} />
             ))}
-          </div>
+          </Carousel>
         </div>
       )}
 
@@ -58,11 +59,11 @@ function YourTeamsSection({
       {playerTeams.length > 0 && (
         <div>
           <h3 className="secondary-text mb-3 font-[poppins] text-lg font-semibold">All Teams</h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Carousel>
             {playerTeams.map((team) => (
               <ViewTeamCard key={team.id} team={team} />
             ))}
-          </div>
+          </Carousel>
         </div>
       )}
 

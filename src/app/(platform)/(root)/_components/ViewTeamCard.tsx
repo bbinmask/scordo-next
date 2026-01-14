@@ -11,7 +11,7 @@ export function ViewTeamCard({ team }: ViewTeamCardProps) {
   return (
     <Link
       href={`/teams/${team.abbreviation}`}
-      className="group container-bg border-input transform cursor-pointer overflow-hidden rounded-lg border transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg"
+      className="group hover-card relative mb-1 grid w-60 flex-shrink-0 rounded-xl bg-white p-4 shadow-md dark:bg-gray-800"
     >
       {/* Card Content */}
       <div className="p-5">
