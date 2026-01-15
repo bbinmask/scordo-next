@@ -2,9 +2,8 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { Users, PlusCircle, Mail, ArrowRight, MapPin } from "lucide-react";
-import { User } from "@/generated/prisma";
 import { TeamForListComponent, TeamRequestWithDetails } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
@@ -13,6 +12,7 @@ import { Carousel } from "@/components/carousel";
 import { useAction } from "@/hooks/useAction";
 import { acceptTeamRequest, declineTeamRequest } from "@/actions/invite-acions";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 function YourTeamsSection({
   teamsAsOwner,
@@ -141,27 +141,35 @@ function CreateTeamCard() {
       <p className="mb-4 font-[urbanist] text-sm font-medium tracking-wide text-green-100">
         Start your own legacy. Build a team from the ground up and recruit players.
       </p>
-      <ActionButton
-        href="/teams/create"
-        title="Create"
-        className="w-full rounded-lg bg-green-100 px-4 py-2 text-center font-[urbanist] font-bold shadow ring-0 transition hover:shadow-md dark:bg-gray-200 dark:hover:opacity-80"
-        spanClasses="text-gray-800 dark:text-gray-800"
-      />
+      <Button asChild className="hover-card">
+        <Link href={"/teams/create"} className="rounded-xl bg-gray-50 px-8 py-2">
+          Create
+        </Link>
+      </Button>
     </div>
   );
 }
 
-interface InvitationsWidgetProps {
-  teamInvites: TeamRequestWithDetails[];
-}
+interface InvitationsProps {}
 
-function Invitations({ teamInvites }: InvitationsWidgetProps) {
+function Invitations({}: InvitationsProps) {
   const [inviteId, setInviteId] = useState<string | null>(null);
+
+  const queryClient = useQueryClient();
+
+  const { data: teamInvites, isLoading: isInviteLoading } = useQuery<TeamRequestWithDetails[]>({
+    queryKey: ["team-invites"],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/me/teams/invites");
+      return data.data;
+    },
+  });
+
   const { execute: executeAccept, isLoading: isAccepting } = useAction(acceptTeamRequest, {
     onSuccess(data) {
+      queryClient.invalidateQueries({ queryKey: ["team-invites"] });
       toast.success("Accepted!");
       setInviteId(null);
-      console.log(data);
     },
     onError(error) {
       toast.error(error);
@@ -171,9 +179,9 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
 
   const { execute: executeDecline, isLoading: isCanceling } = useAction(declineTeamRequest, {
     onSuccess(data) {
+      queryClient.invalidateQueries({ queryKey: ["team-invites"] });
       toast.success("Request Declined!");
       setInviteId(null);
-      console.log(data);
     },
     onError(error) {
       toast.error(error);
@@ -200,7 +208,11 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
       </h2>
 
       {/* Team Invitations */}
-      {teamInvites.length === 0 ? (
+      {isInviteLoading ? (
+        <div className="center flex h-full w-full">
+          <Spinner />
+        </div>
+      ) : !teamInvites || teamInvites.length === 0 ? (
         <NotFoundParagraph
           className="text-gray-200/80 dark:text-gray-200/80"
           description="No new invitations."
@@ -228,7 +240,7 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
                 {invite.status === "pending" && (
                   <div className="flex space-x-2 font-[poppins]">
                     <button
-                      disabled={isAccepting && inviteId === invite.id}
+                      disabled={isAccepting || isCanceling}
                       onClick={() => handleAccept(invite.id, invite.teamId, invite.fromId)}
                       className="center flex flex-1 cursor-pointer rounded-md bg-green-100 py-1.5 text-sm font-semibold text-green-700 transition hover:bg-green-200"
                     >
@@ -236,7 +248,7 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
                     </button>
                     <button
                       onClick={() => handleDecline(invite.id, invite.teamId)}
-                      disabled={isCanceling}
+                      disabled={isCanceling || isAccepting}
                       className="center flex flex-1 cursor-pointer rounded-md bg-red-100 py-1.5 text-sm font-semibold transition hover:bg-red-200"
                     >
                       {isCanceling && inviteId === invite.id ? (
@@ -256,34 +268,19 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
   );
 }
 
-interface TeamsDashboardProps {
-  user: User;
-  teamInvitations: TeamRequestWithDetails[];
-  teamsAsOwner: TeamForListComponent[];
-  teamsAsPlayer: TeamForListComponent[];
-}
-
 const TeamsPage = () => {
-  const { data: dashboardData, isLoading: loading } = useQuery<TeamsDashboardProps>({
-    queryKey: ["team-dashboard"],
+  const { data: teams, isLoading: isTeamLoading } = useQuery<TeamForListComponent[]>({
+    queryKey: ["all-teams"],
     queryFn: async () => {
-      const res = await axios.get("/api/teams/dashboard");
-      return res.data;
+      const { data } = await axios.get("/api/me/teams/all");
+      return data.data;
     },
   });
 
-  if (loading) {
+  if (isTeamLoading) {
     return (
       <div className="min-h flex items-center justify-center">
         <DefaultLoader className="primary-heading" />
-      </div>
-    );
-  }
-
-  if (!dashboardData) {
-    return (
-      <div className="min-h flex items-center justify-center">
-        <NotFoundParagraph description="Could not load dashboard data." />
       </div>
     );
   }
@@ -303,16 +300,13 @@ const TeamsPage = () => {
       <div className="container-bg grid grid-cols-1 gap-6 rounded-xl p-4 lg:grid-cols-3">
         {/* Main Column */}
         <div className="space-y-6 lg:col-span-2">
-          <YourTeamsSection
-            teamsAsOwner={dashboardData.teamsAsOwner}
-            teamsAsPlayer={dashboardData.teamsAsPlayer}
-          />
+          <YourTeamsSection teamsAsOwner={[] as any} teamsAsPlayer={[] as any} />
         </div>
 
         {/* Sidebar Column */}
         <div className="space-y-6 lg:col-span-1">
           <CreateTeamCard />
-          <Invitations teamInvites={dashboardData.teamInvitations} />
+          <Invitations />
         </div>
       </div>
     </div>

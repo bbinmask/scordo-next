@@ -100,7 +100,9 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
 
   const { execute, isLoading } = useAction(inviteInTeam, {
     onSuccess(data) {
+      setInvitingId(null);
       toast.success("Request sent");
+      setRequests((prev) => ({ ...prev, data }));
     },
     onError(error) {
       setInvitingId(null);
@@ -110,7 +112,8 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
 
   const handleInvite = (id: string) => {
     setInvitingId(id);
-    execute({ teamId: id, toId: user.id, username: user.username });
+    if (isLoading) return;
+    execute({ teamId: id, fromId: user.id, username: user.username });
   };
 
   return (

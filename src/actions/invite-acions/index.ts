@@ -85,7 +85,7 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
 
     if (!player)
       return {
-        error: `The user is not a player!`,
+        error: `You are not a player!`,
       };
 
     request = await db.teamRequest.findUnique({
@@ -120,15 +120,11 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
         error: "Cannout find the team!",
       };
 
-    if (team.ownerId !== user.id && team.captainId !== user.id)
-      return {
-        error: "Only owner can accept",
-      };
-
     if (team.players.findIndex((pl) => pl.userId === fromId) !== -1)
       return {
         error: "Already in the team!",
       };
+
     team = await db.team.update({
       where: {
         id: teamId,
@@ -183,11 +179,6 @@ const declineReqHandler = async (data: InputTypeForDecline): Promise<ReturnTypeF
     if (!team)
       return {
         error: "Team not found!",
-      };
-
-    if (team.ownerId !== user.id && team.captainId !== user.id)
-      return {
-        error: "Unauthorized",
       };
 
     await db.teamRequest.delete({
