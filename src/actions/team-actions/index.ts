@@ -303,7 +303,7 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
 
     if (!player)
       return {
-        error: `The use is not a player!`,
+        error: `The user is not a player!`,
       };
 
     if (team.players.findIndex((pl) => pl.id === player?.id))
@@ -313,11 +313,11 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
 
     team.players.push(player);
 
-    request = await db.teamRequest.delete({
-      where: {
-        id: reqId,
-      },
-    });
+    // request = await db.teamRequest.delete({
+    //   where: {
+    //     id: reqId,
+    //   },
+    // });
   } catch (error: any) {
     return {
       error: error.message,

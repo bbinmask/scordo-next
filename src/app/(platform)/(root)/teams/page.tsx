@@ -1,21 +1,9 @@
 "use client";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import {
-  Users,
-  Shield,
-  PlusCircle,
-  Search,
-  Mail,
-  Check,
-  X,
-  ArrowRight,
-  UserPlus,
-  MapPin,
-  Trophy,
-} from "lucide-react";
-import { Role, Team, User } from "@/generated/prisma";
-import { FriendshipWithBoth, TeamForListComponent, TeamRequestWithDetails } from "@/lib/types";
+import React from "react";
+import { Users, PlusCircle, Mail, ArrowRight, MapPin } from "lucide-react";
+import { User } from "@/generated/prisma";
+import { TeamForListComponent, TeamRequestWithDetails } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { DefaultLoader } from "@/components/Spinner";
@@ -72,6 +60,7 @@ function YourTeamsSection({
     </div>
   );
 }
+
 interface ViewTeamCardProps {
   team: TeamForListComponent;
 }
@@ -142,7 +131,7 @@ export function ViewTeamCard({ team }: ViewTeamCardProps) {
 function CreateTeamCard() {
   return (
     <div className="rounded-lg bg-gradient-to-br from-green-600 to-teal-800 p-6 text-white shadow-lg">
-      <h2 className="mb-2 flex items-center font-[cal_sans] text-xl font-bold text-gray-50">
+      <h2 className="mb-2 flex items-center font-[cal_sans] text-xl text-gray-50">
         <PlusCircle size={22} className="mr-2" />
         Create a New Team
       </h2>
@@ -152,7 +141,7 @@ function CreateTeamCard() {
       <ActionButton
         href="/teams/create"
         title="Create"
-        className="w-full rounded-lg bg-green-100 px-4 py-2 text-center font-[urbanist] font-bold shadow ring-0 transition hover:shadow-md dark:bg-gray-200 dark:hover:bg-gray-200"
+        className="w-full rounded-lg bg-green-100 px-4 py-2 text-center font-[urbanist] font-bold shadow ring-0 transition hover:shadow-md dark:bg-gray-200 dark:hover:opacity-80"
         spanClasses="text-gray-800 dark:text-gray-800"
       />
     </div>
@@ -161,11 +150,12 @@ function CreateTeamCard() {
 
 interface InvitationsWidgetProps {
   teamInvites: TeamRequestWithDetails[];
-  onAccept: (id: string) => void;
-  onDecline: (id: string) => void;
 }
 
-function Invitations({ teamInvites, onAccept, onDecline }: InvitationsWidgetProps) {
+function Invitations({ teamInvites }: InvitationsWidgetProps) {
+  const handleAccept = (id: string) => {};
+  const handleDecline = (id: string) => {};
+
   return (
     <div className="hide_scrollbar h-[22rem] overflow-x-hidden overflow-y-auto scroll-smooth rounded-lg bg-gradient-to-br from-green-600 to-emerald-800 p-6 shadow-lg">
       <h2 className="mb-4 flex items-center font-[cal_sans] text-xl text-gray-50">
@@ -189,7 +179,7 @@ function Invitations({ teamInvites, onAccept, onDecline }: InvitationsWidgetProp
                     <img
                       src={invite?.team?.logo || "/team.svg"}
                       alt={invite.team.name}
-                      className="h-8 w-8 rounded-full"
+                      className="h-8 w-8 rounded-full bg-white"
                       onError={(e) =>
                         (e.currentTarget.src = "https://placehold.co/100x100/CCCCCC/FFFFFF?text=T")
                       }
@@ -202,14 +192,14 @@ function Invitations({ teamInvites, onAccept, onDecline }: InvitationsWidgetProp
                 {invite.status === "pending" && (
                   <div className="flex space-x-2 font-[poppins]">
                     <button
-                      onClick={() => onAccept(invite.id)}
-                      className="flex-1 cursor-pointer rounded-md bg-green-100 py-1.5 text-sm text-green-700 transition hover:bg-green-200"
+                      onClick={() => handleAccept(invite.id)}
+                      className="flex-1 cursor-pointer rounded-md bg-green-100 py-1.5 text-sm font-semibold text-green-700 transition hover:bg-green-200"
                     >
                       Accept
                     </button>
                     <button
-                      onClick={() => onDecline(invite.id)}
-                      className="flex-1 cursor-pointer rounded-md bg-red-100 py-1.5 text-sm text-red-700 transition hover:bg-red-200"
+                      onClick={() => handleDecline(invite.id)}
+                      className="flex-1 cursor-pointer rounded-md bg-red-100 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-200"
                     >
                       Decline
                     </button>
@@ -239,52 +229,6 @@ const TeamsPage = () => {
       return res.data;
     },
   });
-
-  // const loading = false;
-  // const [dashboardData, setDashboardData] = useState(mockDashboardData);
-
-  // --- Mock data fetching ---
-  // useEffect(() => {
-  //   // Simulate API call to get all dashboard data for the logged-in user
-  //   setTimeout(() => {
-  //     setDashboardData(mockDashboardData);
-  //     setLoading(false);
-  //   }, 500);
-  // }, []);
-
-  // --- Invitation Handlers (would call APIs) ---
-  const handleAcceptInvite = (inviteId: string) => {
-    alert("Team invitation accepted! (Simulation)");
-    // setDashboardData((prev) => ({
-    //   ...prev,
-    //   teamInvitations: prev.teamInvitations.filter((inv) => inv.id !== inviteId),
-    //   // In a real app, you'd also re-fetch or add to `teamsAsPlayer`
-    // }));
-  };
-
-  const handleDeclineInvite = (inviteId: string) => {
-    alert("Team invitation declined. (Simulation)");
-    // setDashboardData((prev) => ({
-    //   ...prev,
-    //   teamInvitations: prev.teamInvitations.filter((inv) => inv.id !== inviteId),
-    // }));
-  };
-
-  const handleAcceptFriend = (reqId: string) => {
-    alert("Friend request accepted! (Simulation)");
-    // setDashboardData((prev) => ({
-    //   ...prev,
-    //   friendRequests: prev.friendRequests.filter((req) => req.id !== reqId),
-    // }));
-  };
-
-  const handleDeclineFriend = (reqId: string) => {
-    alert("Friend request declined. (Simulation)");
-    // setDashboardData((prev) => ({
-    //   ...prev,
-    //   friendRequests: prev.friendRequests.filter((req) => req.id !== reqId),
-    // }));
-  };
 
   if (loading) {
     return (
@@ -326,11 +270,7 @@ const TeamsPage = () => {
         {/* Sidebar Column */}
         <div className="space-y-6 lg:col-span-1">
           <CreateTeamCard />
-          <Invitations
-            teamInvites={dashboardData.teamInvitations}
-            onAccept={handleAcceptInvite}
-            onDecline={handleDeclineInvite}
-          />
+          <Invitations teamInvites={dashboardData.teamInvitations} />
         </div>
       </div>
     </div>
