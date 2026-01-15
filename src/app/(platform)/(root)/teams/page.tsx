@@ -6,14 +6,13 @@ import { User } from "@/generated/prisma";
 import { TeamForListComponent, TeamRequestWithDetails } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { DefaultLoader } from "@/components/Spinner";
+import Spinner, { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { ActionButton } from "@/components/ActionButton";
 import { Carousel } from "@/components/carousel";
 import { useAction } from "@/hooks/useAction";
 import { acceptTeamRequest, declineTeamRequest } from "@/actions/invite-acions";
 import { toast } from "sonner";
-import { SyncLoader } from "react-spinners";
 
 function YourTeamsSection({
   teamsAsOwner,
@@ -169,9 +168,10 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
       setInviteId(null);
     },
   });
+
   const { execute: executeDecline, isLoading: isCanceling } = useAction(declineTeamRequest, {
     onSuccess(data) {
-      toast.success("Accepted!");
+      toast.success("Request Declined!");
       setInviteId(null);
       console.log(data);
     },
@@ -186,7 +186,9 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
 
     executeAccept({ teamId, reqId: id, fromId });
   };
-  const handleDecline = (id: string, teamId: string, fromId?: string) => {
+  const handleDecline = (id: string, teamId: string) => {
+    setInviteId(id);
+
     executeDecline({ id, teamId });
   };
 
@@ -228,16 +230,20 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
                     <button
                       disabled={isAccepting && inviteId === invite.id}
                       onClick={() => handleAccept(invite.id, invite.teamId, invite.fromId)}
-                      className="flex-1 cursor-pointer rounded-md bg-green-100 py-1.5 text-sm font-semibold text-green-700 transition hover:bg-green-200"
+                      className="center flex flex-1 cursor-pointer rounded-md bg-green-100 py-1.5 text-sm font-semibold text-green-700 transition hover:bg-green-200"
                     >
-                      {isAccepting ? <SyncLoader /> : "Accept"}
+                      {isAccepting && inviteId === invite.id ? <Spinner /> : "Accept"}
                     </button>
                     <button
-                      onClick={() => handleDecline(invite.id, invite.teamId, invite.fromId)}
+                      onClick={() => handleDecline(invite.id, invite.teamId)}
                       disabled={isCanceling}
-                      className="flex-1 cursor-pointer rounded-md bg-red-100 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-200"
+                      className="center flex flex-1 cursor-pointer rounded-md bg-red-100 py-1.5 text-sm font-semibold transition hover:bg-red-200"
                     >
-                      {isCanceling ? <SyncLoader /> : "Decline"}
+                      {isCanceling && inviteId === invite.id ? (
+                        <Spinner className="" />
+                      ) : (
+                        <span className="text-red-600">Decline</span>
+                      )}
                     </button>
                   </div>
                 )}
