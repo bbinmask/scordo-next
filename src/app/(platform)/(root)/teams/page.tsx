@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { Users, PlusCircle, Mail, ArrowRight, MapPin } from "lucide-react";
 import { User } from "@/generated/prisma";
 import { TeamForListComponent, TeamRequestWithDetails } from "@/lib/types";
@@ -10,6 +10,10 @@ import { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { ActionButton } from "@/components/ActionButton";
 import { Carousel } from "@/components/carousel";
+import { useAction } from "@/hooks/useAction";
+import { acceptTeamRequest, declineTeamRequest } from "@/actions/invite-acions";
+import { toast } from "sonner";
+import { SyncLoader } from "react-spinners";
 
 function YourTeamsSection({
   teamsAsOwner,
@@ -153,8 +157,38 @@ interface InvitationsWidgetProps {
 }
 
 function Invitations({ teamInvites }: InvitationsWidgetProps) {
-  const handleAccept = (id: string) => {};
-  const handleDecline = (id: string) => {};
+  const [inviteId, setInviteId] = useState<string | null>(null);
+  const { execute: executeAccept, isLoading: isAccepting } = useAction(acceptTeamRequest, {
+    onSuccess(data) {
+      toast.success("Accepted!");
+      setInviteId(null);
+      console.log(data);
+    },
+    onError(error) {
+      toast.error(error);
+      setInviteId(null);
+    },
+  });
+  const { execute: executeDecline, isLoading: isCanceling } = useAction(declineTeamRequest, {
+    onSuccess(data) {
+      toast.success("Accepted!");
+      setInviteId(null);
+      console.log(data);
+    },
+    onError(error) {
+      toast.error(error);
+      setInviteId(null);
+    },
+  });
+
+  const handleAccept = (id: string, teamId: string, fromId: string) => {
+    setInviteId(id);
+
+    executeAccept({ teamId, reqId: id, fromId });
+  };
+  const handleDecline = (id: string, teamId: string, fromId?: string) => {
+    executeDecline({ id, teamId });
+  };
 
   return (
     <div className="hide_scrollbar h-[22rem] overflow-x-hidden overflow-y-auto scroll-smooth rounded-lg bg-gradient-to-br from-green-600 to-emerald-800 p-6 shadow-lg">
@@ -192,16 +226,18 @@ function Invitations({ teamInvites }: InvitationsWidgetProps) {
                 {invite.status === "pending" && (
                   <div className="flex space-x-2 font-[poppins]">
                     <button
-                      onClick={() => handleAccept(invite.id)}
+                      disabled={isAccepting && inviteId === invite.id}
+                      onClick={() => handleAccept(invite.id, invite.teamId, invite.fromId)}
                       className="flex-1 cursor-pointer rounded-md bg-green-100 py-1.5 text-sm font-semibold text-green-700 transition hover:bg-green-200"
                     >
-                      Accept
+                      {isAccepting ? <SyncLoader /> : "Accept"}
                     </button>
                     <button
-                      onClick={() => handleDecline(invite.id)}
+                      onClick={() => handleDecline(invite.id, invite.teamId, invite.fromId)}
+                      disabled={isCanceling}
                       className="flex-1 cursor-pointer rounded-md bg-red-100 py-1.5 text-sm font-semibold text-red-700 transition hover:bg-red-200"
                     >
-                      Decline
+                      {isCanceling ? <SyncLoader /> : "Decline"}
                     </button>
                   </div>
                 )}

@@ -4,14 +4,17 @@ import { currentUser } from "@/lib/currentUser";
 import {
   InputInviteUserToTeam,
   InputTypeForAccept,
+  InputTypeForDecline,
   ReturnInviteUserToTeam,
   ReturnTypeForAccept,
+  ReturnTypeForDecline,
 } from "./types";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { AcceptRequest, InviteUserToTeam } from "./schema";
+import { AcceptRequest, DeclineRequest, InviteUserToTeam } from "./schema";
 import { Player } from "@/generated/prisma";
+import { error } from "console";
 
 const inviteInTeamHandler = async (
   data: InputInviteUserToTeam
@@ -22,7 +25,7 @@ const inviteInTeamHandler = async (
     return {
       error: "UNAUTHORIZED",
     };
-  const { teamId, username, toId } = data;
+  const { teamId, username, fromId } = data;
 
   let request;
 
@@ -44,8 +47,8 @@ const inviteInTeamHandler = async (
     request = await db.teamRequest.create({
       data: {
         teamId,
-        toId,
-        fromId: user.id,
+        toId: user.id,
+        fromId,
       },
     });
   } catch (error: any) {
@@ -62,7 +65,7 @@ const inviteInTeamHandler = async (
 };
 
 const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeForAccept> => {
-  const { fromId, reqId, teamId } = data;
+  const { reqId, teamId, fromId } = data;
 
   const user = await currentUser();
 
@@ -74,20 +77,6 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
   let request, team, player: Player | null;
 
   try {
-    team = await db.team.findUnique({
-      where: {
-        id: teamId,
-      },
-      include: {
-        players: true,
-      },
-    });
-
-    if (team?.ownerId !== user.id)
-      return {
-        error: "Only owner can accept",
-      };
-
     player = await db.player.findFirst({
       where: {
         userId: fromId,
@@ -99,18 +88,68 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
         error: `The user is not a player!`,
       };
 
-    if (team.players.findIndex((pl) => pl.id === player?.id))
+    request = await db.teamRequest.findUnique({
+      where: {
+        id: reqId,
+      },
+    });
+
+    if (!request)
       return {
-        error: "Player is already in the team!",
+        error: "Request was widthdrawn!",
       };
 
-    team.players.push(player);
+    team = await db.team.findUnique({
+      where: {
+        id: teamId,
+      },
+      select: {
+        players: {
+          select: {
+            userId: true,
+          },
+        },
+        ownerId: true,
+        captainId: true,
+        abbreviation: true,
+      },
+    });
 
-    // request = await db.teamRequest.delete({
-    //   where: {
-    //     id: reqId,
-    //   },
-    // });
+    if (!team)
+      return {
+        error: "Cannout find the team!",
+      };
+
+    if (team.ownerId !== user.id && team.captainId !== user.id)
+      return {
+        error: "Only owner can accept",
+      };
+
+    if (team.players.findIndex((pl) => pl.userId === fromId) !== -1)
+      return {
+        error: "Already in the team!",
+      };
+    team = await db.team.update({
+      where: {
+        id: teamId,
+      },
+      data: {
+        players: {
+          connect: {
+            id: player.id,
+          },
+        },
+      },
+      include: {
+        players: true,
+      },
+    });
+
+    request = await db.teamRequest.delete({
+      where: {
+        id: reqId,
+      },
+    });
   } catch (error: any) {
     return {
       error: error.message,
@@ -122,6 +161,56 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
   return { data: team };
 };
 
+const declineReqHandler = async (data: InputTypeForDecline): Promise<ReturnTypeForDecline> => {
+  const { id, teamId } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Unauthorized!",
+    };
+
+  let team;
+
+  try {
+    team = await db.team.findUnique({
+      where: {
+        id: teamId,
+      },
+    });
+
+    if (!team)
+      return {
+        error: "Team not found!",
+      };
+
+    if (team.ownerId !== user.id && team.captainId !== user.id)
+      return {
+        error: "Unauthorized",
+      };
+
+    await db.teamRequest.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+
+  revalidatePath(`/teams/${team.abbreviation}`);
+  revalidatePath(`/teams`);
+
+  return {
+    data: team,
+  };
+};
+
 export const inviteInTeam = createSafeAction(InviteUserToTeam, inviteInTeamHandler);
 
 export const acceptTeamRequest = createSafeAction(AcceptRequest, acceptReqHandler);
+
+export const declineTeamRequest = createSafeAction(DeclineRequest, declineReqHandler);
