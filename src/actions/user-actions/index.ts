@@ -19,7 +19,6 @@ import {
   RecievedRequest,
   CreateUser,
   SentRequest,
-  CreatePlayer,
   UpdateUserDetails,
   UpdateUserProfile,
 } from "./schema";
@@ -54,15 +53,6 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
       },
     });
 
-    if (role === "player") {
-      await db.player.create({
-        data: {
-          userId: user.id,
-          teamId: user.id,
-        },
-      });
-    }
-
     if (!user) {
       return { error: "Failed to create user" };
     }
@@ -90,39 +80,6 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
     console.error(error?.message);
     return { error: error.message || "Failed to create user" };
   }
-};
-
-const createPlayerHandler = async (): Promise<any> => {
-  const user = await currentUser();
-
-  if (!user) return;
-
-  let player;
-
-  try {
-    const alreadyPlayer = await db.player.findFirst({
-      where: {
-        userId: user.id,
-      },
-    });
-
-    if (alreadyPlayer) return;
-
-    player = await db.player.create({
-      data: {
-        userId: user.id,
-        teamId: user.id,
-      },
-    });
-  } catch (error: any) {
-    return {
-      error: error.message,
-    };
-  }
-
-  revalidatePath(`/profile`);
-
-  return { data: player };
 };
 
 const sendFriendRequestHandler = async (
@@ -387,8 +344,6 @@ export const createUser = createSafeAction(CreateUser, createUserHandler);
 export const updateUserDetails = createSafeAction(UpdateUserDetails, updateUserDetailsHandler);
 
 export const updateUserProfile = createSafeAction(UpdateUserProfile, updateUserProfileHandler);
-
-export const createPlayer = createSafeAction(CreatePlayer, createPlayerHandler);
 
 export const sendFriendRequest = createSafeAction(SentRequest, sendFriendRequestHandler);
 

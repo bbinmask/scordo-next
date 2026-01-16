@@ -90,9 +90,12 @@ interface AskToJoinTeamProps {
 const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamProps) => {
   const [teams, setTeams] = useState(
     initialTeams.filter((team) => {
-      return team.players.some((p) => p.user.username !== user.username);
+      if (team.players.length === 0) return true;
+      return team.players.some((p) => p.userId !== user.id);
     })
   );
+
+  console.log({ teams, initialTeams });
 
   const [requests, setRequests] = useState(initialRequests);
 
@@ -102,7 +105,7 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
     onSuccess(data) {
       setInvitingId(null);
       toast.success("Request sent");
-      setRequests((prev) => ({ ...prev, data }));
+      setRequests((prev) => [...prev, data]);
     },
     onError(error) {
       setInvitingId(null);

@@ -23,7 +23,11 @@ import UpdateTeamImgModal from "./modals/UpdateTeamImgModal";
 import { Team } from "@/generated/prisma";
 import UpdateTeamModal from "./modals/UpdateTeamModal";
 import Requests from "./Requests";
-
+import { ChangeEvent } from "react";
+import { debounce } from "lodash";
+import { useAction } from "@/hooks/useAction";
+import { updateRecruiting } from "@/actions/team-actions";
+import { toast } from "sonner";
 const OptionsPopover = ({ team }: OptionsPopoverProps) => {
   const {
     isOpen: isProfileOpen,
@@ -32,7 +36,23 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
   } = useUpdateLogoAndBanner();
   const { isOpen: isEditOpen, onClose: onEditClose, onOpen: onEditOpen } = useUpdateTeam();
 
+  const { execute, isLoading } = useAction(updateRecruiting, {
+    onSuccess(data) {
+      toast.success("Recruiting updated!");
+    },
+    onError(error) {
+      toast.error(error);
+    },
+  });
+
   const { isOpen: isReqOpen, onClose: onReqClose, onOpen: onReqOpen } = useNotificationModal();
+
+  const handleRecruiting = (e: ChangeEvent<HTMLInputElement>) =>
+    debounce(() => {
+      execute({ abbreviation: team.abbreviation, recruiting: e.target.checked });
+    }, 500);
+
+  console.log({ isLoading });
 
   return (
     <Popover>
@@ -92,6 +112,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
                 <Input
                   id="isRecruiting"
                   type="checkbox"
+                  onChange={handleRecruiting}
                   className="relative z-20 h-full w-full rounded border-gray-300 text-emerald-600"
                 />
                 <div className="slider" />

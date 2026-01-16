@@ -12,6 +12,7 @@ import {
   BuildingIcon,
   Cross,
   GitBranchPlusIcon,
+  History,
   Info,
   Lock,
   MapPinIcon,
@@ -93,10 +94,10 @@ const TeamIdPage = () => {
               <div className="space-y-6 lg:col-span-1">
                 {/* Quick Info */}
                 <div className="rounded-xl bg-gray-50 p-5 font-[poppins] shadow-sm dark:bg-gray-700">
-                  <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                  <h2 className="mb-3 font-[poppins] text-lg font-semibold text-gray-900 dark:text-white">
                     Team Overview
                   </h2>
-                  <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                  <ul className="space-y-2 font-[urbanist] font-semibold text-gray-700 dark:text-gray-300">
                     <li className="flex items-center">
                       <MapPinIcon className="mr-2 h-5 w-5 text-blue-500" />
                       {!team.address
@@ -134,7 +135,7 @@ const TeamIdPage = () => {
 
                 {/* Recruitment Status */}
                 <div className="flex items-center justify-between rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                  <h2 className="flex items-center text-lg font-semibold text-gray-900 dark:text-white">
+                  <h2 className="flex items-center font-[poppins] text-lg font-semibold text-gray-900 dark:text-white">
                     <GitBranchPlusIcon className="mr-2 h-6 w-6 text-blue-500" /> Recruitment Status
                   </h2>
                   {team.isRecruiting ? (
@@ -151,17 +152,15 @@ const TeamIdPage = () => {
 
                 {/* Followers / Following */}
                 <div className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                  <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                  <h2 className="mb-3 font-[poppins] text-lg font-semibold text-gray-900 dark:text-white">
                     Community
                   </h2>
-                  <div className="flex justify-around text-center">
-                    <div>
-                      <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
-                        12000
-                        {/* players.length */}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Followers</p>
-                    </div>
+                  <div className="center grid font-[urbanist]">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
+                      12000
+                      {/* players.length */}
+                    </p>
+                    <p className="secondary-text text-sm font-semibold">Followers</p>
                   </div>
                 </div>
               </div>
@@ -170,13 +169,13 @@ const TeamIdPage = () => {
               <div className="space-y-8 lg:col-span-2">
                 {/* Description Section */}
                 <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                  <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
+                  <h2 className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
                     <span className="mr-2 text-blue-500 dark:text-blue-400">
                       <Info />
                     </span>
                     About the Team
                   </h2>
-                  <p className="leading-relaxed text-gray-700 dark:text-gray-300">
+                  <p className="secondary-text font-[urbanist] leading-relaxed">
                     {"Nothing to show here"}
                   </p>
                 </section>
@@ -185,7 +184,7 @@ const TeamIdPage = () => {
                 <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
                   <Link
                     href={`/teams/${team.abbreviation}/stats`}
-                    className="mb-3 flex items-center text-xl font-bold text-gray-900 lg:text-2xl dark:text-white"
+                    className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white"
                   >
                     <span className="mr-2 text-green-500 dark:text-green-400">
                       <TrophyIcon />
@@ -207,7 +206,7 @@ const TeamIdPage = () => {
 
                 {/* Players Section */}
                 <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                  <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
+                  <h2 className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
                     <span className="mr-2 text-purple-500 dark:text-purple-400">
                       <UsersIcon />
                     </span>
@@ -217,15 +216,13 @@ const TeamIdPage = () => {
                     {team.players.map((player, i) => (
                       <li
                         key={i}
-                        className="flex items-center rounded-lg bg-gray-100 p-3 shadow-sm dark:bg-gray-600"
+                        className="flex items-center rounded-lg p-3 font-semibold shadow-sm"
                       >
-                        <span className="mr-2 font-semibold text-blue-600 dark:text-blue-300">
-                          {i + 1}•
-                        </span>
+                        <span className="mr-2 text-blue-600 dark:text-blue-300">{i + 1}•</span>
                         {typeof player !== "string" ? (
                           <Link
                             href={`/users/${player.user.username}`}
-                            className="text-gray-800 hover:underline dark:text-gray-200"
+                            className="font-[urbanist] font-semibold text-blue-600 hover:underline dark:text-blue-300"
                           >
                             {player.user.name}
                           </Link>
@@ -239,29 +236,13 @@ const TeamIdPage = () => {
 
                 {/* Match History Section */}
                 <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                  <h2 className="mb-3 flex items-center text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
-                    <span className="mr-2 text-orange-500 dark:text-orange-400">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="lucide lucide-calendar-check"
-                      >
-                        <path d="M8 2v4" />
-                        <path d="M16 2v4" />
-                        <rect width="18" height="18" x="3" y="4" rx="2" />
-                        <path d="M3 10h18" />
-                        <path d="m9 16 2 2 4-4" />
-                      </svg>
-                    </span>
+                  <h2 className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
+                    <History color="orange" className="mr-1" />
                     Recent Matches
                   </h2>
+                  <p className="secondary-text py-2 text-center font-[urbanist] font-semibold">
+                    No data to show here
+                  </p>
                   {/* <ul className="space-y-2">
                   {team.matchHistory.map((match, i) => (
                     <li

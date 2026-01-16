@@ -25,16 +25,11 @@ function YourTeamsSection({
   const playerTeams = [...teamsAsPlayer];
 
   return (
-    <div className="p-6">
-      <h2 className="primary-text mb-5 flex items-center font-[cal_sans] text-2xl">
-        <Users size={24} className="mr-3 text-green-600" />
-        Your Teams
-      </h2>
-
+    <div className="">
       {/* Managed Teams */}
       {managedTeams.length > 0 && (
-        <div className="mb-6">
-          <h3 className="secondary-text mb-3 font-[poppins] text-lg font-semibold">
+        <>
+          <h3 className="secondary-text p-6 font-[poppins] text-xl font-semibold">
             Managed by You
           </h3>
           <Carousel>
@@ -42,19 +37,19 @@ function YourTeamsSection({
               <ViewTeamCard key={team.id} team={team} />
             ))}
           </Carousel>
-        </div>
+        </>
       )}
 
       {/* Player Teams */}
       {playerTeams.length > 0 && (
-        <div>
-          <h3 className="secondary-text mb-3 font-[poppins] text-lg font-semibold">All Teams</h3>
+        <>
+          <h3 className="secondary-text p-6 font-[poppins] text-xl font-semibold">All Teams</h3>
           <Carousel>
             {playerTeams.map((team) => (
               <ViewTeamCard key={team.id} team={team} />
             ))}
           </Carousel>
-        </div>
+        </>
       )}
 
       {managedTeams.length === 0 && playerTeams.length === 0 && (
@@ -297,10 +292,10 @@ const TeamsPage = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="container-bg grid grid-cols-1 gap-6 rounded-xl p-4 lg:grid-cols-3">
+      <div className="container-bg grid grid-cols-1 gap-6 rounded-xl lg:grid-cols-3">
         {/* Main Column */}
         <div className="space-y-6 lg:col-span-2">
-          <YourTeamsSection teamsAsOwner={[] as any} teamsAsPlayer={[] as any} />
+          <YourTeamsSection teamsAsOwner={teams as any} teamsAsPlayer={teams as any} />
         </div>
 
         {/* Sidebar Column */}

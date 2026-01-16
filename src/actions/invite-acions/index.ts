@@ -14,7 +14,6 @@ import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/create-safe-action";
 import { AcceptRequest, DeclineRequest, InviteUserToTeam } from "./schema";
 import { Player } from "@/generated/prisma";
-import { error } from "console";
 
 const inviteInTeamHandler = async (
   data: InputInviteUserToTeam
@@ -80,12 +79,13 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
     player = await db.player.findFirst({
       where: {
         userId: fromId,
+        teamId,
       },
     });
 
-    if (!player)
+    if (player)
       return {
-        error: `You are not a player!`,
+        error: `You are already in team!`,
       };
 
     request = await db.teamRequest.findUnique({
@@ -117,13 +117,20 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
 
     if (!team)
       return {
-        error: "Cannout find the team!",
+        error: "Cannot find the team!",
       };
 
     if (team.players.findIndex((pl) => pl.userId === fromId) !== -1)
       return {
         error: "Already in the team!",
       };
+
+    player = await db.player.create({
+      data: {
+        userId: fromId,
+        teamId,
+      },
+    });
 
     team = await db.team.update({
       where: {

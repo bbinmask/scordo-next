@@ -225,20 +225,9 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
       error: "Sign in to join the team!",
     };
 
-  let player, request, team;
+  let request, team;
 
   try {
-    player = await db.player.findFirst({
-      where: {
-        userId: user.id,
-      },
-    });
-
-    if (!player)
-      return {
-        error: "You are not a player!",
-      };
-
     team = await db.team.findUnique({
       where: {
         id: teamId,
@@ -281,6 +270,17 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
   let request, team, player: Player | null;
 
   try {
+    request = await db.teamRequest.findUnique({
+      where: {
+        id: reqId,
+      },
+    });
+
+    if (!request)
+      return {
+        error: "Request was widthdrawn!",
+      };
+
     team = await db.team.findUnique({
       where: {
         id: teamId,
@@ -298,12 +298,13 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
     player = await db.player.findFirst({
       where: {
         userId: fromId,
+        teamId,
       },
     });
 
-    if (!player)
+    if (player)
       return {
-        error: `The user is not a player!`,
+        error: `You are already in the team!`,
       };
 
     if (team.players.findIndex((pl) => pl.id === player?.id))
@@ -311,13 +312,18 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
         error: "Player is already in the team!",
       };
 
-    team.players.push(player);
+    await db.player.create({
+      data: {
+        userId: fromId,
+        teamId,
+      },
+    });
 
-    // request = await db.teamRequest.delete({
-    //   where: {
-    //     id: reqId,
-    //   },
-    // });
+    await db.teamRequest.delete({
+      where: {
+        id: reqId,
+      },
+    });
   } catch (error: any) {
     return {
       error: error.message,

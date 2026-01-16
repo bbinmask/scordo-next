@@ -62,5 +62,3 @@ export const UpdateUserDetails = z.object({
 export const UpdateUserProfile = z.object({
   avatar: z.file({ message }),
 });
-
-export const CreatePlayer = z.object({});

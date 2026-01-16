@@ -12,11 +12,17 @@ export async function GET(req: NextRequest) {
   try {
     const teams = await db.team.findMany({
       where: {
-        players: {
-          some: {
-            userId: user.id,
+        OR: [
+          {
+            players: {
+              some: {
+                userId: user.id,
+              },
+            },
           },
-        },
+          { ownerId: user.id },
+          { captainId: user.id },
+        ],
       },
       include: {
         players: true,
