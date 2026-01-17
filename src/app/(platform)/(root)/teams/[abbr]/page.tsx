@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { notFound, useParams } from "next/navigation";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
@@ -78,6 +78,17 @@ const TeamIdPage = () => {
     },
   });
 
+  const { data: sentRequest } = useQuery({
+    queryKey: ["sent-request", params.abbr],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/me/teams/${params.abbr}/request/status`);
+
+      return data.data;
+    },
+  });
+
+  const hasSentRequest = Boolean(sentRequest);
+
   const { isOwner } = useIsTeamOwner(team as any, user?.id);
 
   return (
@@ -86,7 +97,12 @@ const TeamIdPage = () => {
       {team ? (
         <div className="container-bg relative flex rounded-lg border pb-6">
           <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
-            <TeamHeader user={user} isOwner={isOwner} team={team as any} />
+            <TeamHeader
+              alreadySent={hasSentRequest}
+              user={user}
+              isOwner={isOwner}
+              team={team as any}
+            />
             {/* Main Content */}
 
             <div className="relative mt-4 grid grid-cols-1 gap-8 px-4 lg:grid-cols-3 lg:px-6">
@@ -274,47 +290,42 @@ export function TeamHeader({
   team,
   isOwner,
   user,
+  alreadySent,
 }: {
   team: TeamDetailsProp;
   isOwner: boolean;
   user?: User;
+  alreadySent: boolean;
 }) {
-  const [conditionState, setConditionState] = useState({
-    alreadyInTeam: false,
-    alreadySent: false,
-  });
+  const [alreadyInTeam, setAlreadyInTeam] = useState(false);
 
-  const { execute, isLoading } = useAction(sendTeamRequest, {
+  const isAlreadySent = alreadySent;
+
+  const queryClient = useQueryClient();
+
+  const { execute: executeSentRequest, isLoading } = useAction(sendTeamRequest, {
     onSuccess: (data) => {
-      setConditionState((prev) => ({ ...prev, alreadySent: true }));
+      queryClient.invalidateQueries({
+        queryKey: ["sent-request", team.abbreviation],
+      });
       toast.success("Request sent!");
     },
     onError: (err) => {
-      setConditionState((prev) => ({ ...prev, alreadySent: false }));
       toast.error(err);
-    },
-  });
-
-  const { data: request } = useQuery({
-    queryKey: [],
-    queryFn: async () => {
-      const { data } = await axios.get(`/api/me/teams/${team.abbreviation}/request/status`);
-
-      return data.data;
     },
   });
 
   const handleLeaveTeam = () => {};
 
   const handleJoinTeam = () => {
-    if (conditionState.alreadySent || conditionState.alreadyInTeam) return;
-    execute({ teamId: team.id });
+    if (isAlreadySent || alreadyInTeam) return;
+    executeSentRequest({ teamId: team.id });
   };
 
   useEffect(() => {
     if (user) {
       const index = team.players.findIndex((pl) => pl.user.username === user?.username);
-      if (index !== -1) setConditionState((prev) => ({ ...prev, alreadyInTeam: true }));
+      if (index !== -1) setAlreadyInTeam(true);
     }
   }, [user]);
 
@@ -368,19 +379,19 @@ export function TeamHeader({
 
             {/* Join Button */}
             <div className="mt-4 sm:mt-0">
-              {conditionState.alreadyInTeam ? (
+              {alreadyInTeam ? (
                 <button
                   onClick={handleLeaveTeam}
                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
                 >
                   <MinusCircle size={20} className="mr-1" /> Leave
                 </button>
-              ) : conditionState.alreadySent ? (
+              ) : isAlreadySent ? (
                 <button
                   onClick={() => {}}
                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
                 >
-                  Cancel
+                  Sent
                 </button>
               ) : team.isRecruiting ? (
                 <button

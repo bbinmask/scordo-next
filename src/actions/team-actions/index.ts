@@ -5,12 +5,14 @@ import { revalidatePath } from "next/cache";
 import {
   InputType,
   InputTypeForAccept,
+  InputTypeForLeave,
   InputTypeForLogoAndBanner,
   InputTypeForRecruiting,
   InputTypeForSend,
   InputTypeForUpdateTeam,
   ReturnType,
   ReturnTypeForAccept,
+  ReturnTypeForLeave,
   ReturnTypeForLogoAndBanner,
   ReturnTypeForRecruiting,
   ReturnTypeForSend,
@@ -324,6 +326,61 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
   }
 
   revalidatePath(`/teams/${team.abbreviation}`);
+
+  return { data: team };
+};
+
+const leaveTeamhandler = async (data: InputTypeForLeave): Promise<ReturnTypeForLeave> => {
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Sign in required!",
+    };
+
+  const { teamId } = data;
+
+  let team, player;
+
+  try {
+    team = await db.team.findUnique({
+      where: {
+        id: teamId,
+      },
+    });
+
+    if (!team)
+      return {
+        error: "Team not found!",
+      };
+
+    player = await db.player.deleteMany({
+      where: {
+        teamId,
+        userId: user.id,
+      },
+    });
+
+    team = await db.team.update({
+      where: {
+        id: teamId,
+      },
+      data: {
+        players: {
+          deleteMany: {
+            userId: user.id,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Something went wrong!",
+    };
+  }
+
+  revalidatePath(`/teams/${team.abbreviation}`);
+  revalidatePath(`/teams`);
 
   return { data: team };
 };

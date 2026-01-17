@@ -6,10 +6,12 @@ import {
   AcceptRequest,
   CreateTeam,
   DeclineRequest,
+  LeaveTeam,
   SendRequest,
   UpdateLogoAndBanner,
   UpdateRecruiting,
   UpdateTeam,
+  WidthdrawRequest,
 } from "./schema";
 import { TeamRequestWithDetails } from "@/lib/types";
 
@@ -26,6 +28,12 @@ export type ReturnTypeForRecruiting = ActionState<InputTypeForRecruiting, Team>;
 
 export type InputTypeForAccept = z.infer<typeof AcceptRequest>;
 export type ReturnTypeForAccept = ActionState<InputTypeForAccept, Team>;
+
+export type InputTypeForLeave = z.infer<typeof LeaveTeam>;
+export type ReturnTypeForLeave = ActionState<InputTypeForLeave, Team>;
+
+export type InputTypeForWidthdraw = z.infer<typeof WidthdrawRequest>;
+export type ReturnTypeForWidthdraw = ActionState<InputTypeForWidthdraw, Team>;
 
 export type InputTypeForSend = z.infer<typeof SendRequest>;
 export type ReturnTypeForSend = ActionState<InputTypeForSend, TeamRequest>;

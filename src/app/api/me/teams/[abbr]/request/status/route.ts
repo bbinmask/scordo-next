@@ -4,14 +4,12 @@ import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
-export const GET = async (req: Request, { params }: { params: { abbr: string } }) => {
-  const { abbr } = params;
+export const GET = async (req: Request, { params }: { params: Promise<{ abbr: string }> }) => {
+  const { abbr } = await params;
 
   const user = await currentUser();
 
   if (!user) return NextResponse.json(new ApiError(ERROR_CODES.UNAUTHORIZED));
-
-  console.log({ abbr });
 
   try {
     const team = await db.team.findUnique({
