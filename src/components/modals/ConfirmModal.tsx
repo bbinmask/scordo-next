@@ -27,14 +27,13 @@ export function ConfirmModal({
   confirmVariant = "primary",
   isLoading,
 }: ConfirmModalProps) {
-  if (!isOpen) return null;
-
   const [isConfirm, setIsConfirm] = useState(false);
 
   useEffect(() => {
     if (!isLoading && isConfirm) onClose();
   }, [isLoading, isConfirm]);
 
+  if (!isOpen) return null;
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-full max-w-sm rounded-lg bg-white p-6 font-[poppins] dark:bg-gray-800">

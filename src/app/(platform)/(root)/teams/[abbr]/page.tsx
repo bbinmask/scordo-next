@@ -31,6 +31,8 @@ import { TeamRequestWithDetails } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { sendTeamRequest } from "@/actions/team-actions";
 import { toast } from "sonner";
+import ConfirmModal from "@/components/modals/ConfirmModal";
+import { useConfirmModal } from "@/hooks/useConfirmModal";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -315,7 +317,15 @@ export function TeamHeader({
     },
   });
 
-  const handleLeaveTeam = () => {};
+  const { confirmModalState, openConfirmModal, closeConfirmModal } = useConfirmModal();
+
+  const handleLeaveTeam = () => {
+    alert("Left");
+  };
+
+  const handleWidthdrawRequest = () => {
+    alert("Request widthdrawn");
+  };
 
   const handleJoinTeam = () => {
     if (isAlreadySent || alreadyInTeam) return;
@@ -381,14 +391,27 @@ export function TeamHeader({
             <div className="mt-4 sm:mt-0">
               {alreadyInTeam ? (
                 <button
-                  onClick={handleLeaveTeam}
+                  onClick={() => {
+                    openConfirmModal({
+                      onConfirm: handleLeaveTeam,
+                      title: `Leave ${team.name}`,
+                      confirmVariant: "destructive",
+                      description: "Are you want to leave this team?",
+                    });
+                  }}
                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
                 >
                   <MinusCircle size={20} className="mr-1" /> Leave
                 </button>
               ) : isAlreadySent ? (
                 <button
-                  onClick={() => {}}
+                  onClick={() => {
+                    openConfirmModal({
+                      onConfirm: handleWidthdrawRequest,
+                      title: `Request`,
+                      description: "Are you want to cancel the request",
+                    });
+                  }}
                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
                 >
                   Sent
@@ -410,6 +433,7 @@ export function TeamHeader({
           </div>
         </div>
       </div>
+      <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
     </>
   );
 }
