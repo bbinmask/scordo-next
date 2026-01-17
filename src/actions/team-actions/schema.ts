@@ -43,6 +43,7 @@ export const LeaveTeam = z.object({
 
 export const WidthdrawRequest = z.object({
   teamId: z.string({ message }),
+  abbr: z.string({ message }),
 });
 
 export const SendRequest = z.object({

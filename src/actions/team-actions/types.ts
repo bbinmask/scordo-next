@@ -33,7 +33,7 @@ export type InputTypeForLeave = z.infer<typeof LeaveTeam>;
 export type ReturnTypeForLeave = ActionState<InputTypeForLeave, Team>;
 
 export type InputTypeForWidthdraw = z.infer<typeof WidthdrawRequest>;
-export type ReturnTypeForWidthdraw = ActionState<InputTypeForWidthdraw, Team>;
+export type ReturnTypeForWidthdraw = ActionState<InputTypeForWidthdraw, boolean>;
 
 export type InputTypeForSend = z.infer<typeof SendRequest>;
 export type ReturnTypeForSend = ActionState<InputTypeForSend, TeamRequest>;

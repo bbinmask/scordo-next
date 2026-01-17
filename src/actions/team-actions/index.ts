@@ -10,6 +10,7 @@ import {
   InputTypeForRecruiting,
   InputTypeForSend,
   InputTypeForUpdateTeam,
+  InputTypeForWidthdraw,
   ReturnType,
   ReturnTypeForAccept,
   ReturnTypeForLeave,
@@ -17,16 +18,19 @@ import {
   ReturnTypeForRecruiting,
   ReturnTypeForSend,
   ReturnTypeForUpdateTeam,
+  ReturnTypeForWidthdraw,
 } from "./types";
 import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
 import {
   AcceptRequest,
   CreateTeam,
+  LeaveTeam,
   SendRequest,
   UpdateLogoAndBanner,
   UpdateRecruiting,
   UpdateTeam,
+  WidthdrawRequest,
 } from "./schema";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
 import { Player, User } from "@/generated/prisma";
@@ -385,6 +389,38 @@ const leaveTeamhandler = async (data: InputTypeForLeave): Promise<ReturnTypeForL
   return { data: team };
 };
 
+const widthdrawRequestHandler = async (
+  data: InputTypeForWidthdraw
+): Promise<ReturnTypeForWidthdraw> => {
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Sign in required!",
+    };
+
+  const { teamId, abbr } = data;
+
+  let request;
+
+  try {
+    request = await db.teamRequest.deleteMany({
+      where: {
+        teamId,
+        fromId: user.id,
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Something went wrong!",
+    };
+  }
+
+  revalidatePath(`/teams/${abbr}`);
+
+  return { data: request.count === 0 ? false : true };
+};
+
 export const createTeam = createSafeAction(CreateTeam, createTeamHandler);
 export const updateTeam = createSafeAction(UpdateTeam, teamUpdateHandler);
 export const updateTeamLogoAndBanner = createSafeAction(
@@ -395,3 +431,5 @@ export const updateRecruiting = createSafeAction(UpdateRecruiting, recruitingUpd
 
 export const acceptTeamRequest = createSafeAction(AcceptRequest, acceptReqHandler);
 export const sendTeamRequest = createSafeAction(SendRequest, sendRequestHandler);
+export const leaveTeam = createSafeAction(LeaveTeam, leaveTeamhandler);
+export const widthdrawRequest = createSafeAction(WidthdrawRequest, widthdrawRequestHandler);
