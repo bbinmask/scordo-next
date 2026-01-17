@@ -191,12 +191,6 @@ const recruitingUpdateHanlder = async (
 
   const { abbreviation, recruiting } = data;
 
-  if (!abbreviation || !recruiting) {
-    return {
-      error: "Required paramter is missing!",
-    };
-  }
-
   let team;
 
   try {
@@ -209,7 +203,6 @@ const recruitingUpdateHanlder = async (
   } catch (error: any) {
     return { error: error.message };
   }
-
   revalidatePath(`/teams/${abbreviation}`);
 
   return { data: team };

@@ -23,7 +23,7 @@ import UpdateTeamImgModal from "./modals/UpdateTeamImgModal";
 import { Team } from "@/generated/prisma";
 import UpdateTeamModal from "./modals/UpdateTeamModal";
 import Requests from "./Requests";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { debounce } from "lodash";
 import { useAction } from "@/hooks/useAction";
 import { updateRecruiting } from "@/actions/team-actions";
@@ -38,6 +38,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
 
   const { execute, isLoading } = useAction(updateRecruiting, {
     onSuccess(data) {
+      setIsRecruiting(data.isRecruiting);
       toast.success("Recruiting updated!");
     },
     onError(error) {
@@ -45,21 +46,22 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
     },
   });
 
+  const [isRecruiting, setIsRecruiting] = useState(team.isRecruiting);
+
   const { isOpen: isReqOpen, onClose: onReqClose, onOpen: onReqOpen } = useNotificationModal();
 
-  const handleRecruiting = (e: ChangeEvent<HTMLInputElement>) =>
-    debounce(() => {
-      execute({ abbreviation: team.abbreviation, recruiting: e.target.checked });
-    }, 500);
-
-  console.log({ isLoading });
+  const handleRecruiting = debounce((e: ChangeEvent<HTMLInputElement>) => {
+    const recruiting = e.target.checked;
+    if (recruiting === team.isRecruiting) return;
+    execute({ abbreviation: team.abbreviation, recruiting });
+  }, 2000);
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <EllipsisVertical className="h-8 w-8 rounded-full bg-gray-200 p-1 text-black opacity-50" />
       </PopoverTrigger>
-      <PopoverContent className="bg-gray-50 p-0 dark:bg-gray-800">
+      <PopoverContent align="end" className="bg-gray-50 p-0 dark:bg-gray-800">
         <h1 className="primary-text mb-2 px-4 py-2 font-[poppins] text-lg font-semibold tracking-wide">
           Options
         </h1>
@@ -107,12 +109,16 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
 
               {/* Recruiting */}
               <div
-                className={`switch bg-gradient-to-r ${team.isRecruiting ? "from-lime-500 via-green-600 to-emerald-600" : "from-teal-900 via-green-900/80 to-gray-400/70"}`}
+                className={`switch bg-gradient-to-r ${isRecruiting ? "from-lime-500 via-green-600 to-emerald-600" : "from-teal-900 via-green-900/80 to-gray-400/70"}`}
               >
                 <Input
                   id="isRecruiting"
                   type="checkbox"
-                  onChange={handleRecruiting}
+                  defaultChecked={isRecruiting}
+                  onChange={(e) => {
+                    setIsRecruiting(e.target.checked);
+                    handleRecruiting(e);
+                  }}
                   className="relative z-20 h-full w-full rounded border-gray-300 text-emerald-600"
                 />
                 <div className="slider" />

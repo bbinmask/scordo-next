@@ -281,24 +281,33 @@ export function TeamHeader({
 }) {
   const [conditionState, setConditionState] = useState({
     alreadyInTeam: false,
-    alreadySendRequest: false,
+    alreadySent: false,
   });
 
   const { execute, isLoading } = useAction(sendTeamRequest, {
     onSuccess: (data) => {
-      setConditionState((prev) => ({ ...prev, alreadySendRequest: true }));
+      setConditionState((prev) => ({ ...prev, alreadySent: true }));
       toast.success("Request sent!");
     },
     onError: (err) => {
-      setConditionState((prev) => ({ ...prev, alreadySendRequest: false }));
+      setConditionState((prev) => ({ ...prev, alreadySent: false }));
       toast.error(err);
+    },
+  });
+
+  const { data: request } = useQuery({
+    queryKey: [],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/me/teams/${team.abbreviation}/request/status`);
+
+      return data.data;
     },
   });
 
   const handleLeaveTeam = () => {};
 
   const handleJoinTeam = () => {
-    if (conditionState.alreadySendRequest || conditionState.alreadyInTeam) return;
+    if (conditionState.alreadySent || conditionState.alreadyInTeam) return;
     execute({ teamId: team.id });
   };
 
@@ -366,12 +375,12 @@ export function TeamHeader({
                 >
                   <MinusCircle size={20} className="mr-1" /> Leave
                 </button>
-              ) : conditionState.alreadySendRequest ? (
+              ) : conditionState.alreadySent ? (
                 <button
                   onClick={() => {}}
                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
                 >
-                  <Cross size={20} className="mr-1" /> Cancel
+                  Cancel
                 </button>
               ) : team.isRecruiting ? (
                 <button
