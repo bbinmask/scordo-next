@@ -1,11 +1,6 @@
 import { ActionButton } from "@/components/ActionButton";
 import { UserWithTeamsProps } from "@/lib/types";
-import AxiosRequest from "@/utils/AxiosResponse";
-import { useQuery } from "@tanstack/react-query";
-import { capitalize } from "lodash";
-import { LucideProps, PlusCircle, Search } from "lucide-react";
-import Link from "next/link";
-import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { PlusCircle, Search } from "lucide-react";
 
 interface HeroSectionProps {
   user?: UserWithTeamsProps;
@@ -45,8 +40,8 @@ const HeroSection = ({ user }: HeroSectionProps) => {
 
         <div className="grid items-stretch gap-6 md:grid-cols-5">
           {/* Upcoming Match Card */}
-          <div className="flex flex-col rounded-xl bg-white/60 p-5 shadow-md ring-1 ring-slate-200/50 backdrop-blur-sm transition-all duration-300 hover:ring-slate-300 md:col-span-3 dark:bg-slate-800/50 dark:shadow-lg dark:ring-slate-700/50 dark:hover:ring-slate-600">
-            <h2 className="mb-4 font-[poppins] text-sm font-semibold tracking-wider text-green-600 uppercase dark:text-green-500">
+          <div className="border-input flex flex-col rounded-xl border bg-white/60 p-5 ring-1 ring-slate-200/50 transition-all duration-300 hover:ring-slate-300 md:col-span-3 dark:bg-slate-800/50 dark:ring-slate-700/50 dark:hover:ring-slate-600">
+            <h2 className="mb-4 font-[poppins] text-sm font-semibold tracking-wider text-green-600 uppercase dark:text-emerald-600">
               Your Next Match
             </h2>
             <div className="grid grid-cols-5 items-center justify-between font-[poppins]">

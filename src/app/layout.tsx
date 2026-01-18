@@ -1,6 +1,7 @@
 import { Cal_Sans, Poppins, Urbanist } from "next/font/google";
 import "../app/globals.css";
 import { getMetadata } from "@/utils/helper/getMetadata";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const cal_sans = Cal_Sans({
   weight: "400",
@@ -25,9 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="layout-background">
-        <main className={`min-h-[calc(100vh-100px)] w-full antialiased`}>{children}</main>
+        <ThemeProvider>
+          <main className={`min-h-[calc(100vh-100px)] w-full antialiased`}>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );

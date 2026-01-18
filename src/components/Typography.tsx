@@ -11,7 +11,7 @@ export const TypographyHeading = ({
   return (
     <h2
       className={cn(
-        "flex items-center font-[cal_sans] text-3xl font-extrabold tracking-wide text-green-700 drop-shadow-lg sm:text-4xl dark:text-lime-400",
+        "primary-heading flex items-center font-[cal_sans] text-3xl font-extrabold tracking-wide drop-shadow-lg sm:text-4xl",
         className && className
       )}
     >
