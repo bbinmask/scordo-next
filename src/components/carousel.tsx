@@ -92,7 +92,7 @@ export function Carousel({ children }: CarouselProps) {
       {isScrollable && canScrollLeft && (
         <button
           onClick={() => scroll(-1)}
-          className="bg-main absolute top-1/2 left-0 z-50 hidden -translate-y-1/2 rounded-full p-1.5 text-white opacity-80 hover:opacity-90 md:block"
+          className="bg-main absolute top-1/2 left-0 z-50 hidden -translate-y-1/2 rounded-full p-1.5 text-white opacity-80 transition-transform duration-500 hover:scale-125 hover:opacity-90 md:block"
         >
           <ChevronLeft size={18} />
         </button>
@@ -102,7 +102,7 @@ export function Carousel({ children }: CarouselProps) {
       {isScrollable && canScrollRight && (
         <button
           onClick={() => scroll(1)}
-          className="bg-main absolute top-1/2 right-0 z-50 hidden -translate-y-1/2 rounded-full p-1.5 text-white opacity-80 hover:opacity-90 md:block"
+          className="bg-main absolute top-1/2 right-0 z-50 hidden -translate-y-1/2 rounded-full p-1.5 text-white opacity-80 transition-transform duration-500 hover:scale-125 hover:opacity-90 md:block"
         >
           <ChevronRight size={18} />
         </button>
@@ -111,7 +111,7 @@ export function Carousel({ children }: CarouselProps) {
       {/* Scroll Container */}
       <div
         ref={scrollRef}
-        className="hide_scrollbar flex gap-2 overflow-x-auto overflow-y-hidden scroll-smooth px-2 py-6"
+        className="hide_scrollbar flex gap-2 overflow-x-auto overflow-y-hidden scroll-smooth px-2 py-2"
       >
         {children}
       </div>

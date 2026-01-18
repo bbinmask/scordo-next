@@ -75,13 +75,13 @@ const DashboardPage = () => {
           </section>
           <section title="matches" className="">
             <div className="mb-8">
-              <TypographyHeading className="mb-4 px-4" content="Live on Scordo" />
+              <TypographyHeading className="mb-4 px-4 font-black" content="Live on Scordo" />
               <Carousel>
                 <MatchList matches={Array.from({ length: 10 }).fill(0)} status="live" />
               </Carousel>
             </div>
             <div className="mb-8">
-              <TypographyHeading className="mb-4 px-4" content="Upcoming on Scordo" />
+              <TypographyHeading className="mb-4 px-4 font-black" content="Upcoming on Scordo" />
 
               <Carousel>
                 <MatchList matches={Array.from({ length: 10 }).fill(0)} status="upcoming" />

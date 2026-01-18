@@ -9,13 +9,13 @@ export const TypographyHeading = ({
   className?: string;
 }) => {
   return (
-    <h2
+    <h1
       className={cn(
-        "primary-heading flex items-center font-[cal_sans] text-3xl font-extrabold tracking-wide drop-shadow-lg sm:text-4xl",
+        "primary-heading flex items-center font-[poppins] text-3xl font-extrabold tracking-wide drop-shadow-lg sm:text-4xl",
         className && className
       )}
     >
       {content}
-    </h2>
+    </h1>
   );
 };
