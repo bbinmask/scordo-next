@@ -378,7 +378,7 @@ export function TeamHeader({
 
             {/* Team Name & Actions */}
             <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
-              <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold md:text-4xl">
+              <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold overflow-ellipsis md:text-4xl">
                 {team.name}
               </h1>
               <p className="secondary-text font-[urbanist] text-lg font-medium">

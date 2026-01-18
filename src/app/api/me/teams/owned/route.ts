@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
             user: {
               select: { name: true, username: true },
             },
+            userId: true,
           },
         },
         abbreviation: true,

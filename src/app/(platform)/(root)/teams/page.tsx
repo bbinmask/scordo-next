@@ -7,22 +7,15 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
-import { ActionButton } from "@/components/ActionButton";
 import { Carousel } from "@/components/carousel";
 import { useAction } from "@/hooks/useAction";
 import { acceptTeamRequest, declineTeamRequest } from "@/actions/invite-acions";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
-function YourTeamsSection({
-  teamsAsOwner,
-  teamsAsPlayer,
-}: {
-  teamsAsOwner: TeamForListComponent[];
-  teamsAsPlayer: TeamForListComponent[];
-}) {
-  const managedTeams = [...teamsAsOwner];
-  const playerTeams = [...teamsAsPlayer];
+function YourTeamsSection({ teams }: { teams: TeamForListComponent[] }) {
+  const managedTeams = teams;
+  const playerTeams = teams;
 
   return (
     <div className="">
@@ -295,7 +288,7 @@ const TeamsPage = () => {
       <div className="container-bg grid grid-cols-1 gap-6 rounded-xl lg:grid-cols-3">
         {/* Main Column */}
         <div className="space-y-6 lg:col-span-2">
-          <YourTeamsSection teamsAsOwner={teams as any} teamsAsPlayer={teams as any} />
+          <YourTeamsSection teams={teams as any} />
         </div>
 
         {/* Sidebar Column */}

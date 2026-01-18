@@ -27,14 +27,14 @@ interface AskToJoinTeamModalProps {
 
 export const AskToJoinTeamModal = ({ user, isOpen, onClose }: AskToJoinTeamModalProps) => {
   const { data: teams, isLoading } = useQuery({
-    queryKey: [],
+    queryKey: ["my-teams", user.id],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/teams/owned");
       return data.data;
     },
   });
   const { data: requests } = useQuery({
-    queryKey: [user],
+    queryKey: ["user-team-requests", user.id],
     queryFn: async () => {
       const { data } = await axios.get(`/api/teams/requests/user/${user.id}`);
       return data.data;
@@ -88,14 +88,10 @@ interface AskToJoinTeamProps {
 }
 
 const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamProps) => {
-  const [teams, setTeams] = useState(
-    initialTeams.filter((team) => {
-      if (team.players.length === 0) return true;
-      return team.players.some((p) => p.userId !== user.id);
-    })
-  );
-
-  console.log({ teams, initialTeams });
+  const teams = initialTeams.filter((team) => {
+    if (team.players.length === 0) return true;
+    return !team.players.some((p) => p.userId === user.id);
+  });
 
   const [requests, setRequests] = useState(initialRequests);
 
@@ -161,16 +157,16 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
               {/* Action Button */}
               <button
                 onClick={() => handleInvite(team.id)}
-                disabled={requests.findIndex((t) => t.teamId === team.id) !== -1 || isLoading}
+                disabled={requests.findIndex((t) => t.fromId === user.id) !== -1 || isLoading}
                 className={`relative flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 ${
-                  requests.findIndex((t) => t.teamId === team.id) !== -1
+                  requests?.findIndex((t) => t.teamId === team.id) !== -1
                     ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
                     : "border border-slate-200 bg-white text-slate-400 group-hover:bg-green-50 hover:border-green-500 hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
                 }`}
               >
                 {invitingId === team.id ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
-                ) : requests.findIndex((t) => t.teamId === team.id) !== -1 ? (
+                ) : requests.findIndex((t) => t.fromId === user.id) !== -1 ? (
                   <Check className="h-5 w-5" />
                 ) : (
                   <Plus className="h-5 w-5" />
