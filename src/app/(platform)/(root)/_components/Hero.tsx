@@ -2,6 +2,7 @@ import { ActionButton } from "@/components/ActionButton";
 import { UserWithTeamsProps } from "@/lib/types";
 import AxiosRequest from "@/utils/AxiosResponse";
 import { useQuery } from "@tanstack/react-query";
+import { capitalize } from "lodash";
 import { LucideProps, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
@@ -33,22 +34,22 @@ const HeroSection = ({ user }: HeroSectionProps) => {
       <div className="relative z-10">
         <header className="mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-800 md:text-4xl dark:text-slate-100">
-              Welcome back, {user?.username || "User"}!
+            <h1 className="font-[cal_sans] text-2xl font-bold text-slate-800 md:text-3xl dark:text-slate-100">
+              Welcome back,
             </h1>
-            <p className="text-md mt-2 text-slate-600 dark:text-slate-400">
-              Here's your personal cricket hub.
-            </p>
+            <span className="primary-heading font-[poppins] text-3xl font-bold md:text-4xl">
+              {capitalize(user?.name || "User")}!
+            </span>
           </div>
         </header>
 
         <div className="grid items-stretch gap-6 md:grid-cols-5">
           {/* Upcoming Match Card */}
           <div className="flex flex-col rounded-xl bg-white/60 p-5 shadow-md ring-1 ring-slate-200/50 backdrop-blur-sm transition-all duration-300 hover:ring-slate-300 md:col-span-3 dark:bg-slate-800/50 dark:shadow-lg dark:ring-slate-700/50 dark:hover:ring-slate-600">
-            <h2 className="mb-4 text-sm font-semibold tracking-wider text-teal-600 uppercase dark:text-teal-400">
+            <h2 className="mb-4 font-[poppins] text-sm font-semibold tracking-wider text-green-600 uppercase dark:text-green-500">
               Your Next Match
             </h2>
-            <div className="grid grid-cols-5 items-center justify-between">
+            <div className="grid grid-cols-5 items-center justify-between font-[poppins]">
               <div className="col-span-2 flex flex-col items-center gap-2 text-center md:flex-row md:gap-4">
                 <img
                   src={upcomingMatch.teamA.logo}
@@ -74,10 +75,10 @@ const HeroSection = ({ user }: HeroSectionProps) => {
               </div>
             </div>
             <div className="mt-5 border-t border-slate-200 pt-4 text-center dark:border-slate-700">
-              <p className="font-semibold text-slate-700 dark:text-slate-200">
+              <p className="font-inter font-semibold text-slate-700 dark:text-slate-200">
                 {upcomingMatch.time}
               </p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{upcomingMatch.venue}</p>
+              <p className="secondary-text text-sm font-semibold">{upcomingMatch.venue}</p>
             </div>
           </div>
 
