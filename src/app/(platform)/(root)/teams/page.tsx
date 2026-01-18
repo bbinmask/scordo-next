@@ -1,8 +1,17 @@
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
-import { Users, PlusCircle, Mail, ArrowRight, MapPin } from "lucide-react";
-import { TeamForListComponent, TeamRequestWithDetails } from "@/lib/types";
+import {
+  Users,
+  PlusCircle,
+  Mail,
+  ArrowRight,
+  MapPin,
+  Shield,
+  ArrowUpRight,
+  Trophy,
+} from "lucide-react";
+import { TeamForListComponent, TeamRequestWithDetails, TeamWithPlayers } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
@@ -11,113 +20,126 @@ import { Carousel } from "@/components/carousel";
 import { useAction } from "@/hooks/useAction";
 import { acceptTeamRequest, declineTeamRequest } from "@/actions/invite-acions";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 
-function YourTeamsSection({ teams }: { teams: TeamForListComponent[] }) {
-  const managedTeams = teams;
-  const playerTeams = teams;
+function YourTeamsSection() {
+  const { data: managedTeams, isLoading: isTeamLoading } = useQuery<TeamWithPlayers[]>({
+    queryKey: ["managed-teams"],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/me/teams/owned");
+      return data.data;
+    },
+  });
+  const { data: playerTeams, isLoading: isLoading } = useQuery<TeamWithPlayers[]>({
+    queryKey: ["player-teams"],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/me/teams/joined");
+      return data.data;
+    },
+  });
+
+  if (isTeamLoading || isLoading) {
+    return (
+      <div className="min-h flex items-center justify-center">
+        <DefaultLoader className="primary-heading" />
+      </div>
+    );
+  }
 
   return (
     <div className="">
       {/* Managed Teams */}
-      {managedTeams.length > 0 && (
-        <>
-          <h3 className="secondary-text p-6 font-[poppins] text-xl font-semibold">
-            Managed by You
-          </h3>
-          <Carousel>
-            {managedTeams.map((team) => (
-              <ViewTeamCard key={team.id} team={team} />
-            ))}
-          </Carousel>
-        </>
+
+      {(!managedTeams || managedTeams.length === 0) &&
+      (!playerTeams || playerTeams.length === 0) ? (
+        <p className="text-gray-500">You are not a member of any teams yet.</p>
+      ) : (
+        managedTeams &&
+        managedTeams.length > 0 && (
+          <>
+            <h3 className="secondary-text p-6 font-[poppins] text-xl font-semibold">
+              Managed by You
+            </h3>
+            <Carousel>
+              {managedTeams?.map((team) => (
+                <TeamCard key={team.id} team={team} />
+              ))}
+            </Carousel>
+          </>
+        )
       )}
 
       {/* Player Teams */}
-      {playerTeams.length > 0 && (
+      {playerTeams && playerTeams.length > 0 && (
         <>
-          <h3 className="secondary-text p-6 font-[poppins] text-xl font-semibold">All Teams</h3>
+          <h3 className="secondary-text p-6 font-[poppins] text-xl font-semibold">Joined Teams</h3>
           <Carousel>
             {playerTeams.map((team) => (
-              <ViewTeamCard key={team.id} team={team} />
+              <TeamCard key={team.id} team={team} />
             ))}
           </Carousel>
         </>
-      )}
-
-      {managedTeams.length === 0 && playerTeams.length === 0 && (
-        <p className="text-gray-500">You are not a member of any teams yet.</p>
       )}
     </div>
   );
 }
 
-interface ViewTeamCardProps {
-  team: TeamForListComponent;
+interface TeamCardProps {
+  team: TeamWithPlayers;
 }
 
-export function ViewTeamCard({ team }: ViewTeamCardProps) {
+const TeamCard = ({ team }: TeamCardProps) => {
+  if (!team) return null;
+
+  const { name, abbreviation, logo, players } = team;
+
   return (
-    <Link
-      href={`/teams/${team.abbreviation}`}
-      className="group hover-card relative mb-1 grid w-60 flex-shrink-0 rounded-xl bg-white shadow-md dark:bg-gray-800"
-    >
-      {/* Card Content */}
-      <div className="px-3 py-4">
-        <div className="flex items-center space-x-2">
-          {/* Team Logo */}
-          <div className="flex-shrink-0">
-            <img
-              src={team?.logo || "/team.svg"}
-              alt={`${team.name} logo`}
-              className="border-input h-12 w-12 rounded-full border-2"
-              onError={(e) =>
-                (e.currentTarget.src = "https://placehold.co/100x100/CCCCCC/FFFFFF?text=T")
-              }
-            />
+    <div className="group relative h-48 w-80 flex-shrink-0 transition-all duration-500 hover:-translate-y-2">
+      <div className="hover-card relative flex h-full w-full flex-col justify-between overflow-hidden rounded-3xl border p-6">
+        <div className="relative z-10 flex items-start justify-between">
+          <div className="relative">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 dark:border-white/10 dark:bg-slate-950">
+              {logo ? (
+                <img src={logo} alt={name} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900">
+                  <Trophy className="h-7 w-7 text-green-500/80 dark:text-green-400/80" />
+                </div>
+              )}
+            </div>
+            <div className="absolute -right-1.5 -bottom-1.5 rounded-xl bg-green-600 p-1.5 text-white shadow-xl dark:bg-green-500">
+              <Shield className="h-3 w-3" />
+            </div>
           </div>
-          {/* Team Name */}
-          <div className="min-w-0 flex-1">
-            <h3
-              title={team.name}
-              className="primary-text truncate font-[cal_sans] text-[15px] font-bold tracking-wide"
+
+          <div className="flex gap-2">
+            <Link
+              href={`/teams/${team.abbreviation}`}
+              className="group/btn flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-100/50 px-3 py-2 text-slate-500 shadow-sm transition-all duration-300 hover:bg-white hover:text-green-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-400 dark:hover:bg-green-600 dark:hover:text-white"
             >
-              {team.name}
-            </h3>
-            <p className="secondary-text font-[urbanist] text-sm tracking-wide">
-              @{team.abbreviation}
-            </p>
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
 
-        {/* Team Info */}
-        <div className="mt-3 space-y-1">
-          {team.address && (
-            <div className="secondary-text flex items-center font-[urbanist] text-xs font-semibold">
-              <MapPin size={16} className="mr-2 text-green-600" />
-              <span>
-                {team?.address?.city} {team?.address?.state}
-              </span>
+        <div className="relative z-10">
+          <div className="mb-2 flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-green-100 bg-green-50 px-2.5 py-1 text-[10px] font-black tracking-widest text-green-600 uppercase dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400">
+              {abbreviation || "PRO"}
+            </span>
+            <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-tighter text-slate-500 uppercase dark:text-slate-400">
+              <Users className="h-3.5 w-3.5" />
+              {players.length || 0} Members
             </div>
-          )}
-          {(team?._count?.players !== undefined || team?._count?.players !== null) && (
-            <div className="secondary-text flex items-center font-[urbanist] text-xs font-semibold">
-              <Users size={16} className="mr-2 text-green-600" />
-              <span>{team?._count?.players} Players</span>
-            </div>
-          )}
+          </div>
+
+          <h3 className="font-inter dark:group-hover:text-green-40 truncate text-lg font-bold tracking-tight text-slate-900 uppercase transition-colors duration-300 group-hover:text-green-600 dark:text-white">
+            {name || "Unnamed Team"}
+          </h3>
         </div>
       </div>
-      <div className="flex items-center justify-between px-4 py-2 font-[poppins] text-sm font-medium text-green-600">
-        <span>View Team</span>
-        <ArrowRight
-          size={16}
-          className="transition-transform duration-300 group-hover:translate-x-1"
-        />
-      </div>
-    </Link>
+    </div>
   );
-}
+};
 
 function CreateTeamCard() {
   return (
@@ -129,11 +151,12 @@ function CreateTeamCard() {
       <p className="mb-4 font-[urbanist] text-sm font-medium tracking-wide text-green-100">
         Start your own legacy. Build a team from the ground up and recruit players.
       </p>
-      <Button asChild className="hover-card">
-        <Link href={"/teams/create"} className="rounded-xl bg-gray-50 px-8 py-2">
-          Create
-        </Link>
-      </Button>
+      <Link
+        href={"/teams/create"}
+        className="hover-card rounded-xl px-8 py-2 text-slate-900 hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-300"
+      >
+        Create
+      </Link>
     </div>
   );
 }
@@ -257,22 +280,6 @@ function Invitations({}: InvitationsProps) {
 }
 
 const TeamsPage = () => {
-  const { data: teams, isLoading: isTeamLoading } = useQuery<TeamForListComponent[]>({
-    queryKey: ["all-teams"],
-    queryFn: async () => {
-      const { data } = await axios.get("/api/me/teams/all");
-      return data.data;
-    },
-  });
-
-  if (isTeamLoading) {
-    return (
-      <div className="min-h flex items-center justify-center">
-        <DefaultLoader className="primary-heading" />
-      </div>
-    );
-  }
-
   return (
     <div className="mx-auto mt-4">
       {/* Dashboard Header */}
@@ -288,7 +295,7 @@ const TeamsPage = () => {
       <div className="container-bg grid grid-cols-1 gap-6 rounded-xl lg:grid-cols-3">
         {/* Main Column */}
         <div className="space-y-6 lg:col-span-2">
-          <YourTeamsSection teams={teams as any} />
+          <YourTeamsSection />
         </div>
 
         {/* Sidebar Column */}

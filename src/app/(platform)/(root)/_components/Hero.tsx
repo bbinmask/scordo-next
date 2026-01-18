@@ -38,7 +38,7 @@ const HeroSection = ({ user }: HeroSectionProps) => {
               Welcome back,
             </h1>
             <span className="primary-heading font-[poppins] text-3xl font-bold md:text-4xl">
-              {capitalize(user?.name || "User")}!
+              {user?.name || "User"}!
             </span>
           </div>
         </header>
