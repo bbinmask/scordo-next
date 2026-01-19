@@ -2,18 +2,17 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ClassNameValue } from "tailwind-merge";
 
 interface CarouselProps {
   children: React.ReactNode;
+  className?: ClassNameValue;
 }
 
-/**
- * Classic ease-in-out cubic.
- * Used for decades. Reliable and natural.
- */
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-export function Carousel({ children }: CarouselProps) {
+export function Carousel({ children, className }: CarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const [isScrollable, setIsScrollable] = useState(false);
@@ -87,7 +86,7 @@ export function Carousel({ children }: CarouselProps) {
   }, [children]);
 
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       {/* Left Arrow */}
       {isScrollable && canScrollLeft && (
         <button
