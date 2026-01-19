@@ -97,7 +97,7 @@ const ProfilePage = ({ user }: { user: User }) => {
   const { data: request, isLoading: requestsLoading } = useQuery<Friendship>({
     queryKey: ["friend-request", user.id],
     queryFn: async () => {
-      const res = await axios.get(`/api/users/friends/${user.id}/status`);
+      const res = await axios.get(`/api/u/friends/${user.id}/status`);
 
       if (res.status < 400) {
         setFriendshipStatus(res.data.data?.status.toLowerCase());
@@ -601,7 +601,7 @@ export const FriendsCard = ({
                   className="flex w-full items-center justify-between bg-gray-50 hover:opacity-80 dark:bg-gray-800"
                 >
                   <a
-                    href={you ? "/profile" : `/users/${friend.username}`}
+                    href={you ? "/profile" : `/u/${friend.username}`}
                     onClick={(e) => {
                       e.preventDefault();
                     }}

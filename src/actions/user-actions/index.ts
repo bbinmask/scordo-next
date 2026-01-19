@@ -157,8 +157,8 @@ const sendFriendRequestHandler = async (
     return { error: "An unexpected error occurred. Please try again." };
   }
 
-  revalidatePath(`/users/${username}`);
-  revalidatePath(`/users/${requester.username}`);
+  revalidatePath(`/u/${username}`);
+  revalidatePath(`/u/${requester.username}`);
 
   return { data: { data: friendship, message: "Friend request sent!" } };
 };
@@ -197,8 +197,8 @@ const acceptRequestHandler = async (
   }
 
   revalidatePath(`/profile`);
-  revalidatePath(`/users/${reqUsername}`);
-  revalidatePath(`/users/${user.username}`);
+  revalidatePath(`/u/${reqUsername}`);
+  revalidatePath(`/u/${user.username}`);
 
   return { data: request };
 };
@@ -227,8 +227,8 @@ const cancelFriendRequestHandler = async (
     };
   }
 
-  revalidatePath(`/users/${username}`);
-  revalidatePath(`/users/${user.username}`);
+  revalidatePath(`/u/${username}`);
+  revalidatePath(`/u/${user.username}`);
 
   return { data: requests };
 };
@@ -256,8 +256,8 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
     };
   }
 
-  revalidatePath(`/users/${username}`);
-  revalidatePath(`/users/${user.username}`);
+  revalidatePath(`/u/${username}`);
+  revalidatePath(`/u/${user.username}`);
   revalidatePath(`/profile`);
   return { data: friends };
 };

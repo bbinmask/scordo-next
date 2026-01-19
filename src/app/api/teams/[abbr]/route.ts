@@ -21,6 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ abbr
               select: {
                 username: true,
                 name: true,
+                avatar: true,
               },
             },
           },

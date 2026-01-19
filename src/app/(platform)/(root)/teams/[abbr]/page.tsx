@@ -9,19 +9,29 @@ import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { useIsTeamOwner } from "@/hooks/useTeam";
 import Link from "next/link";
 import {
+  ArrowUpRight,
+  Building,
   BuildingIcon,
   Cross,
+  Flag,
   GitBranchPlusIcon,
   History,
   Info,
   Lock,
+  LucideProps,
+  MapPin,
   MapPinIcon,
   MinusCircle,
+  MoreVertical,
+  Shield,
   SparklesIcon,
+  Trophy,
   TrophyIcon,
   UserIcon,
   UserPlus,
+  Users,
   UsersIcon,
+  Zap,
 } from "lucide-react";
 import { Player as IPlayer, Team as ITeam, User } from "@/generated/prisma";
 import { useUpdateTeam } from "@/hooks/store/use-team";
@@ -39,7 +49,7 @@ interface PlayerProps extends IPlayer {
   userId: string;
 }
 
-interface TeamDetailsProp extends ITeam {
+interface TealgetailsProp extends ITeam {
   owner: User | string;
   captain: User | string | null;
   players: PlayerProps[];
@@ -53,7 +63,7 @@ const TeamIdPage = () => {
     data: team,
     isLoading,
     error,
-  } = useQuery<TeamDetailsProp>({
+  } = useQuery<TealgetailsProp>({
     queryKey: ["team", params.abbr],
     queryFn: async () => {
       const { data } = await axios.get(`/api/teams/${params.abbr}`);
@@ -93,6 +103,8 @@ const TeamIdPage = () => {
 
   const { isOwner } = useIsTeamOwner(team as any, user?.id);
 
+  console.log(team?.players[1].user.avatar);
+
   return (
     <div className="w-full pt-4">
       {!team && !isLoading && notFound()}
@@ -107,69 +119,46 @@ const TeamIdPage = () => {
             />
             {/* Main Content */}
 
-            <div className="relative mt-4 grid grid-cols-1 gap-8 px-4 lg:grid-cols-3 lg:px-6">
+            <div className="relative mt-4 grid grid-cols-1 gap-8 px-4 lg:mt-12 lg:grid-cols-3 lg:px-6">
               {/* Left Column - General Info & Recruitment */}
               <div className="space-y-6 lg:col-span-1">
                 {/* Quick Info */}
-                <div className="rounded-xl bg-gray-50 p-5 font-[poppins] shadow-sm dark:bg-gray-700">
-                  <h2 className="mb-3 font-[poppins] text-lg font-semibold text-gray-900 dark:text-white">
-                    Team Overview
-                  </h2>
-                  <ul className="space-y-2 font-[urbanist] font-semibold text-gray-700 dark:text-gray-300">
-                    <li className="flex items-center">
-                      <MapPinIcon className="mr-2 h-5 w-5 text-blue-500" />
-                      {!team.address
-                        ? "No address found."
-                        : `${team.address.city}, ${team.address.state}(${team.address.country})`}
-                    </li>
-                    <li className="flex items-center">
-                      <BuildingIcon className="mr-2 h-5 w-5 text-blue-500" /> Type:{" "}
-                      {team.type.charAt(0).toUpperCase() + team.type.slice(1)}
-                    </li>
-                    <li className="flex items-center">
-                      <UserIcon className="mr-2 h-5 w-5 text-blue-500" /> Captain:{" "}
-                      {team.captain && typeof team.captain !== "string" && (
-                        <Link
-                          href={`/users/${team.captain.username}`}
-                          className="ml-1 font-medium hover:underline"
-                        >
-                          {team.captain.name}
-                        </Link>
-                      )}
-                    </li>
-                    <li className="flex items-center">
-                      <SparklesIcon className="mr-2 h-5 w-5 text-blue-500" /> Owner:
-                      {team.owner && typeof team.owner !== "string" && (
-                        <Link
-                          href={`/users/${team.owner.username}`}
-                          className="ml-1 font-medium hover:underline"
-                        >
-                          {team.owner.name}
-                        </Link>
-                      )}
-                    </li>
-                  </ul>
-                </div>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 gap-4">
+                    <StatCard
+                      label="Location"
+                      value={`${team.address?.city}, ${team.address?.state}`}
+                      icon={MapPin}
+                      color="emerald"
+                    />
+                    <StatCard label="Team Type" value={team.type} icon={Building} color="indigo" />
+                    <StatCard
+                      label="Organization Status"
+                      value={team.isRecruiting ? "Open" : "Invite Only"}
+                      icon={Shield}
+                      color="purple"
+                    />
+                  </div>
 
-                {/* Recruitment Status */}
-                <div className="flex items-center justify-between rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                  <h2 className="flex items-center font-[poppins] text-lg font-semibold text-gray-900 dark:text-white">
-                    <GitBranchPlusIcon className="mr-2 h-6 w-6 text-blue-500" /> Recruitment Status
-                  </h2>
-                  {team.isRecruiting ? (
-                    <span className="inline-flex items-center rounded-full border-none bg-green-100 px-3 py-1 text-sm font-semibold text-green-800 dark:bg-green-800 dark:text-green-200">
-                      <span className="mr-2 h-2 w-2 animate-pulse rounded-full bg-green-500"></span>
-                      Open
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-800 dark:bg-red-800 dark:text-red-200">
-                      Closed
-                    </span>
+                  {team.isRecruiting && (
+                    <div className="group relative overflow-hidden rounded-[2rem] bg-green-700 p-8 text-white">
+                      <Zap className="absolute top-2 right-2 h-32 w-32 -rotate-12 text-white/5 transition-transform group-hover:scale-110" />
+                      <h3 className="mb-2 text-2xl font-black tracking-tighter uppercase italic">
+                        Recruitment Active
+                      </h3>
+                      <p className="font-[urbanist] text-sm leading-snug font-medium text-slate-300">
+                        We are currently looking for Grandmaster level players for our upcoming
+                        matches.
+                      </p>
+                      <button className="mt-6 w-full cursor-pointer rounded-xl bg-white py-3 font-[poppins] text-xs font-bold text-slate-800 uppercase transition-all hover:shadow-xl">
+                        Apply Now
+                      </button>
+                    </div>
                   )}
                 </div>
 
                 {/* Followers / Following */}
-                <div className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
+                <div className="hover-card rounded-xl p-5">
                   <h2 className="mb-3 font-[poppins] text-lg font-semibold text-gray-900 dark:text-white">
                     Community
                   </h2>
@@ -186,9 +175,9 @@ const TeamIdPage = () => {
               {/* Right Column  */}
               <div className="space-y-8 lg:col-span-2">
                 {/* Description Section */}
-                <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
+                <section className="hover-card rounded-xl p-5">
                   <h2 className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
-                    <span className="mr-2 text-blue-500 dark:text-blue-400">
+                    <span className="mr-2 text-green-600">
                       <Info />
                     </span>
                     About the Team
@@ -199,7 +188,7 @@ const TeamIdPage = () => {
                 </section>
 
                 {/* Key Stats Section */}
-                <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
+                <section className="hover-card rounded-xl p-5">
                   <Link
                     href={`/teams/${team.abbreviation}/stats`}
                     className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white"
@@ -209,51 +198,52 @@ const TeamIdPage = () => {
                     </span>
                     Season Statistics
                   </Link>
-                  {/* <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {team.matches.map((stat, i) => (
-                    <div
-                      key={i}
-                      className="transform rounded-xl bg-gray-100 p-4 text-center shadow-sm transition-transform duration-200 hover:scale-105 dark:bg-gray-600"
-                    >
-                      <p className="text-xl font-bold text-blue-600 dark:text-blue-300">{stat}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{stat}</p>
-                    </div>
-                  ))}
-                </div> */}
                 </section>
 
                 {/* Players Section */}
-                <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
-                  <h2 className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
-                    <span className="mr-2 text-purple-500 dark:text-purple-400">
-                      <UsersIcon />
-                    </span>
-                    Members
-                  </h2>
-                  <ul className="custom-scrollbar grid max-h-60 grid-cols-1 gap-3 overflow-y-auto pr-2 sm:grid-cols-2">
-                    {team.players.map((player, i) => (
-                      <li
-                        key={i}
-                        className="flex items-center rounded-lg p-3 font-semibold shadow-sm"
-                      >
-                        <span className="mr-2 text-blue-600 dark:text-blue-300">{i + 1}•</span>
-                        {typeof player !== "string" ? (
-                          <Link
-                            href={`/users/${player.user.username}`}
-                            className="font-[urbanist] font-semibold text-blue-600 hover:underline dark:text-blue-300"
-                          >
-                            {player.user.name}
-                          </Link>
-                        ) : (
-                          <span className="text-gray-800 dark:text-gray-200">null</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
 
+                <section className="hover-card rounded-2xl p-8">
+                  <div className="mb-6 flex items-center justify-between">
+                    <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
+                      <Users className="text-purple-500" /> Players
+                    </h2>
+                    <span className="rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black tracking-widest text-slate-500 uppercase dark:bg-white/5">
+                      {team.players.length} Total
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {team.players.map((p, i) => (
+                      <Link
+                        href={`/u/${p.user.username}`}
+                        key={i}
+                        className="group border-input flex items-center justify-between rounded-2xl border bg-slate-200 p-4 transition-all hover:border-blue-500/50 dark:bg-slate-900"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 font-black text-blue-600 dark:bg-indigo-900/30`}
+                          >
+                            {p.user?.avatar ? (
+                              <img src={p.user.avatar} className="h-full w-full rounded-xl" />
+                            ) : (
+                              p.user.name.charAt(0)
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold tracking-tighter uppercase transition-colors group-hover:text-indigo-500">
+                              {p.user.name}
+                            </p>
+                            <p className="text-[10px] font-black tracking-widest text-slate-400 italic">
+                              {p.user.username}
+                            </p>
+                          </div>
+                        </div>
+                        <ArrowUpRight className="h-4 w-4 text-slate-300 transition-all group-hover:text-indigo-500" />
+                      </Link>
+                    ))}
+                  </div>
+                </section>
                 {/* Match History Section */}
-                <section className="rounded-xl bg-gray-50 p-5 shadow-sm dark:bg-gray-700">
+                <section className="hover-card rounded-xl p-5">
                   <h2 className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
                     <History color="orange" className="mr-1" />
                     Recent Matches
@@ -261,19 +251,6 @@ const TeamIdPage = () => {
                   <p className="secondary-text py-2 text-center font-[urbanist] font-semibold">
                     No data to show here
                   </p>
-                  {/* <ul className="space-y-2">
-                  {team.matchHistory.map((match, i) => (
-                    <li
-                      key={i}
-                      className={`flex items-center rounded-lg p-3 ${match.startsWith("W") ? "bg-green-50 dark:bg-green-900/40" : match.startsWith("L") ? "bg-red-50 dark:bg-red-900/40" : "bg-yellow-50 dark:bg-yellow-900/40"} text-sm font-medium text-gray-800 dark:text-gray-200`}
-                    >
-                      <span
-                        className={`mr-3 h-3 w-3 rounded-full ${match.startsWith("W") ? "bg-green-500" : match.startsWith("L") ? "bg-red-500" : "bg-yellow-500"}`}
-                      ></span>
-                      {match}
-                    </li>
-                  ))}
-                </ul> */}
                 </section>
               </div>
             </div>
@@ -288,17 +265,120 @@ const TeamIdPage = () => {
   );
 };
 
-export function TeamHeader({
-  team,
-  isOwner,
-  user,
-  alreadySent,
-}: {
-  team: TeamDetailsProp;
+interface TeamHeaderProps {
+  team: TealgetailsProp;
   isOwner: boolean;
   user?: User;
   alreadySent: boolean;
-}) {
+}
+
+// export function TeamHeader({
+//   team,
+//   isOwner,
+//   user,
+//   alreadySent,
+// }: TeamHeaderProps) {
+
+//   return (
+//     <>
+//       <div className="container-bg relative overflow-hidden rounded-t-lg shadow-sm">
+//         <div className="absolute top-4 right-4 z-20">
+//           {isOwner && (
+//             <div title="Edit Profile details" className="">
+//               <OptionsPopover team={team} />
+//             </div>
+//           )}
+//         </div>
+//         {/* Banner */}
+//         <div className="relative h-40 lg:h-44">
+//           {team.banner && (
+//             <img
+//               src={team?.banner || undefined}
+//               alt={`${team.name} banner`}
+//               className="h-full w-full object-cover"
+//               onError={(e) =>
+//                 (e.currentTarget.src =
+//                   "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
+//               }
+//             />
+//           )}
+//         </div>
+
+//         {/* Header */}
+//         <div className="p-6">
+//           <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
+//             <img
+//               src={team?.logo || "/team.svg"}
+//               alt={`${team.name} logo`}
+//               className="h-32 w-32 rounded-full border-4 border-white shadow-lg lg:h-40 lg:w-40"
+//               onError={(e) =>
+//                 (e.currentTarget.src = "https://placehold.co/150x150/667EEA/FFFFFF?text=Logo")
+//               }
+//             />
+
+//             {/* Team Name & Actions */}
+//             <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
+//               <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold overflow-ellipsis lg:text-4xl">
+//                 {team.name}
+//               </h1>
+//               <p className="secondary-text font-[urbanist] text-lg font-medium">
+//                 @{team.abbreviation}
+//               </p>
+//               <p className="secondary-text font-[inter] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
+//             </div>
+
+//             {/* Join Button */}
+//             <div className="mt-4 sm:mt-0">
+//               {alreadyInTeam ? (
+//                 <button
+//                   onClick={() => {
+//                     openConfirmModal({
+//                       onConfirm: handleLeaveTeam,
+//                       title: `Leave ${team.name}`,
+//                       confirmVariant: "destructive",
+//                       description: "Are you want to leave this team?",
+//                     });
+//                   }}
+//                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+//                 >
+//                   <MinusCircle size={20} className="mr-1" /> Leave
+//                 </button>
+//               ) : isAlreadySent ? (
+//                 <button
+//                   onClick={() => {
+//                     openConfirmModal({
+//                       onConfirm: handleWidthdrawRequest,
+//                       title: `Request`,
+//                       description: "Are you want to cancel the request",
+//                     });
+//                   }}
+//                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+//                 >
+//                   Sent
+//                 </button>
+//               ) : team.isRecruiting ? (
+//                 <button
+//                   disabled={isLoading}
+//                   onClick={handleJoinTeam}
+//                   className="primary-btn flex transform cursor-pointer items-center rounded-3xl px-4 py-2 font-[urbanist] text-sm hover:opacity-80 active:scale-95"
+//                 >
+//                   {isLoading ? <Spinner /> : "Join"}
+//                 </button>
+//               ) : (
+//                 <span className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+//                   Private <Lock className="h-4 w-4" />
+//                 </span>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//       <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
+//     </>
+//   );
+// }
+
+const TeamHeader = ({ team, isOwner, user, alreadySent }: TeamHeaderProps) => {
   const [alreadyInTeam, setAlreadyInTeam] = useState(false);
 
   const isAlreadySent = alreadySent;
@@ -340,102 +420,142 @@ export function TeamHeader({
   }, [user]);
 
   return (
-    <>
-      <div className="container-bg relative overflow-hidden rounded-t-lg shadow-sm">
-        <div className="absolute top-4 right-4 z-20">
-          {isOwner && (
-            <div title="Edit Profile details" className="">
-              <OptionsPopover team={team} />
-            </div>
-          )}
-        </div>
-        {/* Banner */}
-        <div className="relative h-40 md:h-44">
-          {team.banner && (
-            <img
-              src={team?.banner || undefined}
-              alt={`${team.name} banner`}
-              className="h-full w-full object-cover"
-              onError={(e) =>
-                (e.currentTarget.src =
-                  "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
-              }
-            />
-          )}
-        </div>
+    <header className="relative w-full">
+      {/* --- DYNAMIC HERO BANNER SECTION --- */}
+      <div className="relative h-64 w-full overflow-hidden lg:h-96">
+        {/* Layer 1: Actual Image or Animated Fallback */}
+        {team.banner ? (
+          <img src={team.banner} alt="Banner" className="h-full w-full rounded-t-lg object-cover" />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-950">
+            <div className="absolute inset-0 animate-pulse bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20" />
+            {/* Dynamic Mesh Blobs */}
+            <div className="absolute top-1/4 left-1/4 h-96 w-96 animate-pulse rounded-full bg-indigo-500 opacity-30 blur-[120px]" />
+            <div className="absolute right-1/4 bottom-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-500 opacity-30 blur-[120px]" />
+          </div>
+        )}
 
-        {/* Header */}
-        <div className="p-6">
-          <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
-            <img
-              src={team?.logo || "/team.svg"}
-              alt={`${team.name} logo`}
-              className="h-32 w-32 rounded-full border-4 border-white shadow-md md:h-40 md:w-40"
-              onError={(e) =>
-                (e.currentTarget.src = "https://placehold.co/150x150/667EEA/FFFFFF?text=Logo")
-              }
-            />
+        {/* Layer 2: Scrims & Overlays */}
+        <div className="absolute inset-0 hidden bg-gradient-to-b from-black/20 via-transparent to-slate-50 lg:block dark:to-[#020617]" />
 
-            {/* Team Name & Actions */}
-            <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
-              <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold overflow-ellipsis md:text-4xl">
-                {team.name}
-              </h1>
-              <p className="secondary-text font-[urbanist] text-lg font-medium">
-                @{team.abbreviation}
-              </p>
-              <p className="secondary-text font-[inter] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
-            </div>
+        {isOwner && (
+          <div className="absolute top-6 right-6 z-50">
+            <OptionsPopover team={team} />
+          </div>
+        )}
+      </div>
 
-            {/* Join Button */}
-            <div className="mt-4 sm:mt-0">
-              {alreadyInTeam ? (
-                <button
-                  onClick={() => {
-                    openConfirmModal({
-                      onConfirm: handleLeaveTeam,
-                      title: `Leave ${team.name}`,
-                      confirmVariant: "destructive",
-                      description: "Are you want to leave this team?",
-                    });
-                  }}
-                  className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-                >
-                  <MinusCircle size={20} className="mr-1" /> Leave
-                </button>
-              ) : isAlreadySent ? (
-                <button
-                  onClick={() => {
-                    openConfirmModal({
-                      onConfirm: handleWidthdrawRequest,
-                      title: `Request`,
-                      description: "Are you want to cancel the request",
-                    });
-                  }}
-                  className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-                >
-                  Sent
-                </button>
-              ) : team.isRecruiting ? (
-                <button
-                  disabled={isLoading}
-                  onClick={handleJoinTeam}
-                  className="primary-btn flex transform cursor-pointer items-center rounded-3xl px-4 py-2 font-[urbanist] text-sm hover:opacity-80 active:scale-95"
-                >
-                  {isLoading ? <Spinner /> : "Join"}
-                </button>
+      {/* --- MAIN HEADER CONTENT --- */}
+      <div className="relative z-10 mx-auto -mt-24 max-w-7xl px-6 lg:-mt-32">
+        <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-end lg:gap-10">
+          {/* Logo */}
+          <div className="group relative">
+            <div className="h-40 w-40 overflow-hidden rounded-[2.5rem] border-4 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-[1.02] lg:h-52 lg:w-52 dark:border-[#020617] dark:bg-slate-900">
+              {team.logo ? (
+                <img src={team.logo} alt="Team Logo" className="h-full w-full object-cover" />
               ) : (
-                <span className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-                  Private <Lock className="h-4 w-4" />
-                </span>
+                <Trophy className="h-full w-full p-12 text-slate-300" />
               )}
             </div>
+            <div className="absolute -right-2 -bottom-2 rounded-2xl bg-emerald-500 p-2.5 text-white shadow-xl ring-2 ring-slate-50 dark:ring-[#020617]">
+              <Shield className="h-6 w-6" />
+            </div>
+          </div>
+
+          {/* Title Info */}
+          <div className="mb-2 flex-1 text-center lg:text-left">
+            <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <h1 className="text-4xl font-black tracking-tighter uppercase italic lg:text-6xl">
+                {team.name}
+              </h1>
+            </div>
+            <p className="mt-1 text-xl font-bold tracking-tighter text-slate-500 lg:text-2xl dark:text-slate-400">
+              @{team.abbreviation}
+            </p>
+            <div className="secondary-text mt-4 flex items-center justify-center gap-4 font-[urbanist] text-xs font-bold uppercase lg:justify-start">
+              <div className="flex items-center gap-1">
+                <Flag className="h-3 w-3 text-emerald-500" /> Est. Nov 2023
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="h-3 w-3 text-indigo-500" /> 12.4k Following
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 dark:border-white/10">
+            {alreadyInTeam ? (
+              <button
+                onClick={() => {
+                  openConfirmModal({
+                    onConfirm: handleLeaveTeam,
+                    title: `Leave ${team.name}`,
+                    confirmVariant: "destructive",
+                    description: "Are you want to leave this team?",
+                  });
+                }}
+                className="flex cursor-pointer items-center gap-1 bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+              >
+                <MinusCircle size={20} className="mr-1" /> Leave
+              </button>
+            ) : isAlreadySent ? (
+              <button
+                onClick={() => {
+                  openConfirmModal({
+                    onConfirm: handleWidthdrawRequest,
+                    title: `Request`,
+                    description: "Are you want to cancel the request",
+                  });
+                }}
+                className="flex cursor-pointer items-center gap-1 bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+              >
+                Sent
+              </button>
+            ) : team.isRecruiting ? (
+              <button
+                disabled={isLoading}
+                onClick={handleJoinTeam}
+                className="primary-btn flex transform cursor-pointer items-center rounded-3xl px-4 py-2 font-[urbanist] text-sm hover:opacity-80 active:scale-95"
+              >
+                {isLoading ? <Spinner /> : "Join"}
+              </button>
+            ) : (
+              <span className="flex cursor-pointer items-center gap-1 bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+                Private <Lock className="h-4 w-4" />
+              </span>
+            )}
           </div>
         </div>
       </div>
       <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
-    </>
+    </header>
   );
+};
+
+interface StatCardProps {
+  label: string;
+  value: string;
+  icon: React.ComponentType<LucideProps>;
+  color: string;
 }
+const StatCard = ({ label, value, icon: Icon, color = "indigo" }: StatCardProps) => (
+  <div className="group hover-card rounded-3xl p-5">
+    <div className="mb-2 flex items-start justify-between">
+      <div
+        className={`rounded-xl p-2 bg-${color}-50 dark:bg-${color}-500/10 text-${color}-600 dark:text-${color}-400 transition-transform group-hover:scale-110`}
+      >
+        <Icon className="h-5 w-5" />
+      </div>
+      <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase transition-colors group-hover:text-slate-900 dark:group-hover:text-white">
+        Verified
+      </span>
+    </div>
+    <p className="text-[11px] font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
+      {label}
+    </p>
+    <p className="mt-1 text-lg font-black tracking-tight text-slate-900 uppercase dark:text-white">
+      {value}
+    </p>
+  </div>
+);
 
 export default TeamIdPage;

@@ -58,7 +58,7 @@ const AfterSearch = ({ results, isLoading = true, query, clearSearch }: AfterSea
                   icon={User}
                   title={user.name}
                   subtitle={user.bio || "Go to"}
-                  href={`/users/${user.username}`}
+                  href={`/u/${user.username}`}
                 />
               ))}
             </div>

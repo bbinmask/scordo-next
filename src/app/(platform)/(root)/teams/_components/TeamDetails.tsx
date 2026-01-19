@@ -133,7 +133,7 @@ interface TeamDetailsProp extends TeamProps {
 //                     <UserIcon className="mr-2 h-5 w-5 text-blue-500" /> Captain:{" "}
 //                     {team.captain && typeof team.captain !== "string" && (
 //                       <Link
-//                         href={`/users/${team.captain.username}`}
+//                         href={`/u/${team.captain.username}`}
 //                         className="ml-1 font-medium hover:underline"
 //                       >
 //                         {team.captain.name}
@@ -144,7 +144,7 @@ interface TeamDetailsProp extends TeamProps {
 //                     <SparklesIcon className="mr-2 h-5 w-5 text-blue-500" /> Owner:
 //                     {team.owner && typeof team.owner !== "string" && (
 //                       <Link
-//                         href={`/users/${team.owner.username}`}
+//                         href={`/u/${team.owner.username}`}
 //                         className="ml-1 font-medium hover:underline"
 //                       >
 //                         {team.owner.name}
@@ -246,7 +246,7 @@ interface TeamDetailsProp extends TeamProps {
 //                       </span>
 //                       {typeof player !== "string" ? (
 //                         <Link
-//                           href={`/users/${player.user.username}`}
+//                           href={`/u/${player.user.username}`}
 //                           className="text-gray-800 hover:underline dark:text-gray-200"
 //                         >
 //                           {player.user.name}

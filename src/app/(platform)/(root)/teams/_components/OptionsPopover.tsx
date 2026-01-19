@@ -59,7 +59,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <EllipsisVertical className="h-8 w-8 rounded-full bg-gray-200 p-1 text-black opacity-50" />
+        <EllipsisVertical className="h-9 w-9 rounded-lg border border-white/20 bg-white/10 p-2 text-white backdrop-blur-lg transition-all hover:bg-white/20" />
       </PopoverTrigger>
       <PopoverContent align="end" className="bg-gray-50 p-0 dark:bg-gray-800">
         <h1 className="primary-text mb-2 px-4 py-2 font-[poppins] text-lg font-semibold tracking-wide">

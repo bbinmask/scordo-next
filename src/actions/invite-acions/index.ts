@@ -56,7 +56,7 @@ const inviteInTeamHandler = async (
     };
   }
 
-  revalidatePath(`/users/${username}`);
+  revalidatePath(`/u/${username}`);
 
   return {
     data: request,

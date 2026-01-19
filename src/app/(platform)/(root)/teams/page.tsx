@@ -81,16 +81,18 @@ const TeamCard = ({ team }: TeamCardProps) => {
 };
 const CreateTeamCard = () => (
   <div className="group relative h-52 overflow-hidden rounded-3xl bg-gradient-to-br from-green-600 to-teal-900 p-6 text-white shadow-2xl">
-    <h2 className="flex items-center text-2xl font-black tracking-tighter uppercase italic">
-      <PlusCircle size={26} className="mr-3" />
-      Build Your Legacy
-    </h2>
-    <p className="font-inter mb-6 text-sm font-medium text-green-100 opacity-80">
+    <div className="flex items-center">
+      <PlusCircle size={28} className="mr-3" />
+      <h2 className="flex items-center text-2xl font-black tracking-tighter uppercase italic">
+        Build Your Legacy
+      </h2>
+    </div>
+    <p className="font-inter mb-6 pl-10 text-sm font-medium text-green-100 opacity-80">
       Start your own legacy. Build a team from the ground up and recruit players.
     </p>
     <Link
       href={"/teams/create"}
-      className="inline-block rounded-2xl bg-white px-6 py-3 font-[poppins] text-xs font-bold text-green-900 uppercase shadow-lg transition-colors hover:bg-green-50"
+      className="ml-10 inline-block rounded-2xl bg-white px-6 py-3 font-[poppins] text-xs font-bold text-green-900 uppercase shadow-lg hover:bg-green-50"
     >
       Create a team
     </Link>
@@ -307,7 +309,7 @@ const TeamsPage = () => {
 
               <div className="h-[17rem]">
                 <h3 className="my-2 ml-4 flex h-12 items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
-                  Managed <span className="primary-heading pr-2">By You</span>
+                  Joined <span className="primary-heading pr-2">Squads</span>
                 </h3>
                 {/* Managed Teams */}
                 {playerTeams && playerTeams.length > 0 ? (
@@ -327,7 +329,7 @@ const TeamsPage = () => {
         </div>
 
         {/* Sidebar Column */}
-        <div className="flex flex-col gap-4 lg:col-span-1 lg:h-[36rem] lg:justify-between">
+        <div className="flex flex-col gap-4 px-2 lg:col-span-1 lg:h-[36rem] lg:justify-between">
           <Invitations />
           <CreateTeamCard />
         </div>

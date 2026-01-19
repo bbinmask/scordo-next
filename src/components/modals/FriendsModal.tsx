@@ -56,7 +56,7 @@ const FriendsModal = ({ friends, isOwnProfile }: FriendsModalProps) => {
                     className="flex w-full items-center justify-between bg-gray-50 hover:opacity-80 dark:bg-gray-800"
                   >
                     <a
-                      href={`/users/${friend.username}`}
+                      href={`/u/${friend.username}`}
                       onClick={(e) => {
                         e.preventDefault();
                         onClose();
