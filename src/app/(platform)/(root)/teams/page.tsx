@@ -11,6 +11,7 @@ import {
   ArrowUpRight,
   Trophy,
   Search,
+  Bell,
 } from "lucide-react";
 import { TeamForListComponent, TeamRequestWithDetails, TeamWithPlayers } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -121,14 +122,16 @@ const EmptyCard = ({ type = "managed" }: { type: "managed" | "joined" }) => {
         {isManaged ? (
           <Link
             href="/teams/create"
-            className="flex items-center gap-2 rounded-xl bg-green-700 px-6 py-2 font-[poppins] text-[10px] font-bold text-white uppercase transition-all hover:scale-105 hover:bg-green-800 active:scale-95"
+            className="flex items-center gap-2 rounded-xl bg-green-700 px-6 py-2 font-[poppins] text-[10px] font-bold text-white uppercase transition-all hover:bg-green-800 hover:underline"
           >
             <PlusCircle className="h-4 w-4" /> Create a Team
           </Link>
         ) : (
           <button
-            onClick={() => {}}
-            className="flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-2 font-[poppins] text-xs font-bold text-white uppercase shadow-lg transition-all hover:opacity-80 active:opacity-70 dark:bg-white dark:text-slate-900"
+            onClick={() => {
+              router.push("/explore");
+            }}
+            className="flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-2 font-[poppins] text-xs font-bold text-white uppercase shadow-lg transition-all hover:underline hover:opacity-80 active:opacity-70 dark:bg-white dark:text-slate-900"
           >
             <Search className="h-4 w-4" /> Browse Open Spots
           </button>
@@ -187,11 +190,21 @@ function Invitations() {
   };
 
   return (
-    <div className="hide_scrollbar group relative h-52 overflow-x-hidden overflow-y-auto scroll-smooth rounded-3xl bg-gradient-to-br from-green-600 to-teal-900 p-6 text-white shadow-2xl lg:mt-16">
-      <h2 className="sticky mb-4 flex items-center font-[cal_sans] text-xl text-gray-50 uppercase">
-        <Mail size={22} className="mr-3" />
-        Inbox
-      </h2>
+    <div className="hide_scrollbar group border-input relative h-52 w-full overflow-x-hidden overflow-y-auto scroll-smooth rounded-3xl border bg-gray-100 p-6 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:bg-gray-50/80 hover:shadow-md hover:ring-1 hover:shadow-green-500/30 hover:ring-green-600/40 lg:mt-16 dark:bg-slate-800 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="primary-text flex items-center gap-3 font-[poppins] text-lg font-black tracking-tighter uppercase italic">
+          <div className="relative">
+            <Bell size={20} className="text-green-600" />
+            {teamInvites?.length ? (
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 ring-1 ring-white dark:ring-slate-900" />
+            ) : null}
+          </div>
+          Inbox
+        </h2>
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500 dark:bg-white/5">
+          {teamInvites?.length} NEW
+        </span>
+      </div>
 
       {/* Team Invitations */}
       {isInviteLoading ? (
@@ -204,7 +217,7 @@ function Invitations() {
           description="No new invitations."
         />
       ) : (
-        <ul className="hover-card mb-4 space-y-3 rounded-xl">
+        <ul className="mb-4 space-y-3 rounded-xl">
           {teamInvites.map((invite) => (
             <li key={invite.id} className="rounded-lg p-3">
               <div className="mb-2 flex items-center justify-between">
@@ -217,9 +230,9 @@ function Invitations() {
                       (e.currentTarget.src = "https://placehold.co/100x100/CCCCCC/FFFFFF?text=T")
                     }
                   />
-                  <span className="font-[poppins] font-semibold text-gray-100">
+                  <h3 className="font-[urbanist] font-bold text-slate-800 dark:text-slate-100">
                     {invite.team.name}
-                  </span>
+                  </h3>
                 </div>
               </div>
               {invite.status === "pending" && (
@@ -227,19 +240,23 @@ function Invitations() {
                   <button
                     disabled={isAccepting || isCanceling}
                     onClick={() => handleAccept(invite.id, invite.teamId, invite.fromId)}
-                    className="center flex flex-1 cursor-pointer rounded-md bg-green-100 py-1.5 text-sm font-semibold text-green-700 transition hover:bg-green-200"
+                    className="flex-1 rounded-xl bg-green-600 py-2 text-[10px] font-bold text-white uppercase transition-opacity hover:opacity-90"
                   >
-                    {isAccepting && inviteId === invite.id ? <Spinner /> : "Accept"}
+                    {isAccepting && inviteId === invite.id ? (
+                      <Spinner className="mx-auto h-4" />
+                    ) : (
+                      "Accept"
+                    )}
                   </button>
                   <button
                     onClick={() => handleDecline(invite.id, invite.teamId)}
                     disabled={isCanceling || isAccepting}
-                    className="center flex flex-1 cursor-pointer rounded-md bg-red-100 py-1.5 text-sm font-semibold transition hover:bg-red-200"
+                    className="center flex flex-1 rounded-xl bg-slate-200 py-2 text-[10px] font-bold text-slate-600 uppercase transition-colors hover:bg-slate-300 dark:bg-white/10 dark:text-slate-400"
                   >
                     {isCanceling && inviteId === invite.id ? (
-                      <Spinner className="" />
+                      <Spinner className="mx-auto h-4" />
                     ) : (
-                      <span className="text-red-600">Decline</span>
+                      <span className="text-red-600 dark:text-red-300">Decline</span>
                     )}
                   </button>
                 </div>

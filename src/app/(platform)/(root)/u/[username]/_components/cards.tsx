@@ -42,6 +42,7 @@ import { getAvailabilityClass } from "@/utils/helper/classes";
 import OptionsPopover from "@/components/modals/OptionsPopover";
 import { useAskToJoinModal, useJoinTheirTeamModal } from "@/hooks/store/use-user";
 import { AskToJoinTeamModal } from "./modal";
+import { getFullAddress } from "@/utils";
 interface ProfileCardProps {
   user: User;
   currentUser: User;
@@ -53,10 +54,6 @@ const capitalize = (str: string) => {
   const label = str.replace(/-/g, " ");
   return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
 };
-
-const getFullAddress = (address: any) => address || "Global / Remote";
-const checkAvailability = (availability: any) =>
-  availability ? "Available for Teams" : "Busy / In-Match";
 
 const ProfilePage = ({ user }: { user: User }) => {
   const queryClient = useQueryClient();
@@ -350,11 +347,11 @@ const ProfilePage = ({ user }: { user: User }) => {
             </BentoCard>
             <BentoCard title="Availability" icon={Zap}>
               <p className="font-[urbanist] text-sm font-semibold text-green-500">
-                {checkAvailability(user.availability)}
+                {user.availability}
               </p>
             </BentoCard>
             <BentoCard title="Friends" icon={Users}>
-              <p className="font-[urbanist] text-sm font-semibold">1,248 Connections</p>
+              <p className="font-[urbanist] text-sm font-semibold">{friends?.length}</p>
             </BentoCard>
           </div>
 

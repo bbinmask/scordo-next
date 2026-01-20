@@ -56,18 +56,14 @@ export const AskToJoinTeamModal = ({ user, isOpen, onClose }: AskToJoinTeamModal
         ) : (
           <AskToJoinTeam initialRequests={requests} initialTeams={teams} user={user} />
         )}
-        <DialogFooter>
-          <div className="rounded-xl border-t border-slate-100 bg-slate-200 p-4 dark:border-white/5 dark:bg-white/5">
-            <div className="flex items-center justify-end text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-              {/* <span>Manage your squads</span> */}
-
-              <Link
-                className="border-input tracking-tigher flex items-center gap-1 rounded-xl border bg-white px-4 py-2 font-[urbanist] text-xs text-green-500 transition-colors hover:text-green-600 hover:opacity-80 dark:bg-slate-800"
-                href={"/teams/create"}
-              >
-                Create New <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
+        <DialogFooter className="h-min py-0">
+          <div className="flex items-center justify-end rounded-xl border-t border-slate-100 bg-slate-200 p-4 text-[11px] font-bold tracking-widest text-slate-400 uppercase dark:border-white/5 dark:bg-white/5">
+            <Link
+              className="border-input tracking-tigher flex items-center gap-1 rounded-xl border bg-white px-4 py-2 font-[urbanist] text-xs text-green-500 transition-colors hover:text-green-600 hover:opacity-80 dark:bg-slate-800"
+              href={"/teams/create"}
+            >
+              Create New <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
         </DialogFooter>
       </DialogContent>
@@ -157,7 +153,10 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
               {/* Action Button */}
               <button
                 onClick={() => handleInvite(team.id)}
-                disabled={requests.findIndex((t) => t.fromId === user.id) !== -1 || isLoading}
+                disabled={
+                  requests.findIndex((t) => t.fromId === user.id && t.teamId === team.id) !== -1 ||
+                  isLoading
+                }
                 className={`relative flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 ${
                   requests?.findIndex((t) => t.teamId === team.id) !== -1
                     ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
@@ -166,7 +165,8 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
               >
                 {invitingId === team.id ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
-                ) : requests.findIndex((t) => t.fromId === user.id) !== -1 ? (
+                ) : requests.findIndex((t) => t.fromId === user.id && t.teamId === team.id) !==
+                  -1 ? (
                   <Check className="h-5 w-5" />
                 ) : (
                   <Plus className="h-5 w-5" />
