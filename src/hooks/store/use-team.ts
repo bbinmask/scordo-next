@@ -23,3 +23,9 @@ export const useNotificationModal = create<UpdateTeamProps>((set) => ({
   onOpen: () => set({ isOpen: true }),
   onClose: () => set({ isOpen: false }),
 }));
+
+export const usePlayerModal = create<UpdateTeamProps>((set) => ({
+  isOpen: false,
+  onOpen: () => set({ isOpen: true }),
+  onClose: () => set({ isOpen: false }),
+}));

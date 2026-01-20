@@ -52,6 +52,12 @@ const tournamentRequestWithDetails = Prisma.validator<Prisma.TournamentRequestDe
   },
 });
 
+const playerWithUser = Prisma.validator<Prisma.PlayerDefaultArgs>()({
+  include: {
+    user: true,
+  },
+});
+
 export type TeamRequestWithDetails = Prisma.TeamRequestGetPayload<typeof teamRequestWithDetails>;
 
 export type TournamentRequestWithDetails = Prisma.TournamentRequestGetPayload<
@@ -75,3 +81,5 @@ const userWithTeams = Prisma.validator<Prisma.UserDefaultArgs>()({
 });
 
 export type UserWithTeamsProps = Prisma.UserGetPayload<typeof userWithTeams>;
+
+export type PlayerWithUser = Prisma.PlayerGetPayload<typeof playerWithUser>;

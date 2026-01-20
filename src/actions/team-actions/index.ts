@@ -224,7 +224,7 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
       error: "Sign in to join the team!",
     };
 
-  let request, team;
+  let request, team, player;
 
   try {
     team = await db.team.findUnique({
@@ -238,13 +238,34 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
         error: "Team not found!",
       };
 
-    request = await db.teamRequest.create({
-      data: {
-        fromId: user.id,
-        toId: team.ownerId,
-        teamId,
-      },
-    });
+    if (team.ownerId === user.id) {
+      player = await db.player.findFirst({
+        where: {
+          userId: user.id,
+          teamId,
+        },
+      });
+
+      if (player)
+        return {
+          error: `You are already in the team!`,
+        };
+
+      player = await db.player.create({
+        data: {
+          userId: user.id,
+          teamId,
+        },
+      });
+    } else {
+      request = await db.teamRequest.create({
+        data: {
+          fromId: user.id,
+          toId: team.ownerId,
+          teamId,
+        },
+      });
+    }
   } catch (error: any) {
     return {
       error: error.message,

@@ -34,16 +34,17 @@ import {
   Zap,
 } from "lucide-react";
 import { Player as IPlayer, Team as ITeam, User } from "@/generated/prisma";
-import { useUpdateTeam } from "@/hooks/store/use-team";
+import { usePlayerModal, useUpdateTeam } from "@/hooks/store/use-team";
 import OptionsPopover from "../_components/OptionsPopover";
 import { formatDate } from "@/utils/helper/formatDate";
-import { TeamRequestWithDetails } from "@/lib/types";
+import { PlayerWithUser, TeamRequestWithDetails } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { sendTeamRequest } from "@/actions/team-actions";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { Separator } from "@/components/ui/separator";
+import PlayerModal from "./_components/PlayerModal";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -102,9 +103,13 @@ const TeamIdPage = () => {
 
   const [alreadyInTeam, setAlreadyInTeam] = useState(false);
 
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithUser | null>(null);
+
   const hasSentRequest = Boolean(sentRequest);
 
   const { isOwner } = useIsTeamOwner(team as any, user?.id);
+
+  const { onOpen: onPlayerOpen } = usePlayerModal();
 
   useEffect(() => {
     if (user) {
@@ -217,16 +222,20 @@ const TeamIdPage = () => {
                     <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
                       <Users className="text-purple-500" /> Players
                     </h2>
-                    <span className="rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black tracking-widest text-slate-500 uppercase dark:bg-white/5">
+                    <span className="rounded-lg bg-slate-100 px-3 py-1 text-[10px] font-black text-slate-500 uppercase dark:bg-white/5">
                       {team.players.length} Total
                     </span>
                   </div>
                   <Separator />
                   <div className="grid max-h-60 grid-cols-1 gap-4 overflow-auto overflow-x-hidden p-4 sm:grid-cols-2">
                     {team.players.map((p, i) => (
-                      <Link
-                        href={`/u/${p.user.username}`}
+                      <div
                         key={i}
+                        onClick={() => {
+                          setSelectedPlayer(p);
+
+                          onPlayerOpen();
+                        }}
                         className="group border-input flex items-center justify-between rounded-2xl border bg-slate-200 p-4 transition-all hover:border-green-500/50 dark:bg-slate-900"
                       >
                         <div className="flex items-center gap-3">
@@ -241,15 +250,15 @@ const TeamIdPage = () => {
                           </div>
                           <div>
                             <p className="font-bold tracking-tighter uppercase transition-colors group-hover:text-green-500">
-                              {p.user.name}
+                              {`${p.user.name}`}
                             </p>
                             <p className="text-[10px] font-black tracking-widest text-slate-400 italic">
-                              {p.user.username}
+                              {`${p.user.username}`}
                             </p>
                           </div>
                         </div>
                         <ArrowUpRight className="h-4 w-4 text-slate-300 transition-all group-hover:text-green-500" />
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 </section>
@@ -272,6 +281,7 @@ const TeamIdPage = () => {
       ) : (
         <NotFoundParagraph description={error?.message || "Team not found!"} />
       )}
+      <PlayerModal isOwner={isOwner} player={selectedPlayer} />
     </div>
   );
 };
