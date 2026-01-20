@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { notFound, useParams } from "next/navigation";
@@ -43,6 +43,7 @@ import { sendTeamRequest } from "@/actions/team-actions";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
+import { Separator } from "@/components/ui/separator";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -99,11 +100,18 @@ const TeamIdPage = () => {
     },
   });
 
+  const [alreadyInTeam, setAlreadyInTeam] = useState(false);
+
   const hasSentRequest = Boolean(sentRequest);
 
   const { isOwner } = useIsTeamOwner(team as any, user?.id);
 
-  console.log(team?.players[1].user.avatar);
+  useEffect(() => {
+    if (user) {
+      const index = team?.players.findIndex((pl) => pl.user.username === user?.username);
+      if (index !== -1) setAlreadyInTeam(true);
+    }
+  }, [user, team]);
 
   return (
     <div className="w-full pt-4">
@@ -112,6 +120,8 @@ const TeamIdPage = () => {
         <div className="container-bg relative flex rounded-lg border pb-6">
           <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
             <TeamHeader
+              alreadyInTeam={alreadyInTeam}
+              setAlreadyInTeam={setAlreadyInTeam}
               alreadySent={hasSentRequest}
               user={user}
               isOwner={isOwner}
@@ -119,7 +129,7 @@ const TeamIdPage = () => {
             />
             {/* Main Content */}
 
-            <div className="relative mt-4 grid grid-cols-1 gap-8 px-4 lg:mt-12 lg:grid-cols-3 lg:px-6">
+            <div className="relative mt-4 grid grid-cols-1 gap-8 px-4 pb-8 lg:mt-12 lg:grid-cols-3 lg:px-6">
               {/* Left Column - General Info & Recruitment */}
               <div className="space-y-6 lg:col-span-1">
                 {/* Quick Info */}
@@ -140,7 +150,7 @@ const TeamIdPage = () => {
                     />
                   </div>
 
-                  {team.isRecruiting && (
+                  {team.isRecruiting && !alreadyInTeam && !hasSentRequest && (
                     <div className="group relative overflow-hidden rounded-[2rem] bg-green-700 p-8 text-white">
                       <Zap className="absolute top-2 right-2 h-32 w-32 -rotate-12 text-white/5 transition-transform group-hover:scale-110" />
                       <h3 className="mb-2 text-2xl font-black tracking-tighter uppercase italic">
@@ -163,7 +173,7 @@ const TeamIdPage = () => {
                     Community
                   </h2>
                   <div className="center grid font-[urbanist]">
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-300">
                       12000
                       {/* players.length */}
                     </p>
@@ -202,8 +212,8 @@ const TeamIdPage = () => {
 
                 {/* Players Section */}
 
-                <section className="hover-card rounded-2xl p-8">
-                  <div className="mb-6 flex items-center justify-between">
+                <section className="hover-card rounded-2xl py-8">
+                  <div className="mb-6 flex items-center justify-between px-8">
                     <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
                       <Users className="text-purple-500" /> Players
                     </h2>
@@ -211,16 +221,17 @@ const TeamIdPage = () => {
                       {team.players.length} Total
                     </span>
                   </div>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Separator />
+                  <div className="grid max-h-60 grid-cols-1 gap-4 overflow-auto overflow-x-hidden p-4 sm:grid-cols-2">
                     {team.players.map((p, i) => (
                       <Link
                         href={`/u/${p.user.username}`}
                         key={i}
-                        className="group border-input flex items-center justify-between rounded-2xl border bg-slate-200 p-4 transition-all hover:border-blue-500/50 dark:bg-slate-900"
+                        className="group border-input flex items-center justify-between rounded-2xl border bg-slate-200 p-4 transition-all hover:border-green-500/50 dark:bg-slate-900"
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className={`flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 font-black text-blue-600 dark:bg-indigo-900/30`}
+                            className={`flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 font-black text-green-600 dark:bg-indigo-900/30`}
                           >
                             {p.user?.avatar ? (
                               <img src={p.user.avatar} className="h-full w-full rounded-xl" />
@@ -229,7 +240,7 @@ const TeamIdPage = () => {
                             )}
                           </div>
                           <div>
-                            <p className="font-bold tracking-tighter uppercase transition-colors group-hover:text-indigo-500">
+                            <p className="font-bold tracking-tighter uppercase transition-colors group-hover:text-green-500">
                               {p.user.name}
                             </p>
                             <p className="text-[10px] font-black tracking-widest text-slate-400 italic">
@@ -237,7 +248,7 @@ const TeamIdPage = () => {
                             </p>
                           </div>
                         </div>
-                        <ArrowUpRight className="h-4 w-4 text-slate-300 transition-all group-hover:text-indigo-500" />
+                        <ArrowUpRight className="h-4 w-4 text-slate-300 transition-all group-hover:text-green-500" />
                       </Link>
                     ))}
                   </div>
@@ -269,118 +280,19 @@ interface TeamHeaderProps {
   team: TealgetailsProp;
   isOwner: boolean;
   user?: User;
+  alreadyInTeam: boolean;
+  setAlreadyInTeam: Dispatch<SetStateAction<boolean>>;
   alreadySent: boolean;
 }
 
-// export function TeamHeader({
-//   team,
-//   isOwner,
-//   user,
-//   alreadySent,
-// }: TeamHeaderProps) {
-
-//   return (
-//     <>
-//       <div className="container-bg relative overflow-hidden rounded-t-lg shadow-sm">
-//         <div className="absolute top-4 right-4 z-20">
-//           {isOwner && (
-//             <div title="Edit Profile details" className="">
-//               <OptionsPopover team={team} />
-//             </div>
-//           )}
-//         </div>
-//         {/* Banner */}
-//         <div className="relative h-40 lg:h-44">
-//           {team.banner && (
-//             <img
-//               src={team?.banner || undefined}
-//               alt={`${team.name} banner`}
-//               className="h-full w-full object-cover"
-//               onError={(e) =>
-//                 (e.currentTarget.src =
-//                   "https://placehold.co/1200x400/667EEA/FFFFFF?text=Team+Banner")
-//               }
-//             />
-//           )}
-//         </div>
-
-//         {/* Header */}
-//         <div className="p-6">
-//           <div className="relative z-10 -mt-20 flex flex-col items-center sm:-mt-24 sm:flex-row sm:items-end">
-//             <img
-//               src={team?.logo || "/team.svg"}
-//               alt={`${team.name} logo`}
-//               className="h-32 w-32 rounded-full border-4 border-white shadow-lg lg:h-40 lg:w-40"
-//               onError={(e) =>
-//                 (e.currentTarget.src = "https://placehold.co/150x150/667EEA/FFFFFF?text=Logo")
-//               }
-//             />
-
-//             {/* Team Name & Actions */}
-//             <div className="mt-4 flex-1 text-center sm:mt-0 sm:ml-6 sm:text-left">
-//               <h1 className="primary-text truncate font-[cal_sans] text-3xl font-bold overflow-ellipsis lg:text-4xl">
-//                 {team.name}
-//               </h1>
-//               <p className="secondary-text font-[urbanist] text-lg font-medium">
-//                 @{team.abbreviation}
-//               </p>
-//               <p className="secondary-text font-[inter] text-xs">{`Established - ${formatDate(new Date(team.createdAt))}`}</p>
-//             </div>
-
-//             {/* Join Button */}
-//             <div className="mt-4 sm:mt-0">
-//               {alreadyInTeam ? (
-//                 <button
-//                   onClick={() => {
-//                     openConfirmModal({
-//                       onConfirm: handleLeaveTeam,
-//                       title: `Leave ${team.name}`,
-//                       confirmVariant: "destructive",
-//                       description: "Are you want to leave this team?",
-//                     });
-//                   }}
-//                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-//                 >
-//                   <MinusCircle size={20} className="mr-1" /> Leave
-//                 </button>
-//               ) : isAlreadySent ? (
-//                 <button
-//                   onClick={() => {
-//                     openConfirmModal({
-//                       onConfirm: handleWidthdrawRequest,
-//                       title: `Request`,
-//                       description: "Are you want to cancel the request",
-//                     });
-//                   }}
-//                   className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-//                 >
-//                   Sent
-//                 </button>
-//               ) : team.isRecruiting ? (
-//                 <button
-//                   disabled={isLoading}
-//                   onClick={handleJoinTeam}
-//                   className="primary-btn flex transform cursor-pointer items-center rounded-3xl px-4 py-2 font-[urbanist] text-sm hover:opacity-80 active:scale-95"
-//                 >
-//                   {isLoading ? <Spinner /> : "Join"}
-//                 </button>
-//               ) : (
-//                 <span className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-//                   Private <Lock className="h-4 w-4" />
-//                 </span>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//       <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
-//     </>
-//   );
-// }
-
-const TeamHeader = ({ team, isOwner, user, alreadySent }: TeamHeaderProps) => {
-  const [alreadyInTeam, setAlreadyInTeam] = useState(false);
-
+const TeamHeader = ({
+  team,
+  isOwner,
+  user,
+  alreadySent,
+  alreadyInTeam,
+  setAlreadyInTeam,
+}: TeamHeaderProps) => {
   const isAlreadySent = alreadySent;
 
   const queryClient = useQueryClient();
@@ -412,17 +324,10 @@ const TeamHeader = ({ team, isOwner, user, alreadySent }: TeamHeaderProps) => {
     executeSentRequest({ teamId: team.id });
   };
 
-  useEffect(() => {
-    if (user) {
-      const index = team.players.findIndex((pl) => pl.user.username === user?.username);
-      if (index !== -1) setAlreadyInTeam(true);
-    }
-  }, [user]);
-
   return (
     <header className="relative w-full">
       {/* --- DYNAMIC HERO BANNER SECTION --- */}
-      <div className="relative h-64 w-full overflow-hidden lg:h-96">
+      <div className="relative h-64 w-full overflow-hidden rounded-t-lg lg:h-96">
         {/* Layer 1: Actual Image or Animated Fallback */}
         {team.banner ? (
           <img src={team.banner} alt="Banner" className="h-full w-full rounded-t-lg object-cover" />
@@ -436,7 +341,7 @@ const TeamHeader = ({ team, isOwner, user, alreadySent }: TeamHeaderProps) => {
         )}
 
         {/* Layer 2: Scrims & Overlays */}
-        <div className="absolute inset-0 hidden bg-gradient-to-b from-black/20 via-transparent to-slate-50 lg:block dark:to-[#020617]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-slate-50 dark:to-[#020617]" />
 
         {isOwner && (
           <div className="absolute top-6 right-6 z-50">
@@ -482,48 +387,46 @@ const TeamHeader = ({ team, isOwner, user, alreadySent }: TeamHeaderProps) => {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 dark:border-white/10">
-            {alreadyInTeam ? (
-              <button
-                onClick={() => {
-                  openConfirmModal({
-                    onConfirm: handleLeaveTeam,
-                    title: `Leave ${team.name}`,
-                    confirmVariant: "destructive",
-                    description: "Are you want to leave this team?",
-                  });
-                }}
-                className="flex cursor-pointer items-center gap-1 bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-              >
-                <MinusCircle size={20} className="mr-1" /> Leave
-              </button>
-            ) : isAlreadySent ? (
-              <button
-                onClick={() => {
-                  openConfirmModal({
-                    onConfirm: handleWidthdrawRequest,
-                    title: `Request`,
-                    description: "Are you want to cancel the request",
-                  });
-                }}
-                className="flex cursor-pointer items-center gap-1 bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-              >
-                Sent
-              </button>
-            ) : team.isRecruiting ? (
-              <button
-                disabled={isLoading}
-                onClick={handleJoinTeam}
-                className="primary-btn flex transform cursor-pointer items-center rounded-3xl px-4 py-2 font-[urbanist] text-sm hover:opacity-80 active:scale-95"
-              >
-                {isLoading ? <Spinner /> : "Join"}
-              </button>
-            ) : (
-              <span className="flex cursor-pointer items-center gap-1 bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-                Private <Lock className="h-4 w-4" />
-              </span>
-            )}
-          </div>
+          {alreadyInTeam ? (
+            <button
+              onClick={() => {
+                openConfirmModal({
+                  onConfirm: handleLeaveTeam,
+                  title: `Leave ${team.name}`,
+                  confirmVariant: "destructive",
+                  description: "Are you want to leave this team?",
+                });
+              }}
+              className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+            >
+              <MinusCircle size={20} className="mr-1" /> Leave
+            </button>
+          ) : isAlreadySent ? (
+            <button
+              onClick={() => {
+                openConfirmModal({
+                  onConfirm: handleWidthdrawRequest,
+                  title: `Request`,
+                  description: "Are you want to cancel the request",
+                });
+              }}
+              className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+            >
+              Sent
+            </button>
+          ) : team.isRecruiting ? (
+            <button
+              disabled={isLoading}
+              onClick={handleJoinTeam}
+              className="primary-btn flex transform cursor-pointer items-center rounded-lg px-4 py-2 font-[urbanist] text-sm hover:opacity-80 active:scale-95"
+            >
+              {isLoading ? <Spinner /> : "Join"}
+            </button>
+          ) : (
+            <span className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-1 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+              Private <Lock className="h-4 w-4" />
+            </span>
+          )}
         </div>
       </div>
       <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
@@ -545,9 +448,9 @@ const StatCard = ({ label, value, icon: Icon, color = "indigo" }: StatCardProps)
       >
         <Icon className="h-5 w-5" />
       </div>
-      <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase transition-colors group-hover:text-slate-900 dark:group-hover:text-white">
+      {/* <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase transition-colors group-hover:text-slate-900 dark:group-hover:text-white">
         Verified
-      </span>
+      </span> */}
     </div>
     <p className="text-[11px] font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
       {label}
