@@ -107,8 +107,7 @@ const TeamIdPage = () => {
 
   const hasSentRequest = Boolean(sentRequest);
 
-  const { isOwner } = useIsTeamOwner(team as any, user?.id);
-
+  const { isOwner, isCaptain } = useIsTeamOwner(team as any, user?.id);
   const { onOpen: onPlayerOpen } = usePlayerModal();
 
   useEffect(() => {
@@ -281,7 +280,7 @@ const TeamIdPage = () => {
       ) : (
         <NotFoundParagraph description={error?.message || "Team not found!"} />
       )}
-      <PlayerModal isOwner={isOwner} player={selectedPlayer} />
+      <PlayerModal isOwner={isOwner} isCaptain={isCaptain} player={selectedPlayer} />
     </div>
   );
 };

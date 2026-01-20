@@ -13,12 +13,12 @@ import Link from "next/link";
 interface PlayerModalProps {
   player: PlayerWithUser | null;
   isOwner: boolean;
+  isCaptain: boolean;
 }
 
-const PlayerModal = ({ player, isOwner }: PlayerModalProps) => {
-  if (!player) return null;
-
+const PlayerModal = ({ player, isOwner, isCaptain }: PlayerModalProps) => {
   const { isOpen, onClose } = usePlayerModal();
+  if (!player) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -66,35 +66,36 @@ const PlayerModal = ({ player, isOwner }: PlayerModalProps) => {
             </Link>
 
             {/* Administrative Actions - Only for Owners */}
-            {isOwner && (
+            {isOwner || isCaptain ? (
               <>
                 <div className="my-2 h-px w-full bg-slate-100 dark:bg-white/5" />
                 <p className="mb-2 ml-1 font-[poppins] text-[10px] font-semibold tracking-widest text-slate-400 uppercase">
                   Management Controls
                 </p>
 
-                <button className="group flex w-full items-center gap-3 rounded-2xl border border-amber-100 bg-amber-50 p-4 transition-all hover:bg-amber-100 dark:border-amber-500/10 dark:bg-amber-500/5 dark:hover:bg-amber-500/10">
-                  <Crown className="h-4 w-4 text-amber-500" />
-                  <span className="font-[urbanist] text-sm font-bold tracking-tight text-amber-700 uppercase dark:text-amber-400">
-                    Promote to Captain
-                  </span>
-                </button>
-
+                {isOwner && (
+                  <button className="group flex w-full items-center gap-3 rounded-2xl border border-amber-100 bg-amber-50 p-4 transition-all hover:bg-amber-100 dark:border-amber-500/10 dark:bg-amber-500/5 dark:hover:bg-amber-500/10">
+                    <Crown className="h-4 w-4 text-amber-500" />
+                    <span className="font-[urbanist] text-sm font-bold tracking-tight text-amber-700 dark:text-amber-400">
+                      Promote to Captain
+                    </span>
+                  </button>
+                )}
                 <button className="group flex w-full items-center gap-3 rounded-2xl border border-red-100 bg-red-50 p-4 transition-all hover:bg-red-100 dark:border-red-500/10 dark:bg-red-500/5 dark:hover:bg-red-500/10">
                   <UserMinus className="h-4 w-4 text-red-500" />
-                  <span className="font-[urbanist] text-sm font-bold tracking-tight text-red-700 uppercase dark:text-red-400">
+                  <span className="font-[urbanist] text-sm font-bold tracking-tight text-red-700 dark:text-red-400">
                     Remove from Roster
                   </span>
                 </button>
               </>
-            )}
+            ) : null}
           </div>
         </div>
 
         <DialogFooter>
           <button
             onClick={onClose}
-            className="flex-1 rounded-xl border border-slate-200 bg-white py-3 font-[poppins] text-[10px] font-black tracking-widest text-slate-600 uppercase transition-all hover:bg-slate-100 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300"
+            className="flex-1 rounded-xl border border-slate-200 bg-white py-3 font-[poppins] text-[10px] font-bold tracking-wide text-slate-600 uppercase transition-all hover:bg-slate-100 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300"
           >
             Dismiss
           </button>

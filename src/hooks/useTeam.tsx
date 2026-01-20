@@ -94,7 +94,8 @@ export const useTeam = () => {
 
 export const useIsTeamOwner = (team: Team, userId?: string) => {
   const isOwner = Boolean(userId && team && userId === team.ownerId);
-  return { isOwner };
+  const isCaptain = Boolean(userId && team && userId === team.captainId);
+  return { isOwner, isCaptain };
 };
 
 export const useTeamRequest = (team: Team, user?: User) => {
