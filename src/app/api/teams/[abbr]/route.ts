@@ -24,12 +24,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ abbr
                 avatar: true,
               },
             },
+            userId: true,
           },
         },
         captain: {
           select: {
             name: true,
             username: true,
+            id: true,
           },
         },
       },

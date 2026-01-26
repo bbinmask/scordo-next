@@ -476,6 +476,11 @@ const removeFromTeamHandler = async (
         error: "Only owner or captain can remove",
       };
 
+    if (playerId === team.ownerId)
+      return {
+        error: "Owner cannot be removed",
+      };
+
     player = await db.player.deleteMany({
       where: {
         userId: playerId,
@@ -552,6 +557,7 @@ export const updateTeamLogoAndBanner = createSafeAction(
   UpdateLogoAndBanner,
   logoAndBannerUpdateHandler
 );
+export const removeFromTeam = createSafeAction(OwnerAction, removeFromTeamHandler);
 export const updateCaptain = createSafeAction(OwnerAction, updateCaptainHandler);
 export const updateRecruiting = createSafeAction(UpdateRecruiting, recruitingUpdateHanlder);
 

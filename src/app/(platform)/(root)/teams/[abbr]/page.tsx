@@ -51,9 +51,9 @@ interface PlayerProps extends IPlayer {
   userId: string;
 }
 
-interface TealgetailsProp extends ITeam {
+interface TeamDetailsProps extends ITeam {
   owner: User | string;
-  captain: User | string | null;
+  captain: User | null;
   players: PlayerProps[];
   // joinRequests: TeamRequest[];
 }
@@ -65,7 +65,7 @@ const TeamIdPage = () => {
     data: team,
     isLoading,
     error,
-  } = useQuery<TealgetailsProp>({
+  } = useQuery<TeamDetailsProps>({
     queryKey: ["team", params.abbr],
     queryFn: async () => {
       const { data } = await axios.get(`/api/teams/${params.abbr}`);
@@ -121,7 +121,7 @@ const TeamIdPage = () => {
     <div className="w-full pt-4">
       {!team && !isLoading && notFound()}
       {team ? (
-        <div className="container-bg relative flex rounded-lg border pb-6">
+        <div className="container-bg relative flex rounded-lg border">
           <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
             <TeamHeader
               alreadyInTeam={alreadyInTeam}
@@ -249,7 +249,7 @@ const TeamIdPage = () => {
                           </div>
                           <div>
                             <p className="font-bold tracking-tighter uppercase transition-colors group-hover:text-green-500">
-                              {`${p.user.name}`}
+                              {`${p.user.name} ${team.captain?.username === p.user.username ? "(c)" : ""}`}
                             </p>
                             <p className="text-[10px] font-black tracking-widest text-slate-400 italic">
                               {`${p.user.username}`}
@@ -286,13 +286,20 @@ const TeamIdPage = () => {
       ) : (
         <NotFoundParagraph description={error?.message || "Team not found!"} />
       )}
-      <PlayerModal isOwner={isOwner} isCaptain={isCaptain} player={selectedPlayer} />
+      <PlayerModal
+        captainId={team?.captainId as string}
+        ownerId={team?.ownerId as string}
+        teamId={team?.id as string}
+        isOwner={isOwner}
+        isCaptain={isCaptain}
+        player={selectedPlayer}
+      />
     </div>
   );
 };
 
 interface TeamHeaderProps {
-  team: TealgetailsProp;
+  team: TeamDetailsProps;
   isOwner: boolean;
   user?: User;
   alreadyInTeam: boolean;
