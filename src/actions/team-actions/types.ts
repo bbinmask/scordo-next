@@ -4,6 +4,7 @@ import { Team, TeamRequest } from "@/generated/prisma";
 import { ActionState } from "@/lib/create-safe-action";
 import {
   AcceptRequest,
+  OwnerAction,
   CreateTeam,
   DeclineRequest,
   LeaveTeam,
@@ -13,7 +14,6 @@ import {
   UpdateTeam,
   WidthdrawRequest,
 } from "./schema";
-import { TeamRequestWithDetails } from "@/lib/types";
 
 export type InputTypeForUpdateTeam = z.infer<typeof UpdateTeam>;
 export type ReturnTypeForUpdateTeam = ActionState<InputTypeForUpdateTeam, Team>;
@@ -37,5 +37,9 @@ export type ReturnTypeForWidthdraw = ActionState<InputTypeForWidthdraw, boolean>
 
 export type InputTypeForSend = z.infer<typeof SendRequest>;
 export type ReturnTypeForSend = ActionState<InputTypeForSend, TeamRequest>;
+
 export type InputTypeForDecline = z.infer<typeof DeclineRequest>;
 export type ReturnTypeForDecline = ActionState<InputTypeForDecline, Team>;
+
+export type InputTypeForOwnerAction = z.infer<typeof OwnerAction>;
+export type ReturnTypeForOwnerAction = ActionState<InputTypeForOwnerAction, Team>;

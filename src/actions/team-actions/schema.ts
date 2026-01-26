@@ -53,3 +53,8 @@ export const SendRequest = z.object({
 export const DeclineRequest = z.object({
   reqId: z.string({ message }),
 });
+
+export const OwnerAction = z.object({
+  playerId: z.string({ message }),
+  teamId: z.string({ message }),
+});

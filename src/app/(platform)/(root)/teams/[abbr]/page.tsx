@@ -216,7 +216,7 @@ const TeamIdPage = () => {
 
                 {/* Players Section */}
 
-                <section className="hover-card rounded-2xl py-8">
+                <section className="hover-card rounded-2xl pt-8">
                   <div className="mb-6 flex items-center justify-between px-8">
                     <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
                       <Users className="text-purple-500" /> Players
@@ -263,13 +263,19 @@ const TeamIdPage = () => {
                 </section>
                 {/* Match History Section */}
                 <section className="hover-card rounded-xl p-5">
-                  <h2 className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
-                    <History color="orange" className="mr-1" />
-                    Recent Matches
-                  </h2>
-                  <p className="secondary-text py-2 text-center font-[urbanist] font-semibold">
-                    No data to show here
-                  </p>
+                  <div className="mb-6 flex items-center justify-between">
+                    <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
+                      <History className="text-amber-500" /> Match Timeline
+                    </h2>
+                  </div>
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 dark:bg-white/5">
+                      <Trophy className="h-8 w-8 text-slate-300" />
+                    </div>
+                    <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+                      Awaiting verified season results
+                    </p>
+                  </div>
                 </section>
               </div>
             </div>

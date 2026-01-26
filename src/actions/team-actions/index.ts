@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import {
   InputType,
   InputTypeForAccept,
+  InputTypeForOwnerAction,
   InputTypeForLeave,
   InputTypeForLogoAndBanner,
   InputTypeForRecruiting,
@@ -13,6 +14,7 @@ import {
   InputTypeForWidthdraw,
   ReturnType,
   ReturnTypeForAccept,
+  ReturnTypeForOwnerAction,
   ReturnTypeForLeave,
   ReturnTypeForLogoAndBanner,
   ReturnTypeForRecruiting,
@@ -24,6 +26,7 @@ import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
 import {
   AcceptRequest,
+  OwnerAction,
   CreateTeam,
   LeaveTeam,
   SendRequest,
@@ -355,7 +358,7 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
   return { data: team };
 };
 
-const leaveTeamhandler = async (data: InputTypeForLeave): Promise<ReturnTypeForLeave> => {
+const leaveTeamHandler = async (data: InputTypeForLeave): Promise<ReturnTypeForLeave> => {
   const user = await currentUser();
 
   if (!user)
@@ -442,15 +445,117 @@ const widthdrawRequestHandler = async (
   return { data: request.count === 0 ? false : true };
 };
 
+const removeFromTeamHandler = async (
+  data: InputTypeForOwnerAction
+): Promise<ReturnTypeForOwnerAction> => {
+  const { playerId, teamId } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Unauthorized",
+    };
+
+  let team, player;
+
+  try {
+    team = await db.team.findUnique({
+      where: {
+        id: teamId,
+      },
+    });
+
+    if (!team)
+      return {
+        error: "Team not found!",
+      };
+
+    if (team.ownerId !== user.id && team.captainId !== user.id)
+      return {
+        error: "Only owner or captain can remove",
+      };
+
+    player = await db.player.deleteMany({
+      where: {
+        userId: playerId,
+        teamId,
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Something went wrong!",
+    };
+  }
+
+  revalidatePath(`/teams/${team.abbreviation}`);
+
+  return {
+    data: team,
+  };
+};
+
+const updateCaptainHandler = async (
+  data: InputTypeForOwnerAction
+): Promise<ReturnTypeForOwnerAction> => {
+  const { playerId, teamId } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Unauthorized",
+    };
+
+  let team;
+
+  try {
+    team = await db.team.findUnique({
+      where: {
+        id: teamId,
+      },
+    });
+
+    if (!team)
+      return {
+        error: "Team not found!",
+      };
+
+    if (team.ownerId !== user.id)
+      return {
+        error: "Only owner can change the captain",
+      };
+
+    team = await db.team.update({
+      where: {
+        id: teamId,
+      },
+      data: {
+        captainId: playerId,
+      },
+    });
+  } catch (error) {
+    return {
+      error: "Something went wrong",
+    };
+  }
+
+  revalidatePath(`/teams/${team.abbreviation}`);
+  return {
+    data: team,
+  };
+};
+
 export const createTeam = createSafeAction(CreateTeam, createTeamHandler);
 export const updateTeam = createSafeAction(UpdateTeam, teamUpdateHandler);
 export const updateTeamLogoAndBanner = createSafeAction(
   UpdateLogoAndBanner,
   logoAndBannerUpdateHandler
 );
+export const updateCaptain = createSafeAction(OwnerAction, updateCaptainHandler);
 export const updateRecruiting = createSafeAction(UpdateRecruiting, recruitingUpdateHanlder);
 
 export const acceptTeamRequest = createSafeAction(AcceptRequest, acceptReqHandler);
 export const sendTeamRequest = createSafeAction(SendRequest, sendRequestHandler);
-export const leaveTeam = createSafeAction(LeaveTeam, leaveTeamhandler);
+export const leaveTeam = createSafeAction(LeaveTeam, leaveTeamHandler);
 export const widthdrawRequest = createSafeAction(WidthdrawRequest, widthdrawRequestHandler);
