@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
   PlusCircle,
@@ -80,7 +80,7 @@ const Bottombar = () => {
                 <MorePopover>
                   <div
                     ref={moreRef as any}
-                    onClick={() => setIsMoreActive((prev) => !prev)}
+                    onClick={() => setIsMoreActive(true)}
                     className={`center flex flex-col rounded-md px-2 py-1 font-[inter] text-stone-900 shadow-black transition-all duration-300 ease-linear hover:translate-y-0 hover:gap-0 hover:bg-emerald-600 hover:text-lime-300 hover:shadow-md hover:brightness-125 dark:text-gray-50 dark:hover:bg-emerald-800 ${isMoreActive ? "translate-y-0 gap-0 bg-emerald-500 shadow-md" : "translate-y-4 gap-8"}`}
                   >
                     <MoreHorizontal />
@@ -118,21 +118,39 @@ interface MorePopoverProps {
   children: React.ReactNode;
 }
 const MorePopover = ({ children }: MorePopoverProps) => {
+  const router = useRouter();
+
   return (
     <Popover>
       <PopoverTrigger className="w-full">{children} </PopoverTrigger>
       <PopoverContent className="relative bg-slate-100 dark:bg-slate-800">
         <div className="mb-2 border-b border-slate-100 p-4 dark:border-white/5">
-          <h4 className="text-xs font-black tracking-[0.2em] text-indigo-500 uppercase">
+          <h4 className="font-[poppins] text-sm font-black text-indigo-500 uppercase">
             Quick Portal
           </h4>
         </div>
         <div className="space-y-1 font-[inter]">
           {[
-            { icon: User, label: "My Profile", color: "blue" },
-            { icon: Settings, label: "Account Settings", color: "slate" },
-            { icon: Bell, label: "Notifications", color: "amber" },
-            { icon: HelpCircle, label: "Support Center", color: "emerald" },
+            {
+              icon: User,
+              label: "My Profile",
+              color: "blue",
+              onClick: () => {
+                router.push("/profile");
+              },
+            },
+            {
+              icon: Settings,
+              label: "Account Settings",
+              color: "slate",
+              onClick: () => {
+                router.push("/settings");
+              },
+            },
+
+            { icon: Bell, label: "Notifications", color: "amber", onClick: () => {} },
+
+            { icon: HelpCircle, label: "About Us", color: "emerald" },
           ].map((item, idx) => (
             <button
               key={idx}
