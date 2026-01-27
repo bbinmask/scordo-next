@@ -150,10 +150,18 @@ const MorePopover = ({ children }: MorePopoverProps) => {
 
             { icon: Bell, label: "Notifications", color: "amber", onClick: () => {} },
 
-            { icon: HelpCircle, label: "About Us", color: "emerald" },
+            {
+              icon: HelpCircle,
+              label: "About Us",
+              color: "emerald",
+              onClick: () => {
+                router.push("/help/about-us");
+              },
+            },
           ].map((item, idx) => (
             <button
               key={idx}
+              onClick={item.onClick}
               className="group flex w-full items-center gap-3 rounded-2xl p-3 transition-all hover:bg-slate-100 dark:hover:bg-white/5"
             >
               <item.icon className="h-4 w-4 text-slate-400 group-hover:text-indigo-500" />
