@@ -3,7 +3,24 @@
 import { User } from "@/generated/prisma";
 import { checkAvailability, getFullAddress } from "@/utils";
 import { capitalize } from "lodash";
-import { CalendarIcon, MailIcon, UserIcon, Verified } from "lucide-react";
+import {
+  BarChart3,
+  Calendar,
+  CalendarIcon,
+  Clock,
+  ExternalLink,
+  Gamepad2,
+  Info,
+  Mail,
+  MailIcon,
+  MapPin,
+  ShieldCheck,
+  Trophy,
+  UserIcon,
+  Users,
+  Verified,
+  Zap,
+} from "lucide-react";
 import { useState } from "react";
 import { CgGenderFemale, CgGenderMale } from "react-icons/cg";
 import { MdLeaderboard, MdLocationPin, MdOutlineEventAvailable } from "react-icons/md";
@@ -26,24 +43,8 @@ import { useDetailsModal, useProfileModal, useRequestModal } from "@/hooks/store
 import UpdateProfileModal from "./UpdateProfileModal";
 import EditDetailsModal from "./EditDetailsModal";
 import RequestsModal from "@/components/modals/RequestsModal";
-
-interface InfoCardProps {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-}
-
-const InfoCard = ({ label, value, icon }: InfoCardProps) => (
-  <div className="border-input container-bg flex items-center justify-between rounded-xl border p-5 font-[poppins]">
-    <div>
-      <p className="text-[13px] text-gray-600 dark:text-gray-300">
-        {label.trim() === "" ? "N/A" : label}
-      </p>
-      <p className="text-foreground text-sm font-semibold">{value}</p>
-    </div>
-    <div className="bg-input rounded-lg p-2">{icon}</div>
-  </div>
-);
+import { BentoCard } from "../../_components/cards/bento-card";
+import { formatDate } from "@/utils/helper/formatDate";
 
 const PersonalDetails = ({
   user,
@@ -132,119 +133,175 @@ const PersonalDetails = ({
   ];
 
   return (
-    <div className="relative">
-      <div className="container-bg mb-6 grid grid-cols-1 gap-6 rounded-xl p-4 shadow-lg md:grid-cols-3">
-        <div className="h-full rounded-xl p-6 transition-all duration-300 md:col-span-1">
-          <div className="mb-6 md:hidden">
-            <h3 className="font-[cal_sans] text-2xl">Profile Information</h3>
-          </div>
-          <div className="relative flex h-full flex-col items-center text-center">
-            <img
-              src={user?.avatar || "./user.svg"}
-              alt="profile"
-              className={`border-input borderh-36 w-36 rounded-full object-cover`}
-            />
-            <div className="relative mt-4 text-center">
-              {user.isVerified && (
-                <span className="absolute top-0 -right-5 rounded-full bg-green-700 text-white">
-                  <Verified className="h-4 w-4" />
-                </span>
-              )}
-              <p className="font-[poppins] text-base font-medium">{`@${user.username}`}</p>
-              <div className="my-3 flex justify-center gap-6 text-base">
-                <button
-                  onClick={openFriends}
-                  className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-800 shadow-sm dark:bg-gray-700 dark:text-blue-300"
-                >
-                  Friends: {friends?.length || 0}
-                </button>
-              </div>
-              <div className="mt-6 max-w-md px-2 text-center">
-                <div className="mx-auto mb-3 h-px w-12 bg-gray-200 dark:bg-gray-700" />
-                {user.bio ? (
-                  <p className="text-sm leading-relaxed text-gray-600 sm:text-base dark:text-gray-300">
-                    “{user.bio}”
-                  </p>
+    <>
+      <div className="bg-slate-50 pb-12 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
+        {/* Hero Banner Area */}
+        <div className="relative h-64 w-full overflow-hidden bg-gradient-to-r from-emerald-600 via-green-600 to-green-800 md:h-80">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-50 to-transparent dark:from-[#020617]" />
+        </div>
+
+        <div className="relative z-10 mx-auto -mt-32 max-w-6xl px-4">
+          {/* Top Header Card */}
+          <div className="mb-8 flex flex-col items-start gap-6 md:flex-row">
+            <div className="group relative">
+              <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl border-8 border-white bg-slate-200 shadow-2xl transition-transform duration-300 group-hover:scale-[1.02] md:h-48 md:w-48 dark:border-slate-900 dark:bg-slate-800">
+                {user.avatar ? (
+                  <img src={user.avatar} alt="User avatar" className="h-full w-full object-cover" />
                 ) : (
-                  <p className="text-sm text-gray-400 italic sm:text-base dark:text-gray-500">
-                    No bio added yet.
-                  </p>
+                  <UserIcon className="h-20 w-20 text-slate-400" />
                 )}
               </div>
-            </div>
-
-            <div className="mt-6">{/* Bio */}</div>
-          </div>
-        </div>
-
-        <div className="relative mb-6 h-full rounded-xl p-6 transition-all duration-300 md:col-span-2">
-          <div>
-            <div className="flex flex-col gap-12 md:flex-row">
-              <section className="w-full">
-                <div className="">
-                  <h2 className="mb-6 font-[cal_sans] text-3xl">Personal Information</h2>
-
-                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                    <InfoCard label="Name" value={user.name} icon={<UserIcon />} />
-                    <InfoCard
-                      label="Date of Birth"
-                      value={new Date(user.dob).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                      icon={<CalendarIcon />}
-                    />
-                    <InfoCard
-                      value={getFullAddress(user?.address)}
-                      label="Address"
-                      icon={<MdLocationPin />}
-                    />
-                    <InfoCard
-                      label="Gender"
-                      value={capitalize(user.gender as string)}
-                      icon={
-                        user.gender && user.gender.toLowerCase() === "male" ? (
-                          <CgGenderMale />
-                        ) : (
-                          <CgGenderFemale />
-                        )
-                      }
-                    />
-                    <InfoCard label="Email" value={user.email} icon={<MailIcon />} />
-                    <InfoCard
-                      label="Availability"
-                      value={checkAvailability(user.availability)}
-                      icon={<MdOutlineEventAvailable />}
-                    />
-                  </div>
+              {user.isVerified && (
+                <div className="absolute -right-2 -bottom-2 rounded-2xl bg-green-500 p-2 text-white shadow-xl ring-4 ring-white dark:ring-slate-900">
+                  <ShieldCheck className="h-6 w-6" />
                 </div>
-              </section>
+              )}
+            </div>
+            <div className="flex w-full items-center justify-between md:mt-28">
+              <div className="flex-1 pb-2 text-left">
+                <div className="flex flex-wrap items-center justify-start gap-3">
+                  <h1 className="font-[cal_sans] text-3xl font-semibold tracking-wide md:text-5xl">
+                    {user.name}
+                  </h1>
+                </div>
+                <p className="mt-1 font-[urbanist] text-base font-semibold text-slate-500 dark:text-slate-400">
+                  @{user.username}
+                </p>
+              </div>
+              <OptionsPopover data={optionsData} />
+            </div>
+          </div>
+        </div>
+
+        {/* Main Bento Grid */}
+        <div className="grid grid-cols-1 gap-6 px-2 md:grid-cols-12">
+          {/* Bio - Large Box */}
+          <BentoCard className="md:col-span-8" title="Bio" icon={Info}>
+            <p className="secondary-text font-[urbanist] text-base leading-relaxed font-semibold md:text-lg">
+              {user.bio}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-4">
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <MapPin className="h-4 w-4 text-green-500" />
+                {getFullAddress(user.address)}
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-500">
+                <Clock className="h-4 w-4 text-green-500" />
+                Member since {formatDate(new Date(user.createdAt))?.split(",")?.[1]}
+              </div>
+            </div>
+          </BentoCard>
+
+          {/* Quick Stats Summary */}
+          <BentoCard
+            className="bg-green-600 !text-white md:col-span-4 dark:bg-green-600"
+            title="Quick Stats"
+            icon={BarChart3}
+          >
+            <div className="grid h-full grid-cols-2 content-center gap-4">
+              <div>
+                <p className="font-[poppins] text-xs font-semibold text-green-600 uppercase dark:text-green-200">
+                  Win Rate
+                </p>
+                {/* <p className="text-3xl font-black">{user.winRate}</p> */}
+              </div>
+              <div>
+                <p className="font-[poppins] text-xs font-semibold text-green-600 uppercase dark:text-green-200">
+                  Matches
+                </p>
+                {/* <p className="text-3xl font-black">{user.matches}</p> */}
+              </div>
+              <div className="col-span-2 pt-4">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-black/20 dark:bg-white/20">
+                  <div className="h-full w-[68%] bg-green-600"></div>
+                </div>
+                <p className="mt-2 font-[urbanist] text-[10px] font-semibold tracking-wide text-green-100 uppercase">
+                  Progress
+                </p>
+              </div>
+            </div>
+          </BentoCard>
+
+          {/* Personal Info Grid - Columnized */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:col-span-12 lg:grid-cols-4">
+            <BentoCard title="Email Address" icon={Mail}>
+              <p className="truncate font-[urbanist] text-sm font-semibold">{user.email}</p>
+            </BentoCard>
+            <BentoCard title="Date of Birth" icon={Calendar}>
+              <p className="font-[urbanist] text-sm font-semibold">
+                {formatDate(new Date(user.dob))}
+              </p>
+            </BentoCard>
+            <BentoCard title="Availability" icon={Zap}>
+              <p className="font-[urbanist] text-sm font-semibold text-green-500">
+                {user.availability}
+              </p>
+            </BentoCard>
+            <BentoCard title="Friends" icon={Users}>
+              <button onClick={() => {}} className="font-[urbanist] text-sm font-semibold">
+                {friends?.length}
+              </button>
+            </BentoCard>
+          </div>
+
+          {/* Main Content Tabs Area */}
+          <div className="mt-4 md:col-span-12">
+            <div className="mb-6 flex flex-col items-center justify-between gap-4 px-2 md:flex-row">
+              <div className="flex w-full gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
+                {["statschart", "match-stats", "tournament-stats"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setCurrentTab(tab)}
+                    className={`rounded-xl px-6 py-2 font-[urbanist] text-sm font-semibold whitespace-nowrap transition-all ${
+                      currentTab === tab
+                        ? "bg-white text-green-600 shadow-sm dark:bg-green-600 dark:text-white"
+                        : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                    }`}
+                  >
+                    {capitalize(tab)}
+                  </button>
+                ))}
+              </div>
+              <button className="flex items-center gap-2 font-[urbanist] text-sm font-semibold text-green-500 hover:underline">
+                View Full History <ExternalLink className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="relative flex min-h-[400px] items-center justify-center overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 dark:border-white/10 dark:bg-slate-900/30">
+              <div className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-5">
+                <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-green-500 blur-[100px]"></div>
+                <div className="absolute right-10 bottom-10 h-64 w-64 rounded-full bg-emerald-500 blur-[100px]"></div>
+              </div>
+
+              <div className="relative z-10 text-center">
+                <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
+                  {currentTab === "statschart" && (
+                    <BarChart3 className="h-12 w-12 text-green-500" />
+                  )}
+                  {currentTab === "match-stats" && (
+                    <Gamepad2 className="h-12 w-12 text-emerald-500" />
+                  )}
+                  {currentTab === "tournament-stats" && (
+                    <Trophy className="h-12 w-12 text-amber-500" />
+                  )}
+                </div>
+                <h3 className="text-2xl font-black tracking-tighter uppercase italic">
+                  Loading {capitalize(currentTab)}...
+                </h3>
+                <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
+                  Synchronizing with match servers
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="container-bg mb-6 w-full rounded-xl p-4 shadow-lg">
-        <div className="mb-6 md:hidden">
-          <h3 className="font-[cal_sans] text-2xl">Statistics</h3>
-        </div>
-        <Tabs tabs={contentTabs} currentTab={currentTab} setCurrentTab={setCurrentTab} />
-        {currentTab === "statschart" && <StatsChart user={user} />}
-        {currentTab === "match-stats" && <MatchStats user={user} />}
-        {currentTab === "tournament-stats" && <TournamentStats user={user} />}
-      </div>
-
-      <div className="absolute top-8 right-6">
-        <OptionsPopover data={optionsData} />
-      </div>
-
-      <>
-        <UpdateProfileModal user={user} />
-        <EditDetailsModal user={user} />
-        <FriendsModal friends={friends} isOwnProfile />
-        <RequestsModal initialRequests={requests} />
-      </>
-    </div>
+      <UpdateProfileModal user={user} />
+      <EditDetailsModal user={user} />
+      <FriendsModal friends={friends} isOwnProfile />
+      <RequestsModal initialRequests={requests} />
+    </>
   );
 };
 
