@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
             userId: true,
           },
         },
+        banner: true,
         abbreviation: true,
         logo: true,
       },

@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
+import type { CSSProperties } from "react";
 import {
   Users,
   PlusCircle,
@@ -35,7 +36,9 @@ const TeamCard = ({ team }: TeamCardProps) => {
   const { name, abbreviation, logo, players } = team;
 
   return (
-    <div className="group hover-card relative flex h-48 w-80 flex-shrink-0 flex-col justify-between overflow-hidden rounded-3xl border p-6 transition-all duration-500">
+    <div
+      className={`group hover-card relative flex h-48 w-80 flex-shrink-0 flex-col justify-between overflow-hidden rounded-3xl border p-6 transition-all duration-500`}
+    >
       <div className="relative z-10 flex items-start justify-between">
         <div className="relative">
           <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 dark:border-white/10 dark:bg-slate-950">

@@ -201,7 +201,7 @@ export const UpdatesList = () => {
   return newsItems.map((item, i) => (
     <div
       key={i}
-      className="mb-2 flex items-center space-x-4 rounded-lg border-2 border-transparent bg-gray-50 p-4 shadow-sm transition-shadow duration-300 hover:border-emerald-600 hover:shadow-lg dark:bg-gray-800 dark:hover:border-green-700"
+      className="hover-card mb-2 flex items-center space-x-4 rounded-lg p-4 duration-300"
     >
       <div className="flex-shrink-0">
         <img
