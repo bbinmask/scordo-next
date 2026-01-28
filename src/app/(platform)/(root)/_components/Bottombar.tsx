@@ -68,7 +68,7 @@ const Bottombar = () => {
   });
 
   return (
-    <div className="fixed bottom-0 left-1/2 z-[999] flex h-16 w-full max-w-[800px] -translate-x-1/2 justify-center rounded-t-lg border border-slate-200 bg-white/80 shadow-2xl backdrop-blur-xl transition-all dark:border-white/10 dark:bg-slate-900/80">
+    <div className="fixed bottom-0 left-1/2 z-[999] flex h-16 w-full max-w-[800px] -translate-x-1/2 justify-center rounded-t-lg border border-slate-200 bg-gradient-to-r from-green-700 via-green-600 to-green-800 shadow-2xl backdrop-blur-xl transition-all dark:border-white/10 dark:from-gray-900/10 dark:via-slate-900/20 dark:to-green-950/10">
       <div className="m-0 grid w-full grid-cols-5 gap-2 rounded-t-2xl px-2 py-1 shadow-lg shadow-black md:grid-cols-6">
         {navLinks.map((item, i) => {
           const isActive = isTabActive(pathname, item.path);
@@ -81,7 +81,7 @@ const Bottombar = () => {
                   <div
                     ref={moreRef as any}
                     onClick={() => setIsMoreActive(true)}
-                    className={`center flex flex-col rounded-md px-2 py-1 font-[inter] text-stone-900 shadow-black transition-all duration-300 ease-linear hover:translate-y-0 hover:gap-0 hover:bg-emerald-600 hover:text-lime-300 hover:shadow-md hover:brightness-125 dark:text-gray-50 dark:hover:bg-emerald-800 ${isMoreActive ? "translate-y-0 gap-0 bg-emerald-500 shadow-md" : "translate-y-4 gap-8"}`}
+                    className={`center flex flex-col rounded-md px-2 py-1 font-[inter] text-stone-900 shadow-black transition-all duration-300 ease-linear hover:translate-y-0 hover:gap-0 hover:bg-green-600 hover:text-lime-300 hover:shadow-md hover:brightness-125 dark:text-gray-50 dark:hover:bg-green-800 ${isMoreActive ? "translate-y-0 gap-0 bg-green-500 shadow-md" : "translate-y-4 gap-8"}`}
                   >
                     <MoreHorizontal />
                     <span
@@ -93,7 +93,7 @@ const Bottombar = () => {
                 </MorePopover>
               ) : (
                 <Link
-                  className={`center flex flex-col rounded-md px-2 py-1 font-[inter] text-stone-900 shadow-black transition-all duration-300 ease-linear hover:translate-y-0 hover:gap-0 hover:bg-emerald-600 hover:text-lime-300 hover:shadow-md hover:brightness-125 dark:text-gray-50 dark:hover:bg-emerald-800 ${isActive ? "translate-y-0 gap-0 bg-emerald-500 shadow-md" : "translate-y-4 gap-8"}`}
+                  className={`center flex flex-col rounded-md px-2 py-1 font-[inter] text-stone-900 shadow-black transition-all duration-300 ease-linear hover:translate-y-0 hover:gap-0 hover:bg-green-600 hover:text-lime-300 hover:shadow-md hover:brightness-125 dark:text-gray-50 dark:hover:bg-green-800 ${isActive ? "translate-y-0 gap-0 bg-green-500 shadow-md" : "translate-y-4 gap-8"}`}
                   href={item.path}
                 >
                   {Icon && (
@@ -153,7 +153,7 @@ const MorePopover = ({ children }: MorePopoverProps) => {
             {
               icon: HelpCircle,
               label: "About Us",
-              color: "emerald",
+              color: "green",
               onClick: () => {
                 router.push("/help/about-us");
               },

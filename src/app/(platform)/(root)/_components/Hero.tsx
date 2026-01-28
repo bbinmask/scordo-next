@@ -19,7 +19,7 @@ const HeroSection = ({ user }: HeroSectionProps) => {
     : `/assets/banners/hero-team-banner.png`;
 
   return (
-    <div className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-900 shadow-lg shadow-slate-200/50 md:p-8 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:shadow-2xl dark:shadow-black/30">
+    <div className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-6 text-slate-900 shadow-lg shadow-slate-200/50 md:p-8 dark:border-slate-800 dark:bg-slate-900/60 dark:text-white dark:shadow-2xl dark:shadow-black/30">
       {/* Subtle background glow effect */}
       <div
         className="absolute top-0 left-1/2 -z-10 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-teal-500/10 blur-3xl"
@@ -40,7 +40,7 @@ const HeroSection = ({ user }: HeroSectionProps) => {
 
         <div className="grid items-stretch gap-6 md:grid-cols-5">
           {/* Upcoming Match Card */}
-          <div className="border-input flex flex-col rounded-xl border bg-white/60 p-5 ring-1 ring-slate-200/50 transition-all duration-300 hover:ring-slate-300 md:col-span-3 dark:bg-slate-800/50 dark:ring-slate-700/50 dark:hover:ring-slate-600">
+          <div className="hover-card flex flex-col rounded-xl p-5 ring-1 ring-slate-200/50 transition-all duration-300 hover:ring-slate-300 md:col-span-3 dark:ring-slate-700/50 dark:hover:ring-slate-600">
             <h2 className="mb-4 font-[poppins] text-sm font-semibold tracking-wider text-green-600 uppercase dark:text-emerald-600">
               Your Next Match
             </h2>
