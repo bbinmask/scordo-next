@@ -18,7 +18,7 @@ const Navbar = () => {
   return (
     <nav className="primary-background sticky top-0 z-[999] px-2 py-3">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-black text-white">Scordo</h1>
+        <h1 className="font-[poppins] text-2xl font-black text-white uppercase italic">Scordo</h1>
 
         <div className="flex items-center gap-4">
           <Button

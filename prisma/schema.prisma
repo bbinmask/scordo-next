@@ -77,6 +77,12 @@ enum FriendshipStatus {
   BLOCKED
 }
 
+enum OfficialRole {
+  SCORER
+  UMPIRE
+  COMMENTATOR
+}
+
 type Address {
   city    String
   state   String
@@ -97,14 +103,12 @@ type TournamentDetails {
   location       Address?
 }
 
-
-
 model Team {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   logo         String?
   banner       String?
-  abbreviation String @unique 
+  abbreviation String   @unique
   address      Address?
   type         TeamType @default(others)
   isRecruiting Boolean  @default(false)
@@ -137,13 +141,14 @@ model Tournament {
   description String?
   organizerId String            @db.ObjectId
 
-  organizer          User                @relation("TournamentOrganizer", fields: [organizerId], references: [id])
-  requests           TournamentRequest[] @relation("TournamentJoinRequests")
-  matches            Match[]             @relation("TournamentMatches")
-  participatingTeams TournamentTeam[]    @relation("TournamentParticipants")
-  rules              String[]
-  startDate          DateTime
-  endDate            DateTime
+  organizer           User                 @relation("TournamentOrganizer", fields: [organizerId], references: [id])
+  requests            TournamentRequest[]  @relation("TournamentJoinRequests")
+  matches             Match[]              @relation("TournamentMatches")
+  participatingTeams  TournamentTeam[]     @relation("TournamentParticipants")
+  rules               String[]
+  startDate           DateTime
+  endDate             DateTime
+  tournamentOfficials TournamentOfficial[]
 }
 
 model User {
@@ -172,8 +177,10 @@ model User {
   sentFriendRequests     Friendship[] @relation("SentFriendRequests")
   receivedFriendRequests Friendship[] @relation("ReceivedFriendRequests")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  matchOfficials      MatchOfficial[]
+  tournamentOfficials TournamentOfficial[]
 }
 
 model Friendship {
@@ -206,6 +213,7 @@ model TournamentRequest {
 
   @@unique([teamId, tournamentId])
 }
+
 model TeamRequest {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
   toId   String @db.ObjectId
@@ -236,7 +244,6 @@ model TournamentTeam {
   @@unique([teamId, tournamentId])
 }
 
-
 model Match {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   teamAId      String      @db.ObjectId
@@ -259,8 +266,9 @@ model Match {
   status MatchStatus @default(not_started)
   result String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  matchOfficials MatchOfficial[]
 }
 
 model Inning {
@@ -371,4 +379,30 @@ model Ball {
   dismissalType WicketType?
 
   createdAt DateTime @default(now())
+}
+
+model MatchOfficial {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  matchId String @db.ObjectId
+  userId  String @db.ObjectId
+
+  role OfficialRole
+
+  match Match @relation(fields: [matchId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([matchId, userId])
+}
+
+model TournamentOfficial {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  tournamentId String @db.ObjectId
+  userId       String @db.ObjectId
+
+  role OfficialRole
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@unique([tournamentId, userId])
 }
