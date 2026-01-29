@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { ApiResponse } from "@/utils/ApiResponse";
 import ApiError from "http-errors";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
       take: 20,
     });
 
-    return NextResponse.json(tournaments);
+    return NextResponse.json(new ApiResponse(tournaments));
   } catch (err) {
     return NextResponse.error();
   }

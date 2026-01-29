@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { ApiResponse } from "@/utils/ApiResponse";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
       take: 20,
     });
 
-    return NextResponse.json(teams);
+    return NextResponse.json(new ApiResponse(teams));
   } catch (error: any) {
     return NextResponse.error();
   }

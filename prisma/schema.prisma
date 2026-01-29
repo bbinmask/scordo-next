@@ -262,6 +262,7 @@ model Match {
   category     MatchCategory @default(others)
   date         DateTime?
   location     String?
+  requestStatus RequestStatus? @default(pending)
 
   status MatchStatus @default(not_started)
   result String?

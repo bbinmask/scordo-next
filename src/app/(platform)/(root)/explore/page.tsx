@@ -62,19 +62,31 @@ const ExplorePage = () => {
 
   const usersQuery = useQuery({
     queryKey: ["search-users", query],
-    queryFn: () => axios.get(`/api/search/users?query=${query}`).then((res) => res.data),
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/search/users?query=${query}`);
+
+      return data.data;
+    },
     enabled: query.trim().length > 0,
   });
 
   const teamsQuery = useQuery({
     queryKey: ["search-teams", query],
-    queryFn: () => axios.get(`/api/search/teams?query=${query}`).then((res) => res.data),
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/search/teams?query=${query}`);
+      return data.data;
+    },
+
     enabled: query.trim().length > 0,
   });
 
   const tournamentsQuery = useQuery({
     queryKey: ["search-tournaments", query],
-    queryFn: () => axios.get(`/api/search/tournaments?query=${query}`).then((res) => res.data),
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/search/tournaments?query=${query}`);
+
+      return data.data;
+    },
     enabled: query.trim().length > 0,
   });
 
