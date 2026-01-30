@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, ComponentRef, Ref, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, ComponentRef, Ref, useEffect, useMemo, useRef, useState } from "react";
 import {
   Trophy,
   Calendar,
@@ -28,6 +28,8 @@ import axios from "axios";
 import { OfficialRole, Player, Team, User } from "@/generated/prisma";
 import { debounce } from "lodash";
 import { useOnClickOutside } from "usehooks-ts";
+import { toast } from "sonner";
+import Spinner from "@/components/Spinner";
 
 const CreateMatchForm: React.FC = () => {
   const {
@@ -63,6 +65,7 @@ const CreateMatchForm: React.FC = () => {
     },
   });
 
+  const [teamsLoading, setTeamsLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [showTeamPopover, setShowTeamPopover] = useState(false);
   const [teamBName, setTeamBName] = useState("");
@@ -70,22 +73,21 @@ const CreateMatchForm: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<OfficialRole>();
   const [selectedOfficial, setSelectedOfficial] = useState<PlayerWithUser>();
   const [players, setPlayers] = useState<PlayerWithUser[]>();
+
+  const matchOfficials = watch("matchOfficials");
+
+  const teamAId = watch("teamAId");
+  const teamBId = watch("teamBId");
+
   const onSubmit: SubmitHandler<z.infer<typeof CreateMatch>> = async (data) => {
     setLoading(true);
     try {
       console.log(data);
     } catch (error) {
-      console.error(error);
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
-  };
-
-  const selectTeamB = (teamId: string, name: string) => {
-    setValue("teamBId", teamId);
-    setShowTeamPopover(false);
-    setTeamBName(name);
-    setQuery("");
   };
 
   const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -95,20 +97,19 @@ const CreateMatchForm: React.FC = () => {
 
     if (value.trim().length === 0) return;
 
-    debounce(async () => {
-      const { data } = await axios.get(`/api/search/teams?query=${query}`);
-
-      setOpponentTeams(data.data);
-    }, 500)();
+    debouncedSearch(value);
   };
 
   const addOfficial = (userId: string, name: string) => {
-    // if (formData.matchOfficials.some((o) => o.userId === userId)) return;
-    // setFormData((prev) => ({
-    //   ...prev,
-    //   matchOfficials: [...prev.matchOfficials, { userId, name, role: selectedRole }],
-    // }));
-    // setOfficialSearch("");
+    if (matchOfficials?.some((o) => o.userId === userId)) return;
+    if (matchOfficials) {
+      setValue("matchOfficials", [
+        ...matchOfficials,
+        { userId, name, role: selectedRole as OfficialRole },
+      ]);
+    } else {
+      setValue("matchOfficials", [{ userId, name, role: selectedRole as OfficialRole }]);
+    }
   };
 
   const removeOfficial = (userId: string) => {
@@ -119,20 +120,38 @@ const CreateMatchForm: React.FC = () => {
     );
   };
 
-  const matchOfficials = watch("matchOfficials");
+  const selectTeamB = (teamId: string, name: string) => {
+    setValue("teamBId", teamId);
+    setShowTeamPopover(false);
+    setTeamBName(name);
+    setQuery("");
+  };
 
-  const teamAId = watch("teamAId");
-  const teamBId = watch("teamBId");
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async (q: string) => {
+        setTeamsLoading(true);
+        try {
+          const { data } = await axios.get(`/api/search/teams?query=${q}`);
+          setOpponentTeams(data.data);
+        } catch (error) {
+          toast.error("Couldn't find teams!");
+        } finally {
+          setTeamsLoading(false);
+        }
+      }, 500),
+    []
+  );
 
   useEffect(() => {
-    const teamA = getTeamA(teamAId);
-    const teamB = getTeamB(teamBId);
+    const teamA = getTeamA(teamAId)?.players || [];
+    const teamB = getTeamB(teamBId)?.players || [];
 
-    const teamAPlayers = teamA?.players || [];
-    const teamBPlayers = teamB?.players || [];
+    const teamAPlayers = [...teamA];
+    const teamBPlayers = [...teamB];
 
     const uniquePlayers = Array.from(
-      new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.id, p])).values()
+      new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
     );
 
     setPlayers(uniquePlayers);
@@ -262,9 +281,13 @@ const CreateMatchForm: React.FC = () => {
                         ))
                     ) : (
                       <div className="p-4 text-center">
-                        <p className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase">
-                          No Teams Found
-                        </p>
+                        {teamsLoading ? (
+                          <Spinner className="h-min w-min" />
+                        ) : (
+                          <p className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase">
+                            No Teams Found
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -449,7 +472,7 @@ const CreateMatchForm: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="relative w-full overflow-visible rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-slate-900">
+            <div className="hover-card relative w-full overflow-visible rounded-[2.5rem] border p-8 shadow-sm">
               <div className="mb-6 flex items-center gap-3">
                 <div className="rounded-lg bg-amber-500/10 p-2 text-amber-500">
                   <Gavel className="h-5 w-5" />
@@ -473,15 +496,9 @@ const CreateMatchForm: React.FC = () => {
                           <option
                             key={pl.userId}
                             onClick={() => setSelectedOfficial(pl)}
-                            className="flex w-full items-center justify-between rounded-lg p-2 transition-all hover:bg-slate-100 dark:hover:bg-white/5"
+                            className="flex w-full items-center justify-between rounded-lg p-2 text-[10px] font-black tracking-tighter text-slate-900 uppercase transition-all hover:bg-slate-100 dark:text-white dark:hover:bg-white/5"
                           >
-                            <p className="text-[10px] font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-                              {pl.user.name}
-                            </p>
-                            <p className="text-[8px] font-bold text-slate-400 uppercase">
-                              @{pl.user.username}
-                            </p>
-                            <Plus className="h-3 w-3 text-indigo-500" />
+                            {pl.user.name}
                           </option>
                         ))}
                       </select>
@@ -493,16 +510,15 @@ const CreateMatchForm: React.FC = () => {
                       Role
                     </label>
                     <select
-                      value={selectedRole}
-                      onChange={(e) => setSelectedRole(e.target.value as OfficialRole)}
+                      onChange={(e) => {
+                        setSelectedRole(e.target.value.toUpperCase() as OfficialRole);
+                      }}
                       className="w-full truncate overflow-x-clip rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold tracking-tight uppercase transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-slate-950"
                     >
                       <option value="">Select Role</option>
                       <option value="umpire">Umpire</option>
-                      <option value="leg_umpire">Leg Umpire</option>
-                      <option value="third_umpire">3rd Umpire</option>
+                      <option value="commentator">Commentator</option>
                       <option value="scorer">Scorer</option>
-                      <option value="referee">Referee</option>
                     </select>
                   </div>
                 </div>
