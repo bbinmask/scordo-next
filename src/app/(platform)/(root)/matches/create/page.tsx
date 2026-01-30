@@ -24,25 +24,6 @@ import { TeamRequestWithDetails } from "@/lib/types";
 import axios from "axios";
 import { Team } from "@/generated/prisma";
 import { debounce } from "lodash";
-type MatchCategory = "t20" | "odi" | "test" | "others";
-
-interface VenueAddress {
-  city: string;
-  state: string;
-  country: string;
-}
-
-interface MatchFormData {
-  teamAId: string;
-  teamBId: string;
-  tournamentId?: string;
-  overs: number;
-  overLimit: number;
-  venue: VenueAddress;
-  category: MatchCategory;
-  date: string;
-  location: string;
-}
 
 const CreateMatchForm: React.FC = () => {
   const {
@@ -272,10 +253,10 @@ const CreateMatchForm: React.FC = () => {
                         name="category"
                         className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-indigo-500 dark:border-white/10 dark:bg-slate-950"
                       >
-                        <option value="t10">T10 Professional</option>
-                        <option value="t20">T20 Professional</option>
-                        <option value="odi">One Day International (ODI)</option>
-                        <option value="test">Test Match</option>
+                        <option value="T10">T10 Professional</option>
+                        <option value="T20">T20 Professional</option>
+                        <option value="ODI">One Day International (ODI)</option>
+                        <option value="Test">Test Match</option>
                         <option value="others">Custom / Others</option>
                       </select>
                     </div>
