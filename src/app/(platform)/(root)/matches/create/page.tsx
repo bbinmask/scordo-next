@@ -30,13 +30,14 @@ import { debounce } from "lodash";
 import { useOnClickOutside } from "usehooks-ts";
 import { toast } from "sonner";
 import Spinner from "@/components/Spinner";
+import { useAction } from "@/hooks/useAction";
+import { createMatch } from "@/actions/match-actions";
 
 const CreateMatchForm: React.FC = () => {
   const {
     register,
     formState: { errors },
     handleSubmit,
-    getFieldState,
     getValues,
     setValue,
     watch,
@@ -54,6 +55,14 @@ const CreateMatchForm: React.FC = () => {
     },
   });
 
+  const { execute } = useAction(createMatch, {
+    onSuccess(data) {
+      toast.success("Match is created!");
+    },
+    onError(error) {
+      toast.error(error);
+    },
+  });
   const [loading, setLoading] = useState(false);
 
   const { data: teams } = useQuery<TeamWithPlayers[]>({
@@ -80,14 +89,7 @@ const CreateMatchForm: React.FC = () => {
   const teamBId = watch("teamBId");
 
   const onSubmit: SubmitHandler<z.infer<typeof CreateMatch>> = async (data) => {
-    setLoading(true);
-    try {
-      console.log(data);
-    } catch (error) {
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    execute(data);
   };
 
   const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {

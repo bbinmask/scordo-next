@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "@/lib/db";
 import { InputTypeForCreate, ReturnTypeForCreate } from "./types";
 import { createSafeAction } from "@/lib/create-safe-action";
