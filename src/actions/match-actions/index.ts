@@ -90,7 +90,7 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
       };
 
     matchOfficial = await db.matchOfficial.createMany({
-      data: matchOfficials.map((official: any) => ({
+      data: matchOfficials?.map((official: any) => ({
         ...official,
         matchId: match.id,
       })),

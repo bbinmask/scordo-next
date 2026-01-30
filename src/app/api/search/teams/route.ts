@@ -20,6 +20,19 @@ export async function GET(req: NextRequest) {
         name: true,
         logo: true,
         abbreviation: true,
+        players: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+                id: true,
+              },
+            },
+
+            userId: true,
+          },
+        },
         _count: {
           select: { players: true },
         },

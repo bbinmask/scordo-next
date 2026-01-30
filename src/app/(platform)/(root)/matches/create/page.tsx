@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, ComponentRef, Ref, useEffect, useRef, useState } from "react";
 import {
   Trophy,
   Calendar,
@@ -14,16 +14,20 @@ import {
   Loader2,
   Search,
   Check,
+  Gavel,
+  UserCheck,
+  UserMinus,
 } from "lucide-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { CreateMatch } from "@/actions/match-actions/schema";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { TeamRequestWithDetails } from "@/lib/types";
+import { PlayerWithUser, TeamRequestWithDetails, TeamWithPlayers } from "@/lib/types";
 import axios from "axios";
-import { Team } from "@/generated/prisma";
+import { OfficialRole, Player, Team, User } from "@/generated/prisma";
 import { debounce } from "lodash";
+import { useOnClickOutside } from "usehooks-ts";
 
 const CreateMatchForm: React.FC = () => {
   const {
@@ -33,6 +37,7 @@ const CreateMatchForm: React.FC = () => {
     getFieldState,
     getValues,
     setValue,
+    watch,
   } = useForm<z.infer<typeof CreateMatch>>({
     resolver: zodResolver(CreateMatch),
     defaultValues: {
@@ -43,14 +48,13 @@ const CreateMatchForm: React.FC = () => {
       overLimit: 4,
       venue: { city: "", state: "", country: "" },
       category: "others",
-      date: new Date(),
       location: "",
     },
   });
 
   const [loading, setLoading] = useState(false);
 
-  const { data: teams } = useQuery<Team[]>({
+  const { data: teams } = useQuery<TeamWithPlayers[]>({
     queryKey: ["my-teams"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/teams/owned");
@@ -60,10 +64,12 @@ const CreateMatchForm: React.FC = () => {
   });
 
   const [query, setQuery] = useState("");
-  const [showPopover, setShowPopover] = useState(false);
+  const [showTeamPopover, setShowTeamPopover] = useState(false);
   const [teamBName, setTeamBName] = useState("");
-  const [opponentTeams, setOpponentTeams] = useState<Team[]>([]);
-
+  const [opponentTeams, setOpponentTeams] = useState<TeamWithPlayers[]>([]);
+  const [selectedRole, setSelectedRole] = useState<OfficialRole>();
+  const [selectedOfficial, setSelectedOfficial] = useState<PlayerWithUser>();
+  const [players, setPlayers] = useState<PlayerWithUser[]>();
   const onSubmit: SubmitHandler<z.infer<typeof CreateMatch>> = async (data) => {
     setLoading(true);
     try {
@@ -77,7 +83,7 @@ const CreateMatchForm: React.FC = () => {
 
   const selectTeamB = (teamId: string, name: string) => {
     setValue("teamBId", teamId);
-    setShowPopover(false);
+    setShowTeamPopover(false);
     setTeamBName(name);
     setQuery("");
   };
@@ -85,7 +91,7 @@ const CreateMatchForm: React.FC = () => {
   const handleQueryChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    setShowPopover(true);
+    setShowTeamPopover(true);
 
     if (value.trim().length === 0) return;
 
@@ -96,12 +102,46 @@ const CreateMatchForm: React.FC = () => {
     }, 500)();
   };
 
-  const getTeamA = (id?: string): Team | null =>
-    id ? (teams?.find((t) => t.id === id) ?? null) : null;
-  const getTeamB = (id?: string): Team | null =>
-    id ? (opponentTeams?.find((t) => t.id === id) ?? null) : null;
+  const addOfficial = (userId: string, name: string) => {
+    // if (formData.matchOfficials.some((o) => o.userId === userId)) return;
+    // setFormData((prev) => ({
+    //   ...prev,
+    //   matchOfficials: [...prev.matchOfficials, { userId, name, role: selectedRole }],
+    // }));
+    // setOfficialSearch("");
+  };
 
-  console.log(errors);
+  const removeOfficial = (userId: string) => {
+    const currentOfficials = getValues("matchOfficials") ?? [];
+    setValue(
+      "matchOfficials",
+      currentOfficials.filter((o) => o.userId !== userId)
+    );
+  };
+
+  const matchOfficials = watch("matchOfficials");
+
+  const teamAId = watch("teamAId");
+  const teamBId = watch("teamBId");
+
+  useEffect(() => {
+    const teamA = getTeamA(teamAId);
+    const teamB = getTeamB(teamBId);
+
+    const teamAPlayers = teamA?.players || [];
+    const teamBPlayers = teamB?.players || [];
+
+    const uniquePlayers = Array.from(
+      new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.id, p])).values()
+    );
+
+    setPlayers(uniquePlayers);
+  }, [teamAId, teamBId]);
+
+  const getTeamA = (id?: string): TeamWithPlayers | null =>
+    id ? (teams?.find((t) => t.id === id) ?? null) : null;
+  const getTeamB = (id?: string): TeamWithPlayers | null =>
+    id ? (opponentTeams?.find((t) => t.id === id) ?? null) : null;
 
   return (
     <div className={`transition-colors duration-500`}>
@@ -123,9 +163,9 @@ const CreateMatchForm: React.FC = () => {
               {/* Team A */}
               <div className="relative z-10 flex flex-col items-center gap-4">
                 <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-slate-100 shadow-xl md:h-32 md:w-32 dark:border-slate-950 dark:bg-slate-800">
-                  {getTeamA(getValues("teamAId"))?.logo ? (
+                  {getTeamA(teamAId)?.logo ? (
                     <img
-                      src={getTeamA(getValues("teamAId"))?.logo as string}
+                      src={getTeamA(teamAId)?.logo as string}
                       className="h-full w-full object-cover"
                       alt="Team A"
                     />
@@ -137,11 +177,11 @@ const CreateMatchForm: React.FC = () => {
                   {...register("teamAId", { required: "Team A is required" })}
                   name="teamAId"
                   required
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold tracking-tight uppercase transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-slate-950"
+                  className="w-full truncate overflow-x-clip rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold tracking-tight uppercase transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-slate-950"
                 >
                   <option value="">Select Your Team</option>
                   {teams
-                    ?.filter((t) => t.id !== getValues("teamBId"))
+                    ?.filter((t) => t.id !== teamBId)
                     .map((t) => (
                       <option key={t.id} value={t.id}>
                         {t.name}
@@ -161,9 +201,9 @@ const CreateMatchForm: React.FC = () => {
               {/* Team B */}
               <div className="relative z-10 flex flex-col items-center gap-4">
                 <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-slate-100 shadow-xl md:h-32 md:w-32 dark:border-slate-950 dark:bg-slate-800">
-                  {getTeamB(getValues("teamBId"))?.logo ? (
+                  {getTeamB(teamBId)?.logo ? (
                     <img
-                      src={getTeamB(getValues("teamBId"))?.logo as string}
+                      src={getTeamB(teamBId)?.logo as string}
                       className="h-full w-full object-cover"
                       alt="Team B"
                     />
@@ -177,7 +217,7 @@ const CreateMatchForm: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Type team name..."
-                    onFocus={() => setShowPopover(true)}
+                    onFocus={() => setShowTeamPopover(true)}
                     value={teamBName || query}
                     onChange={handleQueryChange}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-4 pl-10 text-sm font-bold tracking-tight uppercase transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-slate-950"
@@ -186,38 +226,40 @@ const CreateMatchForm: React.FC = () => {
 
                 {/* Search Popover */}
 
-                {query.trim().length > 0 && (
+                {showTeamPopover && (
                   <div className="animate-in fade-in slide-in-from-top-2 scrollbar-hide absolute top-full left-0 z-[200] mt-2 max-h-60 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white/90 p-2 shadow-2xl backdrop-blur-xl duration-200 dark:border-white/10 dark:bg-slate-900/95">
                     {opponentTeams?.length > 0 ? (
-                      opponentTeams.map((team) => (
-                        <button
-                          key={team.id}
-                          type="button"
-                          onClick={() => selectTeamB(team.id, team.name)}
-                          className="group flex w-full items-center justify-between rounded-xl p-3 transition-all hover:bg-slate-100 dark:hover:bg-white/5"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border border-white bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
-                              {team.logo ? (
-                                <img src={team.logo} className="h-full w-full object-cover" />
-                              ) : (
-                                <Shield className="h-4 w-4 text-slate-400" />
-                              )}
+                      opponentTeams
+                        .filter((team) => team.id !== teamAId)
+                        .map((team) => (
+                          <button
+                            key={team.id}
+                            type="button"
+                            onClick={() => selectTeamB(team.id, team.name)}
+                            className="group flex w-full items-center justify-between rounded-xl p-3 transition-all hover:bg-slate-100 dark:hover:bg-white/5"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border border-white bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+                                {team.logo ? (
+                                  <img src={team.logo} className="h-full w-full object-cover" />
+                                ) : (
+                                  <Shield className="h-4 w-4 text-slate-400" />
+                                )}
+                              </div>
+                              <div className="text-left">
+                                <p className="text-xs font-black tracking-tighter text-slate-900 uppercase dark:text-white">
+                                  {team.name}
+                                </p>
+                                <p className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
+                                  {team.abbreviation}
+                                </p>
+                              </div>
                             </div>
-                            <div className="text-left">
-                              <p className="text-xs font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-                                {team.name}
-                              </p>
-                              <p className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
-                                {team.abbreviation}
-                              </p>
-                            </div>
-                          </div>
-                          {getValues("teamBId") === team.id && (
-                            <Check className="h-4 w-4 text-emerald-500" />
-                          )}
-                        </button>
-                      ))
+                            {getValues("teamBId") === team.id && (
+                              <Check className="h-4 w-4 text-emerald-500" />
+                            )}
+                          </button>
+                        ))
                     ) : (
                       <div className="p-4 text-center">
                         <p className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase">
@@ -407,7 +449,114 @@ const CreateMatchForm: React.FC = () => {
                 </div>
               </div>
             </div>
+            <div className="relative w-full overflow-visible rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-slate-900">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="rounded-lg bg-amber-500/10 p-2 text-amber-500">
+                  <Gavel className="h-5 w-5" />
+                </div>
+                <h3 className="text-xl font-black tracking-tighter uppercase italic">
+                  Match Officials
+                </h3>
+              </div>
 
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <label className="mb-1 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                      Select Official
+                    </label>
+                    <div className="relative">
+                      <select className="w-full truncate overflow-x-clip rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold tracking-tight uppercase transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-slate-950">
+                        <option value="">Select Official</option>
+
+                        {players?.map((pl) => (
+                          <option
+                            key={pl.userId}
+                            onClick={() => setSelectedOfficial(pl)}
+                            className="flex w-full items-center justify-between rounded-lg p-2 transition-all hover:bg-slate-100 dark:hover:bg-white/5"
+                          >
+                            <p className="text-[10px] font-black tracking-tighter text-slate-900 uppercase dark:text-white">
+                              {pl.user.name}
+                            </p>
+                            <p className="text-[8px] font-bold text-slate-400 uppercase">
+                              @{pl.user.username}
+                            </p>
+                            <Plus className="h-3 w-3 text-indigo-500" />
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="w-1/3">
+                    <label className="mb-1 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                      Role
+                    </label>
+                    <select
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value as OfficialRole)}
+                      className="w-full truncate overflow-x-clip rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold tracking-tight uppercase transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-slate-950"
+                    >
+                      <option value="">Select Role</option>
+                      <option value="umpire">Umpire</option>
+                      <option value="leg_umpire">Leg Umpire</option>
+                      <option value="third_umpire">3rd Umpire</option>
+                      <option value="scorer">Scorer</option>
+                      <option value="referee">Referee</option>
+                    </select>
+                  </div>
+                </div>
+
+                {selectedOfficial && (
+                  <button
+                    type="button"
+                    className="primary-btn rounded-xl px-8 py-2"
+                    onClick={() => addOfficial(selectedOfficial.userId, selectedOfficial.user.name)}
+                  >
+                    Add
+                  </button>
+                )}
+
+                {/* Active Officials List */}
+                <div className="mt-4 space-y-2">
+                  {matchOfficials && matchOfficials.length > 0 ? (
+                    matchOfficials.map((official) => (
+                      <div
+                        key={official.userId}
+                        className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-3 dark:border-white/5 dark:bg-white/5"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500">
+                            <UserCheck className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black tracking-tighter text-slate-900 uppercase dark:text-white">
+                              {official?.name}
+                            </p>
+                            <p className="text-[8px] font-bold tracking-[0.2em] text-emerald-500 uppercase">
+                              {official.role.replace("_", " ")}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeOfficial(official.userId)}
+                          className="rounded-lg p-2 text-red-500 opacity-0 transition-all group-hover:opacity-100 hover:bg-red-50"
+                        >
+                          <UserMinus className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-slate-200 py-4 text-center dark:border-white/10">
+                      <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                        No Officials Assigned
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
             {/* Form Actions */}
             <div className="flex flex-col items-center justify-end gap-4 pt-4 md:flex-row">
               <button

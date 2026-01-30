@@ -15,14 +15,15 @@ export const CreateMatch = z.object({
   tossWinner: z.string({ message }).optional(),
   tossDecision: z.string({ message }).optional(),
   category: z.enum(["T10", "T20", "ODI", "Test", "others"]),
-  date: z.date({ message }),
+  date: z.string({ message }),
   location: z.string({ message }).optional(),
-  matchOfficials: z.array(
-    z
-      .object({
+  matchOfficials: z
+    .array(
+      z.object({
         role: z.enum(["SCORER", "UMPIRE", "COMMENTATOR"]),
+        name: z.string({ message }),
         userId: z.string({ message }),
       })
-      .optional()
-  ),
+    )
+    .optional(),
 });
