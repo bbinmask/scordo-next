@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
-  PlusCircle,
+  Swords,
   Search,
   Trophy,
   User,
@@ -43,7 +43,7 @@ const Bottombar = () => {
     },
     {
       title: "Match",
-      icon: PlusCircle,
+      icon: Swords,
       path: "/matches",
       className: "",
     },

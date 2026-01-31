@@ -100,7 +100,6 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
       });
     }
   } catch (error) {
-    console.log({ error: error.message });
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
