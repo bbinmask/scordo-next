@@ -8,6 +8,7 @@ import { formatDate } from "@/utils/helper/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Carousel } from "@/components/carousel";
+import Spinner from "@/components/Spinner";
 
 const MatchCard = ({ match }: { match: any }) => {
   if (!match) return null;
@@ -223,7 +224,7 @@ const MatchesPage = () => {
     },
   ];
 
-  const { data: matchesAsOfficial } = useQuery({
+  const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<Match[]>({
     queryKey: ["matches"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/officials");
@@ -231,7 +232,7 @@ const MatchesPage = () => {
       return data.data;
     },
   });
-  const { data: matches } = useQuery({
+  const { data: matches, isLoading } = useQuery<Match[]>({
     queryKey: ["matches"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/");
@@ -265,9 +266,13 @@ const MatchesPage = () => {
                   <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
                 </div>
 
-                {managedMatches.length > 0 ? (
+                {isLoading ? (
+                  <div className="center flex w-full">
+                    <Spinner />
+                  </div>
+                ) : matches && matches.length > 0 ? (
                   <Carousel>
-                    {managedMatches.map((match) => (
+                    {matches.map((match) => (
                       <MatchCard key={match.id} match={match} />
                     ))}
                   </Carousel>
@@ -284,9 +289,13 @@ const MatchesPage = () => {
                   <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
                 </div>
 
-                {joinedMatches.length > 0 ? (
+                {officialsLoading ? (
+                  <div className="center flex w-full">
+                    <Spinner />
+                  </div>
+                ) : matchesAsOfficial && matchesAsOfficial.length > 0 ? (
                   <div className="no-scrollbar flex gap-8 overflow-x-auto scroll-smooth pb-6">
-                    {joinedMatches.map((match: any, i: number) => (
+                    {matchesAsOfficial.map((match, i) => (
                       <MatchCard key={i} match={match} />
                     ))}
                   </div>
