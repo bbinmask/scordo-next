@@ -58,6 +58,30 @@ const playerWithUser = Prisma.validator<Prisma.PlayerDefaultArgs>()({
   },
 });
 
+const matchWithTeamsAndOfficials = Prisma.validator<Prisma.MatchDefaultArgs>()({
+  include: {
+    teamA: true,
+    teamB: true,
+    matchOfficials: true,
+  },
+});
+
+const inningDetails = Prisma.validator<Prisma.InningDefaultArgs>()({
+  include: {
+    ballsData: true,
+    battingTeam: true,
+    bowlingTeam: true,
+    currentBowler: true,
+    currentNonStriker: true,
+    currentStriker: true,
+    InningBatting: true,
+    InningBowling: true,
+  },
+});
+
+export type InningDetails = Prisma.InningGetPayload<typeof inningDetails>;
+export type MatchWithTeamAndOfficials = Prisma.MatchGetPayload<typeof matchWithTeamsAndOfficials>;
+
 export type TeamRequestWithDetails = Prisma.TeamRequestGetPayload<typeof teamRequestWithDetails>;
 
 export type TournamentRequestWithDetails = Prisma.TournamentRequestGetPayload<
