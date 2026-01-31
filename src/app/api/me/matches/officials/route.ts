@@ -12,26 +12,11 @@ export const GET = async (req: Request) => {
   try {
     const matches = await db.match.findMany({
       where: {
-        OR: [
-          {
-            teamA: {
-              players: {
-                some: {
-                  userId: user.id,
-                },
-              },
-            },
+        matchOfficials: {
+          some: {
+            userId: user.id,
           },
-          {
-            teamB: {
-              players: {
-                some: {
-                  userId: user.id,
-                },
-              },
-            },
-          },
-        ],
+        },
       },
       include: {
         teamA: true,

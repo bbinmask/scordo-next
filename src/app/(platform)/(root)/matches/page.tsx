@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { ArrowUpRight, MapPin, PlusCircle, Calendar, Activity, Sword, Bell } from "lucide-react";
 import Link from "next/link";
 import { Match } from "@/generated/prisma";
@@ -46,9 +46,10 @@ const MatchCard = ({ match }: { match: any }) => {
               • {match.overs} Overs
             </span>
           </div>
-          <h3 className="truncate text-lg font-black tracking-tight text-slate-900 uppercase transition-colors group-hover:text-emerald-500 dark:text-white">
-            {match.teamA.abbr} <span className="mx-1 text-slate-300 dark:text-slate-600">vs</span>{" "}
-            {match.teamB.abbr}
+          <h3 className="truncate font-[poppins] text-lg font-black tracking-tight text-slate-900 uppercase transition-colors group-hover:text-emerald-500 dark:text-white">
+            {match.teamA.abbreviation}{" "}
+            <span className="font-inter mx-1 text-green-800 dark:text-green-700">vs</span>{" "}
+            {match.teamB.abbreviation}
           </h3>
           <p className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
             <MapPin className="h-3 w-3" /> {match.location}
@@ -65,7 +66,7 @@ const MatchCard = ({ match }: { match: any }) => {
               </span>
             </div>
           )}
-          <span className="inline-flex animate-pulse items-center gap-1 text-[9px] font-black tracking-widest text-indigo-500 uppercase italic">
+          <span className="inline-flex animate-pulse items-center gap-1 text-[9px] font-black tracking-widest text-green-500 uppercase italic">
             {match.status === "in_progress" ? (
               <>
                 <div className="h-1.5 w-1.5 rounded-full bg-red-500" /> Live Feed
@@ -225,7 +226,7 @@ const MatchesPage = () => {
   ];
 
   const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<Match[]>({
-    queryKey: ["matches"],
+    queryKey: ["matches-as-official"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/officials");
 
@@ -241,7 +242,7 @@ const MatchesPage = () => {
     },
   });
 
-  const joinedMatches: any = [];
+  console.log({ matches, matchesAsOfficial });
 
   return (
     <div className={`font-sans transition-colors duration-500`}>
@@ -314,7 +315,7 @@ const MatchesPage = () => {
               <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
                 <div className="mb-6 flex items-center justify-between">
                   <h2 className="flex items-center text-xl font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-                    <Bell size={22} className="mr-3 text-indigo-500" />
+                    <Bell size={22} className="mr-3 text-green-500" />
                     Match Feed
                   </h2>
                   <span className="rounded-lg bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-white">
