@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 
 interface MatchIdPageProps {}
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Shield,
   Trophy,
@@ -28,12 +28,23 @@ import {
   MoreHorizontal,
   MonitorPlay,
   Target,
+  ShieldCheck,
+  UserCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { DefaultLoader } from "@/components/Spinner";
 import { InningDetails, MatchWithTeamAndOfficials } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { capitalize } from "lodash";
 
 const InfoCard = ({
   label,
@@ -263,6 +274,70 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
   );
 };
 
+const OfficialsModal = ({
+  officials,
+  onClose,
+  isOpen,
+}: {
+  officials: any;
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  if (!officials) return null;
+  return (
+    <Dialog onOpenChange={onClose} open={isOpen}>
+      <DialogContent className="bg-white backdrop-blur-md dark:bg-slate-950/80">
+        <DialogHeader>
+          <DialogTitle>
+            <div className="flex items-center gap-2 rounded-2xl p-3">
+              <h2 className="font-[poppins] text-xl font-black text-slate-900 uppercase italic dark:text-white">
+                Match Officials
+              </h2>
+              <Gavel className="h-6 w-6 text-white" />
+            </div>
+          </DialogTitle>
+          <DialogDescription className="text-[10px] font-black tracking-wider text-green-500 uppercase">
+            Authorized Personnel
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 pt-4">
+          {officials.map((official: any, idx: number) => (
+            <div
+              key={idx}
+              className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
+            >
+              <div className="flex items-center gap-4">
+                {official.role.includes("UMPIRE") ? (
+                  <ShieldCheck className="h-6 w-6" />
+                ) : (
+                  <UserCheck className="h-6 w-6" />
+                )}
+                <div>
+                  <h4 className="font-[poppins] text-base font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
+                    {official.name}
+                  </h4>
+                  <p className="font-[urbanist] text-xs font-bold text-green-500">
+                    {capitalize(official.role.replace("_", " "))}
+                  </p>
+                </div>
+              </div>
+              <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+            </div>
+          ))}
+        </div>
+        <DialogFooter>
+          <button
+            onClick={onClose}
+            className="w-full rounded-2xl bg-slate-900 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
+          >
+            Close Roster
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const MatchIdPage = ({}: MatchIdPageProps) => {
   const { id } = useParams();
 
@@ -275,6 +350,15 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     },
   });
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = () => {
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+  };
   console.log({ match });
 
   return (
@@ -356,7 +440,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     VS
                   </div>
                   <div className="mt-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 backdrop-blur-md">
-                    <span className="text-[10px] font-black tracking-[0.3em] text-white uppercase">
+                    <span className="font-[poppins] text-xs font-semibold tracking-wider text-white uppercase">
                       Scordo Match
                     </span>
                   </div>
@@ -385,10 +469,11 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
 
               {/* Match Title & Actions */}
               <div className="w-full max-w-4xl text-center">
-                <h1 className="mb-4 text-3xl font-black tracking-tighter uppercase italic md:text-5xl">
-                  {match.teamA.name} <span className="primary-heading pr-2">vs</span>
-                  {match.teamB.name}
-                </h1>
+                <div className="center mb-4 flex flex-col text-3xl font-black tracking-tighter uppercase italic md:text-5xl">
+                  <h1 className="text-start">{match.teamA.name}</h1>
+                  <span className="primary-heading pr-2 text-center">vs</span>
+                  <h1 className="text-end"> {match.teamB.name}</h1>
+                </div>
 
                 <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
                   <button className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-sans text-[10px] font-black tracking-widest text-slate-900 uppercase shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
@@ -424,13 +509,15 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     color="amber"
                     subValue="Match Not Started"
                   />
-                  <InfoCard
-                    label="Official Assigned"
-                    value={match.matchOfficials[0].name}
-                    icon={Gavel}
-                    color="purple"
-                    subValue={match.matchOfficials[0].role}
-                  />
+                  <div className="" onClick={handleOpen}>
+                    <InfoCard
+                      label="Official Assigned"
+                      value={"All Officials"}
+                      icon={Gavel}
+                      color="green"
+                      subValue={"See all officials list of the match"}
+                    />
+                  </div>
                 </div>
                 <div className="flex items-center justify-between px-4">
                   <h3 className="flex items-center gap-3 font-sans text-xl font-black tracking-tighter uppercase italic">
@@ -459,39 +546,13 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     </p>
                   </div>
                 )}
-                {/* Bento Details Grid */}
-              </div>
-
-              {/* Bottom Feed Placeholder */}
-              <div className="mt-12 w-full space-y-8">
-                <div className="flex items-center justify-between px-4">
-                  <h3 className="flex items-center gap-3 text-xl font-black tracking-tighter uppercase italic">
-                    <Clock className="text-indigo-500" /> Match{" "}
-                    <span className="text-indigo-500">Timeline</span>
-                  </h3>
-                  <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-                  <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
-                    UTC +5:30
-                  </span>
-                </div>
-
-                <div className="animate-in fade-in group relative overflow-hidden rounded-[3rem] border border-dashed border-slate-200 bg-white/40 p-12 text-center duration-1000 dark:border-white/10 dark:bg-slate-900/40">
-                  <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 transition-transform group-hover:scale-110 dark:bg-white/5">
-                    <Sword className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-                  </div>
-                  <h4 className="mb-2 text-xl font-black tracking-tight uppercase">
-                    Awaiting Toss Results
-                  </h4>
-                  <p className="mx-auto max-w-sm font-sans text-xs leading-relaxed font-bold tracking-widest text-slate-400 uppercase">
-                    The match engine is on standby. The live scoreboard and ball-by-ball feed will
-                    initialize once the toss decision is logged.
-                  </p>
-                </div>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <OfficialsModal isOpen={isOpen} officials={match?.matchOfficials} onClose={handleClose} />
     </div>
   );
 };
