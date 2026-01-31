@@ -255,13 +255,13 @@ model Match {
   teamB        Team        @relation("TeamB", fields: [teamBId], references: [id])
   tournament   Tournament? @relation("TournamentMatches", fields: [tournamentId], references: [id])
 
-  innings      Inning[]      @relation("MatchInnings")
-  venue        Address
-  tossWinner   String?
-  tossDecision String?
-  category     MatchCategory @default(others)
-  date         DateTime?
-  location     String?
+  innings       Inning[]       @relation("MatchInnings")
+  venue         Address
+  tossWinner    String?
+  tossDecision  String?
+  category      MatchCategory  @default(others)
+  date          DateTime?
+  location      String?
   requestStatus RequestStatus? @default(pending)
 
   status MatchStatus @default(not_started)
@@ -387,10 +387,10 @@ model MatchOfficial {
   matchId String @db.ObjectId
   userId  String @db.ObjectId
 
-  role OfficialRole
-
-  match Match @relation(fields: [matchId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
+  role  OfficialRole
+  name  String
+  match Match        @relation(fields: [matchId], references: [id])
+  user  User         @relation(fields: [userId], references: [id])
 
   @@unique([matchId, userId])
 }

@@ -73,7 +73,7 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
     match = await db.match.create({
       data: {
         category,
-        date,
+        date: new Date(date),
         location,
         overLimit,
         overs,
@@ -91,13 +91,16 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
         error: "Could not create match!",
       };
 
-    matchOfficial = await db.matchOfficial.createMany({
-      data: matchOfficials?.map((official: any) => ({
-        ...official,
-        matchId: match.id,
-      })),
-    });
+    if (matchOfficials && matchOfficials.length > 0) {
+      matchOfficial = await db.matchOfficial.createMany({
+        data: matchOfficials?.map((official: any) => ({
+          ...official,
+          matchId: match.id,
+        })),
+      });
+    }
   } catch (error) {
+    console.log({ error: error.message });
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
