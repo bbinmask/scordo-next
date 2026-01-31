@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 
 interface MatchIdPageProps {}
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Shield,
   Trophy,
@@ -352,7 +352,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full border-4 border-white bg-green-600 text-2xl font-black text-white italic shadow-xl shadow-green-500/30 md:h-24 md:w-24 md:text-4xl dark:border-slate-900">
+                  <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-green-600 text-2xl font-black text-white italic shadow-xl shadow-green-500/30 md:h-24 md:w-24 md:text-4xl">
                     VS
                   </div>
                   <div className="mt-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 backdrop-blur-md">

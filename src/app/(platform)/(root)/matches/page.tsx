@@ -14,7 +14,7 @@ const MatchCard = ({ match }: { match: any }) => {
   if (!match) return null;
 
   return (
-    <div className="group relative h-56 w-80 flex-shrink-0">
+    <div className="group relative h-56 w-80 flex-shrink-0 p-1">
       <div className="hover-card relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[2rem] p-6">
         {/* Visual Versus Header */}
         <div className="flex items-center justify-between gap-2">
@@ -29,7 +29,7 @@ const MatchCard = ({ match }: { match: any }) => {
           <div className="flex gap-2">
             <Link
               href={`/matches/${match.id}`}
-              className="rounded-xl bg-slate-100 p-2.5 text-slate-400 transition-all hover:text-emerald-500 dark:bg-white/5"
+              className="rounded-xl bg-slate-100 p-2.5 text-slate-400 transition-all hover:text-green-500 dark:bg-white/5"
             >
               <ArrowUpRight className="h-4 w-4" />
             </Link>
@@ -39,14 +39,14 @@ const MatchCard = ({ match }: { match: any }) => {
         {/* Match Info */}
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="rounded-md border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-black tracking-widest text-emerald-600 uppercase dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400">
+            <span className="rounded-md border border-green-100 bg-green-50 px-2 py-0.5 text-[9px] font-black tracking-widest text-green-600 uppercase dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400">
               {match.category.toUpperCase()}
             </span>
             <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase">
               • {match.overs} Overs
             </span>
           </div>
-          <h3 className="truncate font-[poppins] text-lg font-black tracking-tight text-slate-900 uppercase transition-colors group-hover:text-emerald-500 dark:text-white">
+          <h3 className="truncate font-[poppins] text-lg font-black tracking-tight text-slate-900 uppercase transition-colors group-hover:text-green-500 dark:text-white">
             {match.teamA.abbreviation}{" "}
             <span className="font-inter mx-1 text-green-800 dark:text-green-700">vs</span>{" "}
             {match.teamB.abbreviation}
@@ -66,13 +66,14 @@ const MatchCard = ({ match }: { match: any }) => {
               </span>
             </div>
           )}
-          <span className="inline-flex animate-pulse items-center gap-1 text-[9px] font-black tracking-widest text-green-500 uppercase italic">
+          <span className="inline-flex animate-pulse items-center gap-1 text-[9px] font-black text-green-500 uppercase italic">
             {match.status === "in_progress" ? (
               <>
-                <div className="h-1.5 w-1.5 rounded-full bg-red-500" /> Live Feed
+                <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                <span className="text-red-500">Live Feed</span>
               </>
             ) : (
-              "Initializing"
+              "Not Started"
             )}
           </span>
         </div>
@@ -108,7 +109,7 @@ const EmptyState = ({ type = "managed" }) => (
       <div className="animate-bounce rounded-3xl bg-slate-100 p-4 text-slate-400 duration-[3000ms] dark:bg-slate-800 dark:text-slate-600">
         <Sword className="h-10 w-10" />
       </div>
-      <div className="absolute -top-1 -right-1 rounded-full border-4 border-white bg-emerald-500 p-1 dark:border-slate-900">
+      <div className="absolute -top-1 -right-1 rounded-full border-4 border-white bg-green-500 p-1 dark:border-slate-900">
         <Activity className="h-3 w-3 text-white" />
       </div>
     </div>
@@ -124,7 +125,7 @@ const EmptyState = ({ type = "managed" }) => (
     </div>
     <Link
       href="/matches/create"
-      className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 hover:bg-emerald-700 active:scale-95"
+      className="flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-green-500/20 transition-all hover:scale-105 hover:bg-green-700 active:scale-95"
     >
       <PlusCircle className="h-3 w-3" /> Initialize Match
     </Link>
@@ -242,8 +243,6 @@ const MatchesPage = () => {
     },
   });
 
-  console.log({ matches, matchesAsOfficial });
-
   return (
     <div className={`font-sans transition-colors duration-500`}>
       <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
@@ -318,7 +317,7 @@ const MatchesPage = () => {
                     <Bell size={22} className="mr-3 text-green-500" />
                     Match Feed
                   </h2>
-                  <span className="rounded-lg bg-emerald-500 px-2 py-0.5 text-[10px] font-black text-white">
+                  <span className="rounded-lg bg-green-500 px-2 py-0.5 text-[10px] font-black text-white">
                     LIVE
                   </span>
                 </div>
