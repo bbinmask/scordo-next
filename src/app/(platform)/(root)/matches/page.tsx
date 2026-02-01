@@ -249,7 +249,7 @@ const MatchesPage = () => {
         <div className="mx-auto max-w-7xl px-6 pt-12">
           <div className="mb-12 flex items-center justify-between">
             <div>
-              <h1 className="text-5xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+              <h1 className="primary-heading pr-1 text-5xl font-black tracking-tighter uppercase italic">
                 Matches Dashboard
               </h1>
             </div>

@@ -34,6 +34,7 @@ import {
   UserCircle2,
   Plus,
   Minus,
+  Trash,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
@@ -365,7 +366,7 @@ const OfficialsModal = ({
         </DialogContent>
       </Dialog>
       <AddOfficialModal
-        isOpen={isAddingOfficial}
+        isOpen={true}
         onClose={() => setIsAddingOfficial(false)}
         players={players}
       />
@@ -426,13 +427,13 @@ const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) =
       <DialogContent className="">
         <DialogHeader>
           <DialogTitle>
-            <div className="font-inter flex items-center justify-between rounded-lg bg-gradient-to-br from-green-500/10 to-transparent p-4 italic">
+            <div className="font-inter flex items-center justify-between rounded-lg bg-gradient-to-br from-green-500/10 to-transparent p-2 italic">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-green-600 p-3 shadow-lg">
-                  <UserPlus className="h-6 w-6 text-white" />
+                <div className="rounded-lg bg-green-600 p-2 shadow-lg">
+                  <UserPlus className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+                  <h2 className="text-lg font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
                     Add New Official
                   </h2>
                 </div>
@@ -441,35 +442,9 @@ const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) =
           </DialogTitle>
           <DialogDescription />
         </DialogHeader>
-        <div className="space-y-6 p-8 pt-4 font-[poppins]">
-          <div>
-            <label className="mb-2 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
-              Select Role
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {["UMPIRE", "SCORER", "COMMENTATOR"].map((role) => (
-                <button
-                  key={role}
-                  onClick={() => setSelectedRole(role as OfficialRole)}
-                  className={`rounded-xl border px-4 py-2 text-[10px] font-bold tracking-tight uppercase transition-all ${
-                    selectedRole === role
-                      ? "border-green-600 bg-green-600 text-white shadow-lg shadow-green-500/20"
-                      : "border-slate-200 bg-slate-50 text-slate-500 hover:border-green-500/50 dark:border-white/10 dark:bg-white/5 dark:text-slate-400"
-                  }`}
-                >
-                  {role.replace("_", " ")}
-                </button>
-              ))}
-              <button
-                onClick={handleAdd}
-                className={`rounded-xl border border-green-600 bg-green-800 px-4 py-2 text-[10px] font-bold tracking-tight text-white uppercase shadow-lg shadow-green-500/20 transition-all`}
-              >
-                Add
-              </button>
-            </div>
-          </div>
-
-          <div className="relative">
+        <div className="w-full bg-slate-600 pb-[1px]" />
+        <div className="grid grid-cols-5 items-end gap-2 space-y-2 font-[poppins]">
+          <div className="col-span-2">
             <label className="mb-2 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
               Select a Player
             </label>
@@ -485,37 +460,62 @@ const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) =
               ))}
             </select>
           </div>
+          <div className="col-span-2">
+            <label className="mb-2 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              Select Role
+            </label>
+            <select
+              onChange={(e) => setSelectedRole(e.target.value as OfficialRole)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
+            >
+              <option>Select Role</option>
+              {["UMPIRE", "SCORER", "COMMENTATOR"].map((role) => (
+                <option className="" key={role} value={role}>
+                  {role}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={handleAdd}
+            className={`col-span-1 mb-2 rounded-xl bg-green-800 px-4 py-2 font-[urbanist] text-sm font-bold text-white focus-visible:ring-2 focus-visible:ring-green-400`}
+          >
+            Add
+          </button>
+        </div>
 
-          {/* Officials List */}
-          {matchOfficials.length > 0 && (
+        {/* Officials List */}
+        {matchOfficials.length > 0 && (
+          <>
+            <div className="w-full bg-slate-600 pb-[1px]" />
             <div className="hide_scrollbar max-h-48 space-y-2 overflow-y-auto pr-2">
               {matchOfficials.map((user) => (
                 <div
                   key={user.userId}
-                  className="group flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500 dark:border-white/5 dark:bg-white/5"
+                  className="group flex w-full items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-2 hover:border-green-500 dark:border-white/5 dark:bg-white/5"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition-colors group-hover:text-green-500 dark:border-white/10 dark:bg-slate-800">
-                      <UserCircle2 className="h-6 w-6" />
+                    <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition-colors group-hover:text-green-500 dark:border-white/10 dark:bg-slate-800">
+                      <UserCircle2 className="h-5 w-5" />
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-black tracking-tight text-slate-900 uppercase dark:text-white">
+                      <p className="text-xs font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
                         {user.name}
                       </p>
                     </div>
                   </div>
                   <button className="" onClick={() => handleRemove(user.userId)}>
-                    <Minus className="h-5 w-5 text-slate-300 transition-all group-hover:text-red-500" />
+                    <Trash className="h-5 w-5 text-slate-300 transition-all group-hover:text-red-500" />
                   </button>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-        <DialogFooter>
+          </>
+        )}
+        <div className="flex w-full items-center justify-between gap-8 px-2">
           {matchOfficials.length > 0 && (
             <button
-              className="w-full rounded-2xl bg-green-800 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
+              className="w-full rounded-2xl bg-green-800 px-4 py-2 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
               onClick={() => handleSubmit()}
             >
               Submit
@@ -523,11 +523,11 @@ const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) =
           )}
           <button
             onClick={onClose}
-            className="w-full rounded-2xl border border-slate-200 bg-white py-4 font-[poppins] text-xs font-semibold tracking-widest text-slate-500 uppercase transition-all hover:bg-slate-100 dark:border-white/10 dark:bg-slate-800 dark:text-slate-400"
+            className="mx-auto w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 font-[poppins] text-xs font-semibold tracking-widest text-slate-500 uppercase transition-all hover:bg-slate-100 dark:border-white/10 dark:bg-slate-800 dark:text-slate-400"
           >
             Cancel
           </button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
