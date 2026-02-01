@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 
 interface MatchIdPageProps {}
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Shield,
   Trophy,
@@ -280,11 +280,13 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
 const OfficialsModal = ({
   officials,
   onClose,
+  players,
   isOpen,
 }: {
-  officials: any;
+  officials: MatchOfficial[];
   isOpen: boolean;
   onClose: () => void;
+  players: PlayerWithUser[];
 }) => {
   const [isAddingOfficial, setIsAddingOfficial] = useState(false);
 
@@ -310,52 +312,58 @@ const OfficialsModal = ({
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
-            {officials.map((official: any, idx: number) => (
-              <div
-                key={idx}
-                className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
-              >
-                <div className="flex items-center gap-4">
-                  {official.role.includes("UMPIRE") ? (
-                    <ShieldCheck className="h-6 w-6" />
-                  ) : (
-                    <UserCheck className="h-6 w-6" />
-                  )}
-                  <div>
-                    <h4 className="font-[poppins] text-base font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
-                      {official.name}
-                    </h4>
-                    <p className="font-[urbanist] text-xs font-bold text-green-500">
-                      {capitalize(official.role.replace("_", " "))}
-                    </p>
+            {officials?.length === 0 ? (
+              <NotFoundParagraph
+                className="font-[poppins] font-bold uppercase"
+                description="No officials appointed"
+              />
+            ) : (
+              officials.map((official, idx) => (
+                <div
+                  key={idx}
+                  className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
+                >
+                  <div className="flex items-center gap-4">
+                    {official.role.includes("UMPIRE") ? (
+                      <ShieldCheck className="h-6 w-6" />
+                    ) : (
+                      <UserCheck className="h-6 w-6" />
+                    )}
+                    <div>
+                      <h4 className="font-[poppins] text-base font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
+                        {official.name}
+                      </h4>
+                      <p className="font-[urbanist] text-xs font-bold text-green-500">
+                        {capitalize(official.role.replace("_", " "))}
+                      </p>
+                    </div>
                   </div>
+                  <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                 </div>
-                <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-              </div>
-            ))}
+              ))
+            )}
           </div>
           <DialogFooter>
             <button
-              className="w-full rounded-2xl bg-green-800 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
+              className="w-full rounded-2xl bg-green-800 py-4 text-xs font-bold tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
               onClick={onOpen}
             >
               Add Official
             </button>
             <button
               onClick={onClose}
-              className="w-full rounded-2xl bg-slate-900 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-gray-500"
+              className="w-full rounded-2xl bg-slate-900 py-4 text-xs font-bold tracking-wide text-white uppercase transition-all active:scale-95 dark:bg-gray-500"
             >
-              Close Roster
+              Cancel
             </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
       <AddOfficialModal
-        isOpen={true}
-        onAdd={({}) => {}}
+        isOpen={isAddingOfficial}
         onClose={() => setIsAddingOfficial(false)}
         existingOfficials={officials}
-        players={[]}
+        players={players}
       />
     </>
   );
@@ -363,7 +371,6 @@ const OfficialsModal = ({
 
 interface AddOfficialModalProps {
   onClose: () => void;
-  onAdd: ({ userId, role, name }: { userId: string; role: string; name: string }) => void;
   isOpen: boolean;
   players: PlayerWithUser[];
   existingOfficials: MatchOfficial[];
@@ -371,7 +378,6 @@ interface AddOfficialModalProps {
 
 const AddOfficialModal = ({
   onClose,
-  onAdd,
   existingOfficials,
   isOpen,
   players,
@@ -425,17 +431,17 @@ const AddOfficialModal = ({
             <label className="mb-2 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
               Select a Player
             </label>
-            <div className="relative">
-              <select
-                onChange={(e) => setSelectedPlayer(e.target.value as any)}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-[poppins] text-xs font-semibold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
-              >
-                <option>Select a Player</option>
-                {players.map((pl) => (
-                  <option value={JSON.stringify(pl)}>{pl.user.name}</option>
-                ))}
-              </select>
-            </div>
+            <select
+              onChange={(e) => setSelectedPlayer(e.target.value as any)}
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
+            >
+              <option>Select a Player</option>
+              {players.map((pl) => (
+                <option className="" key={pl.userId} value={JSON.stringify(pl)}>
+                  {pl.user.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Existing Officials List */}
@@ -445,7 +451,7 @@ const AddOfficialModal = ({
                 <button
                   key={user.id}
                   onClick={() => {
-                    onAdd({ userId: user.id, name: user.name, role: selectedRole });
+                    // onAdd({ userId: user.id, name: user.name, role: selectedRole });
                     onClose();
                   }}
                   className="group flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500 dark:border-white/5 dark:bg-white/5"
@@ -470,13 +476,9 @@ const AddOfficialModal = ({
           {selectedPlayer && (
             <button
               className="w-full rounded-2xl bg-green-800 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
-              onClick={() =>
-                onAdd({
-                  name: selectedPlayer.user.name,
-                  role: selectedRole,
-                  userId: selectedPlayer.userId,
-                })
-              }
+              onClick={() => {
+                // onAdd(selectedPlayer.userId, selectedRole,)
+              }}
             >
               Add
             </button>
@@ -514,7 +516,20 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   const handleClose = () => {
     setIsOpen(false);
   };
-  console.log({ match });
+
+  const players: PlayerWithUser[] = useMemo(() => {
+    const teamA = match?.teamA.players || [];
+    const teamB = match?.teamB.players || [];
+
+    const teamAPlayers = [...teamA];
+    const teamBPlayers = [...teamB];
+
+    const uniquePlayers = Array.from(
+      new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
+    );
+
+    return uniquePlayers;
+  }, [match]);
 
   return (
     <div className={`font-sans transition-colors duration-500`}>
@@ -706,8 +721,12 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
           </div>
         </div>
       )}
-
-      <OfficialsModal isOpen={isOpen} officials={match?.matchOfficials} onClose={handleClose} />
+      <OfficialsModal
+        players={players || []}
+        isOpen={isOpen}
+        officials={match?.matchOfficials || []}
+        onClose={handleClose}
+      />
     </div>
   );
 };

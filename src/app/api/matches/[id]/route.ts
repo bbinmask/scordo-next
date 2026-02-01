@@ -6,16 +6,30 @@ import { NextResponse } from "next/server";
 export const GET = async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
-  console.log({ id });
-
   try {
     const match = await db.match.findUnique({
       where: {
         id,
       },
       include: {
-        teamA: true,
-        teamB: true,
+        teamA: {
+          include: {
+            players: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+        teamB: {
+          include: {
+            players: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
         matchOfficials: true,
       },
     });

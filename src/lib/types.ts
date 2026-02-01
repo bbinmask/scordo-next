@@ -60,8 +60,24 @@ const playerWithUser = Prisma.validator<Prisma.PlayerDefaultArgs>()({
 
 const matchWithTeamsAndOfficials = Prisma.validator<Prisma.MatchDefaultArgs>()({
   include: {
-    teamA: true,
-    teamB: true,
+    teamA: {
+      include: {
+        players: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    },
+    teamB: {
+      include: {
+        players: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    },
     matchOfficials: true,
   },
 });
