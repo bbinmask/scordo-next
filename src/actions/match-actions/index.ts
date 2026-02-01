@@ -1,9 +1,14 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { InputTypeForCreate, ReturnTypeForCreate } from "./types";
+import {
+  InputTypeForCreate,
+  InputTypeForOfficials,
+  ReturnTypeForCreate,
+  ReturnTypeForOfficials,
+} from "./types";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { CreateMatch } from "./schema";
+import { AddOfficials, CreateMatch } from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
 import { Match } from "@/generated/prisma";
@@ -111,4 +116,56 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
   };
 };
 
+const addOfficialsHandler = async (
+  data: InputTypeForOfficials
+): Promise<ReturnTypeForOfficials> => {
+  const { matchOfficials, matchId } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: ERROR_CODES.UNAUTHORIZED.message,
+    };
+
+  let matchOfficial, match;
+
+  try {
+    match = await db.match.findUnique({
+      where: {
+        id: matchId,
+      },
+    });
+
+    if (!match)
+      return {
+        error: "Match not found",
+      };
+
+    await db.matchOfficial.createMany({
+      data: matchOfficials.map((official) => ({
+        ...official,
+        matchId: matchId,
+      })),
+    });
+
+    matchOfficial = await db.matchOfficial.findMany({
+      where: {
+        matchId,
+      },
+    });
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
+  revalidatePath(`/matches/${matchId}`);
+
+  return {
+    data: matchOfficial,
+  };
+};
+
 export const createMatch = createSafeAction(CreateMatch, createMatchHandler);
+export const addOfficials = createSafeAction(AddOfficials, addOfficialsHandler);

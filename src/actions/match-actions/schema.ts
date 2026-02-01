@@ -27,3 +27,14 @@ export const CreateMatch = z.object({
     )
     .optional(),
 });
+
+export const AddOfficials = z.object({
+  matchOfficials: z.array(
+    z.object({
+      role: z.enum(["SCORER", "UMPIRE", "COMMENTATOR"]),
+      name: z.string({ message }),
+      userId: z.string({ message }),
+    })
+  ),
+  matchId: z.string({ message }),
+});
