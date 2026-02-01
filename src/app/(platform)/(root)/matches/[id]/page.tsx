@@ -1,6 +1,6 @@
 "use client";
 
-import { Inning, Match, MatchOfficial, Player } from "@/generated/prisma";
+import { OfficialRole, User } from "@/generated/prisma";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -33,6 +33,7 @@ import {
   UserPlus,
   UserCircle2,
   Plus,
+  Minus,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
@@ -48,6 +49,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { capitalize } from "lodash";
+import { useAction } from "@/hooks/useAction";
+import { addOfficials } from "@/actions/match-actions";
+import { toast } from "sonner";
 
 const InfoCard = ({
   label,
@@ -293,6 +297,7 @@ const OfficialsModal = ({
   const onOpen = () => {
     setIsAddingOfficial(true);
   };
+
   if (!officials) return null;
   return (
     <>
@@ -362,7 +367,6 @@ const OfficialsModal = ({
       <AddOfficialModal
         isOpen={isAddingOfficial}
         onClose={() => setIsAddingOfficial(false)}
-        existingOfficials={officials}
         players={players}
       />
     </>
@@ -373,17 +377,49 @@ interface AddOfficialModalProps {
   onClose: () => void;
   isOpen: boolean;
   players: PlayerWithUser[];
-  existingOfficials: MatchOfficial[];
 }
 
-const AddOfficialModal = ({
-  onClose,
-  existingOfficials,
-  isOpen,
-  players,
-}: AddOfficialModalProps) => {
-  const [selectedRole, setSelectedRole] = useState("MAIN_UMPIRE");
+type MatchOfficial = {
+  name: string;
+  role: OfficialRole;
+  matchId: string;
+  userId: string;
+};
+const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) => {
+  const [selectedRole, setSelectedRole] = useState<OfficialRole>("UMPIRE");
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithUser | null>(null);
+  const [matchOfficials, setMatchOfficials] = useState<MatchOfficial[]>([]);
+  const matchId = "";
+  const { execute } = useAction(addOfficials, {
+    onSuccess(data) {
+      toast.success("Official Added");
+    },
+    onError(error) {
+      toast.error(error);
+    },
+  });
+
+  const handleSubmit = () => {};
+  const handleAdd = () => {
+    if (!selectedPlayer?.userId || selectedRole.trim() === "") return;
+
+    if (matchOfficials.findIndex((official) => official.userId === selectedPlayer.userId) !== -1)
+      return;
+    setMatchOfficials((prev) => [
+      ...prev,
+      {
+        name: selectedPlayer?.user?.name,
+        matchId,
+        role: selectedRole as OfficialRole,
+        userId: selectedPlayer.userId,
+      },
+    ]);
+  };
+
+  const handleRemove = (userId: string) => {
+    const officials = matchOfficials.filter((official) => official.userId !== userId);
+    setMatchOfficials(officials);
+  };
 
   return (
     <Dialog onOpenChange={onClose} open={isOpen}>
@@ -414,7 +450,7 @@ const AddOfficialModal = ({
               {["UMPIRE", "SCORER", "COMMENTATOR"].map((role) => (
                 <button
                   key={role}
-                  onClick={() => setSelectedRole(role)}
+                  onClick={() => setSelectedRole(role as OfficialRole)}
                   className={`rounded-xl border px-4 py-2 text-[10px] font-bold tracking-tight uppercase transition-all ${
                     selectedRole === role
                       ? "border-green-600 bg-green-600 text-white shadow-lg shadow-green-500/20"
@@ -424,6 +460,12 @@ const AddOfficialModal = ({
                   {role.replace("_", " ")}
                 </button>
               ))}
+              <button
+                onClick={handleAdd}
+                className={`rounded-xl border border-green-600 bg-green-800 px-4 py-2 text-[10px] font-bold tracking-tight text-white uppercase shadow-lg shadow-green-500/20 transition-all`}
+              >
+                Add
+              </button>
             </div>
           </div>
 
@@ -432,7 +474,7 @@ const AddOfficialModal = ({
               Select a Player
             </label>
             <select
-              onChange={(e) => setSelectedPlayer(e.target.value as any)}
+              onChange={(e) => setSelectedPlayer(JSON.parse(e.target.value) as any)}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
             >
               <option>Select a Player</option>
@@ -444,16 +486,12 @@ const AddOfficialModal = ({
             </select>
           </div>
 
-          {/* Existing Officials List */}
-          {existingOfficials.length > 0 && (
+          {/* Officials List */}
+          {matchOfficials.length > 0 && (
             <div className="hide_scrollbar max-h-48 space-y-2 overflow-y-auto pr-2">
-              {existingOfficials.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => {
-                    // onAdd({ userId: user.id, name: user.name, role: selectedRole });
-                    onClose();
-                  }}
+              {matchOfficials.map((user) => (
+                <div
+                  key={user.userId}
                   className="group flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500 dark:border-white/5 dark:bg-white/5"
                 >
                   <div className="flex items-center gap-3">
@@ -466,21 +504,21 @@ const AddOfficialModal = ({
                       </p>
                     </div>
                   </div>
-                  <Plus className="h-5 w-5 text-slate-300 transition-all group-hover:text-green-500" />
-                </button>
+                  <button className="" onClick={() => handleRemove(user.userId)}>
+                    <Minus className="h-5 w-5 text-slate-300 transition-all group-hover:text-red-500" />
+                  </button>
+                </div>
               ))}
             </div>
           )}
         </div>
         <DialogFooter>
-          {selectedPlayer && (
+          {matchOfficials.length > 0 && (
             <button
               className="w-full rounded-2xl bg-green-800 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
-              onClick={() => {
-                // onAdd(selectedPlayer.userId, selectedRole,)
-              }}
+              onClick={() => handleSubmit()}
             >
-              Add
+              Submit
             </button>
           )}
           <button
