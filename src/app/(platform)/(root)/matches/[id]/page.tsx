@@ -366,7 +366,7 @@ const OfficialsModal = ({
         </DialogContent>
       </Dialog>
       <AddOfficialModal
-        isOpen={true}
+        isOpen={isAddingOfficial}
         onClose={() => setIsAddingOfficial(false)}
         players={players}
       />
@@ -562,11 +562,19 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     const teamAPlayers = [...teamA];
     const teamBPlayers = [...teamB];
 
-    const uniquePlayers = Array.from(
-      new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
-    );
-
-    return uniquePlayers;
+    let uniquePlayers;
+    if (!match || !match?.matchOfficials || match?.matchOfficials.length === 0) {
+      uniquePlayers = Array.from(
+        new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
+      );
+    } else {
+      uniquePlayers = Array.from(
+        new Map(
+          [...teamAPlayers, ...teamBPlayers, match.matchOfficials].map((p) => [p.userId, p])
+        ).values()
+      );
+    }
+    return uniquePlayers as PlayerWithUser[];
   }, [match]);
 
   return (
