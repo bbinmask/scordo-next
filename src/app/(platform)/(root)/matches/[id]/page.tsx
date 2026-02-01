@@ -1,6 +1,6 @@
 "use client";
 
-import { Inning, Match } from "@/generated/prisma";
+import { Inning, Match, MatchOfficial, Player } from "@/generated/prisma";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -30,11 +30,14 @@ import {
   Target,
   ShieldCheck,
   UserCheck,
+  UserPlus,
+  UserCircle2,
+  Plus,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { DefaultLoader } from "@/components/Spinner";
-import { InningDetails, MatchWithTeamAndOfficials } from "@/lib/types";
+import { InningDetails, MatchWithTeamAndOfficials, PlayerWithUser } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
@@ -92,7 +95,7 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
 
         <div className="relative z-10 flex flex-col items-end justify-between gap-6 md:flex-row">
           <div>
-            <p className="mb-2 text-xs font-black tracking-[0.2em] text-emerald-500 uppercase">
+            <p className="mb-2 text-xs font-black tracking-[0.2em] text-green-500 uppercase">
               Current Innings: {inning.battingTeam.name}
             </p>
             <div className="flex items-baseline gap-4">
@@ -120,7 +123,7 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
                     ball === "W"
                       ? "border-red-600 bg-red-500 text-white"
                       : ball === 4 || ball === 6
-                        ? "border-emerald-600 bg-emerald-500 text-white"
+                        ? "border-green-600 bg-green-500 text-white"
                         : "border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
                   }`}
                 >
@@ -137,7 +140,7 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
         <div className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-slate-900">
           <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-white/5">
             <h3 className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
-              <Target className="h-4 w-4 text-emerald-500" /> Batting
+              <Target className="h-4 w-4 text-green-500" /> Batting
             </h3>
             <span className="text-[10px] font-bold text-slate-400">{inning.battingTeam.name}</span>
           </div>
@@ -165,14 +168,14 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
                     striker: false,
                   },
                 ].map((player, i) => (
-                  <tr key={i} className={`${player.striker ? "bg-emerald-500/5" : ""}`}>
+                  <tr key={i} className={`${player.striker ? "bg-green-500/5" : ""}`}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-black tracking-tight text-slate-900 uppercase dark:text-white">
                           {player.name}
                         </span>
                         {player.striker && (
-                          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                          <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                         )}
                       </div>
                     </td>
@@ -188,7 +191,7 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
                     <td className="px-4 py-4 text-center text-xs font-bold text-slate-500">
                       {player.sixes}
                     </td>
-                    <td className="px-4 py-4 text-center text-[10px] font-black text-indigo-500 italic">
+                    <td className="px-4 py-4 text-center text-[10px] font-black text-green-500 italic">
                       {((player.runs / player.balls) * 100).toFixed(1)}
                     </td>
                   </tr>
@@ -202,7 +205,7 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
         <div className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-slate-900">
           <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-white/5">
             <h3 className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
-              <Flame className="h-4 w-4 text-indigo-500" /> Bowling
+              <Flame className="h-4 w-4 text-green-500" /> Bowling
             </h3>
             <span className="text-[10px] font-bold text-slate-400">{inning.bowlingTeam.name}</span>
           </div>
@@ -237,14 +240,14 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
                     current: false,
                   },
                 ].map((player, i) => (
-                  <tr key={i} className={`${player.current ? "bg-indigo-500/5" : ""}`}>
+                  <tr key={i} className={`${player.current ? "bg-green-500/5" : ""}`}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-black tracking-tight text-slate-900 uppercase dark:text-white">
                           {player.name}
                         </span>
                         {player.current && (
-                          <Activity className="h-3 w-3 animate-pulse text-indigo-500" />
+                          <Activity className="h-3 w-3 animate-pulse text-green-500" />
                         )}
                       </div>
                     </td>
@@ -257,7 +260,7 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
                     <td className="px-4 py-4 text-center text-xs font-bold text-slate-500">
                       {player.runs}
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-black text-emerald-500">
+                    <td className="px-4 py-4 text-center text-xs font-black text-green-500">
                       {player.wickets}
                     </td>
                     <td className="px-4 py-4 text-center text-[10px] font-black text-slate-400">
@@ -283,54 +286,206 @@ const OfficialsModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const [isAddingOfficial, setIsAddingOfficial] = useState(false);
+
+  const onOpen = () => {
+    setIsAddingOfficial(true);
+  };
   if (!officials) return null;
   return (
+    <>
+      <Dialog onOpenChange={onClose} open={isOpen}>
+        <DialogContent className="bg-white backdrop-blur-md dark:bg-slate-950/80">
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2 rounded-2xl p-3">
+                <h2 className="font-[poppins] text-xl font-black text-slate-900 uppercase italic dark:text-white">
+                  Match Officials
+                </h2>
+                <Gavel className="h-6 w-6 text-white" />
+              </div>
+            </DialogTitle>
+            <DialogDescription className="text-[10px] font-black tracking-wider text-green-500 uppercase">
+              Authorized Personnel
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            {officials.map((official: any, idx: number) => (
+              <div
+                key={idx}
+                className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
+              >
+                <div className="flex items-center gap-4">
+                  {official.role.includes("UMPIRE") ? (
+                    <ShieldCheck className="h-6 w-6" />
+                  ) : (
+                    <UserCheck className="h-6 w-6" />
+                  )}
+                  <div>
+                    <h4 className="font-[poppins] text-base font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
+                      {official.name}
+                    </h4>
+                    <p className="font-[urbanist] text-xs font-bold text-green-500">
+                      {capitalize(official.role.replace("_", " "))}
+                    </p>
+                  </div>
+                </div>
+                <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <button
+              className="w-full rounded-2xl bg-green-800 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
+              onClick={onOpen}
+            >
+              Add Official
+            </button>
+            <button
+              onClick={onClose}
+              className="w-full rounded-2xl bg-slate-900 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-gray-500"
+            >
+              Close Roster
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <AddOfficialModal
+        isOpen={true}
+        onAdd={({}) => {}}
+        onClose={() => setIsAddingOfficial(false)}
+        existingOfficials={officials}
+        players={[]}
+      />
+    </>
+  );
+};
+
+interface AddOfficialModalProps {
+  onClose: () => void;
+  onAdd: ({ userId, role, name }: { userId: string; role: string; name: string }) => void;
+  isOpen: boolean;
+  players: PlayerWithUser[];
+  existingOfficials: MatchOfficial[];
+}
+
+const AddOfficialModal = ({
+  onClose,
+  onAdd,
+  existingOfficials,
+  isOpen,
+  players,
+}: AddOfficialModalProps) => {
+  const [selectedRole, setSelectedRole] = useState("MAIN_UMPIRE");
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithUser | null>(null);
+
+  return (
     <Dialog onOpenChange={onClose} open={isOpen}>
-      <DialogContent className="bg-white backdrop-blur-md dark:bg-slate-950/80">
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle>
-            <div className="flex items-center gap-2 rounded-2xl p-3">
-              <h2 className="font-[poppins] text-xl font-black text-slate-900 uppercase italic dark:text-white">
-                Match Officials
-              </h2>
-              <Gavel className="h-6 w-6 text-white" />
-            </div>
-          </DialogTitle>
-          <DialogDescription className="text-[10px] font-black tracking-wider text-green-500 uppercase">
-            Authorized Personnel
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 pt-4">
-          {officials.map((official: any, idx: number) => (
-            <div
-              key={idx}
-              className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
-            >
-              <div className="flex items-center gap-4">
-                {official.role.includes("UMPIRE") ? (
-                  <ShieldCheck className="h-6 w-6" />
-                ) : (
-                  <UserCheck className="h-6 w-6" />
-                )}
+            <div className="font-inter flex items-center justify-between rounded-lg bg-gradient-to-br from-green-500/10 to-transparent p-4 italic">
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl bg-green-600 p-3 shadow-lg">
+                  <UserPlus className="h-6 w-6 text-white" />
+                </div>
                 <div>
-                  <h4 className="font-[poppins] text-base font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
-                    {official.name}
-                  </h4>
-                  <p className="font-[urbanist] text-xs font-bold text-green-500">
-                    {capitalize(official.role.replace("_", " "))}
-                  </p>
+                  <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+                    Add New Official
+                  </h2>
                 </div>
               </div>
-              <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
             </div>
-          ))}
+          </DialogTitle>
+          <DialogDescription />
+        </DialogHeader>
+        <div className="space-y-6 p-8 pt-4 font-[poppins]">
+          <div>
+            <label className="mb-2 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              Select Role
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {["UMPIRE", "SCORER", "COMMENTATOR"].map((role) => (
+                <button
+                  key={role}
+                  onClick={() => setSelectedRole(role)}
+                  className={`rounded-xl border px-4 py-2 text-[10px] font-bold tracking-tight uppercase transition-all ${
+                    selectedRole === role
+                      ? "border-green-600 bg-green-600 text-white shadow-lg shadow-green-500/20"
+                      : "border-slate-200 bg-slate-50 text-slate-500 hover:border-green-500/50 dark:border-white/10 dark:bg-white/5 dark:text-slate-400"
+                  }`}
+                >
+                  {role.replace("_", " ")}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative">
+            <label className="mb-2 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+              Select a Player
+            </label>
+            <div className="relative">
+              <select
+                onChange={(e) => setSelectedPlayer(e.target.value as any)}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-[poppins] text-xs font-semibold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
+              >
+                <option>Select a Player</option>
+                {players.map((pl) => (
+                  <option value={JSON.stringify(pl)}>{pl.user.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Existing Officials List */}
+          {existingOfficials.length > 0 && (
+            <div className="hide_scrollbar max-h-48 space-y-2 overflow-y-auto pr-2">
+              {existingOfficials.map((user) => (
+                <button
+                  key={user.id}
+                  onClick={() => {
+                    onAdd({ userId: user.id, name: user.name, role: selectedRole });
+                    onClose();
+                  }}
+                  className="group flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500 dark:border-white/5 dark:bg-white/5"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition-colors group-hover:text-green-500 dark:border-white/10 dark:bg-slate-800">
+                      <UserCircle2 className="h-6 w-6" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-black tracking-tight text-slate-900 uppercase dark:text-white">
+                        {user.name}
+                      </p>
+                    </div>
+                  </div>
+                  <Plus className="h-5 w-5 text-slate-300 transition-all group-hover:text-green-500" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <DialogFooter>
+          {selectedPlayer && (
+            <button
+              className="w-full rounded-2xl bg-green-800 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
+              onClick={() =>
+                onAdd({
+                  name: selectedPlayer.user.name,
+                  role: selectedRole,
+                  userId: selectedPlayer.userId,
+                })
+              }
+            >
+              Add
+            </button>
+          )}
           <button
             onClick={onClose}
-            className="w-full rounded-2xl bg-slate-900 py-4 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
+            className="w-full rounded-2xl border border-slate-200 bg-white py-4 font-[poppins] text-xs font-semibold tracking-widest text-slate-500 uppercase transition-all hover:bg-slate-100 dark:border-white/10 dark:bg-slate-800 dark:text-slate-400"
           >
-            Close Roster
+            Cancel
           </button>
         </DialogFooter>
       </DialogContent>
@@ -387,7 +542,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     alt="Team A Banner"
                   />
                 ) : (
-                  <div className="h-full w-full bg-gradient-to-br from-blue-900 via-indigo-950 to-slate-900 opacity-60" />
+                  <div className="h-full w-full bg-gradient-to-br from-blue-900 via-green-950 to-slate-900 opacity-60" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-transparent to-transparent" />
               </div>
@@ -436,7 +591,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                 </div>
 
                 <div className="flex flex-col items-center">
-                  <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-green-600 text-2xl font-black text-white italic shadow-xl shadow-green-500/30 md:h-24 md:w-24 md:text-4xl">
+                  <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-green-600 text-2xl font-black text-white italic shadow-xl shadow-green-500/30 hover:animate-none md:h-24 md:w-24 md:text-4xl">
                     VS
                   </div>
                   <div className="mt-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 backdrop-blur-md">
@@ -492,7 +647,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     label="Stadium Venue"
                     value={match.location || "TBD"}
                     icon={MapPin}
-                    color="emerald"
+                    color="green"
                     subValue={`${match.venue.city}, ${match.venue.country}`}
                   />
                   <InfoCard
