@@ -362,7 +362,21 @@ const CreateMatchForm: React.FC = () => {
                         </div>
                       </div>
                     </div>
-
+                    <div>
+                      <label className="mb-1 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                        Player Limit
+                      </label>
+                      <div className="relative">
+                        <Trophy className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="number"
+                          {...register("playerLimit", { required: "Player limit is required" })}
+                          name="playerLimit"
+                          placeholder="Enter limit of players in both team"
+                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pr-4 pl-11 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 dark:border-white/10 dark:bg-slate-950"
+                        />
+                      </div>
+                    </div>
                     <div>
                       <label className="mb-1 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
                         Tournament Association (Optional)

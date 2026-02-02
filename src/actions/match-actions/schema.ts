@@ -11,6 +11,7 @@ export const CreateMatch = z.object({
     state: z.string({ message }),
     country: z.string({ message }),
   }),
+  playerLimit: z.number({ message }),
   tournamentId: z.string({ message }).optional(),
   tossWinner: z.string({ message }).optional(),
   tossDecision: z.string({ message }).optional(),

@@ -95,7 +95,7 @@ const CreateMatchCard = () => (
       match.
     </p>
     <Link
-      href={"/teams/create"}
+      href={"/matches/create"}
       className="ml-10 inline-block rounded-2xl bg-white px-6 py-3 font-[poppins] text-xs font-bold text-green-900 uppercase shadow-lg hover:bg-green-50"
     >
       Create a match
