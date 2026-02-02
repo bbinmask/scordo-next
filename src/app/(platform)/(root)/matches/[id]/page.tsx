@@ -1,12 +1,9 @@
 "use client";
 
-import { OfficialRole, User } from "@/generated/prisma";
-import { useQuery } from "@tanstack/react-query";
+import { OfficialRole } from "@/generated/prisma";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "next/navigation";
-
-interface MatchIdPageProps {}
-
 import React, { useMemo, useState } from "react";
 import {
   Shield,
@@ -54,19 +51,30 @@ import { useAction } from "@/hooks/useAction";
 import { addOfficials } from "@/actions/match-actions";
 import { toast } from "sonner";
 
-const InfoCard = ({
-  label,
-  value,
-  icon: Icon,
-  color = "green",
-  subValue = "",
-}: {
+interface MatchIdPageProps {}
+
+interface InfoCardProps {
   label: string;
   value: string;
   icon: LucideIcon;
   color: string;
   subValue: string;
-}) => (
+}
+
+interface AddOfficialModalProps {
+  onClose: () => void;
+  isOpen: boolean;
+  players: PlayerWithUser[];
+  onSubmit: (matchOfficials: MatchOfficial[]) => void;
+}
+
+type MatchOfficial = {
+  name: string;
+  role: OfficialRole;
+  userId: string;
+};
+
+const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: InfoCardProps) => (
   <div className="group hover-card relative overflow-hidden rounded-3xl p-6">
     <div className="relative z-10">
       <div
@@ -287,11 +295,13 @@ const OfficialsModal = ({
   onClose,
   players,
   isOpen,
+  onSubmit,
 }: {
   officials: MatchOfficial[];
   isOpen: boolean;
   onClose: () => void;
   players: PlayerWithUser[];
+  onSubmit: (matchOffcials: MatchOfficial[]) => void;
 }) => {
   const [isAddingOfficial, setIsAddingOfficial] = useState(false);
 
@@ -304,20 +314,20 @@ const OfficialsModal = ({
     <>
       <Dialog onOpenChange={onClose} open={isOpen}>
         <DialogContent className="bg-white backdrop-blur-md dark:bg-slate-950/80">
-          <DialogHeader>
+          <DialogHeader className="px-3">
             <DialogTitle>
-              <div className="flex items-center gap-2 rounded-2xl p-3">
+              <div className="flex items-center gap-2 rounded-2xl">
                 <h2 className="font-[poppins] text-xl font-black text-slate-900 uppercase italic dark:text-white">
                   Match Officials
                 </h2>
                 <Gavel className="h-6 w-6 text-white" />
               </div>
             </DialogTitle>
-            <DialogDescription className="text-[10px] font-black tracking-wider text-green-500 uppercase">
+            <DialogDescription className="text-left text-[10px] font-black tracking-wider text-green-500 uppercase">
               Authorized Personnel
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
+          <div className="max-h-72 space-y-4 pt-4">
             {officials?.length === 0 ? (
               <NotFoundParagraph
                 className="font-[poppins] font-bold uppercase"
@@ -327,19 +337,19 @@ const OfficialsModal = ({
               officials.map((official, idx) => (
                 <div
                   key={idx}
-                  className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
+                  className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-2 transition-all hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
                 >
                   <div className="flex items-center gap-4">
                     {official.role.includes("UMPIRE") ? (
-                      <ShieldCheck className="h-6 w-6" />
+                      <ShieldCheck className="h-4 w-4" />
                     ) : (
-                      <UserCheck className="h-6 w-6" />
+                      <UserCheck className="h-4 w-4" />
                     )}
                     <div>
-                      <h4 className="font-[poppins] text-base font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
+                      <h4 className="font-[poppins] text-sm font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
                         {official.name}
                       </h4>
-                      <p className="font-[urbanist] text-xs font-bold text-green-500">
+                      <p className="font-[urbanist] text-[10px] font-bold text-green-500">
                         {capitalize(official.role.replace("_", " "))}
                       </p>
                     </div>
@@ -349,10 +359,15 @@ const OfficialsModal = ({
               ))
             )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="grid grid-cols-2 items-center gap-8">
             <button
               className="w-full rounded-2xl bg-green-800 py-4 text-xs font-bold tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
-              onClick={onOpen}
+              onClick={() => {
+                if (players.length === 0) {
+                  toast.error("No players left to appointed");
+                  onClose();
+                } else onOpen();
+              }}
             >
               Add Official
             </button>
@@ -366,6 +381,7 @@ const OfficialsModal = ({
         </DialogContent>
       </Dialog>
       <AddOfficialModal
+        onSubmit={onSubmit}
         isOpen={isAddingOfficial}
         onClose={() => setIsAddingOfficial(false)}
         players={players}
@@ -374,43 +390,18 @@ const OfficialsModal = ({
   );
 };
 
-interface AddOfficialModalProps {
-  onClose: () => void;
-  isOpen: boolean;
-  players: PlayerWithUser[];
-}
-
-type MatchOfficial = {
-  name: string;
-  role: OfficialRole;
-  matchId: string;
-  userId: string;
-};
-const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) => {
+const AddOfficialModal = ({ onClose, onSubmit, isOpen, players }: AddOfficialModalProps) => {
   const [selectedRole, setSelectedRole] = useState<OfficialRole>("UMPIRE");
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithUser | null>(null);
   const [matchOfficials, setMatchOfficials] = useState<MatchOfficial[]>([]);
-  const matchId = "";
-  const { execute } = useAction(addOfficials, {
-    onSuccess(data) {
-      toast.success("Official Added");
-    },
-    onError(error) {
-      toast.error(error);
-    },
-  });
 
-  const handleSubmit = () => {};
   const handleAdd = () => {
     if (!selectedPlayer?.userId || selectedRole.trim() === "") return;
 
-    if (matchOfficials.findIndex((official) => official.userId === selectedPlayer.userId) !== -1)
-      return;
     setMatchOfficials((prev) => [
       ...prev,
       {
         name: selectedPlayer?.user?.name,
-        matchId,
         role: selectedRole as OfficialRole,
         userId: selectedPlayer.userId,
       },
@@ -452,12 +443,14 @@ const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) =
               onChange={(e) => setSelectedPlayer(JSON.parse(e.target.value) as any)}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
             >
-              <option>Select a Player</option>
-              {players.map((pl) => (
-                <option className="" key={pl.userId} value={JSON.stringify(pl)}>
-                  {pl.user.name}
-                </option>
-              ))}
+              <option value={""}>Select a Player</option>
+              {players
+                .filter((pl) => !matchOfficials.some((u) => u.userId === pl.userId))
+                .map((pl) => (
+                  <option className="" key={pl.userId} value={JSON.stringify(pl)}>
+                    {pl.user.name}
+                  </option>
+                ))}
             </select>
           </div>
           <div className="col-span-2">
@@ -468,7 +461,7 @@ const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) =
               onChange={(e) => setSelectedRole(e.target.value as OfficialRole)}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
             >
-              <option>Select Role</option>
+              <option value={""}>Select Role</option>
               {["UMPIRE", "SCORER", "COMMENTATOR"].map((role) => (
                 <option className="" key={role} value={role}>
                   {role}
@@ -516,7 +509,10 @@ const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) =
           {matchOfficials.length > 0 && (
             <button
               className="w-full rounded-2xl bg-green-800 px-4 py-2 text-xs font-black tracking-wide text-white uppercase shadow-lg shadow-green-500/20 transition-all active:scale-95 dark:bg-green-600"
-              onClick={() => handleSubmit()}
+              onClick={() => {
+                onSubmit(matchOfficials);
+                onClose();
+              }}
             >
               Submit
             </button>
@@ -535,7 +531,18 @@ const AddOfficialModal = ({ onClose, isOpen, players }: AddOfficialModalProps) =
 
 const MatchIdPage = ({}: MatchIdPageProps) => {
   const { id } = useParams();
+  const queryClient = useQueryClient();
 
+  const { execute } = useAction(addOfficials, {
+    onSuccess(data) {
+      toast.success("Officials Added");
+      queryClient.invalidateQueries({ queryKey: ["match", id] });
+      handleClose();
+    },
+    onError(error) {
+      toast.error(error);
+    },
+  });
   const { data: match, isLoading } = useQuery<MatchWithTeamAndOfficials>({
     queryKey: ["match", id],
     queryFn: async () => {
@@ -555,6 +562,12 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     setIsOpen(false);
   };
 
+  const handleAddOfficial = (matchOfficials: MatchOfficial[]) => {
+    if (!match) return;
+
+    execute({ matchId: match.id, matchOfficials });
+  };
+
   const players: PlayerWithUser[] = useMemo(() => {
     const teamAPlayers = match?.teamA.players || [];
     const teamBPlayers = match?.teamB.players || [];
@@ -562,8 +575,6 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     const uniquePlayers = Array.from(
       new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
     ).filter((pl) => !match?.matchOfficials.some((official) => official.userId === pl.userId));
-
-    console.log({ teamAPlayers, teamBPlayers, uniquePlayers });
 
     return uniquePlayers as PlayerWithUser[];
   }, [match]);
@@ -733,7 +744,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   </h3>
                   <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
                   <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
-                    Powered by Scordo Engine
+                    Powered by Scordo
                   </span>
                 </div>
                 {/* Conditional Scorecard rendering */}
@@ -759,6 +770,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
         </div>
       )}
       <OfficialsModal
+        onSubmit={handleAddOfficial}
         players={players || []}
         isOpen={isOpen}
         officials={match?.matchOfficials || []}

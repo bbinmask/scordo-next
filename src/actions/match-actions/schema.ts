@@ -38,3 +38,7 @@ export const AddOfficials = z.object({
   ),
   matchId: z.string({ message }),
 });
+
+export const RemoveOfficial = z.object({
+  id: z.string({ message }),
+});

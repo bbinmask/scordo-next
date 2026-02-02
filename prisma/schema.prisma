@@ -181,6 +181,8 @@ model User {
   updatedAt           DateTime             @updatedAt
   matchOfficials      MatchOfficial[]
   tournamentOfficials TournamentOfficial[]
+  organizedMatches Match[] @relation("MatchOrganizer")
+
 }
 
 model Friendship {
@@ -254,7 +256,7 @@ model Match {
   teamA        Team        @relation("TeamA", fields: [teamAId], references: [id])
   teamB        Team        @relation("TeamB", fields: [teamBId], references: [id])
   tournament   Tournament? @relation("TournamentMatches", fields: [tournamentId], references: [id])
-
+  playerLimit   Int
   innings       Inning[]       @relation("MatchInnings")
   venue         Address
   tossWinner    String?
@@ -263,13 +265,19 @@ model Match {
   date          DateTime?
   location      String?
   requestStatus RequestStatus? @default(pending)
+  organizerId String @db.ObjectId
+  organizer   User   @relation("MatchOrganizer", fields: [organizerId], references: [id])
+
 
   status MatchStatus @default(not_started)
   result String?
-
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   matchOfficials MatchOfficial[]
+
+  @@index([teamAId])
+  @@index([teamBId])
+
 }
 
 model Inning {
@@ -287,13 +295,15 @@ model Inning {
   overs   Int @default(0)
   balls   Int @default(0)
 
-  currentStrikerId    String? @unique @db.ObjectId
-  currentNonStrikerId String? @unique @db.ObjectId
-  currentBowlerId     String? @unique @db.ObjectId
+  currentStrikerId    String? @db.ObjectId
+  currentNonStrikerId String? @db.ObjectId
+  currentBowlerId     String? @db.ObjectId
 
-  currentStriker    Player? @relation("CurrentStriker", fields: [currentStrikerId], references: [id])
-  currentNonStriker Player? @relation("CurrentNonStriker", fields: [currentNonStrikerId], references: [id])
-  currentBowler     Player? @relation("CurrentBowler", fields: [currentBowlerId], references: [id])
+
+  currentStriker    Player? @relation("StrikerInnings", fields: [currentStrikerId], references: [id])
+  currentNonStriker Player? @relation("NonStrikerInnings", fields: [currentNonStrikerId], references: [id])
+  currentBowler     Player? @relation("BowlerInnings", fields: [currentBowlerId], references: [id])
+  
 
   ballsData     Ball[]          @relation("InningBalls")
   InningBatting InningBatting[] @relation("InningBatsmenStats")
@@ -308,9 +318,11 @@ model Player {
   userId String @db.ObjectId
   teamId String @db.ObjectId
 
+  /// Relations
   user User @relation("UserPlayerEntries", fields: [userId], references: [id])
   team Team @relation("TeamPlayers", fields: [teamId], references: [id])
 
+  /// Stats Relations
   inningsBatting InningBatting[] @relation("PlayerBattingStats")
   inningsBowling InningBowling[] @relation("PlayerBowlingStats")
 
@@ -318,9 +330,17 @@ model Player {
   ballsBowled  Ball[] @relation("Bowler")
   ballsFielded Ball[] @relation("Fielder")
 
-  inningAsStriker    Inning? @relation("CurrentStriker")
-  inningAsNonStriker Inning? @relation("CurrentNonStriker")
-  inningAsBowler     Inning? @relation("CurrentBowler")
+  /// Current role in innings (many innings can reference same player)
+  strikerInnings    Inning[] @relation("StrikerInnings")
+  nonStrikerInnings Inning[] @relation("NonStrikerInnings")
+  bowlerInnings     Inning[] @relation("BowlerInnings")
+
+  /// Constraints
+  @@unique([userId, teamId]) // prevents same user joining same team twice
+
+  /// Tracking (VERY IMPORTANT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model InningBatting {

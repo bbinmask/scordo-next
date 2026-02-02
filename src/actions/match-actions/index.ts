@@ -4,11 +4,13 @@ import { db } from "@/lib/db";
 import {
   InputTypeForCreate,
   InputTypeForOfficials,
+  InputTypeForRemove,
   ReturnTypeForCreate,
   ReturnTypeForOfficials,
+  ReturnTypeForRemove,
 } from "./types";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { AddOfficials, CreateMatch } from "./schema";
+import { AddOfficials, CreateMatch, RemoveOfficial } from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
 import { Match } from "@/generated/prisma";
@@ -142,6 +144,17 @@ const addOfficialsHandler = async (
         error: "Match not found",
       };
 
+    matchOfficial = await db.matchOfficial.findMany({
+      where: {
+        matchId,
+      },
+    });
+
+    if (matchOfficial.length >= 5)
+      return {
+        error: "Only 5 officials are allowed!",
+      };
+
     await db.matchOfficial.createMany({
       data: matchOfficials.map((official) => ({
         ...official,
@@ -167,5 +180,14 @@ const addOfficialsHandler = async (
   };
 };
 
+const removeOfficialHandler = async (data: InputTypeForRemove): Promise<ReturnTypeForRemove> => {
+  const user = await currentUser();
+
+  return {
+    data: true,
+  };
+};
+
 export const createMatch = createSafeAction(CreateMatch, createMatchHandler);
 export const addOfficials = createSafeAction(AddOfficials, addOfficialsHandler);
+export const removeOfficial = createSafeAction(RemoveOfficial, removeOfficialHandler);
