@@ -556,24 +556,15 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   };
 
   const players: PlayerWithUser[] = useMemo(() => {
-    const teamA = match?.teamA.players || [];
-    const teamB = match?.teamB.players || [];
+    const teamAPlayers = match?.teamA.players || [];
+    const teamBPlayers = match?.teamB.players || [];
 
-    const teamAPlayers = [...teamA];
-    const teamBPlayers = [...teamB];
+    const uniquePlayers = Array.from(
+      new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
+    ).filter((pl) => !match?.matchOfficials.some((official) => official.userId === pl.userId));
 
-    let uniquePlayers;
-    if (!match || !match?.matchOfficials || match?.matchOfficials.length === 0) {
-      uniquePlayers = Array.from(
-        new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
-      );
-    } else {
-      uniquePlayers = Array.from(
-        new Map(
-          [...teamAPlayers, ...teamBPlayers, match.matchOfficials].map((p) => [p.userId, p])
-        ).values()
-      );
-    }
+    console.log({ teamAPlayers, teamBPlayers, uniquePlayers });
+
     return uniquePlayers as PlayerWithUser[];
   }, [match]);
 
