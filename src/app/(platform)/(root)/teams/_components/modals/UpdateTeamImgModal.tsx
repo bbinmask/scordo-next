@@ -62,6 +62,7 @@ interface UpdateLogoAndBannerProps {
   onClose: () => void;
 }
 
+type Type = "logo" | "banner" | "avatar";
 export function UpdateLogoAndBanner({
   data,
 
@@ -90,7 +91,7 @@ export function UpdateLogoAndBanner({
     },
   });
 
-  const handleSave = async (file: File, type: "logo" | "banner") => {
+  const handleSave = async (file: File, type: Type) => {
     const url = URL.createObjectURL(file);
 
     if (type === "logo") {
@@ -102,7 +103,7 @@ export function UpdateLogoAndBanner({
     }
   };
 
-  const handleReset = (type: "logo" | "banner") => {
+  const handleReset = (type: Type) => {
     if (type === "logo") {
       setLogoFile(undefined);
       setLogo(data.logo || "");
@@ -129,25 +130,6 @@ export function UpdateLogoAndBanner({
     execute({ id: data.id, logo: logoFile, banner: bannerFile, abbreviation: data.abbreviation });
   };
 
-  useOnClickOutside(wrapperRef, () => {
-    setIsActive({ logo: false, banner: false });
-  });
-
-  useOnClickOutside(bannerRef, () => {
-    setIsActive((prev) => ({ ...prev, banner: false }));
-  });
-
-  useOnClickOutside(logoRef, () => {
-    setIsActive((prev) => ({ ...prev, logo: false }));
-  });
-
-  const onDeactiveLogo = () => {
-    setIsActive((prev) => ({ ...prev, logo: false }));
-  };
-  const onDeactiveBanner = () => {
-    setIsActive((prev) => ({ ...prev, banner: false }));
-  };
-
   return (
     <div className="mx-auto max-w-4xl space-y-8" ref={wrapperRef}>
       <div className="grid grid-cols-3 gap-8">
@@ -155,19 +137,8 @@ export function UpdateLogoAndBanner({
         <div className="grid justify-center space-y-4" ref={logoRef}>
           <label className="secondary-text block font-[poppins] text-sm font-semibold">Logo</label>
           <div className="flex flex-col items-center space-y-4">
-            <ImagePreview
-              onClick={() => {
-                setIsActive((prev) => ({ ...prev, logo: true }));
-              }}
-              url={logo}
-              type="logo"
-            >
-              <UploadImg
-                isActive={isActive.logo}
-                onDeactive={onDeactiveLogo}
-                onSave={handleSave}
-                type="logo"
-              />
+            <ImagePreview url={logo} type="logo">
+              <UploadImg url={logo} onSave={handleSave} type="logo" />
             </ImagePreview>
           </div>
         </div>
@@ -176,19 +147,8 @@ export function UpdateLogoAndBanner({
         <div className="col-span-2 grid justify-center space-y-4" ref={bannerRef}>
           <label className="secondary-text block text-sm font-semibold">Team Banner</label>
           <div className="space-y-4">
-            <ImagePreview
-              onClick={() => {
-                setIsActive((prev) => ({ ...prev, banner: true }));
-              }}
-              url={banner}
-              type="banner"
-            >
-              <UploadImg
-                isActive={isActive.banner}
-                onDeactive={onDeactiveBanner}
-                onSave={handleSave}
-                type="banner"
-              />
+            <ImagePreview url={banner} type="banner">
+              <UploadImg url={banner} onSave={handleSave} type="banner" />
             </ImagePreview>
           </div>
         </div>

@@ -20,8 +20,8 @@ export type ReturnTypeForUpdateTeam = ActionState<InputTypeForUpdateTeam, Team>;
 
 export type InputTypeForLogoAndBanner = z.infer<typeof UpdateLogoAndBanner>;
 export type ReturnTypeForLogoAndBanner = ActionState<InputTypeForLogoAndBanner, Team>;
-export type InputType = z.infer<typeof CreateTeam>;
-export type ReturnType = ActionState<InputType, Team>;
+export type InputTypeForCreateTeam = z.infer<typeof CreateTeam>;
+export type ReturnTypeForCreateTeam = ActionState<InputType, Team>;
 
 export type InputTypeForRecruiting = z.infer<typeof UpdateRecruiting>;
 export type ReturnTypeForRecruiting = ActionState<InputTypeForRecruiting, Team>;

@@ -1,5 +1,5 @@
 "use client";
-
+import z from "zod";
 import React from "react";
 import TeamForm from "../_components/TeamForm";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { SubmitHandler } from "react-hook-form";
 import { ITeamForm } from "../types";
 import { Button } from "@/components/ui/button";
 import { CgSpinner } from "react-icons/cg";
+import { InputTypeForCreateTeam } from "@/actions/team-actions/types";
 
 const CreateTeamPage = () => {
   const { execute, error, isLoading } = useAction(createTeam, {
@@ -21,7 +22,7 @@ const CreateTeamPage = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<ITeamForm> = async (data) => {
+  const onSubmit: SubmitHandler<InputTypeForCreateTeam> = async (data) => {
     const { name, abbreviation, type, address } = data;
 
     execute({
@@ -33,25 +34,19 @@ const CreateTeamPage = () => {
   };
 
   return (
-    <div className="center flex w-full">
-      <div className="container-bg w-full rounded-2xl border p-6 lg:p-10">
-        <h2 className="primary-heading mb-6 text-center font-[cal_sans] text-3xl font-black tracking-wide">
-          Create Your Team
-        </h2>
-        <TeamForm onSubmit={onSubmit}>
-          <div className="center flex w-full">
-            <Button
-              variant="default"
-              type="submit"
-              disabled={isLoading}
-              className={`primary-btn w-full max-w-48`}
-            >
-              {!isLoading && "Create Team"}
-              {isLoading && <CgSpinner className="absolute animate-spin text-white" />}
-            </Button>
-          </div>
-        </TeamForm>
-      </div>
+    <div className="bg-slate-50 pb-24 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
+      <TeamForm onSubmit={onSubmit}>
+        <div className="center flex w-full">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full rounded-2xl bg-white py-4 font-[poppins] text-[10px] font-black text-emerald-600 uppercase shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale dark:text-slate-900"
+          >
+            {!isLoading && "Create Team"}
+            {isLoading && <CgSpinner className="absolute animate-spin text-white" />}
+          </button>
+        </div>
+      </TeamForm>
     </div>
   );
 };

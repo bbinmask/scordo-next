@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { getCroppedImage } from "@/utils/cropImg";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Upload } from "lucide-react";
 import { Dispatch, ReactNode, SetStateAction, useState } from "react";
 import { Area } from "react-easy-crop";
 import ImageCropper from "./ImageCropper";
@@ -10,37 +10,28 @@ export const ImagePreview = ({
   type,
   children,
   className,
-  onClick,
 }: {
   url: string;
   type: "logo" | "banner" | "avatar";
   children: ReactNode;
   className?: string;
-  onClick: () => void;
 }) => {
   const isBanner = type === "banner";
-  const fallback = `https://placehold.co/${!isBanner ? "200x200" : "800x200"}/f3f4f6/a1a1aa?text=${type}`;
 
   return (
     <div
-      onClick={onClick}
       className={cn(
-        `border-input relative overflow-hidden border-2 border-dashed bg-gray-600 dark:border-gray-200 dark:bg-gray-100 ${
-          !isBanner
-            ? "aspect-square h-24 rounded-full lg:h-32"
-            : "aspect-video h-24 rounded-xl lg:h-40"
-        }`,
+        `h-32 w-full cursor-pointer rounded-[2rem] border-2 border-dashed border-slate-200 transition-all hover:border-emerald-500 hover:bg-emerald-500/5 dark:border-white/10 dark:hover:border-emerald-500 ${url && !isBanner ? "aspect-square w-32" : "aspect-auto"}`,
         className
       )}
     >
-      <img
-        src={url || fallback}
-        alt={`${type} preview`}
-        className="h-full w-full object-cover"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = fallback;
-        }}
-      />
+      {url && (
+        <img
+          src={url}
+          alt={`${type} preview`}
+          className="h-full w-full rounded-[2rem] object-cover"
+        />
+      )}
       {children}
     </div>
   );
@@ -48,12 +39,11 @@ export const ImagePreview = ({
 
 export interface UploadImgProps {
   type: "logo" | "banner" | "avatar";
-  isActive: boolean;
-  onDeactive: () => void;
-  onSave: (file: File, type: "logo" | "banner" | "avatar") => void;
+  url: string;
+  onSave: (file: File, type: "logo" | "banner" | "avatar") => Promise<void>;
 }
 
-export function UploadImg({ type, onSave, isActive, onDeactive }: UploadImgProps) {
+export function UploadImg({ type, url, onSave }: UploadImgProps) {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [cropArea, setCropArea] = useState<Area | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -82,44 +72,33 @@ export function UploadImg({ type, onSave, isActive, onDeactive }: UploadImgProps
     // formData.append("file", file);
 
     onSave(file, type);
-    onDeactive();
     handleClose();
   };
 
   return (
     <div className="h-full w-full space-y-4">
-      {isActive && (
-        <>
-          <input
-            type="file"
-            accept="image/*"
-            className="absolute inset-0 z-40 h-full w-full cursor-pointer opacity-0"
-            onChange={onSelectFile}
-            onClick={(e) => e.stopPropagation()}
-          />
-
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <ImageIcon className="h-8 w-8 text-gray-300" />
+      <>
+        <input
+          type="file"
+          accept="image/*"
+          className="absolute inset-0 z-40 h-full w-full cursor-pointer opacity-0"
+          onChange={onSelectFile}
+          onClick={(e) => e.stopPropagation()}
+        />
+        {!url && (
+          <div className="group z-50 h-full">
+            <label
+              htmlFor="logo-input"
+              className="flex h-full w-full flex-col items-center justify-center gap-2"
+            >
+              <Upload className="h-6 w-6 text-slate-400 group-hover:text-emerald-500" />
+              <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                Upload Icon
+              </span>
+            </label>
           </div>
-        </>
-      )}
-
-      {/* {type === "banner" && isActive.banner && (
-        <>
-          <input
-            type="file"
-            accept="image/*"
-            className="absolute inset-0 z-40 h-full w-full cursor-pointer opacity-0"
-            onChange={onSelectFile}
-            onClick={(e) => e.stopPropagation()}
-          />
-
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <ImageIcon className="h-8 w-8 text-gray-300" />
-          </div>
-        </>
-      )} */}
-
+        )}
+      </>
       {imageSrc && (
         <>
           <ImageCropper

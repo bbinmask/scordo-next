@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import {
-  InputType,
+  InputTypeForCreateTeam,
   InputTypeForAccept,
   InputTypeForOwnerAction,
   InputTypeForLeave,
@@ -12,7 +12,7 @@ import {
   InputTypeForSend,
   InputTypeForUpdateTeam,
   InputTypeForWidthdraw,
-  ReturnType,
+  ReturnTypeForCreateTeam,
   ReturnTypeForAccept,
   ReturnTypeForOwnerAction,
   ReturnTypeForLeave,
@@ -40,7 +40,9 @@ import { Player, User } from "@/generated/prisma";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/currentUser";
 
-const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
+const createTeamHandler = async (
+  data: InputTypeForCreateTeam
+): Promise<ReturnTypeForCreateTeam> => {
   const user = await currentUser();
 
   const { name, abbreviation, address, type, logo, banner } = data;
