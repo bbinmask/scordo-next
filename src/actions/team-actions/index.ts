@@ -41,27 +41,9 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/currentUser";
 
 const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
-  const { userId: clerkId } = await auth();
+  const user = await currentUser();
 
-  if (!clerkId) {
-    return { error: "Unauthorized" };
-  }
-
-  const { name, abbreviation, address, type } = data;
-
-  let user: User | null = null;
-  try {
-    user =
-      (await db?.user.findUnique({
-        where: {
-          clerkId,
-        },
-      })) ?? null;
-  } catch (error: any) {
-    return {
-      error: error.message || "User not found!",
-    };
-  }
+  const { name, abbreviation, address, type, logo, banner } = data;
 
   if (!user) {
     return {
@@ -69,7 +51,15 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  let team;
+  let logoUrl, bannerUrl, team;
+
+  if (logo) {
+    logoUrl = (await uploadImage(logo, "team-logo")).imageUrl;
+  }
+  if (banner) {
+    bannerUrl = (await uploadImage(banner, "team-banner")).imageUrl;
+  }
+
   try {
     team = await db.team.create({
       data: {
@@ -87,6 +77,8 @@ const createTeamHandler = async (data: InputType): Promise<ReturnType> => {
             },
           },
         },
+        logo: logoUrl as string,
+        banner: bannerUrl as string,
         type,
         owner: {
           connect: { id: user.id },

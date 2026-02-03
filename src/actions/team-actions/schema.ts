@@ -11,6 +11,8 @@ export const CreateTeam = z.object({
     state: z.string({ message: "State is required" }).min(2),
     country: z.string({ message: "Country is required" }).min(2),
   }),
+  logo: z.file().optional(),
+  banner: z.file().optional(),
   type: z.enum(["local", "club", "college", "corporate", "others"]).default("others"),
 });
 

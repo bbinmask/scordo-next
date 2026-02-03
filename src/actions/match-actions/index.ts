@@ -29,6 +29,7 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
     tossDecision,
     tossWinner,
     venue,
+    playerLimit,
     tournamentId,
   } = data;
 
@@ -89,7 +90,7 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
         tossDecision,
         tossWinner,
         venue,
-        playerLimit: 0,
+        playerLimit,
         organizerId: user.id,
         ...(tournamentId && { tournamentId }),
       },
