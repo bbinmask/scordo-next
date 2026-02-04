@@ -36,7 +36,6 @@ import {
 import { Player as IPlayer, Team as ITeam, User } from "@/generated/prisma";
 import { usePlayerModal, useUpdateTeam } from "@/hooks/store/use-team";
 import OptionsPopover from "../_components/OptionsPopover";
-import { formatDate } from "@/utils/helper/formatDate";
 import { PlayerWithUser, TeamRequestWithDetails } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { sendTeamRequest } from "@/actions/team-actions";
@@ -354,11 +353,11 @@ const TeamHeader = ({
         {team.banner ? (
           <img src={team.banner} alt="Banner" className="h-full w-full rounded-t-lg object-cover" />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-950">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-900 via-green-600 via-70% to-teal-900">
             <div className="absolute inset-0 animate-pulse bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20" />
             {/* Dynamic Mesh Blobs */}
             <div className="absolute top-1/4 left-1/4 h-96 w-96 animate-pulse rounded-full bg-indigo-500 opacity-30 blur-[120px]" />
-            <div className="absolute right-1/4 bottom-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-500 opacity-30 blur-[120px]" />
+            <div className="absolute right-1/4 bottom-1/4 h-96 w-96 animate-pulse rounded-full bg-green-700 opacity-30 blur-[120px]" />
           </div>
         )}
 

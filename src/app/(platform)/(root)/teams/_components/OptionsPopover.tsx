@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Trash } from "lucide-react";
 
 interface OptionsPopoverProps {
   team: Team;
@@ -45,6 +45,8 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
       toast.error(error);
     },
   });
+
+  const onDelete = () => {};
 
   const [isRecruiting, setIsRecruiting] = useState(team.isRecruiting);
 

@@ -66,7 +66,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
   const [logoFileName, setLogoFileName] = useState<string | null>(null);
   const [bannerFileName, setBannerFileName] = useState<string | null>(null);
   const navigate = useRouter();
-
+  const [isLoading, setIsLoading] = useState(false);
   // const handleFileChange = (
   //   e: React.ChangeEvent<HTMLInputElement>,
   //   fieldName: "logo" | "banner"
@@ -79,8 +79,9 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
   const checkAbbreviation = useMemo(
     () =>
       debounce(async (value: string) => {
+        setIsLoading(true);
         try {
-          const res = await axios.get(`/api/teams/${value}`);
+          const res = await axios.get(`/api/teams/${value.toLowerCase()}`);
 
           if (res.data.success) {
             setError("abbreviation", {
@@ -91,6 +92,8 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
           }
         } catch (error) {
           toast.error("Something went wrong!");
+        } finally {
+          setIsLoading(false);
         }
       }, 500),
 
@@ -109,12 +112,12 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
   };
 
   return (
-    <div className="bg-slate-50 pb-24 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
+    <div className="bg-slate-50 pb-4 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
       <div className="relative mb-12 h-64 w-full overflow-hidden md:h-80">
         {bannerPreview ? (
           <img src={bannerPreview} className="h-full w-full object-cover" alt="Banner Preview" />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950">
+          <div className="absolute inset-0 bg-gradient-to-r from-green-900 via-slate-900 to-green-950">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
             <div className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center opacity-30">
               <ImageIcon className="mb-2 h-12 w-12 text-white" />
@@ -145,12 +148,12 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
                 {getValues("name") || "SQUAD NAME"}
               </h2>
               {getValues("type") && (
-                <span className="rounded-xl border border-slate-200 bg-white/40 px-3 py-1 text-[10px] font-black tracking-widest text-indigo-500 uppercase backdrop-blur-md dark:border-white/10 dark:bg-white/10">
+                <span className="rounded-xl border border-slate-200 bg-white/40 px-3 py-1 text-[10px] font-black tracking-widest text-slate-500 uppercase backdrop-blur-md dark:border-white/10 dark:bg-white/10">
                   {getValues("type")}
                 </span>
               )}
             </div>
-            <p className="mt-1 text-lg font-bold text-slate-500 uppercase md:text-xl dark:text-slate-400">
+            <p className="mt-1 text-lg font-bold text-slate-600 uppercase md:text-xl dark:dark:text-slate-400">
               @{getValues("abbreviation") || "ABBR"}
             </p>
           </div>
@@ -174,13 +177,14 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* Team Name */}
                 <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
                     Official Name
                   </label>
                   <div className="group relative">
-                    <Users className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-emerald-500" />
+                    <Users className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 transition-colors group-focus-within:text-emerald-500 dark:text-slate-400" />
                     <input
                       type="text"
+                      required
                       id="team-name"
                       {...register("name", {
                         required: team?.name ? false : "Team name is required",
@@ -196,11 +200,11 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
 
                 {/* Abbreviation */}
                 <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
                     Team Handle / Abbr
                   </label>
                   <div className="group relative">
-                    <Hash className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-indigo-500" />
+                    <Hash className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 transition-colors group-focus-within:text-green-500 dark:text-slate-400" />
                     <input
                       type="text"
                       id="abbreviation"
@@ -216,7 +220,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
                         onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                           const value = e.target.value;
 
-                          if (!/^[a-z0-9_-]*$/.test(value)) {
+                          if (!/^[a-zA-Z0-9_-]*$/.test(value)) {
                             setError("abbreviation", {
                               message: "This type of abbreviation is not available!",
                             });
@@ -248,18 +252,25 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
                       placeholder={team?.abbreviation || "Create an abbreviation"}
                       required
                       defaultValue={getValues("abbreviation")}
-                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold uppercase transition-all outline-none focus:ring-2 focus:ring-indigo-500 dark:border-white/5 dark:bg-slate-950"
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold uppercase transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
                     />
+                  </div>
+                  <div className="w-full px-4">
+                    {isLoading ? (
+                      <Spinner className="h-4 w-4" />
+                    ) : errors.abbreviation?.message ? (
+                      <p className="text-xs text-red-500">{errors.abbreviation.message}</p>
+                    ) : null}
                   </div>
                 </div>
 
                 {/* Team Type Select */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
                     Squad Classification
                   </label>
                   <div className="group relative">
-                    <Building className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Building className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 dark:text-slate-400" />
                     <select
                       required
                       {...register("type", { required: "Type is required" })}
@@ -275,7 +286,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
                       <option value="corporate">Corporate Organization</option>
                       <option value="other">Other / Custom</option>
                     </select>
-                    <ChevronRight className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-400" />
+                    <ChevronRight className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-600 dark:text-slate-400" />
                   </div>
                 </div>
               </div>
@@ -284,7 +295,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
             {/* Location Section */}
             <section className="rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm md:p-10 dark:border-white/10 dark:bg-slate-900">
               <div className="mb-8 flex items-center gap-3">
-                <div className="rounded-xl bg-indigo-500/10 p-2 text-indigo-500">
+                <div className="rounded-xl bg-green-500/10 p-2 text-green-500">
                   <MapPin className="h-5 w-5" />
                 </div>
                 <h3 className="text-xl font-black tracking-tighter uppercase italic">
@@ -294,7 +305,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
                     City
                   </label>
                   <input
@@ -305,11 +316,11 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
                     {...register("address.city", {
                       required: getValues("address.city") ? false : "City is required",
                     })}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-indigo-500 dark:border-white/5 dark:bg-slate-950"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
                     State
                   </label>
                   <input
@@ -319,15 +330,15 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
                     {...register("address.state", {
                       required: getValues("address.state") ? false : "State is required",
                     })}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-indigo-500 dark:border-white/5 dark:bg-slate-950"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
                     Country
                   </label>
                   <div className="group relative">
-                    <Globe className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Globe className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 dark:text-slate-400" />
                     <input
                       type="text"
                       required
@@ -335,7 +346,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
                       {...register("address.country", {
                         required: getValues("address.country") ? false : "Country is required",
                       })}
-                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-indigo-500 dark:border-white/5 dark:bg-slate-950"
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
                     />
                   </div>
                 </div>
@@ -346,7 +357,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
           {/* Right Column: Asset Uploads */}
           <div className="space-y-6 lg:col-span-4">
             <div className="rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-slate-900">
-              <h4 className="mb-6 flex items-center gap-2 text-xs font-black tracking-widest text-slate-400 uppercase">
+              <h4 className="mb-6 flex items-center gap-2 text-xs font-black tracking-widest text-slate-600 uppercase dark:dark:text-slate-400">
                 <Upload className="h-3 w-3" /> Creative Assets
               </h4>
 
@@ -378,12 +389,12 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
             </div>
 
             {/* Status Indicator */}
-            <div className="group relative overflow-hidden rounded-[3rem] bg-slate-900 p-8 text-white shadow-2xl dark:bg-emerald-600">
+            <div className="group group relative h-52 overflow-hidden rounded-[3rem] bg-gradient-to-br from-green-600 to-teal-900 p-8 text-white shadow-2xl">
               <Shield className="absolute top-2 right-2 h-32 w-32 -rotate-12 text-white/5 transition-transform duration-700 group-hover:rotate-0" />
               <h4 className="mb-2 text-xl font-black tracking-tighter uppercase italic">
                 Deploy Scordo
               </h4>
-              <p className="mb-6 text-xs leading-relaxed font-medium text-emerald-100/70">
+              <p className="mb-6 text-xs leading-relaxed font-medium text-emerald-100">
                 By initializing this squad, you agree to the regional competitive integrity
                 guidelines.
               </p>

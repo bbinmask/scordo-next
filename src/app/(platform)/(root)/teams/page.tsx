@@ -193,7 +193,7 @@ function Invitations() {
   };
 
   return (
-    <div className="hide_scrollbar group border-input relative h-52 w-full overflow-x-hidden overflow-y-auto scroll-smooth rounded-3xl border bg-gray-100 p-6 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:bg-gray-50/80 hover:shadow-md hover:ring-1 hover:shadow-green-500/30 hover:ring-green-600/40 lg:mt-16 dark:bg-slate-800 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600">
+    <div className="group hover-card border-input relative h-52 w-full rounded-3xl border p-6 font-[urbanist] font-semibold lg:mt-16">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="primary-text flex items-center gap-3 font-[poppins] text-lg font-black tracking-tighter uppercase italic">
           <div className="relative">
@@ -220,7 +220,7 @@ function Invitations() {
           description="No new invitations."
         />
       ) : (
-        <ul className="mb-4 space-y-3 rounded-xl">
+        <ul className="hide_scrollbar mb-4 max-h-44 space-y-3 overflow-y-auto scroll-smooth rounded-xl">
           {teamInvites.map((invite) => (
             <li key={invite.id} className="rounded-lg p-3">
               <div className="mb-2 flex items-center justify-between">
