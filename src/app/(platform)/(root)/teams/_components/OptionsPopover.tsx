@@ -1,33 +1,24 @@
-import { Button } from "@/components/ui/button";
-import { NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { EllipsisVertical, Trash } from "lucide-react";
-
-interface OptionsPopoverProps {
-  team: Team;
-  // onEditOpen: () => void;
-  // onEditClose: () => void;
-  // isEditOpen: boolean;
-  // isProfileOpen: boolean;
-  // onProfileOpen: () => void;
-  // onProfileClose: () => void;
-  // isReqOpen: boolean;
-  // onReqOpen: () => void;
-  // onReqClose: () => void;
-}
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { useUpdateLogoAndBanner, useUpdateTeam } from "@/hooks/store/use-team";
 import { useNotificationModal } from "@/hooks/store/use-team";
 import UpdateTeamImgModal from "./modals/UpdateTeamImgModal";
 import { Team } from "@/generated/prisma";
 import UpdateTeamModal from "./modals/UpdateTeamModal";
 import Requests from "./Requests";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { debounce } from "lodash";
 import { useAction } from "@/hooks/useAction";
-import { updateRecruiting } from "@/actions/team-actions";
+import { deleteTeam, updateRecruiting } from "@/actions/team-actions";
 import { toast } from "sonner";
+import { useConfirmModal } from "@/hooks/useConfirmModal";
+import { useOnClickOutside } from "usehooks-ts";
+import ConfirmModal from "@/components/modals/ConfirmModal";
+
+interface OptionsPopoverProps {
+  team: Team;
+}
 const OptionsPopover = ({ team }: OptionsPopoverProps) => {
   const {
     isOpen: isProfileOpen,
@@ -36,7 +27,9 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
   } = useUpdateLogoAndBanner();
   const { isOpen: isEditOpen, onClose: onEditClose, onOpen: onEditOpen } = useUpdateTeam();
 
-  const { execute, isLoading } = useAction(updateRecruiting, {
+  const popoverRef = useRef<any>(null);
+
+  const { execute: executeRecruiting, isLoading } = useAction(updateRecruiting, {
     onSuccess(data) {
       setIsRecruiting(data.isRecruiting);
       toast.success("Recruiting updated!");
@@ -45,8 +38,21 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
       toast.error(error);
     },
   });
+  const { execute: executeDelete } = useAction(deleteTeam, {
+    onSuccess(data) {
+      setIsRecruiting(data.isRecruiting);
+      toast.success("Team Deleted!");
+    },
+    onError(error) {
+      toast.error(error);
+    },
+  });
 
-  const onDelete = () => {};
+  const { closeConfirmModal, confirmModalState, openConfirmModal } = useConfirmModal();
+
+  const onDelete = () => {
+    executeDelete({ id: team.id });
+  };
 
   const [isRecruiting, setIsRecruiting] = useState(team.isRecruiting);
 
@@ -55,8 +61,12 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
   const handleRecruiting = debounce((e: ChangeEvent<HTMLInputElement>) => {
     const recruiting = e.target.checked;
     if (recruiting === team.isRecruiting) return;
-    execute({ abbreviation: team.abbreviation, recruiting });
+    executeRecruiting({ abbreviation: team.abbreviation, recruiting });
   }, 2000);
+
+  useOnClickOutside(popoverRef, () => {
+    closeConfirmModal();
+  });
 
   return (
     <Popover>
@@ -65,6 +75,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
       </PopoverTrigger>
 
       <PopoverContent
+        ref={popoverRef}
         align="end"
         className="animate-in fade-in slide-in-from-top-2 mt-3 rounded-[1.5rem] border border-slate-200 bg-white/90 p-2 shadow-2xl backdrop-blur-xl duration-200 dark:border-white/10 dark:bg-slate-900/95"
       >
@@ -91,6 +102,20 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
             className="flex w-full items-center gap-3 rounded-xl p-3 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
           >
             <span className="primary-text font-[urbanist] text-base font-semibold">Requests</span>
+          </button>
+
+          <button
+            onClick={() => {
+              openConfirmModal({
+                onConfirm: onDelete,
+                title: "Delete Team",
+                description: "Are you sure you want to delete this team?",
+              });
+            }}
+            className="group flex w-full items-center justify-between gap-3 rounded-xl p-3 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
+          >
+            <span className="primary-text font-[urbanist] text-base font-semibold">Delete</span>
+            <Trash className="group-hover:text-red-600" />
           </button>
 
           {/* Recruiting */}
@@ -126,6 +151,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
           {/* <Requests data={[]} /> */}
         </>
       </PopoverContent>
+      <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
     </Popover>
   );
 };

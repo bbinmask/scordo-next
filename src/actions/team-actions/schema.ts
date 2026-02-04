@@ -48,6 +48,10 @@ export const WidthdrawRequest = z.object({
   abbr: z.string({ message }),
 });
 
+export const DeleteTeam = z.object({
+  id: z.string({ message }),
+});
+
 export const SendRequest = z.object({
   teamId: z.string({ message }),
 });

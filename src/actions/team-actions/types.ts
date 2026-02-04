@@ -13,6 +13,7 @@ import {
   UpdateRecruiting,
   UpdateTeam,
   WidthdrawRequest,
+  DeleteTeam,
 } from "./schema";
 
 export type InputTypeForUpdateTeam = z.infer<typeof UpdateTeam>;
@@ -21,7 +22,7 @@ export type ReturnTypeForUpdateTeam = ActionState<InputTypeForUpdateTeam, Team>;
 export type InputTypeForLogoAndBanner = z.infer<typeof UpdateLogoAndBanner>;
 export type ReturnTypeForLogoAndBanner = ActionState<InputTypeForLogoAndBanner, Team>;
 export type InputTypeForCreateTeam = z.infer<typeof CreateTeam>;
-export type ReturnTypeForCreateTeam = ActionState<InputType, Team>;
+export type ReturnTypeForCreateTeam = ActionState<InputTypeForCreateTeam, Team>;
 
 export type InputTypeForRecruiting = z.infer<typeof UpdateRecruiting>;
 export type ReturnTypeForRecruiting = ActionState<InputTypeForRecruiting, Team>;
@@ -43,3 +44,6 @@ export type ReturnTypeForDecline = ActionState<InputTypeForDecline, Team>;
 
 export type InputTypeForOwnerAction = z.infer<typeof OwnerAction>;
 export type ReturnTypeForOwnerAction = ActionState<InputTypeForOwnerAction, Team>;
+
+export type InputTypeForDeleteTeam = z.infer<typeof DeleteTeam>;
+export type ReturnTypeForDeleteTeam = ActionState<InputTypeForDeleteTeam, any>;

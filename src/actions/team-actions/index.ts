@@ -21,6 +21,8 @@ import {
   ReturnTypeForSend,
   ReturnTypeForUpdateTeam,
   ReturnTypeForWidthdraw,
+  InputTypeForDeleteTeam,
+  ReturnTypeForDeleteTeam,
 } from "./types";
 import { auth } from "@clerk/nextjs/server";
 import { createSafeAction } from "@/lib/create-safe-action";
@@ -34,11 +36,13 @@ import {
   UpdateRecruiting,
   UpdateTeam,
   WidthdrawRequest,
+  DeleteTeam,
 } from "./schema";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
 import { Player, User } from "@/generated/prisma";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/currentUser";
+import { ERROR_CODES } from "@/constants";
 
 const createTeamHandler = async (
   data: InputTypeForCreateTeam
@@ -494,6 +498,50 @@ const removeFromTeamHandler = async (
   };
 };
 
+const deleteTeamHandler = async (
+  data: InputTypeForDeleteTeam
+): Promise<ReturnTypeForDeleteTeam> => {
+  const { id } = data;
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Log in required!",
+    };
+
+  let team;
+
+  try {
+    team = await db.team.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!team)
+      return {
+        error: "Team not found!",
+      };
+
+    if (team.ownerId !== user.id)
+      return {
+        error: "Only owner can delete the Team!",
+      };
+
+    team = await db.team.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
+  redirect(`/teams`);
+};
+
 const updateCaptainHandler = async (
   data: InputTypeForOwnerAction
 ): Promise<ReturnTypeForOwnerAction> => {
@@ -551,6 +599,8 @@ export const updateTeamLogoAndBanner = createSafeAction(
   UpdateLogoAndBanner,
   logoAndBannerUpdateHandler
 );
+export const deleteTeam = createSafeAction(DeleteTeam, deleteTeamHandler);
+
 export const removeFromTeam = createSafeAction(OwnerAction, removeFromTeamHandler);
 export const updateCaptain = createSafeAction(OwnerAction, updateCaptainHandler);
 export const updateRecruiting = createSafeAction(UpdateRecruiting, recruitingUpdateHanlder);
