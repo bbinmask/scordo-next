@@ -231,6 +231,8 @@ const MatchesPage = () => {
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/officials");
 
+      if (!data.success) return [];
+
       return data.data;
     },
   });
@@ -238,6 +240,10 @@ const MatchesPage = () => {
     queryKey: ["matches"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/");
+
+      if (!data.success) {
+        return [];
+      }
 
       return data.data;
     },

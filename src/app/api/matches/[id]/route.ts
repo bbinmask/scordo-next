@@ -34,10 +34,13 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
       },
     });
 
+    console.log({ match });
+
     if (!match) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
 
     return NextResponse.json(new ApiResponse(match));
   } catch (error) {
+    console.log(error.message);
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

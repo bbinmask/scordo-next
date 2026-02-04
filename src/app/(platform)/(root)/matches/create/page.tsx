@@ -31,8 +31,11 @@ import { toast } from "sonner";
 import Spinner from "@/components/Spinner";
 import { useAction } from "@/hooks/useAction";
 import { createMatch } from "@/actions/match-actions";
+import { useRouter } from "next/navigation";
 
 const CreateMatchForm: React.FC = () => {
+  const router = useRouter();
+
   const {
     register,
     formState: { errors },
@@ -54,15 +57,15 @@ const CreateMatchForm: React.FC = () => {
     },
   });
 
-  const { execute } = useAction(createMatch, {
+  const { execute, isLoading } = useAction(createMatch, {
     onSuccess(data) {
       toast.success("Match is created!");
+      router.push(`/matches/${data.id}`);
     },
     onError(error) {
       toast.error(error);
     },
   });
-  const [loading, setLoading] = useState(false);
 
   const { data: teams } = useQuery<TeamWithPlayers[]>({
     queryKey: ["my-teams"],
@@ -162,6 +165,8 @@ const CreateMatchForm: React.FC = () => {
     id ? (teams?.find((t) => t.id === id) ?? null) : null;
   const getTeamB = (id?: string): TeamWithPlayers | null =>
     id ? (opponentTeams?.find((t) => t.id === id) ?? null) : null;
+
+  console.log(errors.playerLimit);
 
   return (
     <div className={`transition-colors duration-500`}>
@@ -370,8 +375,11 @@ const CreateMatchForm: React.FC = () => {
                         <Trophy className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <input
                           type="number"
-                          {...register("playerLimit", { required: "Player limit is required" })}
-                          name="playerLimit"
+                          {...register("playerLimit", {
+                            required: "Player limit is required",
+                            valueAsNumber: true,
+                          })}
+                          required
                           placeholder="Enter limit of players in both team"
                           className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pr-4 pl-11 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 dark:border-white/10 dark:bg-slate-950"
                         />
@@ -597,16 +605,16 @@ const CreateMatchForm: React.FC = () => {
                 Discard Fixture
               </button>
               <button
-                disabled={loading}
+                disabled={isLoading}
                 type="submit"
                 className="flex w-full items-center justify-center gap-3 rounded-2xl bg-emerald-600 px-12 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-emerald-600/20 transition-all hover:bg-emerald-700 active:scale-95 disabled:opacity-50 md:w-auto"
               >
-                {loading ? (
+                {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Plus className="h-4 w-4" />
                 )}
-                {loading ? "Constructing..." : "Initialize Scordo Match"}
+                {isLoading ? "Constructing..." : "Initialize Scordo Match"}
               </button>
             </div>
           </form>
