@@ -112,7 +112,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
   };
 
   return (
-    <div className="bg-slate-50 pb-4 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
+    <div className="w-full overflow-x-hidden bg-slate-50 pb-12 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
       <div className="relative mb-12 h-64 w-full overflow-hidden md:h-80">
         {bannerPreview ? (
           <img src={bannerPreview} className="h-full w-full object-cover" alt="Banner Preview" />
@@ -129,7 +129,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-transparent to-black/20 dark:from-[#020617]" />
       </div>
-      <div className="relative z-10 mx-auto -mt-36 flex max-w-5xl items-end px-6 pb-8">
+      <div className="relative z-10 mx-auto -mt-36 flex items-end px-6 pb-8">
         <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-end">
           <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl md:h-40 md:w-40 dark:border-[#020617] dark:bg-slate-900">
             {logoPreview ? (
@@ -160,247 +160,237 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-          {/* Left Column: Core Identity */}
-          <div className="space-y-8 lg:col-span-8">
-            <section className="relative overflow-hidden rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm md:p-10 dark:border-white/10 dark:bg-slate-900">
-              <div className="mb-8 flex items-center gap-3">
-                <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-500">
-                  <Plus className="h-5 w-5" />
-                </div>
-                <h3 className="text-xl font-black tracking-tighter uppercase italic">
-                  Identity Setup
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                {/* Team Name */}
-                <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
-                    Official Name
-                  </label>
-                  <div className="group relative">
-                    <Users className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 transition-colors group-focus-within:text-emerald-500 dark:text-slate-400" />
-                    <input
-                      type="text"
-                      required
-                      id="team-name"
-                      {...register("name", {
-                        required: team?.name ? false : "Team name is required",
-                        minLength: 3,
-                      })}
-                      placeholder={team?.name || "Enter your team's name"}
-                      defaultValue={getValues("name")}
-                      minLength={3}
-                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/5 dark:bg-slate-950"
-                    />
+      <div className="mx-auto px-6">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            {/* Left Column: Core Identity */}
+            <div className="space-y-8 lg:col-span-8">
+              <section className="relative overflow-hidden rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm md:p-10 dark:border-white/10 dark:bg-slate-900">
+                <div className="mb-8 flex items-center gap-3">
+                  <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-500">
+                    <Plus className="h-5 w-5" />
                   </div>
+                  <h3 className="text-xl font-black tracking-tighter uppercase italic">
+                    Identity Setup
+                  </h3>
                 </div>
 
-                {/* Abbreviation */}
-                <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
-                    Team Handle / Abbr
-                  </label>
-                  <div className="group relative">
-                    <Hash className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 transition-colors group-focus-within:text-green-500 dark:text-slate-400" />
-                    <input
-                      type="text"
-                      id="abbreviation"
-                      {...register("abbreviation", {
-                        required: team?.abbreviation
-                          ? false
-                          : "Create an abbreviation for the team",
-                        pattern: {
-                          value: /^[a-zA-Z0-9_-]+$/,
-                          message: "Only letters, numbers, - and _ allowed",
-                        },
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {/* Team Name */}
+                  <div className="space-y-1.5">
+                    <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
+                      Official Name
+                    </label>
+                    <div className="group relative">
+                      <Users className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 transition-colors group-focus-within:text-emerald-500 dark:text-slate-400" />
+                      <input
+                        type="text"
+                        required
+                        id="team-name"
+                        {...register("name", {
+                          required: team?.name ? false : "Team name is required",
+                          minLength: 3,
+                        })}
+                        placeholder={team?.name || "Enter your team's name"}
+                        defaultValue={getValues("name")}
+                        minLength={3}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/5 dark:bg-slate-950"
+                      />
+                    </div>
+                  </div>
 
-                        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                          const value = e.target.value;
+                  {/* Abbreviation */}
+                  <div className="space-y-1.5">
+                    <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
+                      Team Handle / Abbr
+                    </label>
+                    <div className="group relative">
+                      <Hash className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 transition-colors group-focus-within:text-green-500 dark:text-slate-400" />
+                      <input
+                        type="text"
+                        id="abbreviation"
+                        {...register("abbreviation", {
+                          required: team?.abbreviation
+                            ? false
+                            : "Create an abbreviation for the team",
+                          pattern: {
+                            value: /^[a-zA-Z0-9_-]+$/,
+                            message: "Only letters, numbers, - and _ allowed",
+                          },
 
-                          if (!/^[a-zA-Z0-9_-]*$/.test(value)) {
-                            setError("abbreviation", {
-                              message: "This type of abbreviation is not available!",
-                            });
-                            return;
+                          onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                            const value = e.target.value;
+
+                            if (!/^[a-zA-Z0-9_-]*$/.test(value)) {
+                              setError("abbreviation", {
+                                message: "This type of abbreviation is not available!",
+                              });
+                              return;
+                            }
+                            clearErrors("abbreviation");
+                            checkAbbreviation(value);
+                          },
+
+                          validate: (value) => {
+                            if (value.trim() === "" && !team?.abbreviation)
+                              return "Abbreviation cannot be empty!";
+                          },
+                        })}
+                        onKeyDown={(e) => {
+                          const allowedRegex = /^[a-zA-Z0-9_-]$/;
+                          const allowedKeys =
+                            e.key === "Backspace" ||
+                            e.key === "Delete" ||
+                            e.key === "ArrowLeft" ||
+                            e.key === "ArrowRight" ||
+                            e.key === "Tab";
+
+                          if (allowedKeys) {
+                          } else if (!allowedRegex.test(e.key)) {
+                            e.preventDefault();
                           }
-                          clearErrors("abbreviation");
-                          checkAbbreviation(value);
-                        },
-
-                        validate: (value) => {
-                          if (value.trim() === "" && !team?.abbreviation)
-                            return "Abbreviation cannot be empty!";
-                        },
-                      })}
-                      onKeyDown={(e) => {
-                        const allowedRegex = /^[a-zA-Z0-9_-]$/;
-                        const allowedKeys =
-                          e.key === "Backspace" ||
-                          e.key === "Delete" ||
-                          e.key === "ArrowLeft" ||
-                          e.key === "ArrowRight" ||
-                          e.key === "Tab";
-
-                        if (allowedKeys) {
-                        } else if (!allowedRegex.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                      placeholder={team?.abbreviation || "Create an abbreviation"}
-                      required
-                      defaultValue={getValues("abbreviation")}
-                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold uppercase transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
-                    />
+                        }}
+                        placeholder={team?.abbreviation || "Create an abbreviation"}
+                        required
+                        defaultValue={getValues("abbreviation")}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold uppercase transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
+                      />
+                    </div>
+                    <div className="w-full px-4">
+                      {isLoading ? (
+                        <Spinner className="h-4 w-4" />
+                      ) : errors.abbreviation?.message ? (
+                        <p className="text-xs text-red-500">{errors.abbreviation.message}</p>
+                      ) : null}
+                    </div>
                   </div>
-                  <div className="w-full px-4">
-                    {isLoading ? (
-                      <Spinner className="h-4 w-4" />
-                    ) : errors.abbreviation?.message ? (
-                      <p className="text-xs text-red-500">{errors.abbreviation.message}</p>
-                    ) : null}
-                  </div>
-                </div>
 
-                {/* Team Type Select */}
-                <div className="space-y-1.5 md:col-span-2">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
-                    Squad Classification
-                  </label>
-                  <div className="group relative">
-                    <Building className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 dark:text-slate-400" />
-                    <select
-                      required
-                      {...register("type", { required: "Type is required" })}
-                      defaultValue={getValues("type")}
-                      className="w-full cursor-pointer appearance-none rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/5 dark:bg-slate-950"
-                    >
-                      <option value="" disabled>
-                        Select Team Type
-                      </option>
-                      <option value="local">Local Team</option>
-                      <option value="college">College / University</option>
-                      <option value="club">Private Club</option>
-                      <option value="corporate">Corporate Organization</option>
-                      <option value="other">Other / Custom</option>
-                    </select>
-                    <ChevronRight className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-600 dark:text-slate-400" />
+                  {/* Team Type Select */}
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
+                      Squad Classification
+                    </label>
+                    <div className="group relative">
+                      <Building className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 dark:text-slate-400" />
+                      <select
+                        required
+                        {...register("type", { required: "Type is required" })}
+                        defaultValue={getValues("type")}
+                        className="w-full cursor-pointer appearance-none rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/5 dark:bg-slate-950"
+                      >
+                        <option value="" disabled>
+                          Select Team Type
+                        </option>
+                        <option value="local">Local Team</option>
+                        <option value="college">College / University</option>
+                        <option value="club">Private Club</option>
+                        <option value="corporate">Corporate Organization</option>
+                        <option value="other">Other / Custom</option>
+                      </select>
+                      <ChevronRight className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 rotate-90 text-slate-600 dark:text-slate-400" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
+              </section>
 
-            {/* Location Section */}
-            <section className="rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm md:p-10 dark:border-white/10 dark:bg-slate-900">
-              <div className="mb-8 flex items-center gap-3">
-                <div className="rounded-xl bg-green-500/10 p-2 text-green-500">
-                  <MapPin className="h-5 w-5" />
+              {/* Location Section */}
+              <section className="rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm md:p-10 dark:border-white/10 dark:bg-slate-900">
+                <div className="mb-8 flex items-center gap-3">
+                  <div className="rounded-xl bg-green-500/10 p-2 text-green-500">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-xl font-black tracking-tighter uppercase italic">
+                    Base Location
+                  </h3>
                 </div>
-                <h3 className="text-xl font-black tracking-tighter uppercase italic">
-                  Base Location
-                </h3>
-              </div>
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
-                    City
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    defaultValue={getValues("address.city")}
-                    placeholder={team?.address?.city || "Enter your city"}
-                    {...register("address.city", {
-                      required: getValues("address.city") ? false : "City is required",
-                    })}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
-                    State
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder={getValues("address.state") || "Enter State Name"}
-                    {...register("address.state", {
-                      required: getValues("address.state") ? false : "State is required",
-                    })}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
-                    Country
-                  </label>
-                  <div className="group relative">
-                    <Globe className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 dark:text-slate-400" />
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <div className="space-y-1.5">
+                    <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
+                      City
+                    </label>
                     <input
                       type="text"
                       required
-                      placeholder={getValues("address.country") || "Enter Country Name"}
-                      {...register("address.country", {
-                        required: getValues("address.country") ? false : "Country is required",
+                      defaultValue={getValues("address.city")}
+                      placeholder={team?.address?.city || "Enter your city"}
+                      {...register("address.city", {
+                        required: getValues("address.city") ? false : "City is required",
                       })}
-                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
                     />
                   </div>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          {/* Right Column: Asset Uploads */}
-          <div className="space-y-6 lg:col-span-4">
-            <div className="rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-slate-900">
-              <h4 className="mb-6 flex items-center gap-2 text-xs font-black tracking-widest text-slate-600 uppercase dark:dark:text-slate-400">
-                <Upload className="h-3 w-3" /> Creative Assets
-              </h4>
-
-              {/* Logo Upload Card */}
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
-                    Squad Logo
-                  </p>
-                  <div className="group center relative flex w-full">
-                    <ImagePreview url={logoPreview} type="logo">
-                      <UploadImg url={logoPreview} onSave={handleSave} type="logo" />
-                    </ImagePreview>
+                  <div className="space-y-1.5">
+                    <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
+                      State
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder={getValues("address.state") || "Enter State Name"}
+                      {...register("address.state", {
+                        required: getValues("address.state") ? false : "State is required",
+                      })}
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="ml-1 text-[10px] font-black tracking-widest text-slate-600 uppercase dark:text-slate-400">
+                      Country
+                    </label>
+                    <div className="group relative">
+                      <Globe className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-600 dark:text-slate-400" />
+                      <input
+                        type="text"
+                        required
+                        placeholder={getValues("address.country") || "Enter Country Name"}
+                        {...register("address.country", {
+                          required: getValues("address.country") ? false : "Country is required",
+                        })}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3.5 pr-4 pl-11 text-sm font-bold transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/5 dark:bg-slate-950"
+                      />
+                    </div>
                   </div>
                 </div>
+              </section>
+            </div>
 
-                {/* Banner Upload Card */}
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
-                    Profile Banner
-                  </p>
-                  <div className="group center relative flex w-full">
-                    <ImagePreview url={bannerPreview} type="banner">
-                      <UploadImg url={bannerPreview} onSave={handleSave} type="banner" />
-                    </ImagePreview>
+            {/* Right Column: Asset Uploads */}
+            <div className="space-y-6 lg:col-span-4">
+              <div className="rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-slate-900">
+                <h4 className="mb-6 flex items-center gap-2 text-xs font-black tracking-widest text-slate-600 uppercase dark:dark:text-slate-400">
+                  <Upload className="h-3 w-3" /> Creative Assets
+                </h4>
+
+                {/* Logo Upload Card */}
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                      Squad Logo
+                    </p>
+                    <div className="group center relative flex w-full">
+                      <ImagePreview url={logoPreview} type="logo">
+                        <UploadImg url={logoPreview} onSave={handleSave} type="logo" />
+                      </ImagePreview>
+                    </div>
+                  </div>
+
+                  {/* Banner Upload Card */}
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                      Profile Banner
+                    </p>
+                    <div className="group center relative flex w-full">
+                      <ImagePreview url={bannerPreview} type="banner">
+                        <UploadImg url={bannerPreview} onSave={handleSave} type="banner" />
+                      </ImagePreview>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Status Indicator */}
-            <div className="group group relative h-52 overflow-hidden rounded-[3rem] bg-gradient-to-br from-green-600 to-teal-900 p-8 text-white shadow-2xl">
-              <Shield className="absolute top-2 right-2 h-32 w-32 -rotate-12 text-white/5 transition-transform duration-700 group-hover:rotate-0" />
-              <h4 className="mb-2 text-xl font-black tracking-tighter uppercase italic">
-                Deploy Scordo
-              </h4>
-              <p className="mb-6 text-xs leading-relaxed font-medium text-emerald-100">
-                By initializing this squad, you agree to the regional competitive integrity
-                guidelines.
-              </p>
-              {children}
-            </div>
           </div>
+          {children}
         </form>
       </div>
     </div>

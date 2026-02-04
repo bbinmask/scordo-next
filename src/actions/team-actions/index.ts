@@ -509,12 +509,15 @@ const deleteTeamHandler = async (
       error: "Log in required!",
     };
 
-  let team;
+  let team, players;
 
   try {
     team = await db.team.findUnique({
       where: {
         id,
+      },
+      include: {
+        players: true,
       },
     });
 
@@ -528,6 +531,12 @@ const deleteTeamHandler = async (
         error: "Only owner can delete the Team!",
       };
 
+    players = await db.player.deleteMany({
+      where: {
+        teamId: id,
+      },
+    });
+
     team = await db.team.delete({
       where: {
         id,
@@ -539,7 +548,9 @@ const deleteTeamHandler = async (
     };
   }
 
-  redirect(`/teams`);
+  return {
+    data: true,
+  };
 };
 
 const updateCaptainHandler = async (

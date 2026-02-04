@@ -39,11 +39,11 @@ const CreateTeamPage = () => {
   return (
     <div className="bg-slate-50 pb-24 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
       <TeamForm onSubmit={onSubmit}>
-        <div className="center flex w-full">
+        <div className="center mt-6 flex w-full">
           <button
             type="submit"
             disabled={isLoading}
-            className="center flex w-full rounded-2xl bg-white py-4 font-[poppins] text-[10px] font-black text-emerald-600 uppercase shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale dark:text-slate-900"
+            className="center flex w-full max-w-xl rounded-2xl bg-white py-4 font-[poppins] text-xs font-black text-emerald-600 uppercase shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale dark:text-slate-900"
           >
             {isLoading ? <Spinner className="text-black" /> : "Create Squad"}
           </button>

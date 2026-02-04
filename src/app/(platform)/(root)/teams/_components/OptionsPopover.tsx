@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { useOnClickOutside } from "usehooks-ts";
 import ConfirmModal from "@/components/modals/ConfirmModal";
+import { useRouter } from "next/navigation";
 
 interface OptionsPopoverProps {
   team: Team;
@@ -26,6 +27,8 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
     onOpen: onProfileOpen,
   } = useUpdateLogoAndBanner();
   const { isOpen: isEditOpen, onClose: onEditClose, onOpen: onEditOpen } = useUpdateTeam();
+
+  const router = useRouter();
 
   const popoverRef = useRef<any>(null);
 
@@ -40,8 +43,8 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
   });
   const { execute: executeDelete } = useAction(deleteTeam, {
     onSuccess(data) {
-      setIsRecruiting(data.isRecruiting);
       toast.success("Team Deleted!");
+      router.push("/teams");
     },
     onError(error) {
       toast.error(error);
@@ -77,7 +80,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
       <PopoverContent
         ref={popoverRef}
         align="end"
-        className="animate-in fade-in slide-in-from-top-2 mt-3 rounded-[1.5rem] border border-slate-200 bg-white/90 p-2 shadow-2xl backdrop-blur-xl duration-200 dark:border-white/10 dark:bg-slate-900/95"
+        className="animate-in fade-in slide-in-from-top-2 mt-3 w-full max-w-full rounded-[1.5rem] border border-slate-200 bg-white/90 p-2 shadow-2xl backdrop-blur-xl duration-200 dark:border-white/10 dark:bg-slate-900/95"
       >
         <div className="rounded-xl">
           <button

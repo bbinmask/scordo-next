@@ -57,19 +57,19 @@ const UpdateTeamModal = ({ isOpen, onClose, team }: UpdateTeamModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-sm rounded-lg bg-white font-[poppins] dark:bg-gray-800">
+      <DialogContent className="h-full w-full overflow-y-auto rounded-lg bg-white font-[poppins] sm:max-w-full dark:bg-gray-900">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             {`Update ${team.abbreviation.toUpperCase()} Details`}
           </DialogTitle>
-          <DialogDescription className="text-gray-500">{}</DialogDescription>
+          <DialogDescription className="text-gray-500" />
         </DialogHeader>
         <TeamForm onSubmit={onSubmit} team={team}>
-          <div className="mt-2 flex justify-end space-x-3">
+          <div className="mt-6 flex w-full justify-end space-x-3">
             <button
               onClick={onClose}
               type="button"
-              className="rounded-md border border-gray-300 px-4 py-1 text-xs font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+              className="rounded-md border border-gray-300 px-4 py-1 text-base font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
             >
               Cancel
             </button>
@@ -77,7 +77,7 @@ const UpdateTeamModal = ({ isOpen, onClose, team }: UpdateTeamModalProps) => {
               type="submit"
               disabled={isLoading}
               className={
-                "rounded-md bg-blue-600 px-4 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700"
+                "primary-btn rounded-md px-4 py-1 text-base font-semibold text-white shadow-sm transition"
               }
             >
               {isLoading ? <Spinner /> : "Update"}

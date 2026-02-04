@@ -21,7 +21,7 @@ export const ImagePreview = ({
   return (
     <div
       className={cn(
-        `h-32 w-full cursor-pointer rounded-[2rem] border-2 border-dashed border-slate-200 transition-all hover:border-emerald-500 hover:bg-emerald-500/5 dark:border-white/10 dark:hover:border-emerald-500 ${url && !isBanner ? "aspect-square w-32" : "aspect-auto"}`,
+        `relative h-36 w-full cursor-pointer rounded-[2rem] border-2 border-dashed border-slate-200 transition-all hover:border-emerald-500 hover:bg-emerald-500/5 dark:border-white/10 dark:hover:border-emerald-500 ${url && !isBanner ? "aspect-square w-36" : "aspect-video w-64"}`,
         className
       )}
     >
@@ -29,7 +29,7 @@ export const ImagePreview = ({
         <img
           src={url}
           alt={`${type} preview`}
-          className="h-full w-full rounded-[2rem] object-cover"
+          className="absolute h-full w-full rounded-[2rem] object-cover"
         />
       )}
       {children}
@@ -81,7 +81,7 @@ export function UploadImg({ type, url, onSave }: UploadImgProps) {
         <input
           type="file"
           accept="image/*"
-          className="absolute inset-0 z-40 h-full w-full cursor-pointer opacity-0"
+          className="absolute z-40 h-full w-full cursor-pointer opacity-0"
           onChange={onSelectFile}
           onClick={(e) => e.stopPropagation()}
         />

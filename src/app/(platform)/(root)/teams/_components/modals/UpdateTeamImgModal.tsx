@@ -70,10 +70,6 @@ export function UpdateLogoAndBanner({
 }: UpdateLogoAndBannerProps) {
   const [logo, setLogo] = useState(data.logo || "./team.svg");
   const [banner, setBanner] = useState(data.banner || "");
-  const [isActive, setIsActive] = useState({
-    logo: false,
-    banner: false,
-  });
   const [logoFile, setLogoFile] = useState<File>();
   const [bannerFile, setBannerFile] = useState<File>();
 
