@@ -1,6 +1,6 @@
 "use client";
 
-import { OfficialRole } from "@/generated/prisma";
+import { OfficialRole, User } from "@/generated/prisma";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -78,7 +78,7 @@ const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: 
   <div className="group hover-card relative overflow-hidden rounded-3xl p-6">
     <div className="relative z-10">
       <div
-        className={`h-10 w-10 rounded-xl bg-${color}-50 dark:bg-${color}-500/10 text-${color}-600 dark:text-${color}-400 mb-4 flex items-center justify-center transition-transform group-hover:scale-110`}
+        className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600 transition-transform group-hover:scale-110 dark:bg-green-500/10 dark:text-green-400`}
       >
         <Icon className="h-5 w-5" />
       </div>
@@ -390,6 +390,80 @@ const OfficialsModal = ({
   );
 };
 
+interface SquadModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  teamName: string;
+  teamLogo: string;
+  players: PlayerWithUser[];
+}
+const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModalProps) => (
+  <Dialog open={isOpen} onOpenChange={onClose}>
+    <DialogContent className="overflow-hidden p-0">
+      <div className={`bg-gradient-to-br from-green-500/10 to-transparent p-8 pb-4`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border-2 border-white bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
+              {teamLogo ? (
+                <img src={teamLogo} alt={teamName} className="h-full w-full object-cover" />
+              ) : (
+                <Shield className={`h-8 w-8 text-green-500/40`} />
+              )}
+            </div>
+            <div>
+              <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+                {teamName}
+              </h2>
+              <p className={`text-[10px] font-black tracking-[0.2em] text-green-500 uppercase`}>
+                Roster Details // {players.length} Active
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+      <div className="p-8 pt-4">
+        <div className="custom-scrollbar max-h-[60vh] space-y-3 overflow-y-auto pr-2">
+          {players.map((player: any, idx: number) => (
+            <div
+              key={idx}
+              className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-emerald-500/50 dark:border-white/5 dark:bg-white/5"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm transition-colors group-hover:text-emerald-500 dark:bg-slate-800 dark:text-slate-500">
+                  <UserCircle2 className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black tracking-tight text-slate-900 uppercase dark:text-white">
+                    {player.user.name}
+                  </h4>
+                  <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase italic">
+                    Core Squad
+                  </p>
+                </div>
+              </div>
+              <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+            </div>
+          ))}
+        </div>
+        <div className="pt-8">
+          <button
+            onClick={onClose}
+            className={`w-full rounded-2xl bg-green-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-green-500/20 transition-all active:scale-95`}
+          >
+            Dismiss Roster
+          </button>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
+
 const AddOfficialModal = ({ onClose, onSubmit, isOpen, players }: AddOfficialModalProps) => {
   const [selectedRole, setSelectedRole] = useState<OfficialRole>("UMPIRE");
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithUser | null>(null);
@@ -552,6 +626,15 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     },
   });
 
+  const { data: user } = useQuery<User>({
+    queryKey: ["organizer", id],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/me");
+
+      return data.data;
+    },
+  });
+
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -694,9 +777,11 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                 </div>
 
                 <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
-                  <button className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-sans text-[10px] font-black tracking-widest text-slate-900 uppercase shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
-                    Initialize Official Scorer
-                  </button>
+                  {match.organizerId === user?.id && (
+                    <button className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[poppins] text-xs font-semibold tracking-widest text-slate-900 uppercase shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
+                      Initialize Match
+                    </button>
+                  )}
                   <button className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800">
                     <Share2 className="h-5 w-5" />
                   </button>
@@ -776,6 +861,8 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
         officials={match?.matchOfficials || []}
         onClose={handleClose}
       />
+
+      <SquadModal isOpen={false} onClose={() => {}} players={[]} teamLogo="" teamName="" />
     </div>
   );
 };

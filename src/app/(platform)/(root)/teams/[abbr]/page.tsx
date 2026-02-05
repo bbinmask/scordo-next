@@ -76,9 +76,9 @@ const TeamIdPage = () => {
   const { data: user, isLoading: isUserLoading } = useQuery<User>({
     queryKey: ["me"],
     queryFn: async () => {
-      const res = await axios.get("/api/me");
+      const { data } = await axios.get("/api/me");
 
-      return res.data;
+      return data.data;
     },
   });
 
