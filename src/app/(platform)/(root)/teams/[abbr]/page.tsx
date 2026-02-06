@@ -38,7 +38,7 @@ import { usePlayerModal, useUpdateTeam } from "@/hooks/store/use-team";
 import OptionsPopover from "../_components/OptionsPopover";
 import { PlayerWithUser, TeamRequestWithDetails } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
-import { sendTeamRequest } from "@/actions/team-actions";
+import { leaveTeam, sendTeamRequest } from "@/actions/team-actions";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
@@ -73,6 +73,15 @@ const TeamIdPage = () => {
     },
   });
 
+  const { execute: executeSentRequest, isLoading: sendingReq } = useAction(sendTeamRequest, {
+    onSuccess: (data) => {
+      toast.success("Request sent!");
+    },
+    onError: (err) => {
+      toast.error(err);
+    },
+  });
+
   const { data: user, isLoading: isUserLoading } = useQuery<User>({
     queryKey: ["me"],
     queryFn: async () => {
@@ -104,7 +113,7 @@ const TeamIdPage = () => {
 
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithUser | null>(null);
 
-  const hasSentRequest = Boolean(sentRequest);
+  const [alreadySent, setAlreadySent] = useState(Boolean(sentRequest));
 
   const { isOwner, isCaptain } = useIsTeamOwner(team as any, user?.id);
   const { onOpen: onPlayerOpen } = usePlayerModal();
@@ -125,7 +134,8 @@ const TeamIdPage = () => {
             <TeamHeader
               alreadyInTeam={alreadyInTeam}
               setAlreadyInTeam={setAlreadyInTeam}
-              alreadySent={hasSentRequest}
+              alreadySent={alreadySent}
+              setAlreadySent={setAlreadySent}
               user={user}
               isOwner={isOwner}
               team={team as any}
@@ -153,7 +163,7 @@ const TeamIdPage = () => {
                     />
                   </div>
 
-                  {team.isRecruiting && !alreadyInTeam && !hasSentRequest && (
+                  {team.isRecruiting && !alreadyInTeam && !alreadySent && (
                     <div className="group relative overflow-hidden rounded-[2rem] bg-green-700 p-8 text-white">
                       <Zap className="absolute top-2 right-2 h-32 w-32 -rotate-12 text-white/5 transition-transform group-hover:scale-110" />
                       <h3 className="mb-2 text-2xl font-black tracking-tighter uppercase italic">
@@ -163,25 +173,17 @@ const TeamIdPage = () => {
                         We are currently looking for Grandmaster level players for our upcoming
                         matches.
                       </p>
-                      <button className="mt-6 w-full cursor-pointer rounded-xl bg-white py-3 font-[poppins] text-xs font-bold text-slate-800 uppercase transition-all hover:shadow-xl">
-                        Apply Now
+                      <button
+                        disabled={sendingReq}
+                        onClick={() => {
+                          executeSentRequest({ teamId: team.id });
+                        }}
+                        className="mt-6 w-full cursor-pointer rounded-xl bg-white py-3 font-[poppins] text-xs font-bold text-slate-800 uppercase transition-all hover:shadow-xl"
+                      >
+                        {sendingReq ? <Spinner /> : "Apply Now"}
                       </button>
                     </div>
                   )}
-                </div>
-
-                {/* Followers / Following */}
-                <div className="hover-card rounded-xl p-5">
-                  <h2 className="mb-3 font-[poppins] text-lg font-semibold text-gray-900 dark:text-white">
-                    Community
-                  </h2>
-                  <div className="center grid font-[urbanist]">
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-300">
-                      12000
-                      {/* players.length */}
-                    </p>
-                    <p className="secondary-text text-sm font-semibold">Followers</p>
-                  </div>
                 </div>
               </div>
 
@@ -303,6 +305,7 @@ interface TeamHeaderProps {
   user?: User;
   alreadyInTeam: boolean;
   setAlreadyInTeam: Dispatch<SetStateAction<boolean>>;
+  setAlreadySent: Dispatch<SetStateAction<boolean>>;
   alreadySent: boolean;
 }
 
@@ -313,6 +316,7 @@ const TeamHeader = ({
   alreadySent,
   alreadyInTeam,
   setAlreadyInTeam,
+  setAlreadySent,
 }: TeamHeaderProps) => {
   const isAlreadySent = alreadySent;
 
@@ -323,7 +327,23 @@ const TeamHeader = ({
       queryClient.invalidateQueries({
         queryKey: ["sent-request", team.abbreviation],
       });
-      toast.success("Request sent!");
+      toast.success(user?.id === team.ownerId ? "You joined the squad!" : "Request sent!");
+      if (user?.id === team.ownerId) setAlreadyInTeam(true);
+      else {
+        setAlreadySent(true);
+      }
+    },
+    onError: (err) => {
+      toast.error(err);
+    },
+  });
+
+  const { execute: executeLeave, isLoading: leavingTeam } = useAction(leaveTeam, {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["team", team.abbreviation],
+      });
+      toast.success("You left the team!");
     },
     onError: (err) => {
       toast.error(err);
@@ -333,7 +353,7 @@ const TeamHeader = ({
   const { confirmModalState, openConfirmModal, closeConfirmModal } = useConfirmModal();
 
   const handleLeaveTeam = () => {
-    alert("Left");
+    executeLeave({ teamId: team.id });
   };
 
   const handleWidthdrawRequest = () => {

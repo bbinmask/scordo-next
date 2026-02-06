@@ -393,14 +393,14 @@ const OfficialsModal = ({
 interface SquadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  teamName: string;
-  teamLogo: string;
-  players: PlayerWithUser[];
+  teamName?: string;
+  teamLogo?: string;
+  players?: PlayerWithUser[];
 }
 const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModalProps) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent className="overflow-hidden p-0">
-      <div className={`bg-gradient-to-br from-green-500/10 to-transparent p-8 pb-4`}>
+      <DialogHeader className={`bg-gradient-to-br from-green-500/10 to-transparent p-6 pb-4`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border-2 border-white bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
@@ -415,21 +415,17 @@ const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModal
                 {teamName}
               </h2>
               <p className={`text-[10px] font-black tracking-[0.2em] text-green-500 uppercase`}>
-                Roster Details // {players.length} Active
+                {players?.length} Active
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
-          >
-            <X className="h-6 w-6" />
-          </button>
         </div>
-      </div>
-      <div className="p-8 pt-4">
-        <div className="custom-scrollbar max-h-[60vh] space-y-3 overflow-y-auto pr-2">
-          {players.map((player: any, idx: number) => (
+      </DialogHeader>
+      <div className="hide_scrollbar mt-4 max-h-[40vh] space-y-3 overflow-y-auto px-4 pr-2">
+        {!players || players?.length === 0 ? (
+          <NotFoundParagraph description="No players in the squad" />
+        ) : (
+          players.map((player: any, idx: number) => (
             <div
               key={idx}
               className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-emerald-500/50 dark:border-white/5 dark:bg-white/5"
@@ -449,17 +445,17 @@ const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModal
               </div>
               <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
             </div>
-          ))}
-        </div>
-        <div className="pt-8">
-          <button
-            onClick={onClose}
-            className={`w-full rounded-2xl bg-green-600 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-green-500/20 transition-all active:scale-95`}
-          >
-            Dismiss Roster
-          </button>
-        </div>
+          ))
+        )}
       </div>
+      <DialogFooter className="p-4">
+        <button
+          onClick={onClose}
+          className={`w-full rounded-2xl bg-green-600 py-4 text-xs font-bold tracking-wide text-white uppercase shadow-xl shadow-green-500/20 transition-all active:scale-95`}
+        >
+          Dismiss Roster
+        </button>
+      </DialogFooter>
     </DialogContent>
   </Dialog>
 );
@@ -603,6 +599,12 @@ const AddOfficialModal = ({ onClose, onSubmit, isOpen, players }: AddOfficialMod
   );
 };
 
+type SquadState = {
+  teamName?: string;
+  teamLogo?: string;
+  isOpen: boolean;
+  players?: PlayerWithUser[];
+};
 const MatchIdPage = ({}: MatchIdPageProps) => {
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -635,6 +637,8 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     },
   });
 
+  const [squadModalState, setSquadModalState] = useState<SquadState>({ isOpen: false });
+
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -649,6 +653,18 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     if (!match) return;
 
     execute({ matchId: match.id, matchOfficials });
+  };
+
+  const handleCloseSquad = () => {
+    setSquadModalState((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const handleOpenSquad = (
+    teamName: string,
+    teamLogo: string | null,
+    players: PlayerWithUser[]
+  ) => {
+    setSquadModalState({ players, teamName, teamLogo: teamLogo || undefined, isOpen: true });
   };
 
   const players: PlayerWithUser[] = useMemo(() => {
@@ -718,7 +734,12 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
               <div className="animate-in zoom-in mb-8 flex items-center gap-4 duration-500 md:gap-12">
                 {/* Team A Logo Frame */}
                 <div className="group relative">
-                  <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900">
+                  <div
+                    onClick={() =>
+                      handleOpenSquad(match.teamA.name, match.teamA.logo, match.teamA.players)
+                    }
+                    className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
+                  >
                     {match.teamA.logo ? (
                       <img
                         src={match.teamA.logo}
@@ -749,7 +770,12 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
 
                 {/* Team B Logo Frame */}
                 <div className="group relative">
-                  <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900">
+                  <div
+                    onClick={() =>
+                      handleOpenSquad(match.teamB.name, match.teamB.logo, match.teamB.players)
+                    }
+                    className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
+                  >
                     {match.teamB.logo ? (
                       <img
                         src={match.teamB.logo}
@@ -862,7 +888,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
         onClose={handleClose}
       />
 
-      <SquadModal isOpen={false} onClose={() => {}} players={[]} teamLogo="" teamName="" />
+      <SquadModal onClose={handleCloseSquad} {...squadModalState} />
     </div>
   );
 };

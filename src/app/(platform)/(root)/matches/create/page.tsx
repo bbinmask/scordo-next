@@ -166,8 +166,6 @@ const CreateMatchForm: React.FC = () => {
   const getTeamB = (id?: string): TeamWithPlayers | null =>
     id ? (opponentTeams?.find((t) => t.id === id) ?? null) : null;
 
-  console.log(errors.playerLimit);
-
   return (
     <div className={`transition-colors duration-500`}>
       <div className="bg-slate-50 p-4 font-sans text-slate-900 md:p-8 dark:bg-[#020617] dark:text-slate-100">

@@ -387,18 +387,34 @@ const leaveTeamHandler = async (data: InputTypeForLeave): Promise<ReturnTypeForL
       },
     });
 
-    team = await db.team.update({
-      where: {
-        id: teamId,
-      },
-      data: {
-        players: {
-          deleteMany: {
-            userId: user.id,
+    if (user.id === team.captainId) {
+      team = await db.team.update({
+        where: {
+          id: teamId,
+        },
+        data: {
+          captainId: null,
+          players: {
+            deleteMany: {
+              userId: user.id,
+            },
           },
         },
-      },
-    });
+      });
+    } else {
+      team = await db.team.update({
+        where: {
+          id: teamId,
+        },
+        data: {
+          players: {
+            deleteMany: {
+              userId: user.id,
+            },
+          },
+        },
+      });
+    }
   } catch (error) {
     return {
       error: "Something went wrong!",
