@@ -53,6 +53,7 @@ import { toast } from "sonner";
 import InitializeMatchModal from "../_components/modals/InitializeMatchModal";
 import { type MatchOfficial } from "../_types/types";
 import { AddOfficialModal } from "../_components/AddOfficialsModal";
+import { ControlPad } from "../_components/ControlPad";
 interface MatchIdPageProps {}
 
 interface InfoCardProps {
@@ -662,7 +663,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   </div>
 
                   <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
-                    {isOrganizer && (
+                    {isOrganizer && match.status === "not_started" && (
                       <button
                         onClick={() => setIsInitializing(true)}
                         className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[poppins] text-xs font-semibold tracking-widest text-slate-900 uppercase shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
@@ -676,6 +677,8 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   </div>
                 </div>
 
+                <Separator />
+                <ControlPad />
                 <Separator />
                 <div className="mt-4 w-full space-y-12">
                   <div className="mt-4 grid w-full grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">
@@ -751,11 +754,13 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
           />
 
           <SquadModal onClose={handleCloseSquad} {...squadModalState} />
-          <InitializeMatchModal
-            isOpen={isInitializing}
-            match={match}
-            onClose={() => setIsInitializing(false)}
-          />
+          {isOrganizer && (
+            <InitializeMatchModal
+              isOpen={isInitializing}
+              match={match}
+              onClose={() => setIsInitializing(false)}
+            />
+          )}
         </>
       )}
     </div>

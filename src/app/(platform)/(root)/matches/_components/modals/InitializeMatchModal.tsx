@@ -3,14 +3,12 @@
 import {
   DialogContent,
   Dialog,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
 import { MatchWithTeamAndOfficials } from "@/lib/types";
 import {
-  Activity,
   Check,
   CheckCircle2,
   ChevronLeft,
@@ -87,14 +85,14 @@ export const InitializeMatchModal = ({
     if (!battingTeam) return [];
     const activeIds =
       battingTeam.id === match.teamA.id ? formData.teamAActiveIds : formData.teamBActiveIds;
-    return battingTeam.players.filter((p: any) => activeIds.includes(p.id));
+    return battingTeam.players.filter((p) => activeIds.includes(p.userId));
   }, [battingTeam, formData.teamAActiveIds, formData.teamBActiveIds]);
 
   const activeBowlingPlayers = useMemo(() => {
     if (!bowlingTeam) return [];
     const activeIds =
       bowlingTeam.id === match.teamA.id ? formData.teamAActiveIds : formData.teamBActiveIds;
-    return bowlingTeam.players.filter((p: any) => activeIds.includes(p.id));
+    return bowlingTeam.players.filter((p) => activeIds.includes(p.userId));
   }, [bowlingTeam, formData.teamAActiveIds, formData.teamBActiveIds]);
 
   const onSubmit = async (data: InitializeMatchForm) => {
@@ -119,6 +117,8 @@ export const InitializeMatchModal = ({
     }
   };
 
+  console.log({ teamA: formData?.teamAActiveIds, teamB: formData?.teamBActiveIds });
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="p-0">
@@ -131,14 +131,14 @@ export const InitializeMatchModal = ({
               <DialogTitle className="font-[cal_sans] text-xl font-bold text-slate-900 uppercase italic dark:text-white">
                 Start the Match
               </DialogTitle>
-              <DialogDescription className="font-inter text-xs font-bold tracking-wider text-green-500 uppercase">
+              <DialogDescription className="font-[inter] text-xs font-bold tracking-wide text-green-500 uppercase">
                 Step {step} of 3
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="hide_scrollbar flex-1 overflow-y-auto px-6 pt-4 font-[poppins]">
+        <div className="hide_scrollbar max-h-[48vh] flex-1 overflow-y-auto px-6 py-4 font-[poppins]">
           <form id="init-form" onSubmit={handleSubmit(onSubmit)}>
             {/* STEP 1: TOSS DATA */}
             {step === 1 && (
@@ -226,11 +226,11 @@ export const InitializeMatchModal = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Users className="h-5 w-5 text-green-500" />
-                    <h3 className="text-lg font-black tracking-tight uppercase italic">
-                      Squad Deployment
+                    <h3 className="text-lg font-bold tracking-tight uppercase italic">
+                      Select Players
                     </h3>
                   </div>
-                  <div className="rounded-full border border-green-500/20 bg-green-500/10 px-3 py-1 text-[10px] font-black text-green-500 uppercase">
+                  <div className="rounded-full border border-green-500/20 bg-green-500/10 px-3 py-1 text-[10px] font-bold text-green-500 uppercase">
                     Limit: {match.playerLimit}
                   </div>
                 </div>
@@ -245,23 +245,29 @@ export const InitializeMatchModal = ({
                       </span>
                     </p>
                     <div className="custom-scrollbar max-h-64 space-y-1 overflow-y-auto pr-2">
-                      {match.teamA.players.map((p: any) => (
-                        <button
-                          key={p.id}
-                          type="button"
-                          onClick={() => togglePlayer("A", p.id)}
-                          className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                            formData.teamAActiveIds.includes(p.id)
-                              ? "border-teal-500 bg-teal-500/10 text-teal-600"
-                              : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
-                          }`}
-                        >
-                          <span className="truncate text-[10px] font-bold uppercase">
-                            {p.user.name}
-                          </span>
-                          {formData.teamAActiveIds.includes(p.id) && <Check className="h-3 w-3" />}
-                        </button>
-                      ))}
+                      {match.teamA.players
+                        .filter(
+                          (pl) => !formData.teamBActiveIds.some((userId) => pl.userId === userId)
+                        )
+                        .map((p) => (
+                          <button
+                            key={p.userId}
+                            type="button"
+                            onClick={() => togglePlayer("A", p.userId)}
+                            className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
+                              formData.teamAActiveIds.includes(p.userId)
+                                ? "border-teal-500 bg-teal-500/10 text-teal-600"
+                                : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
+                            }`}
+                          >
+                            <span className="truncate text-[10px] font-bold uppercase">
+                              {p.user.name}
+                            </span>
+                            {formData.teamAActiveIds.includes(p.userId) && (
+                              <Check className="h-3 w-3" />
+                            )}
+                          </button>
+                        ))}
                     </div>
                   </div>
 
@@ -274,36 +280,42 @@ export const InitializeMatchModal = ({
                       </span>
                     </p>
                     <div className="custom-scrollbar max-h-64 space-y-1 overflow-y-auto pr-2">
-                      {match.teamB.players.map((p: any) => (
-                        <button
-                          key={p.id}
-                          type="button"
-                          onClick={() => togglePlayer("B", p.id)}
-                          className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                            formData.teamBActiveIds.includes(p.id)
-                              ? "border-red-500 bg-red-500/10 text-red-600"
-                              : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
-                          }`}
-                        >
-                          <span className="truncate text-[10px] font-bold uppercase">
-                            {p.user.name}
-                          </span>
-                          {formData.teamBActiveIds.includes(p.id) && <Check className="h-3 w-3" />}
-                        </button>
-                      ))}
+                      {match.teamB.players
+                        .filter(
+                          (pl) => !formData.teamAActiveIds.some((userId) => pl.userId === userId)
+                        )
+                        .map((p) => (
+                          <button
+                            key={p.userId}
+                            type="button"
+                            onClick={() => togglePlayer("B", p.userId)}
+                            className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
+                              formData.teamBActiveIds.includes(p.userId)
+                                ? "border-yellow-500 bg-yellow-500/10 text-yellow-600"
+                                : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
+                            }`}
+                          >
+                            <span className="truncate text-[10px] font-bold uppercase">
+                              {p.user.name}
+                            </span>
+                            {formData.teamBActiveIds.includes(p.userId) && (
+                              <Check className="h-3 w-3" />
+                            )}
+                          </button>
+                        ))}
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* STEP 3: INITIAL DEPLOYMENT */}
+            {/* STEP 3: Select Openers */}
             {step === 3 && (
               <div className="animate-in slide-in-from-right-4 space-y-8 duration-300">
                 <div className="flex items-center gap-3">
                   <Target className="h-5 w-5 text-green-500" />
                   <h3 className="text-lg font-black tracking-tight uppercase italic">
-                    Initial Deployment
+                    Select Openers
                   </h3>
                 </div>
 
@@ -327,8 +339,8 @@ export const InitializeMatchModal = ({
                           <option value="" className="bg-slate-900 text-slate-400">
                             Choose Batter
                           </option>
-                          {activeBattingPlayers.map((p: any) => (
-                            <option key={p.id} value={p.id} className="bg-slate-900">
+                          {activeBattingPlayers.map((p) => (
+                            <option key={p.userId} value={p.userId} className="bg-slate-900">
                               {p.user.name}
                             </option>
                           ))}
@@ -349,9 +361,9 @@ export const InitializeMatchModal = ({
                             Choose Batter
                           </option>
                           {activeBattingPlayers
-                            .filter((p: any) => p.id !== formData.strikerId)
-                            .map((p: any) => (
-                              <option key={p.id} value={p.id} className="bg-slate-900">
+                            .filter((p) => p.userId !== formData.strikerId)
+                            .map((p) => (
+                              <option key={p.userId} value={p.userId} className="bg-slate-900">
                                 {p.user.name}
                               </option>
                             ))}
@@ -372,8 +384,8 @@ export const InitializeMatchModal = ({
                         <option value="" className="bg-slate-900 text-slate-400">
                           Choose Bowler
                         </option>
-                        {activeBowlingPlayers.map((p: any) => (
-                          <option key={p.id} value={p.id} className="bg-slate-900">
+                        {activeBowlingPlayers.map((p) => (
+                          <option key={p.userId} value={p.userId} className="bg-slate-900">
                             {p.user.name}
                           </option>
                         ))}
@@ -385,8 +397,7 @@ export const InitializeMatchModal = ({
                 <div className="flex items-start gap-4 rounded-3xl border border-green-500/20 bg-green-500/5 p-6">
                   <Info className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
                   <p className="text-xs leading-relaxed font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                    Ready for synchronized deployment. Initializing this match will finalize the
-                    toss and set the{" "}
+                    Ready for the match. Starting this match will finalize the toss and set the{" "}
                     <span className="font-bold text-green-500 underline">LIVE</span> status for all
                     spectators.
                   </p>
@@ -397,11 +408,11 @@ export const InitializeMatchModal = ({
         </div>
 
         {/* Footer */}
-        <DialogFooter className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between gap-2 px-4 py-2">
           <button
             type="button"
             onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
-            className="group center flex w-full gap-2 rounded-2xl bg-slate-300 px-6 py-4 text-center text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
+            className="group center flex w-full gap-2 rounded-2xl bg-slate-300 px-6 py-4 text-center font-[urbanist] text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
           >
             {step === 1 ? (
               "Cancel"
@@ -422,7 +433,7 @@ export const InitializeMatchModal = ({
                   (formData.teamAActiveIds.length === 0 || formData.teamBActiveIds.length === 0))
               }
               onClick={() => setStep(step + 1)}
-              className="group primary-btn center flex w-full gap-2 rounded-2xl px-8 py-4 text-xs font-black tracking-widest uppercase shadow-xl transition-all active:scale-95 disabled:opacity-50"
+              className="group primary-btn center flex w-full gap-2 rounded-2xl px-8 py-4 font-[urbanist] text-xs font-black tracking-widest uppercase shadow-xl transition-all active:scale-95 disabled:opacity-50"
             >
               Next{" "}
               <ChevronRight className="h-4 w-4 transition-all duration-500 group-hover:translate-x-2" />
@@ -434,17 +445,16 @@ export const InitializeMatchModal = ({
               disabled={
                 isSubmitting || !formData.strikerId || !formData.nonStrikerId || !formData.bowlerId
               }
-              className="center primary-btn flex gap-3 rounded-2xl px-12 py-4 text-center text-xs font-bold tracking-widest uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
+              className="center group primary-btn flex gap-3 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
             >
-              {isSubmitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Activity className="h-4 w-4" />
+              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isSubmitting ? "Starting..." : "Start"}
+              {!isSubmitting && (
+                <ChevronRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-2" />
               )}
-              {isSubmitting ? "Synchronizing..." : "Initialize Scordo Match"}
             </button>
           )}
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
