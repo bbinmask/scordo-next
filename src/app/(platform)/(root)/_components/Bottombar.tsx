@@ -13,11 +13,14 @@ import {
   Bell,
   HelpCircle,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { isTabActive } from "@/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
+import { useTheme } from "next-themes";
 
 const Bottombar = () => {
   const pathname = usePathname();
@@ -120,12 +123,21 @@ interface MorePopoverProps {
 const MorePopover = ({ children }: MorePopoverProps) => {
   const router = useRouter();
 
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <Popover>
       <PopoverTrigger className="w-full">{children} </PopoverTrigger>
       <PopoverContent className="relative bg-slate-100 dark:bg-slate-800">
         <div className="mb-2 border-b border-slate-100 p-4 dark:border-white/5">
-          <h4 className="font-[poppins] text-sm font-black text-indigo-500 uppercase">
+          <h4 className="font-[poppins] text-sm font-black text-green-500 uppercase">
             Quick Portal
           </h4>
         </div>
@@ -149,7 +161,11 @@ const MorePopover = ({ children }: MorePopoverProps) => {
             },
 
             { icon: Bell, label: "Notifications", color: "amber", onClick: () => {} },
-
+            {
+              icon: theme === "dark" ? Moon : Sun,
+              onClick: () => setTheme(theme === "dark" ? "light" : "dark"),
+              label: theme === "dark" ? "Dark" : "Light",
+            },
             {
               icon: HelpCircle,
               label: "About Us",

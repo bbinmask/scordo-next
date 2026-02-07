@@ -113,78 +113,89 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
 
   return (
     <div className="hide_scrollbar max-h-[45vh] overflow-hidden overflow-x-hidden overflow-y-auto pb-8">
-      <ul className="custom-scrollbar max-h-[400px] space-y-3 overflow-y-auto p-2">
-        {teams.length > 0 ? (
-          teams.map((team) => (
-            <li
-              key={team.id}
-              className="group hover-card flex items-center gap-4 rounded-2xl border border-transparent p-4 transition-all duration-300 hover:border-slate-200 hover:bg-slate-50 dark:hover:border-white/10 dark:hover:bg-white/5"
-            >
-              {/* Team Logo */}
-              <div className="relative">
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border-2 border-white bg-slate-100 shadow-sm dark:border-slate-900 dark:bg-slate-800">
-                  {team.logo ? (
-                    <img src={team.logo} alt={team.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="text-xs font-black text-slate-400">{team.abbreviation}</span>
-                  )}
-                </div>
-                <div className="absolute -top-1 -left-1 rounded-lg bg-green-500 p-1 text-white shadow-lg">
-                  <Shield className="h-2.5 w-2.5" />
-                </div>
-              </div>
-
-              {/* Team Info */}
-              <div className="min-w-0 flex-1">
-                <h4 className="primary-text truncate font-sans text-sm font-black uppercase">
-                  {team.name}
-                </h4>
-                <div className="mt-0.5 flex items-center gap-2">
-                  <span className="secondary-text rounded-md bg-slate-200 px-1.5 py-0.5 font-[urbanist] text-[10px] font-black dark:bg-white/10">
-                    {team.abbreviation}
-                  </span>
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase">
-                    <Users className="h-3 w-3" />
-                    {team.players.length} Members
+      {!teams ? (
+        <div className="py-12 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 dark:bg-slate-800">
+            <Trophy className="h-8 w-8 text-slate-300" />
+          </div>
+          <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+            No Managed Teams Found
+          </p>
+        </div>
+      ) : (
+        <ul className="custom-scrollbar max-h-[400px] space-y-3 overflow-y-auto p-2">
+          {teams.length > 0 ? (
+            teams.map((team) => (
+              <li
+                key={team.id}
+                className="group hover-card flex items-center gap-4 rounded-2xl border border-transparent p-4 transition-all duration-300 hover:border-slate-200 hover:bg-slate-50 dark:hover:border-white/10 dark:hover:bg-white/5"
+              >
+                {/* Team Logo */}
+                <div className="relative">
+                  <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border-2 border-white bg-slate-100 shadow-sm dark:border-slate-900 dark:bg-slate-800">
+                    {team.logo ? (
+                      <img src={team.logo} alt={team.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-xs font-black text-slate-400">{team.abbreviation}</span>
+                    )}
+                  </div>
+                  <div className="absolute -top-1 -left-1 rounded-lg bg-green-500 p-1 text-white shadow-lg">
+                    <Shield className="h-2.5 w-2.5" />
                   </div>
                 </div>
-              </div>
 
-              {/* Action Button */}
-              <button
-                onClick={() => handleInvite(team.id)}
-                disabled={
-                  requests.findIndex((t) => t.fromId === user.id && t.teamId === team.id) !== -1 ||
-                  isLoading
-                }
-                className={`relative flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 ${
-                  requests?.findIndex((t) => t.teamId === team.id) !== -1
-                    ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
-                    : "border border-slate-200 bg-white text-slate-400 group-hover:bg-green-50 hover:border-green-500 hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
-                }`}
-              >
-                {invitingId === team.id ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : requests.findIndex((t) => t.fromId === user.id && t.teamId === team.id) !==
-                  -1 ? (
-                  <Check className="h-5 w-5" />
-                ) : (
-                  <Plus className="h-5 w-5" />
-                )}
-              </button>
-            </li>
-          ))
-        ) : (
-          <div className="py-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 dark:bg-slate-800">
-              <Trophy className="h-8 w-8 text-slate-300" />
+                {/* Team Info */}
+                <div className="min-w-0 flex-1">
+                  <h4 className="primary-text truncate font-sans text-sm font-black uppercase">
+                    {team.name}
+                  </h4>
+                  <div className="mt-0.5 flex items-center gap-2">
+                    <span className="secondary-text rounded-md bg-slate-200 px-1.5 py-0.5 font-[urbanist] text-[10px] font-black dark:bg-white/10">
+                      {team.abbreviation}
+                    </span>
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase">
+                      <Users className="h-3 w-3" />
+                      {team.players.length} Members
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <button
+                  onClick={() => handleInvite(team.id)}
+                  disabled={
+                    requests.findIndex((t) => t.fromId === user.id && t.teamId === team.id) !==
+                      -1 || isLoading
+                  }
+                  className={`relative flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 ${
+                    requests?.findIndex((t) => t.teamId === team.id) !== -1
+                      ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400"
+                      : "border border-slate-200 bg-white text-slate-400 group-hover:bg-green-50 hover:border-green-500 hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
+                  }`}
+                >
+                  {invitingId === team.id ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : requests.findIndex((t) => t.fromId === user.id && t.teamId === team.id) !==
+                    -1 ? (
+                    <Check className="h-5 w-5" />
+                  ) : (
+                    <Plus className="h-5 w-5" />
+                  )}
+                </button>
+              </li>
+            ))
+          ) : (
+            <div className="py-12 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 dark:bg-slate-800">
+                <Trophy className="h-8 w-8 text-slate-300" />
+              </div>
+              <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+                No Managed Teams Found
+              </p>
             </div>
-            <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
-              No Managed Teams Found
-            </p>
-          </div>
-        )}
-      </ul>
+          )}
+        </ul>
+      )}
     </div>
   );
 };

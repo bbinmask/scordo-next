@@ -194,7 +194,7 @@ function Invitations() {
 
   return (
     <div className="group hover-card border-input relative h-52 w-full rounded-3xl border p-6 font-[urbanist] font-semibold lg:mt-16">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <h2 className="primary-text flex items-center gap-3 font-[poppins] text-lg font-black tracking-tighter uppercase italic">
           <div className="relative">
             <Bell size={20} className="text-green-600" />
@@ -220,9 +220,9 @@ function Invitations() {
           description="No new invitations."
         />
       ) : (
-        <ul className="hide_scrollbar mb-4 max-h-44 space-y-3 overflow-y-auto scroll-smooth rounded-xl">
+        <ul className="hide_scrollbar mb-4 max-h-36 overflow-y-auto scroll-smooth rounded-xl">
           {teamInvites.map((invite) => (
-            <li key={invite.id} className="rounded-lg p-3">
+            <li key={invite.id} className="rounded-lg px-3 py-2">
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <img

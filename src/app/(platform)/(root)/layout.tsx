@@ -12,7 +12,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <Navbar />
       <ModalProvider />
       <div className="flex justify-center">
-        <div className="w-full max-w-[1200px] pb-[70px]">{children}</div>
+        <div className="w-full max-w-[1600px] pb-[70px]">{children}</div>
       </div>
       <Bottombar />
     </QueryProvider>
@@ -20,3 +20,5 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default RootLayout;
+
+// 1200px

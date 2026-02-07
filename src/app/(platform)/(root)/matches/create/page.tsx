@@ -376,6 +376,7 @@ const CreateMatchForm: React.FC = () => {
                           {...register("playerLimit", {
                             required: "Player limit is required",
                             valueAsNumber: true,
+                            min: 2,
                           })}
                           required
                           placeholder="Enter limit of players in both team"
