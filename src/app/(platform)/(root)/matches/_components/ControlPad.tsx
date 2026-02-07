@@ -3,12 +3,16 @@ import { RotateCcw, Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import WicketDetailsModal from "./modals/WicketDetailsModal";
+import { PlayerWithUser } from "@/lib/types";
 
 type ExtraType = "wd" | "nb" | "b";
 
-interface ControlPadProps {}
+interface ControlPadProps {
+  battingPlayers: PlayerWithUser[];
+  bowlingPlayers: PlayerWithUser[];
+}
 
-export const ControlPad = ({}: ControlPadProps) => {
+export const ControlPad = ({ battingPlayers, bowlingPlayers }: ControlPadProps) => {
   const onBall = (runs: number, extra?: ExtraType | null, wicket?: boolean) => {
     setExtras({
       isWide: false,
@@ -170,10 +174,11 @@ export const ControlPad = ({}: ControlPadProps) => {
         </button>
       </div>
       <WicketDetailsModal
+        fielders={bowlingPlayers}
+        batters={[battingPlayers[0], battingPlayers[1]]}
         isOpen={isWicket}
         onClose={() => setIsWicket(false)}
         onConfirm={() => {}}
-        pendingRuns={20}
       />
     </div>
   );

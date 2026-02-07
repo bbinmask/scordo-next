@@ -537,6 +537,8 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     return match?.organizerId === user?.id;
   }, [user, match]);
 
+  console.log({ match });
+
   return (
     <div className={`font-sans transition-colors duration-500`}>
       {isLoading ? (
@@ -677,8 +679,16 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   </div>
                 </div>
 
-                <Separator />
-                <ControlPad />
+                {/* 
+                {match.status === "in_progress" &&
+                  match.matchOfficials.findIndex((mo) => mo.userId === user?.id) !== -1 && (
+                    
+                  )} */}
+                <ControlPad
+                  battingPlayers={match.teamA.players}
+                  bowlingPlayers={match.teamB.players}
+                />
+
                 <Separator />
                 <div className="mt-4 w-full space-y-12">
                   <div className="mt-4 grid w-full grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">

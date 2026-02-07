@@ -6,7 +6,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Ball, WicketType } from "@/generated/prisma";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { PlayerWithUser } from "@/lib/types";
+import { ArrowLeft, Check, CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface WicketDetails {
@@ -38,10 +39,7 @@ const WICKET_CONFIGS: WicketConfig[] = [
     id: "runout",
     label: "Run Out",
     icon: "🏃",
-    fields: [
-      { key: "primary", label: "Player Out", placeholder: "Batsman name" },
-      { key: "secondary", label: "Thrown by", placeholder: "Fielder name" },
-    ],
+    fields: [{ key: "secondary", label: "Thrown by", placeholder: "Fielder name" }],
   },
   {
     id: "stumped",
@@ -56,18 +54,23 @@ interface WicketDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (data: Partial<Ball>) => void;
-  pendingRuns: number;
+  batters: PlayerWithUser[];
+  fielders: PlayerWithUser[];
 }
 
 export const WicketDetailsModal = ({
   isOpen,
   onClose,
   onConfirm,
-  pendingRuns,
+  fielders,
+  batters,
 }: WicketDetailsModalProps) => {
   const [step, setStep] = useState<"type" | "fields">("type");
   const [selectedConfig, setSelectedConfig] = useState<WicketConfig | null>(null);
   const [formData, setFormData] = useState<WicketDetails>({ primary: "", secondary: "" });
+  const [selectedFielderID, setSelectedFielderID] = useState<string>("");
+  const [selectedBatterID, setSelectedBatterID] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -90,78 +93,110 @@ export const WicketDetailsModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="animate-in slide-in-from-bottom-8 space-y-6 rounded-[2rem] duration-300">
         {/* Header */}
-        <DialogHeader className="flex flex-col items-center justify-start">
-          <DialogTitle>
-            {step === "fields" && (
-              <button
-                onClick={() => setStep("type")}
-                className="mb-1 flex items-center gap-1 text-[10px] font-bold tracking-widest text-indigo-500 uppercase"
-              >
-                <ArrowLeft size={12} /> Back
-              </button>
-            )}
-            <h3 className="text-2xl font-black tracking-tight italic">
-              {step === "type" ? "Dismissal Type" : `${selectedConfig?.label} Details`}
-            </h3>
+        <DialogHeader className="flex items-center justify-start">
+          <DialogTitle className="text-2xl font-black tracking-tight italic">
+            {step === "type" ? "Dismissal Type" : `${selectedConfig?.label} Details`}
           </DialogTitle>
           <DialogDescription />
         </DialogHeader>
 
         {/* Content */}
-        <div className="max-h-[280px]">
+        <div className="max-h-[280px] overflow-y-auto">
           {step === "type" ? (
             <div className="grid grid-cols-2 gap-3">
               {WICKET_CONFIGS.map((config) => (
                 <button
                   key={config.id}
                   onClick={() => handleTypeSelect(config)}
-                  className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-slate-100 bg-slate-50 p-4 text-slate-700 transition-all hover:border-green-500 hover:bg-green-500/70 hover:text-white"
+                  className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-slate-100 bg-slate-50 p-4 font-[inter] text-slate-900 transition-all hover:border-green-500 hover:bg-green-500/10 hover:text-green-600"
                 >
-                  <span className="text-sm font-bold">{config.label}</span>
+                  <span className="text-xs font-bold">{config.label}</span>
                 </button>
               ))}
             </div>
           ) : (
             <div className="space-y-4">
               {selectedConfig?.fields.map((field) => (
-                <div key={field.key} className="space-y-1.5">
-                  <label className="ml-1 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
-                    {field.label}
-                  </label>
-                  <div className="relative">
-                    <input
-                      autoFocus={field.key === "primary"}
-                      type="text"
-                      placeholder={field.placeholder}
-                      value={formData[field.key] || ""}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
-                      }
-                      className="w-full rounded-2xl border-2 border-slate-100 bg-slate-50 py-4 pr-4 pl-12 font-bold text-slate-700 transition-all outline-none focus:border-indigo-500"
-                    />
+                <>
+                  <div key={field.key} className="space-y-1.5">
+                    <label className="ml-1 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
+                      {field.label}
+                    </label>
+                    <div className="relative grid max-h-48 grid-cols-2 gap-2 overflow-y-auto">
+                      {fielders.map((fielder) => (
+                        <button
+                          key={fielder.userId}
+                          type="button"
+                          onClick={() => setSelectedFielderID(fielder.userId)}
+                          className={`flex w-full items-center justify-between overflow-x-hidden rounded-xl border p-3 text-left transition-all ${
+                            selectedFielderID === fielder.userId
+                              ? "border-teal-500 bg-teal-500/10 text-teal-600"
+                              : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
+                          }`}
+                        >
+                          <span className="truncate text-[10px] font-bold uppercase">
+                            {fielder.user.name}
+                          </span>
+                          {selectedFielderID === fielder.userId && <Check className="h-3 w-3" />}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </>
               ))}
 
-              <button
-                onClick={() => onConfirm({ dismissalType: selectedConfig?.label as WicketType })}
-                className="mt-4 flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-900 py-5 font-black tracking-widest text-white uppercase transition-colors hover:bg-black"
-              >
-                Confirm Wicket <CheckCircle2 size={18} />
-              </button>
+              {selectedConfig?.id === "runout" && (
+                <div className="space-y-1.5">
+                  <label className="ml-1 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
+                    Player Out
+                  </label>
+                  <div className="relative grid max-h-48 grid-cols-2 gap-2">
+                    {batters.map((batter) => (
+                      <button
+                        key={batter.id}
+                        type="button"
+                        onClick={() => setSelectedBatterID(batter.userId)}
+                        className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
+                          selectedBatterID === batter.userId
+                            ? "border-teal-500 bg-teal-500/10 text-teal-600"
+                            : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
+                        }`}
+                      >
+                        <span className="truncate text-[10px] font-bold uppercase">
+                          {batter.user.name}
+                        </span>
+                        {selectedBatterID === batter.userId && <Check className="h-3 w-3" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
 
         {/* Status bar inside modal */}
-        <div className="flex items-center gap-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 font-bold text-white italic">
-            {pendingRuns}
+        {step === "fields" && (
+          <div className="grid grid-cols-2 items-center justify-between gap-2 py-2">
+            <button
+              onClick={() => setStep("type")}
+              type="button"
+              className="group center flex w-full gap-2 rounded-2xl bg-slate-300 px-6 py-4 text-center font-[urbanist] text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="center group primary-btn flex gap-3 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
+            >
+              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isSubmitting ? "Loading..." : "Done"}
+              {!isSubmitting && (
+                <ChevronRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-2" />
+              )}
+            </button>
           </div>
-          <p className="text-[10px] font-bold tracking-wider text-indigo-600 uppercase">
-            Runs recorded on this delivery
-          </p>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );
