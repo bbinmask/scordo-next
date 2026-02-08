@@ -23,13 +23,18 @@ export const GET = async (req: Request) => {
             },
           },
           {
-            teamB: {
-              players: {
-                some: {
-                  userId: user.id,
+            AND: [
+              {
+                teamB: {
+                  players: {
+                    some: {
+                      userId: user.id,
+                    },
+                  },
                 },
               },
-            },
+              { requestStatus: "accepted" },
+            ],
           },
         ],
       },

@@ -5,12 +5,14 @@ import {
   InputTypeForCreate,
   InputTypeForOfficials,
   InputTypeForRemove,
+  InputTypeForRequest,
   ReturnTypeForCreate,
   ReturnTypeForOfficials,
   ReturnTypeForRemove,
+  ReturnTypeForRequest,
 } from "./types";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { AddOfficials, CreateMatch, RemoveOfficial } from "./schema";
+import { AddOfficials, CreateMatch, RemoveOfficial, Request } from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
 import { Match } from "@/generated/prisma";
@@ -191,6 +193,118 @@ const removeOfficialHandler = async (data: InputTypeForRemove): Promise<ReturnTy
   };
 };
 
+const declineMatchRequestHandler = async (
+  data: InputTypeForRequest
+): Promise<ReturnTypeForRequest> => {
+  const { id } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Login required!",
+    };
+
+  let match;
+  try {
+    match = await db.match.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        teamB: {
+          select: {
+            ownerId: true,
+            captainId: true,
+          },
+        },
+      },
+    });
+
+    if (!match)
+      return {
+        error: "Match not found!",
+      };
+
+    if (match.teamB.ownerId !== user.id && match.teamB.captainId !== user.id)
+      return {
+        error: "Only owner or captain can decline",
+      };
+
+    match = await db.match.delete({
+      where: { id },
+    });
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
+  revalidatePath(`/teams`);
+
+  return {
+    data: match,
+  };
+};
+const acceptMatchRequestHandler = async (
+  data: InputTypeForRequest
+): Promise<ReturnTypeForRequest> => {
+  const { id } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Login required!",
+    };
+
+  let match;
+  try {
+    match = await db.match.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        teamB: {
+          select: {
+            ownerId: true,
+            captainId: true,
+          },
+        },
+      },
+    });
+
+    if (!match)
+      return {
+        error: "Match not found!",
+      };
+
+    if (match.teamB.ownerId !== user.id && match.teamB.captainId !== user.id)
+      return {
+        error: "Only owner or captain can decline",
+      };
+
+    match = await db.match.update({
+      where: { id },
+      data: {
+        requestStatus: "accepted",
+      },
+    });
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
+  revalidatePath(`/teams`);
+
+  return {
+    data: match,
+  };
+};
+
 export const createMatch = createSafeAction(CreateMatch, createMatchHandler);
 export const addOfficials = createSafeAction(AddOfficials, addOfficialsHandler);
 export const removeOfficial = createSafeAction(RemoveOfficial, removeOfficialHandler);
+export const declineMatchRequest = createSafeAction(Request, declineMatchRequestHandler);
+export const acceptMatchRequest = createSafeAction(Request, acceptMatchRequestHandler);

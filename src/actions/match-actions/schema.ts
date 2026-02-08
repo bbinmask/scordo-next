@@ -43,3 +43,7 @@ export const AddOfficials = z.object({
 export const RemoveOfficial = z.object({
   id: z.string({ message }),
 });
+
+export const Request = z.object({
+  id: z.string({ message }),
+});

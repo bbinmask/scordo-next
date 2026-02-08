@@ -13,7 +13,7 @@ export const GET = async (req: Request) => {
     const matches = await db.match.findMany({
       where: {
         teamB: {
-          ownerId: user.id,
+          OR: [{ ownerId: user.id }, { captainId: user.id }],
         },
         requestStatus: "pending",
       },
