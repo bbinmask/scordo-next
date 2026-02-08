@@ -1,5 +1,5 @@
 import z from "zod";
-import { AddOfficials, CreateMatch, Request, RemoveOfficial } from "./schema";
+import { AddOfficials, CreateMatch, Request, RemoveOfficial, InitializeMatch } from "./schema";
 import { ActionState } from "@/lib/create-safe-action";
 import { Match, MatchOfficial } from "@/generated/prisma";
 
@@ -14,3 +14,6 @@ export type ReturnTypeForRemove = ActionState<InputTypeForRemove, any>;
 
 export type InputTypeForRequest = z.infer<typeof Request>;
 export type ReturnTypeForRequest = ActionState<InputTypeForRequest, any>;
+
+export type InputTypeForInitializeMatch = z.infer<typeof InitializeMatch>;
+export type ReturnTypeForInitialieMatch = ActionState<InputTypeForInitializeMatch, any>;

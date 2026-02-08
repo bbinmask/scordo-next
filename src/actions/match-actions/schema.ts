@@ -47,3 +47,14 @@ export const RemoveOfficial = z.object({
 export const Request = z.object({
   id: z.string({ message }),
 });
+
+export const InitializeMatch = z.object({
+  matchId: z.string({ message }),
+  tossWinnerId: z.string({ message }),
+  strikerId: z.string({ message }),
+  nonStrikerId: z.string({ message }),
+  bowlerId: z.string({ message }),
+  tossDecision: z.enum(["BAT", "BOWL"], { message, error: "Toss decision must be bat or ball" }),
+  teamAPlayerIds: z.array(z.string({ message })),
+  teamBPlayerIds: z.array(z.string({ message })),
+});

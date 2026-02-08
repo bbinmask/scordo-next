@@ -3,10 +3,12 @@
 import { db } from "@/lib/db";
 import {
   InputTypeForCreate,
+  InputTypeForInitializeMatch,
   InputTypeForOfficials,
   InputTypeForRemove,
   InputTypeForRequest,
   ReturnTypeForCreate,
+  ReturnTypeForInitialieMatch,
   ReturnTypeForOfficials,
   ReturnTypeForRemove,
   ReturnTypeForRequest,
@@ -300,6 +302,79 @@ const acceptMatchRequestHandler = async (
 
   return {
     data: match,
+  };
+};
+
+const initializeMatchHandler = async (
+  data: InputTypeForInitializeMatch
+): Promise<ReturnTypeForInitialieMatch> => {
+  const {
+    bowlerId,
+    matchId,
+    nonStrikerId,
+    strikerId,
+    teamAPlayerIds,
+    teamBPlayerIds,
+    tossDecision,
+    tossWinnerId,
+  } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Login required",
+    };
+
+  let inning, match;
+  try {
+    match = await db.match.findUnique({
+      where: {
+        id: matchId,
+      },
+      select: {
+        organizerId: true,
+        teamAId: true,
+        teamBId: true,
+      },
+    });
+
+    if (!match)
+      return {
+        error: "Match not found",
+      };
+
+    if (match.organizerId !== user.id) {
+      return {
+        error: "Only match organizer can start the match!",
+      };
+    }
+
+    const battingTeamId =
+      tossWinnerId === match.teamAId && tossDecision === "BAT" ? match.teamAId : match.teamBId;
+    const bowlingTeamId =
+      tossWinnerId === match.teamAId && tossDecision === "BOWL" ? match.teamAId : match.teamBId;
+
+    inning = await db.inning.create({
+      data: {
+        battingTeamId,
+        bowlingTeamId,
+        matchId,
+        currentBowlerId: bowlerId,
+        currentStrikerId: strikerId,
+        currentNonStrikerId: nonStrikerId,
+      },
+    });
+
+    // Do it later
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
+  return {
+    data: "",
   };
 };
 

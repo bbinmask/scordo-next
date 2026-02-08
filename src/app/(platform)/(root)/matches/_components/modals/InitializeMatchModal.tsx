@@ -24,18 +24,8 @@ import {
   Zap,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-
-interface InitializeMatchForm {
-  tossWinnerId: string;
-  tossDecision: "BAT" | "BOWL";
-  teamAActiveIds: string[];
-  teamBActiveIds: string[];
-  strikerId: string;
-  nonStrikerId: string;
-  bowlerId: string;
-}
-
+import { SubmitHandler, useForm } from "react-hook-form";
+import { type InputTypeForInitializeMatch as InitializeMatchForm } from "@/actions/match-actions/types";
 export const InitializeMatchModal = ({
   isOpen,
   onClose,
@@ -52,23 +42,24 @@ export const InitializeMatchModal = ({
     handleSubmit,
     watch,
     setValue,
-    formState: { isValid },
+    formState: { isValid, errors },
   } = useForm<InitializeMatchForm>({
     defaultValues: {
+      matchId: match.id,
       tossWinnerId: "",
       tossDecision: "BAT",
-      teamAActiveIds: [],
-      teamBActiveIds: [],
+      teamAPlayerIds: [],
+      teamBPlayerIds: [],
       strikerId: "",
       nonStrikerId: "",
       bowlerId: "",
     },
+
     mode: "onChange",
   });
 
   const formData = watch();
 
-  // Determine who bats and bowls based on toss
   const battingTeam = useMemo(() => {
     if (!formData.tossWinnerId) return null;
     const isWinnerA = formData.tossWinnerId === match.teamA.id;
@@ -84,28 +75,28 @@ export const InitializeMatchModal = ({
   const activeBattingPlayers = useMemo(() => {
     if (!battingTeam) return [];
     const activeIds =
-      battingTeam.id === match.teamA.id ? formData.teamAActiveIds : formData.teamBActiveIds;
+      battingTeam.id === match.teamA.id ? formData.teamAPlayerIds : formData.teamBPlayerIds;
     return battingTeam.players.filter((p) => activeIds.includes(p.userId));
-  }, [battingTeam, formData.teamAActiveIds, formData.teamBActiveIds]);
+  }, [battingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds]);
 
   const activeBowlingPlayers = useMemo(() => {
     if (!bowlingTeam) return [];
     const activeIds =
-      bowlingTeam.id === match.teamA.id ? formData.teamAActiveIds : formData.teamBActiveIds;
+      bowlingTeam.id === match.teamA.id ? formData.teamAPlayerIds : formData.teamBPlayerIds;
     return bowlingTeam.players.filter((p) => activeIds.includes(p.userId));
-  }, [bowlingTeam, formData.teamAActiveIds, formData.teamBActiveIds]);
+  }, [bowlingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds]);
 
-  const onSubmit = async (data: InitializeMatchForm) => {
+  const onSubmit: SubmitHandler<InitializeMatchForm> = async (data) => {
     setIsSubmitting(true);
     console.log("Scordo Engine Init Payload:", data);
     setTimeout(() => {
       setIsSubmitting(false);
-      onClose();
+      // onClose();
     }, 2000);
   };
 
   const togglePlayer = (team: "A" | "B", playerId: string) => {
-    const field = team === "A" ? "teamAActiveIds" : "teamBActiveIds";
+    const field = team === "A" ? "teamAPlayerIds" : "teamBPlayerIds";
     const current = formData[field];
     if (current.includes(playerId)) {
       setValue(
@@ -116,8 +107,6 @@ export const InitializeMatchModal = ({
       setValue(field, [...current, playerId]);
     }
   };
-
-  console.log({ teamA: formData?.teamAActiveIds, teamB: formData?.teamBActiveIds });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -241,13 +230,13 @@ export const InitializeMatchModal = ({
                     <p className="flex justify-between text-[10px] font-black tracking-widest text-slate-400 uppercase">
                       {match.teamA.abbreviation}{" "}
                       <span>
-                        {formData.teamAActiveIds.length}/{match.playerLimit}
+                        {formData.teamAPlayerIds.length}/{match.playerLimit}
                       </span>
                     </p>
                     <div className="custom-scrollbar max-h-64 space-y-1 overflow-y-auto pr-2">
                       {match.teamA.players
                         .filter(
-                          (pl) => !formData.teamBActiveIds.some((userId) => pl.userId === userId)
+                          (pl) => !formData.teamBPlayerIds.some((userId) => pl.userId === userId)
                         )
                         .map((p) => (
                           <button
@@ -255,7 +244,7 @@ export const InitializeMatchModal = ({
                             type="button"
                             onClick={() => togglePlayer("A", p.userId)}
                             className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                              formData.teamAActiveIds.includes(p.userId)
+                              formData.teamAPlayerIds.includes(p.userId)
                                 ? "border-teal-500 bg-teal-500/10 text-teal-600"
                                 : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
                             }`}
@@ -263,7 +252,7 @@ export const InitializeMatchModal = ({
                             <span className="truncate text-[10px] font-bold uppercase">
                               {p.user.name}
                             </span>
-                            {formData.teamAActiveIds.includes(p.userId) && (
+                            {formData.teamAPlayerIds.includes(p.userId) && (
                               <Check className="h-3 w-3" />
                             )}
                           </button>
@@ -276,13 +265,13 @@ export const InitializeMatchModal = ({
                     <p className="flex justify-between text-[10px] font-black tracking-widest text-slate-400 uppercase">
                       {match.teamB.abbreviation}{" "}
                       <span>
-                        {formData.teamBActiveIds.length}/{match.playerLimit}
+                        {formData.teamBPlayerIds.length}/{match.playerLimit}
                       </span>
                     </p>
                     <div className="custom-scrollbar max-h-64 space-y-1 overflow-y-auto pr-2">
                       {match.teamB.players
                         .filter(
-                          (pl) => !formData.teamAActiveIds.some((userId) => pl.userId === userId)
+                          (pl) => !formData.teamAPlayerIds.some((userId) => pl.userId === userId)
                         )
                         .map((p) => (
                           <button
@@ -290,7 +279,7 @@ export const InitializeMatchModal = ({
                             type="button"
                             onClick={() => togglePlayer("B", p.userId)}
                             className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                              formData.teamBActiveIds.includes(p.userId)
+                              formData.teamBPlayerIds.includes(p.userId)
                                 ? "border-yellow-500 bg-yellow-500/10 text-yellow-600"
                                 : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
                             }`}
@@ -298,7 +287,7 @@ export const InitializeMatchModal = ({
                             <span className="truncate text-[10px] font-bold uppercase">
                               {p.user.name}
                             </span>
-                            {formData.teamBActiveIds.includes(p.userId) && (
+                            {formData.teamBPlayerIds.includes(p.userId) && (
                               <Check className="h-3 w-3" />
                             )}
                           </button>
@@ -430,7 +419,7 @@ export const InitializeMatchModal = ({
               disabled={
                 (step === 1 && !formData.tossWinnerId) ||
                 (step === 2 &&
-                  (formData.teamAActiveIds.length === 0 || formData.teamBActiveIds.length === 0))
+                  (formData.teamAPlayerIds.length === 0 || formData.teamBPlayerIds.length === 0))
               }
               onClick={() => setStep(step + 1)}
               className="group primary-btn center flex w-full gap-2 rounded-2xl px-8 py-4 font-[urbanist] text-xs font-black tracking-widest uppercase shadow-xl transition-all active:scale-95 disabled:opacity-50"
