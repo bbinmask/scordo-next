@@ -1,14 +1,17 @@
 "use client";
 
-import React from "react";
-import { ArrowUpRight, MapPin, PlusCircle, Calendar, Activity, Sword, Bell } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowUpRight, MapPin, PlusCircle, Calendar, Sword, Bell } from "lucide-react";
 import Link from "next/link";
 import { Match } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Carousel } from "@/components/carousel";
 import Spinner from "@/components/Spinner";
+import { toast } from "sonner";
+import { useAction } from "@/hooks/useAction";
+import { MatchWithTeamAndOfficials } from "@/lib/types";
 
 const MatchCard = ({ match }: { match: any }) => {
   if (!match) return null;
@@ -109,9 +112,6 @@ const EmptyState = ({ type = "managed" }) => (
       <div className="animate-bounce rounded-3xl bg-slate-100 p-4 text-slate-400 duration-[3000ms] dark:bg-slate-800 dark:text-slate-600">
         <Sword className="h-10 w-10" />
       </div>
-      <div className="absolute -top-1 -right-1 rounded-full border-4 border-white bg-green-500 p-1 dark:border-slate-900">
-        <Activity className="h-3 w-3 text-white" />
-      </div>
     </div>
     <div className="mb-6 max-w-xs text-center">
       <h4 className="mb-1 text-lg font-black tracking-tighter text-slate-900 uppercase dark:text-white">
@@ -131,6 +131,137 @@ const EmptyState = ({ type = "managed" }) => (
     </Link>
   </div>
 );
+
+function MatchRequests() {
+  const [inviteId, setInviteId] = useState<string | null>(null);
+  const isAccepting = false;
+  const isCanceling = false;
+  const queryClient = useQueryClient();
+
+  const { data: matchRequests, isLoading } = useQuery<MatchWithTeamAndOfficials[]>({
+    queryKey: ["match-requests"],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/me/matches/requests");
+
+      return data.data;
+    },
+  });
+
+  // const { execute: executeAccept, isLoading: isAccepting } = useAction(acceptTeamRequest, {
+  //   onSuccess(data) {
+  //     queryClient.invalidateQueries({ queryKey: ["team-invites"] });
+  //     toast.success("Accepted!");
+  //     setInviteId(null);
+  //   },
+  //   onError(error) {
+  //     toast.error(error);
+  //     setInviteId(null);
+  //   },
+  // });
+
+  // const { execute: executeDecline, isLoading: isCanceling } = useAction(declineTeamRequest, {
+  //   onSuccess(data) {
+  //     queryClient.invalidateQueries({ queryKey: ["team-invites"] });
+  //     toast.success("Request Declined!");
+  //     setInviteId(null);
+  //   },
+  //   onError(error) {
+  //     toast.error(error);
+  //     setInviteId(null);
+  //   },
+  // });
+
+  const handleAccept = (id: string, teamId: string, fromId: string) => {
+    setInviteId(id);
+
+    // executeAccept({ teamId, reqId: id, fromId });
+  };
+  const handleDecline = (id: string) => {
+    setInviteId(id);
+
+    // executeDecline({ id, teamId });
+  };
+
+  return (
+    <div className="group hover-card border-input relative h-52 w-full rounded-3xl border p-6 font-[urbanist] font-semibold lg:mt-16">
+      <div className="flex items-center justify-between">
+        <h2 className="primary-text flex items-center gap-3 font-[inter] text-lg font-bold uppercase italic">
+          <div className="relative">
+            <Bell size={20} className="text-green-600" />
+            {matchRequests?.length ? (
+              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 ring-1 ring-white dark:ring-slate-900" />
+            ) : null}
+          </div>
+          Inbox
+        </h2>
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500 dark:bg-white/5">
+          {matchRequests?.length} NEW
+        </span>
+      </div>
+
+      {/* Team Invitations */}
+      {isLoading ? (
+        <div className="center flex h-full w-full">
+          <Spinner />
+        </div>
+      ) : !matchRequests || matchRequests.length === 0 ? (
+        <div className="rounded-[2rem] border border-dashed border-slate-200 p-6 text-center dark:border-white/10">
+          <p className="text-[10px] font-normal tracking-widest text-slate-400 uppercase">
+            No Requests found!
+          </p>
+        </div>
+      ) : (
+        <ul className="hide_scrollbar mb-4 max-h-36 overflow-y-auto scroll-smooth rounded-xl">
+          {matchRequests.map((invite) => (
+            <li key={invite.id} className="rounded-lg px-3 py-2">
+              <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <img
+                    src={invite?.teamA?.logo || "/team.svg"}
+                    alt={invite.teamA.name}
+                    className="h-8 w-8 rounded-full bg-white"
+                    onError={(e) =>
+                      (e.currentTarget.src = "https://placehold.co/100x100/CCCCCC/FFFFFF?text=T")
+                    }
+                  />
+                  <h3 className="font-[urbanist] font-bold text-slate-800 dark:text-slate-100">
+                    {invite.teamA.name}
+                  </h3>
+                </div>
+              </div>
+              {
+                <div className="flex space-x-2 font-[poppins]">
+                  <button
+                    disabled={isAccepting || isCanceling}
+                    onClick={() => handleAccept("", "", "")}
+                    className="flex-1 rounded-xl bg-green-600 py-2 text-[10px] font-bold text-white uppercase transition-opacity hover:opacity-90"
+                  >
+                    {isAccepting && inviteId === invite.id ? (
+                      <Spinner className="mx-auto h-4" />
+                    ) : (
+                      "Accept"
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleDecline(invite.id)}
+                    disabled={isCanceling || isAccepting}
+                    className="center flex flex-1 rounded-xl bg-slate-200 py-2 text-[10px] font-bold text-slate-600 uppercase transition-colors hover:bg-slate-300 dark:bg-white/10 dark:text-slate-400"
+                  >
+                    {isCanceling && inviteId === invite.id ? (
+                      <Spinner className="mx-auto h-4" />
+                    ) : (
+                      <span className="text-red-600 dark:text-red-300">Decline</span>
+                    )}
+                  </button>
+                </div>
+              }
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 const MatchesPage = () => {
   const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<Match[]>({
@@ -157,94 +288,77 @@ const MatchesPage = () => {
   });
 
   return (
-    <div className={`font-sans transition-colors duration-500`}>
-      <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
-        <div className="mx-auto max-w-7xl px-6 pt-12">
-          <div className="mb-12 flex items-center justify-between">
-            <div>
-              <h1 className="primary-heading pr-1 text-5xl font-black tracking-tighter uppercase italic">
-                Matches Dashboard
-              </h1>
-            </div>
-          </div>
+    <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
+      <div className="max-w-7xl pt-12">
+        <div className="mb-12 flex items-center justify-between px-4">
+          <h1 className="primary-text font-[inter] text-3xl font-black tracking-tighter uppercase italic">
+            Matches <span className="primary-heading pr-2">Dashboard</span>
+          </h1>
+        </div>
 
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-            {/* Main Matches Column */}
-            <div className="space-y-12 lg:col-span-8">
-              <section>
-                <div className="mb-6 flex items-center justify-between px-4">
-                  <h3 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
-                    Team <span className="primary-heading pr-2">Matches</span>
-                  </h3>
-                  <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-                </div>
-
-                {isLoading ? (
-                  <div className="center flex w-full">
-                    <Spinner />
-                  </div>
-                ) : matches && matches.length > 0 ? (
-                  <Carousel>
-                    {matches.map((match) => (
-                      <MatchCard key={match.id} match={match} />
-                    ))}
-                  </Carousel>
-                ) : (
-                  <EmptyState type="managed" />
-                )}
-              </section>
-
-              <section>
-                <div className="mb-6 flex items-center justify-between px-4">
-                  <h3 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
-                    Matches As <span className="primary-heading pr-2">Official</span>
-                  </h3>
-                  <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-                </div>
-
-                {officialsLoading ? (
-                  <div className="center flex w-full">
-                    <Spinner />
-                  </div>
-                ) : matchesAsOfficial && matchesAsOfficial.length > 0 ? (
-                  <div className="no-scrollbar flex gap-8 overflow-x-auto scroll-smooth pb-6">
-                    {matchesAsOfficial.map((match, i) => (
-                      <MatchCard key={i} match={match} />
-                    ))}
-                  </div>
-                ) : (
-                  <EmptyState type="joined" />
-                )}
-              </section>
-            </div>
-
-            {/* Sidebar Column */}
-            <aside className="space-y-8 lg:col-span-4">
-              {/* Create Match CTA */}
-              <CreateMatchCard />
-
-              {/* Match Inbox / Requests */}
-              <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
-                <div className="mb-6 flex items-center justify-between">
-                  <h2 className="flex items-center text-xl font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-                    <Bell size={22} className="mr-3 text-green-500" />
-                    Match Feed
-                  </h2>
-                  <span className="rounded-lg bg-green-500 px-2 py-0.5 text-[10px] font-black text-white">
-                    LIVE
-                  </span>
-                </div>
-                <div className="rounded-[2rem] border border-dashed border-slate-200 p-6 text-center dark:border-white/10">
-                  <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
-                    System Monitoring Active
-                  </p>
-                  <p className="mt-2 text-[9px] font-bold text-slate-500">
-                    Awaiting real-time match data streams
-                  </p>
-                </div>
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+          {/* Main Matches Column */}
+          <div className="space-y-12 lg:col-span-8">
+            <section>
+              <div className="mb-6 flex items-center justify-between px-4">
+                <h3 className="flex items-center gap-3 font-[inter] text-2xl font-black uppercase italic">
+                  Team <span className="primary-heading pr-2">Matches</span>
+                </h3>
+                <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
               </div>
-            </aside>
+
+              {isLoading ? (
+                <div className="center flex w-full">
+                  <Spinner />
+                </div>
+              ) : matches && matches.length > 0 ? (
+                <Carousel>
+                  {matches.map((match) => (
+                    <MatchCard key={match.id} match={match} />
+                  ))}
+                </Carousel>
+              ) : (
+                <div className="px-4">
+                  <EmptyState type="managed" />
+                </div>
+              )}
+            </section>
+
+            <section>
+              <div className="mb-6 flex items-center justify-between px-4">
+                <h3 className="flex items-center gap-2 font-[inter] text-2xl font-black tracking-tighter uppercase italic">
+                  Matches As <span className="primary-heading pr-2">Official</span>
+                </h3>
+                <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
+              </div>
+
+              {officialsLoading ? (
+                <div className="center flex w-full">
+                  <Spinner />
+                </div>
+              ) : matchesAsOfficial && matchesAsOfficial.length > 0 ? (
+                <div className="no-scrollbar flex gap-8 overflow-x-auto scroll-smooth pb-6">
+                  {matchesAsOfficial.map((match, i) => (
+                    <MatchCard key={i} match={match} />
+                  ))}
+                </div>
+              ) : (
+                <div className="px-4">
+                  <EmptyState type="joined" />
+                </div>
+              )}
+            </section>
           </div>
+
+          {/* Sidebar Column */}
+          <aside className="flex gap-2 space-y-8 px-4 lg:col-span-4 lg:block lg:px-0 lg:pr-2">
+            {/* Create Match */}
+            <CreateMatchCard />
+
+            {/* Match Requests */}
+
+            <MatchRequests />
+          </aside>
         </div>
       </div>
     </div>
