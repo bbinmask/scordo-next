@@ -54,6 +54,7 @@ import InitializeMatchModal from "../_components/modals/InitializeMatchModal";
 import { type MatchOfficial } from "../_types/types";
 import { AddOfficialModal } from "../_components/AddOfficialsModal";
 import { ControlPad } from "../_components/ControlPad";
+import { TypographyHeading } from "@/components/Typography";
 interface MatchIdPageProps {}
 
 interface InfoCardProps {
@@ -393,7 +394,7 @@ interface SquadModalProps {
 }
 const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModalProps) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
-    <DialogContent className="overflow-hidden p-0">
+    <DialogContent className="overflow-hidden p-0 font-[poppins]">
       <DialogHeader className={`bg-gradient-to-br from-green-500/10 to-transparent p-6 pb-4`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -405,12 +406,14 @@ const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModal
               )}
             </div>
             <div>
-              <h2 className="text-xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+              <DialogTitle className="text-xl font-bold tracking-tighter text-slate-900 uppercase italic dark:text-white">
                 {teamName}
-              </h2>
-              <p className={`text-[10px] font-black tracking-[0.2em] text-green-500 uppercase`}>
+              </DialogTitle>
+              <DialogDescription
+                className={`w-full text-left text-[10px] font-semibold tracking-wide text-green-500 uppercase`}
+              >
                 {players?.length} Active
-              </p>
+              </DialogDescription>
             </div>
           </div>
         </div>
@@ -429,10 +432,10 @@ const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModal
                   <UserCircle2 className="h-6 w-6" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-black tracking-tight text-slate-900 uppercase dark:text-white">
+                  <h4 className="font-[inter] text-sm font-semibold tracking-tight text-slate-900 uppercase dark:text-white">
                     {player.user.name}
                   </h4>
-                  <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase italic">
+                  <p className="font-[urbanist] text-[10px] font-bold tracking-wide text-slate-400 uppercase">
                     Core Squad
                   </p>
                 </div>
@@ -447,7 +450,7 @@ const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModal
           onClick={onClose}
           className={`w-full rounded-2xl bg-green-600 py-4 text-xs font-bold tracking-wide text-white uppercase shadow-xl shadow-green-500/20 transition-all active:scale-95`}
         >
-          Dismiss Roster
+          Dismiss
         </button>
       </DialogFooter>
     </DialogContent>
@@ -460,6 +463,120 @@ type SquadState = {
   isOpen: boolean;
   players?: PlayerWithUser[];
 };
+
+export const MatchHeroSection = ({ match }: { match: MatchWithTeamAndOfficials }) => {
+  const [squadModalState, setSquadModalState] = useState<SquadState>({ isOpen: false });
+
+  const handleOpenSquad = (
+    teamName: string,
+    teamLogo: string | null,
+    players: PlayerWithUser[]
+  ) => {
+    setSquadModalState({ players, teamName, teamLogo: teamLogo || undefined, isOpen: true });
+  };
+  const handleCloseSquad = () => {
+    setSquadModalState((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  return (
+    <>
+      <div className="relative h-64 w-full overflow-hidden md:h-96">
+        {/* Banner */}
+        <div className="absolute inset-0 flex">
+          {/* Team A Banner*/}
+          <div className="relative flex-1 overflow-hidden border-r-2 border-slate-900/10 dark:border-white/5">
+            {match.teamA.banner ? (
+              <img
+                src={match.teamA.banner}
+                className="h-full w-full object-cover opacity-60"
+                alt="Team A Banner"
+              />
+            ) : (
+              <div className="h-full w-full bg-gradient-to-br from-blue-900 via-green-950 to-slate-900 opacity-60" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-transparent to-transparent" />
+          </div>
+
+          {/* Team B Banner */}
+          <div className="relative flex-1 overflow-hidden">
+            {match.teamB.banner ? (
+              <img
+                src={match.teamB.banner}
+                className="h-full w-full object-cover opacity-60"
+                alt="Team B Banner"
+              />
+            ) : (
+              <div className="h-full w-full bg-gradient-to-bl from-red-900 via-rose-950 to-slate-900 opacity-60" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-l from-slate-900 via-transparent to-transparent" />
+          </div>
+        </div>
+
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-slate-50 dark:to-[#020617]" />
+      </div>
+      <div className="animate-in zoom-in z-10 mx-auto -mt-24 mb-8 flex max-w-7xl items-center justify-between gap-4 px-6 duration-500 md:-mt-32 md:gap-12">
+        {/* Team A Logo Frame */}
+        <div className="group relative">
+          <div
+            onClick={() => handleOpenSquad(match.teamA.name, match.teamA.logo, match.teamA.players)}
+            className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
+          >
+            {match.teamA.logo ? (
+              <img
+                src={match.teamA.logo}
+                alt={match.teamA.abbreviation}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-slate-50 dark:bg-slate-800">
+                <Shield className="h-16 w-16 text-blue-500/40 md:h-24 md:w-24" />
+              </div>
+            )}
+          </div>
+          <div className="absolute -bottom-2 -left-2 rounded-xl bg-blue-600 px-4 py-1 text-xs font-black tracking-widest text-white uppercase shadow-lg">
+            {match.teamA.abbreviation}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-green-600 text-2xl font-black text-white italic shadow-xl shadow-green-500/30 hover:animate-none md:h-24 md:w-24 md:text-4xl">
+            VS
+          </div>
+          <div className="mt-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 backdrop-blur-md">
+            <span className="font-[poppins] text-xs font-semibold tracking-wider text-white uppercase">
+              Scordo Match
+            </span>
+          </div>
+        </div>
+
+        {/* Team B Logo Frame */}
+        <div className="group relative">
+          <div
+            onClick={() => handleOpenSquad(match.teamB.name, match.teamB.logo, match.teamB.players)}
+            className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
+          >
+            {match.teamB.logo ? (
+              <img
+                src={match.teamB.logo}
+                alt={match.teamB.abbreviation}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-slate-50 dark:bg-slate-800">
+                <Trophy className="h-16 w-16 text-red-500/40 md:h-24 md:w-24" />
+              </div>
+            )}
+          </div>
+          <div className="absolute -right-2 -bottom-2 rounded-xl bg-red-600 px-4 py-1 text-xs font-black tracking-widest text-white uppercase shadow-lg">
+            {match.teamB.abbreviation}
+          </div>
+        </div>
+      </div>
+      <SquadModal onClose={handleCloseSquad} {...squadModalState} />
+    </>
+  );
+};
+
 const MatchIdPage = ({}: MatchIdPageProps) => {
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -492,7 +609,6 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     },
   });
 
-  const [squadModalState, setSquadModalState] = useState<SquadState>({ isOpen: false });
   const [isInitializing, setIsInitializing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -508,18 +624,6 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     if (!match) return;
 
     execute({ matchId: match.id, matchOfficials });
-  };
-
-  const handleCloseSquad = () => {
-    setSquadModalState((prev) => ({ ...prev, isOpen: false }));
-  };
-
-  const handleOpenSquad = (
-    teamName: string,
-    teamLogo: string | null,
-    players: PlayerWithUser[]
-  ) => {
-    setSquadModalState({ players, teamName, teamLogo: teamLogo || undefined, isOpen: true });
   };
 
   const players: PlayerWithUser[] = useMemo(() => {
@@ -554,182 +658,70 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
         <>
           <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
             {/* Hero Section */}
-            <div className="relative h-64 w-full overflow-hidden md:h-96">
-              {/* Composite Banner Logic with Fallbacks */}
-              <div className="absolute inset-0 flex">
-                {/* Team A Banner Side */}
-                <div className="relative flex-1 overflow-hidden border-r-2 border-slate-900/10 dark:border-white/5">
-                  {match.teamA.banner ? (
-                    <img
-                      src={match.teamA.banner}
-                      className="h-full w-full object-cover opacity-60"
-                      alt="Team A Banner"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gradient-to-br from-blue-900 via-green-950 to-slate-900 opacity-60" />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-transparent to-transparent" />
+
+            <MatchHeroSection match={match} />
+
+            <div className="flex flex-col items-center px-4">
+              {/* Match Title & Actions */}
+              <div className="w-full max-w-4xl text-center">
+                <div className="center mb-4 flex flex-col text-3xl font-black tracking-tighter uppercase italic md:text-5xl">
+                  <h1 className="text-start">{match.teamA.name}</h1>
+                  <span className="primary-heading pr-2 text-center">vs</span>
+                  <h1 className="text-end"> {match.teamB.name}</h1>
                 </div>
 
-                {/* Team B Banner Side */}
-                <div className="relative flex-1 overflow-hidden">
-                  {match.teamB.banner ? (
-                    <img
-                      src={match.teamB.banner}
-                      className="h-full w-full object-cover opacity-60"
-                      alt="Team B Banner"
-                    />
+                <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
+                  {isOrganizer ? (
+                    <>
+                      {match.requestStatus === "pending" ? (
+                        <span className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
+                          Request Pending
+                        </span>
+                      ) : (
+                        match.status === "not_started" && (
+                          <button
+                            onClick={() => setIsInitializing(true)}
+                            className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                          >
+                            Initialize Match
+                          </button>
+                        )
+                      )}
+                    </>
                   ) : (
-                    <div className="h-full w-full bg-gradient-to-bl from-red-900 via-rose-950 to-slate-900 opacity-60" />
+                    <div className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
+                      {match.status === "not_started" && "Not started yet"}
+                    </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-l from-slate-900 via-transparent to-transparent" />
+                  <button className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800">
+                    <Share2 className="h-5 w-5" />
+                  </button>
                 </div>
               </div>
 
-              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-slate-50 dark:to-[#020617]" />
-            </div>
-
-            {/* Versus Main Header */}
-            <div className="relative z-10 mx-auto -mt-24 max-w-7xl px-6 md:-mt-32">
-              <div className="flex flex-col items-center">
-                {/* Visual Versus Display */}
-                <div className="animate-in zoom-in mb-8 flex items-center gap-4 duration-500 md:gap-12">
-                  {/* Team A Logo Frame */}
-                  <div className="group relative">
-                    <div
-                      onClick={() =>
-                        handleOpenSquad(match.teamA.name, match.teamA.logo, match.teamA.players)
-                      }
-                      className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
-                    >
-                      {match.teamA.logo ? (
-                        <img
-                          src={match.teamA.logo}
-                          alt={match.teamA.abbreviation}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-slate-50 dark:bg-slate-800">
-                          <Shield className="h-16 w-16 text-blue-500/40 md:h-24 md:w-24" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="absolute -bottom-2 -left-2 rounded-xl bg-blue-600 px-4 py-1 text-xs font-black tracking-widest text-white uppercase shadow-lg">
-                      {match.teamA.abbreviation}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-center">
-                    <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-green-600 text-2xl font-black text-white italic shadow-xl shadow-green-500/30 hover:animate-none md:h-24 md:w-24 md:text-4xl">
-                      VS
-                    </div>
-                    <div className="mt-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 backdrop-blur-md">
-                      <span className="font-[poppins] text-xs font-semibold tracking-wider text-white uppercase">
-                        Scordo Match
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Team B Logo Frame */}
-                  <div className="group relative">
-                    <div
-                      onClick={() =>
-                        handleOpenSquad(match.teamB.name, match.teamB.logo, match.teamB.players)
-                      }
-                      className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
-                    >
-                      {match.teamB.logo ? (
-                        <img
-                          src={match.teamB.logo}
-                          alt={match.teamB.abbreviation}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-slate-50 dark:bg-slate-800">
-                          <Trophy className="h-16 w-16 text-red-500/40 md:h-24 md:w-24" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="absolute -right-2 -bottom-2 rounded-xl bg-red-600 px-4 py-1 text-xs font-black tracking-widest text-white uppercase shadow-lg">
-                      {match.teamB.abbreviation}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Match Title & Actions */}
-                <div className="w-full max-w-4xl text-center">
-                  <div className="center mb-4 flex flex-col text-3xl font-black tracking-tighter uppercase italic md:text-5xl">
-                    <h1 className="text-start">{match.teamA.name}</h1>
-                    <span className="primary-heading pr-2 text-center">vs</span>
-                    <h1 className="text-end"> {match.teamB.name}</h1>
-                  </div>
-
-                  <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
-                    {isOrganizer && match.status === "not_started" && (
-                      <button
-                        onClick={() => setIsInitializing(true)}
-                        className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[poppins] text-xs font-semibold tracking-widest text-slate-900 uppercase shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
-                      >
-                        Initialize Match
-                      </button>
-                    )}
-                    <button className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800">
-                      <Share2 className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* 
+              {/* 
                 {match.status === "in_progress" &&
                   match.matchOfficials.findIndex((mo) => mo.userId === user?.id) !== -1 && (
                     
                   )} */}
-                <ControlPad
-                  battingPlayers={match.teamA.players}
-                  bowlingPlayers={match.teamB.players}
-                />
+              {match.status === "in_progress" &&
+                match.matchOfficials.findIndex((official) => official.userId === user?.id) !==
+                  -1 && (
+                  <ControlPad
+                    battingPlayers={match.teamA.players}
+                    bowlingPlayers={match.teamB.players}
+                  />
+                )}
 
-                <Separator />
-                <div className="mt-4 w-full space-y-12">
-                  <div className="mt-4 grid w-full grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">
-                    <InfoCard
-                      label="Stadium Venue"
-                      value={match.location || "TBD"}
-                      icon={MapPin}
-                      color="green"
-                      subValue={`${match.venue.city}, ${match.venue.country}`}
-                    />
-                    <InfoCard
-                      label="Match Category"
-                      value={match.category}
-                      icon={Activity}
-                      color="blue"
-                      subValue={`${match.overs} Over Restricted`}
-                    />
-                    <InfoCard
-                      label="Scheduled Kickoff"
-                      value="Jan 31, 2026"
-                      icon={Calendar}
-                      color="amber"
-                      subValue="Match Not Started"
-                    />
-                    <div className="" onClick={handleOpen}>
-                      <InfoCard
-                        label="Official Assigned"
-                        value={`${match.matchOfficials.length} Officials`}
-                        icon={Gavel}
-                        color="green"
-                        subValue={"See all officials list of the match"}
-                      />
-                    </div>
-                  </div>
+              <div className="mt-4 w-full space-y-12">
+                <div className="space-y-12">
                   <div className="flex items-center justify-between px-4">
-                    <h3 className="flex items-center gap-3 font-sans text-xl font-black tracking-tighter uppercase italic">
+                    <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
                       <MonitorPlay className="primary-heading" /> Match
-                      <span className="primary-heading">Center</span>
+                      <span className="primary-heading pr-2">Center</span>
                     </h3>
                     <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-                    <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                    <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
                       Powered by Scordo
                     </span>
                   </div>
@@ -751,6 +743,49 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     </div>
                   )}
                 </div>
+                <div className="flex items-center justify-between px-4">
+                  <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
+                    <MonitorPlay className="primary-heading" /> Match
+                    <span className="primary-heading pr-2">Details</span>
+                  </h3>
+                  <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
+                  <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                    Powered by Scordo
+                  </span>
+                </div>
+
+                <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">
+                  <InfoCard
+                    label="Stadium Venue"
+                    value={match.location || "TBD"}
+                    icon={MapPin}
+                    color="green"
+                    subValue={`${match.venue.city}, ${match.venue.country}`}
+                  />
+                  <InfoCard
+                    label="Match Category"
+                    value={match.category}
+                    icon={Activity}
+                    color="blue"
+                    subValue={`${match.overs} Over Restricted`}
+                  />
+                  <InfoCard
+                    label="Scheduled Kickoff"
+                    value="Jan 31, 2026"
+                    icon={Calendar}
+                    color="amber"
+                    subValue="Match Not Started"
+                  />
+                  <div className="" onClick={handleOpen}>
+                    <InfoCard
+                      label="Official Assigned"
+                      value={`${match.matchOfficials.length} Officials`}
+                      icon={Gavel}
+                      color="green"
+                      subValue={"See all officials list of the match"}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -763,7 +798,6 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
             onClose={handleClose}
           />
 
-          <SquadModal onClose={handleCloseSquad} {...squadModalState} />
           {isOrganizer && (
             <InitializeMatchModal
               isOpen={isInitializing}

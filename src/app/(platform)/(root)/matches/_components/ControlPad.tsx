@@ -46,13 +46,17 @@ export const ControlPad = ({ battingPlayers, bowlingPlayers }: ControlPadProps) 
     <button
       onClick={onClick}
       className={cn(
-        `relative flex aspect-square flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out active:translate-y-1 active:scale-90`,
-        active ? "translate-y-[2px] scale-95 border-b-0 ring-4" : "",
+        `relative flex aspect-square flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`,
+        active ? "ring-indigo-500" : "ring-transparent",
         className
       )}
     >
-      <span className="text-xl font-bold italic">{label}</span>
-      {sub && <span className="text-[10px] font-semibold tracking-wide opacity-70">{sub}</span>}
+      <span className="font-[inter] text-lg font-bold">{label}</span>
+      {sub && (
+        <span className="font-[urbanist] text-[8px] font-semibold tracking-wide uppercase opacity-70">
+          {sub}
+        </span>
+      )}
     </button>
   );
 
@@ -85,57 +89,46 @@ export const ControlPad = ({ battingPlayers, bowlingPlayers }: ControlPadProps) 
     }
   };
 
+  const runsClasses =
+    "border-indigo-100 border dark:border-none border-input bg-indigo-100 text-indigo-600 shadow-md active:translate-y-1 active:scale-90  dark:bg-indigo-500/10 dark:text-indigo-400";
+
+  const nullClasses =
+    "bg-slate-100 border border-input dark:border-none text-slate-600 shadow-sm hover:bg-slate-200  dark:bg-slate-800 dark:text-slate-300";
+
+  const boundaryClasses =
+    "border-emerald-600 bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:translate-y-1 active:scale-90";
+
   return (
     <div className="space-y-6 p-8">
       <div className="grid grid-cols-5 gap-3">
         <Btn
           label="0"
           onClick={() => onBall(0)}
-          className="bg-slate-50 text-slate-600 shadow-sm hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300"
+          className={`${nullClasses} active:translate-y-1 active:scale-90`}
         />
-        <Btn
-          label="1"
-          onClick={() => onBall(1)}
-          className="border-indigo-100 bg-indigo-50 text-indigo-600 shadow-sm dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400"
-        />
-        <Btn
-          label="2"
-          onClick={() => onBall(2)}
-          className="border-indigo-100 bg-indigo-50 text-indigo-600 shadow-sm dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400"
-        />
+        <Btn label="1" onClick={() => onBall(1)} className={`${runsClasses}`} />
+        <Btn label="2" onClick={() => onBall(2)} className={`${runsClasses}`} />
         <Btn
           label="WD"
           sub="Wide"
           active={extras.isWide}
-          className={`bg-slate-50 text-slate-600 shadow-sm ring-indigo-500 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300`}
+          className={`${nullClasses} border-input border ring-2`}
           onClick={() => handleExtras("wd")}
         />
         <Btn
           label="B"
           active={extras.isBye}
-          className={`bg-slate-50 text-slate-600 shadow-sm ring-indigo-500 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300`}
+          className={`${nullClasses} ring-2`}
           sub="Bye"
           onClick={() => handleExtras("b")}
         />
-        <Btn
-          label="3"
-          onClick={() => onBall(3)}
-          className="border-indigo-100 bg-indigo-50 text-indigo-600 shadow-sm dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400"
-        />
-        <Btn
-          label="4"
-          onClick={() => onBall(4)}
-          className="border-emerald-600 bg-emerald-500 text-white shadow-sm hover:bg-emerald-600"
-        />
-        <Btn
-          label="6"
-          className="border-emerald-600 bg-emerald-500 text-white shadow-sm hover:bg-emerald-600"
-          onClick={() => onBall(6)}
-        />
+        <Btn label="3" onClick={() => onBall(3)} className={`${runsClasses}`} />
+        <Btn label="4" onClick={() => onBall(4)} className={`${boundaryClasses}`} />
+        <Btn label="6" className={`${boundaryClasses}`} onClick={() => onBall(6)} />
         <Btn
           label="NB"
           active={extras.isNB}
-          className={`bg-slate-50 text-slate-600 shadow-sm ring-indigo-500 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300`}
+          className={`${nullClasses} ring-2`}
           sub="No Ball"
           onClick={() => handleExtras("nb")}
         />
@@ -157,18 +150,25 @@ export const ControlPad = ({ battingPlayers, bowlingPlayers }: ControlPadProps) 
           onClick={onUndo}
           disabled={history.length === 0}
           className={cn(
-            "flex flex-[2] items-center justify-center gap-3 rounded-2xl border-b-4 py-4 text-xs font-black tracking-widest uppercase transition-all",
+            "center flex flex-[2] gap-3 rounded-2xl bg-yellow-800 py-4 font-[inter] text-xs font-semibold text-slate-100 transition-all",
             history.length > 0
-              ? "border-slate-200 bg-slate-100 text-slate-600 active:translate-y-1 active:border-b-0"
-              : "cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300 opacity-50"
+              ? "active:translate-y-1 active:border-b-0"
+              : "cursor-not-allowed opacity-50"
           )}
         >
           <RotateCcw size={16} />
           Undo Ball
         </button>
         <button
+          className={cn(
+            "flex flex-[2] items-center justify-center gap-3 rounded-2xl bg-orange-800 py-3 font-[inter] text-sm font-semibold transition-all active:translate-y-1"
+          )}
+        >
+          Retire Player
+        </button>
+        <button
           onClick={() => toast.error("Settings coming soon!")}
-          className="flex flex-1 items-center justify-center rounded-2xl border-b-4 border-slate-200 bg-slate-100 p-4 text-slate-400 active:translate-y-1 active:border-b-0"
+          className="flex flex-1 items-center justify-center rounded-2xl bg-teal-700 p-4 text-slate-100 active:translate-y-1"
         >
           <Settings size={20} />
         </button>

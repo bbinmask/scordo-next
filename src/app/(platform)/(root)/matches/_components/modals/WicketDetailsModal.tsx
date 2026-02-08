@@ -117,32 +117,30 @@ export const WicketDetailsModal = ({
           ) : (
             <div className="space-y-4">
               {selectedConfig?.fields.map((field) => (
-                <>
-                  <div key={field.key} className="space-y-1.5">
-                    <label className="ml-1 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
-                      {field.label}
-                    </label>
-                    <div className="relative grid max-h-48 grid-cols-2 gap-2 overflow-y-auto">
-                      {fielders.map((fielder) => (
-                        <button
-                          key={fielder.userId}
-                          type="button"
-                          onClick={() => setSelectedFielderID(fielder.userId)}
-                          className={`flex w-full items-center justify-between overflow-x-hidden rounded-xl border p-3 text-left transition-all ${
-                            selectedFielderID === fielder.userId
-                              ? "border-teal-500 bg-teal-500/10 text-teal-600"
-                              : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
-                          }`}
-                        >
-                          <span className="truncate text-[10px] font-bold uppercase">
-                            {fielder.user.name}
-                          </span>
-                          {selectedFielderID === fielder.userId && <Check className="h-3 w-3" />}
-                        </button>
-                      ))}
-                    </div>
+                <div key={field.key} className="space-y-1.5">
+                  <label className="ml-1 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
+                    {field.label}
+                  </label>
+                  <div className="relative grid max-h-48 grid-cols-2 gap-2 overflow-y-auto">
+                    {fielders.map((fielder) => (
+                      <button
+                        key={fielder.userId}
+                        type="button"
+                        onClick={() => setSelectedFielderID(fielder.userId)}
+                        className={`flex w-full items-center justify-between overflow-x-hidden rounded-xl border p-3 text-left transition-all ${
+                          selectedFielderID === fielder.userId
+                            ? "border-teal-500 bg-teal-500/10 text-teal-600"
+                            : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
+                        }`}
+                      >
+                        <span className="truncate text-[10px] font-bold uppercase">
+                          {fielder.user.name}
+                        </span>
+                        {selectedFielderID === fielder.userId && <Check className="h-3 w-3" />}
+                      </button>
+                    ))}
                   </div>
-                </>
+                </div>
               ))}
 
               {selectedConfig?.id === "runout" && (
