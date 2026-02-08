@@ -539,13 +539,11 @@ export const MatchHeroSection = ({ match }: { match: MatchWithTeamAndOfficials }
         </div>
 
         <div className="flex flex-col items-center">
-          <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-green-600 text-2xl font-black text-white italic shadow-xl shadow-green-500/30 hover:animate-none md:h-24 md:w-24 md:text-4xl">
+          <div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-full bg-green-600 text-2xl font-black text-white italic shadow-xl shadow-green-500/30 md:h-24 md:w-24 md:text-4xl">
             VS
           </div>
-          <div className="mt-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 backdrop-blur-md">
-            <span className="font-[poppins] text-xs font-semibold tracking-wider text-white uppercase">
-              Scordo Match
-            </span>
+          <div className="border-input secondary-text mt-4 rounded-full border bg-teal-900/20 px-3 py-2 font-[poppins] text-xs font-semibold tracking-wide text-white uppercase backdrop-blur-md dark:bg-slate-800/10">
+            Scordo Match
           </div>
         </div>
 
@@ -641,8 +639,6 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     return match?.organizerId === user?.id;
   }, [user, match]);
 
-  console.log({ match });
-
   return (
     <div className={`font-sans transition-colors duration-500`}>
       {isLoading ? (
@@ -674,7 +670,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   {isOrganizer ? (
                     <>
                       {match.requestStatus === "pending" ? (
-                        <span className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
+                        <span className="border-input secondary-text rounded-2xl border bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest shadow-lg transition-all hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700">
                           Request Pending
                         </span>
                       ) : (
@@ -725,7 +721,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                       Powered by Scordo
                     </span>
                   </div>
-                  {/* Conditional Scorecard rendering */}
+                  {/* Scorecard */}
                   {match.status === "in_progress" ? (
                     <LiveScorecard inning={null as any} />
                   ) : (

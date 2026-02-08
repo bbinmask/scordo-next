@@ -216,7 +216,7 @@ function Invitations() {
         </div>
       ) : !teamInvites || teamInvites.length === 0 ? (
         <NotFoundParagraph
-          className="text-gray-200/80 dark:text-gray-200/80"
+          className="font-[urbanist] text-sm font-semibold"
           description="No new invitations."
         />
       ) : (
@@ -289,7 +289,7 @@ const TeamsPage = () => {
   });
 
   return (
-    <div className="mx-auto mt-4">
+    <div className="mx-auto mt-4 pb-[60px]">
       {/* Dashboard Header */}
       <div className="mb-6">
         <h1 className="font-[poppins] text-4xl font-extrabold">
