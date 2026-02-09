@@ -25,7 +25,7 @@ export const ControlPad = ({ battingPlayers, bowlingPlayers }: ControlPadProps) 
     isBye: false,
     isNB: false,
   });
-  const [isWicket, setIsWicket] = useState(true);
+  const [isWicket, setIsWicket] = useState(false);
   const [isRunOut, setIsRunOut] = useState(false);
 
   const onUndo = () => {};

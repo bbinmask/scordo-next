@@ -1,6 +1,6 @@
 "use client";
 
-import { OfficialRole, User } from "@/generated/prisma";
+import { Ball, OfficialRole, User } from "@/generated/prisma";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -84,79 +84,72 @@ const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: 
 const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
   if (!innings) return null;
 
+  const getPartnership = (ballData: Ball[]) => {
+    return 0;
+  };
+
+  const getStrikeRate = (runs: number, balls: number) => {
+    if (balls === 0) return 0;
+
+    return ((runs / balls) * 100).toFixed(1);
+  };
+
+  const getEcon = (runs: number, overs: number, balls: number) => {
+    if (overs === 0) {
+      if (balls === 0) return 0;
+      return (runs / (balls / 6)).toFixed(2);
+    } else {
+      return (runs / overs).toFixed(2);
+    }
+  };
+
+  const length = innings.length - 1;
+
+  console.log(length);
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 w-full space-y-6 duration-700">
       {/* Live Header Banner */}
-      <div className="relative overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
-        <div className="absolute top-0 right-0 p-8">
-          <div className="flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1">
-            <div className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-            <span className="text-[10px] font-black tracking-widest text-red-500 uppercase">
-              Live Match
-            </span>
+      <div className="relative flex items-start justify-between overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
+        <div className="w-[90%]">
+          <p className="mb-2 w-full truncate overflow-x-clip font-[inter] text-xs font-bold text-nowrap text-green-500 uppercase">
+            Current Innings: {innings[length].battingTeam.name}
+          </p>
+          <div className="flex items-baseline gap-4">
+            <h2 className="text-6xl font-black tracking-tighter text-slate-900 uppercase dark:text-white">
+              {innings[length].runs}/{innings[length].wickets}
+            </h2>
+            <p className="text-xl font-bold text-slate-400">
+              ({innings[length].overs}.{innings[length].balls} Overs)
+            </p>
           </div>
+          <p className="mt-4 text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
+            CRR:{" "}
+            {(
+              innings[length].runs / (innings[length].overs + innings[length].balls / 6) || 0
+            ).toFixed(2)}
+          </p>
         </div>
-
-        <div className="relative z-10 flex flex-col items-end justify-between gap-6 md:flex-row">
-          <div>
-            <p className="mb-2 text-xs font-black tracking-[0.2em] text-green-500 uppercase">
-              Current Innings: {innings[innings.length - 1].battingTeam.name}
-            </p>
-            <div className="flex items-baseline gap-4">
-              <h2 className="text-6xl font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-                {innings[innings.length - 1].runs}/{innings[innings.length - 1].wickets}
-              </h2>
-              <p className="text-xl font-bold text-slate-400">
-                ({innings[innings.length - 1].overs}.{innings[innings.length - 1].balls} Overs)
-              </p>
-            </div>
-            <p className="mt-4 text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
-              CRR:{" "}
-              {(
-                innings[innings.length - 1].runs /
-                  (innings[innings.length - 1].overs + innings[innings.length - 1].balls / 6) || 0
-              ).toFixed(2)}
-            </p>
-          </div>
-
-          <div className="flex w-full flex-col items-end gap-2 md:w-auto">
-            <p className="mb-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
-              Partnership: 42 (34)
-            </p>
-            <div className="flex gap-2">
-              {[4, 1, "wd", ".", 6, "W"].map((ball, i) => (
-                <div
-                  key={i}
-                  className={`flex h-8 w-8 items-center justify-center rounded-lg border text-[10px] font-black ${
-                    ball === "W"
-                      ? "border-red-600 bg-red-500 text-white"
-                      : ball === 4 || ball === 6
-                        ? "border-green-600 bg-green-500 text-white"
-                        : "border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-                  }`}
-                >
-                  {ball}
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className="flex w-[10%] items-center justify-evenly rounded-full border border-red-500/20 bg-red-500/10 px-1 py-0.5">
+          <div className="h-1 w-1 animate-pulse rounded-full bg-red-500" />
+          <span className="text-[8px] font-bold text-red-500 uppercase">Live</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 font-[poppins] lg:grid-cols-2">
         {/* Batting Table */}
-        <div className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-slate-900">
+        <div className="border-input overflow-hidden rounded-[2.5rem] border bg-white shadow-sm dark:bg-slate-900">
           <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-white/5">
             <h3 className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
               <Target className="h-4 w-4 text-green-500" /> Batting
             </h3>
             <span className="text-[10px] font-bold text-slate-400">
-              {innings[innings.length - 1].battingTeam.name}
+              {innings[length].battingTeam.name}
             </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-slate-50 text-[9px] font-black tracking-widest text-slate-400 uppercase dark:bg-white/5">
+              <thead className="bg-slate-50 text-[9px] font-semibold tracking-widest text-slate-400 uppercase dark:bg-white/5">
                 <tr>
                   <th className="px-6 py-3">Batter</th>
                   <th className="px-4 py-3 text-center">R</th>
@@ -167,42 +160,39 @@ const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                {[
-                  { name: "Virat Kohli", runs: 74, balls: 48, fours: 6, sixes: 3, striker: true },
-                  {
-                    name: "Faf du Plessis",
-                    runs: 32,
-                    balls: 22,
-                    fours: 2,
-                    sixes: 1,
-                    striker: false,
-                  },
-                ].map((player, i) => (
-                  <tr key={i} className={`${player.striker ? "bg-green-500/5" : ""}`}>
-                    <td className="px-6 py-4">
+                {innings[length].InningBatting.filter(
+                  (inn) =>
+                    inn.playerId === innings[length].currentStrikerId ||
+                    inn.playerId === innings[length].currentNonStrikerId
+                ).map((inn, i) => (
+                  <tr
+                    key={i}
+                    className={`${inn.playerId === innings[length].currentStrikerId ? "bg-green-500/5" : ""}`}
+                  >
+                    <td className="px-6 py-4 font-[poppins]">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black tracking-tight text-slate-900 uppercase dark:text-white">
-                          {player.name}
+                        <span className="text-xs font-semibold text-slate-900 uppercase dark:text-white">
+                          {inn?.player.user.name}
                         </span>
-                        {player.striker && (
+                        {inn.playerId === innings[length].currentStrikerId && (
                           <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-black text-slate-900 dark:text-white">
-                      {player.runs}
+                    <td className="px-4 py-4 text-center text-xs font-semibold text-slate-900 dark:text-white">
+                      {inn.runs}
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-bold text-slate-500">
-                      {player.balls}
+                    <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
+                      {inn.balls}
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-bold text-slate-500">
-                      {player.fours}
+                    <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
+                      {inn.fours}
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-bold text-slate-500">
-                      {player.sixes}
+                    <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
+                      {inn.sixes}
                     </td>
-                    <td className="px-4 py-4 text-center text-[10px] font-black text-green-500 italic">
-                      {((player.runs / player.balls) * 100).toFixed(1)}
+                    <td className="px-4 py-4 text-center text-[10px] font-semibold text-green-500">
+                      {getStrikeRate(inn.runs, inn.balls)}
                     </td>
                   </tr>
                 ))}
@@ -218,12 +208,12 @@ const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
               <Flame className="h-4 w-4 text-green-500" /> Bowling
             </h3>
             <span className="text-[10px] font-bold text-slate-400">
-              {innings[innings.length - 1].bowlingTeam.name}
+              {innings[length].bowlingTeam.name}
             </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-slate-50 text-[9px] font-black tracking-widest text-slate-400 uppercase dark:bg-white/5">
+              <thead className="bg-slate-50 font-[inter] text-[9px] font-black tracking-widest text-slate-400 uppercase dark:bg-white/5">
                 <tr>
                   <th className="px-6 py-3">Bowler</th>
                   <th className="px-4 py-3 text-center">O</th>
@@ -233,56 +223,62 @@ const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
                   <th className="px-4 py-3 text-center">ECON</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                {[
-                  {
-                    name: "Jasprit Bumrah",
-                    overs: 3.4,
-                    maidens: 0,
-                    runs: 24,
-                    wickets: 2,
-                    current: true,
-                  },
-                  {
-                    name: "Hardik Pandya",
-                    overs: 4,
-                    maidens: 0,
-                    runs: 38,
-                    wickets: 1,
-                    current: false,
-                  },
-                ].map((player, i) => (
-                  <tr key={i} className={`${player.current ? "bg-green-500/5" : ""}`}>
+              <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/5">
+                {innings[length].InningBowling.filter(
+                  (inn) => inn.playerId === innings[length].currentBowlerId
+                ).map((player, i) => (
+                  <tr key={i} className={`bg-green-500/5`}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black tracking-tight text-slate-900 uppercase dark:text-white">
-                          {player.name}
+                        <span className="text-xs font-semibold text-slate-900 uppercase dark:text-white">
+                          {player.player.user.name}
                         </span>
-                        {player.current && (
-                          <Activity className="h-3 w-3 animate-pulse text-green-500" />
-                        )}
+                        {/* {player.current && (
+                        <Activity className="h-3 w-3 animate-pulse text-green-500" />
+                        )} */}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-black text-slate-900 dark:text-white">
-                      {player.overs}
+                    <td className="px-4 py-4 text-center text-xs font-bold text-slate-900 dark:text-white">
+                      {`${player.overs} ${player.balls % 6 === 0 ? "" : "." + (player.balls % 6)}`}
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-bold text-slate-500">
+                    <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
                       {player.maidens}
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-bold text-slate-500">
+                    <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
                       {player.runs}
                     </td>
-                    <td className="px-4 py-4 text-center text-xs font-black text-green-500">
+                    <td className="px-4 py-4 text-center text-xs font-bold text-green-500">
                       {player.wickets}
                     </td>
-                    <td className="px-4 py-4 text-center text-[10px] font-black text-slate-400">
-                      {(player.runs / player.overs).toFixed(2)}
+                    <td className="px-4 py-4 text-center text-[10px] font-semibold text-slate-400">
+                      {getEcon(player.runs, player.overs, player.balls)}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+      <div className="flex w-full flex-col items-end gap-2 md:w-auto">
+        <p className="mb-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+          Partnership: {getPartnership(innings[length].ballsData)}
+        </p>
+        <div className="flex gap-2">
+          {[4, 1, "wd", ".", 6, "W"].map((ball, i) => (
+            <div
+              key={i}
+              className={`flex h-8 w-8 items-center justify-center rounded-lg border text-[10px] font-black ${
+                ball === "W"
+                  ? "border-red-600 bg-red-500 text-white"
+                  : ball === 4 || ball === 6
+                    ? "border-green-600 bg-green-500 text-white"
+                    : "border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+              }`}
+            >
+              {ball}
+            </div>
+          ))}
         </div>
       </div>
     </div>

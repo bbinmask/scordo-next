@@ -84,11 +84,66 @@ const matchWithTeamsAndOfficials = Prisma.validator<Prisma.MatchDefaultArgs>()({
         ballsData: true,
         battingTeam: true,
         bowlingTeam: true,
-        currentBowler: true,
-        currentNonStriker: true,
-        currentStriker: true,
-        InningBatting: true,
-        InningBowling: true,
+        currentBowler: {
+          include: {
+            ballsBowled: true,
+            user: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        currentNonStriker: {
+          include: {
+            ballsBatted: true,
+            user: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        currentStriker: {
+          include: {
+            ballsBatted: true,
+            user: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+        InningBatting: {
+          include: {
+            player: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                    username: true,
+                  },
+                },
+                userId: true,
+              },
+            },
+          },
+        },
+        InningBowling: {
+          include: {
+            player: {
+              select: {
+                user: {
+                  select: {
+                    name: true,
+                    username: true,
+                  },
+                },
+                userId: true,
+              },
+            },
+          },
+        },
       },
     },
   },
@@ -99,11 +154,66 @@ const inningDetails = Prisma.validator<Prisma.InningDefaultArgs>()({
     ballsData: true,
     battingTeam: true,
     bowlingTeam: true,
-    currentBowler: true,
-    currentNonStriker: true,
-    currentStriker: true,
-    InningBatting: true,
-    InningBowling: true,
+    currentBowler: {
+      include: {
+        ballsBowled: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    },
+    currentNonStriker: {
+      include: {
+        ballsBatted: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    },
+    currentStriker: {
+      include: {
+        ballsBatted: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    },
+    InningBatting: {
+      include: {
+        player: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+              },
+            },
+            userId: true,
+          },
+        },
+      },
+    },
+    InningBowling: {
+      include: {
+        player: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+              },
+            },
+            userId: true,
+          },
+        },
+      },
+    },
   },
 });
 
