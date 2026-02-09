@@ -308,7 +308,7 @@ model Inning {
   ballsData     Ball[]          @relation("InningBalls")
   InningBatting InningBatting[] @relation("InningBatsmenStats")
   InningBowling InningBowling[] @relation("InningBowlerStats")
-
+  inningNumber Int @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

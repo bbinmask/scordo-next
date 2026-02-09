@@ -14,10 +14,10 @@ import {
   ReturnTypeForRequest,
 } from "./types";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { AddOfficials, CreateMatch, RemoveOfficial, Request } from "./schema";
+import { AddOfficials, CreateMatch, InitializeMatch, RemoveOfficial, Request } from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
-import { Match } from "@/generated/prisma";
+import { Inning, Match } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 
 const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeForCreate> => {
@@ -326,7 +326,12 @@ const initializeMatchHandler = async (
       error: "Login required",
     };
 
-  let inning, match;
+  const uniquePlayers = new Set([...teamAPlayerIds, ...teamBPlayerIds]);
+  if (uniquePlayers.size !== teamAPlayerIds.length + teamBPlayerIds.length) {
+    return { error: "Duplicate players detected in playing XI" };
+  }
+
+  let inning: Inning, match;
   try {
     match = await db.match.findUnique({
       where: {
@@ -336,6 +341,9 @@ const initializeMatchHandler = async (
         organizerId: true,
         teamAId: true,
         teamBId: true,
+        status: true,
+        innings: { select: { id: true } },
+        playerLimit: true,
       },
     });
 
@@ -344,6 +352,17 @@ const initializeMatchHandler = async (
         error: "Match not found",
       };
 
+    if (match.status !== "not_started" || match.innings.length > 0) {
+      return { error: "Match already started" };
+    }
+
+    if (
+      teamAPlayerIds.length !== match.playerLimit ||
+      teamBPlayerIds.length !== match.playerLimit
+    ) {
+      return { error: `Each team must have exactly ${match.playerLimit} players` };
+    }
+
     if (match.organizerId !== user.id) {
       return {
         error: "Only match organizer can start the match!",
@@ -351,31 +370,136 @@ const initializeMatchHandler = async (
     }
 
     const battingTeamId =
-      tossWinnerId === match.teamAId && tossDecision === "BAT" ? match.teamAId : match.teamBId;
+      (tossWinnerId === match.teamAId && tossDecision === "BAT") ||
+      (tossWinnerId === match.teamBId && tossDecision === "BOWL")
+        ? match.teamAId
+        : match.teamBId;
     const bowlingTeamId =
-      tossWinnerId === match.teamAId && tossDecision === "BOWL" ? match.teamAId : match.teamBId;
+      (tossWinnerId === match.teamAId && tossDecision === "BOWL") ||
+      (tossWinnerId === match.teamBId && tossDecision === "BAT")
+        ? match.teamAId
+        : match.teamBId;
 
-    inning = await db.inning.create({
-      data: {
-        battingTeamId,
-        bowlingTeamId,
-        matchId,
-        currentBowlerId: bowlerId,
-        currentStrikerId: strikerId,
-        currentNonStrikerId: nonStrikerId,
+    const battingPlayers = battingTeamId === match.teamAId ? teamAPlayerIds : teamBPlayerIds;
+
+    const bowlingPlayers = bowlingTeamId === match.teamAId ? teamAPlayerIds : teamBPlayerIds;
+
+    if (!battingPlayers.includes(strikerId) || !battingPlayers.includes(nonStrikerId)) {
+      return { error: "Strikers must be from batting team" };
+    }
+
+    if (battingPlayers.includes(bowlerId)) {
+      return { error: "Bowler cannot be from batting team" };
+    }
+
+    if (!bowlingPlayers.includes(bowlerId)) {
+      return { error: "Bowler must be from bowling team" };
+    }
+
+    if (strikerId === nonStrikerId) {
+      return { error: "Striker and non-striker cannot be the same player" };
+    }
+
+    const validPlayers = await db.player.findMany({
+      where: {
+        id: { in: [...teamAPlayerIds, ...teamBPlayerIds] },
+      },
+      select: {
+        id: true,
+        teamId: true,
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+    if (validPlayers.length !== teamAPlayerIds.length + teamBPlayerIds.length) {
+      return { error: "One or more players do not exist" };
+    }
+
+    const playerMap = new Map(
+      validPlayers.map((p) => [p.id, { teamId: p.teamId, username: p.user.username }])
+    );
+
+    for (const id of teamAPlayerIds) {
+      if (playerMap.get(id)?.teamId !== match.teamAId)
+        return { error: `Player ${playerMap.get(id)?.username} is invalid in Team A` };
+    }
+
+    for (const id of teamBPlayerIds) {
+      if (playerMap.get(id)?.teamId !== match.teamBId)
+        return { error: `Player ${playerMap.get(id)?.username} is invalid in Team B` };
+    }
+
+    inning = await db.$transaction(async (tx) => {
+      const createdInning = await tx.inning.create({
+        data: {
+          battingTeamId,
+          bowlingTeamId,
+          matchId,
+          currentBowlerId: bowlerId,
+          currentStrikerId: strikerId,
+          currentNonStrikerId: nonStrikerId,
+          inningNumber: 1,
+        },
+      });
+
+      await tx.inningBatting.createMany({
+        data: battingPlayers.map((id) => ({
+          playerId: id,
+          inningId: createdInning.id,
+        })),
+      });
+
+      await tx.inningBowling.createMany({
+        data: bowlingPlayers.map((id) => ({
+          playerId: id,
+          inningId: createdInning.id,
+        })),
+      });
+
+      await tx.match.update({
+        where: { id: matchId },
+        data: {
+          status: "in_progress",
+          tossWinner: tossWinnerId,
+          tossDecision,
+        },
+      });
+
+      return createdInning;
+    });
+
+    const foundInning = await db.inning.findUnique({
+      where: {
+        id: inning.id,
+      },
+      include: {
+        battingTeam: true,
+        bowlingTeam: true,
+        InningBatting: true,
+        InningBowling: true,
+        currentBowler: true,
+        currentNonStriker: true,
+        currentStriker: true,
       },
     });
 
-    // Do it later
+    if (!foundInning)
+      return {
+        error: "Inning not found",
+      };
+
+    revalidatePath(`/matches/${matchId}`);
+    return {
+      data: foundInning,
+    };
   } catch (error) {
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
   }
-
-  return {
-    data: "",
-  };
 };
 
 export const createMatch = createSafeAction(CreateMatch, createMatchHandler);
@@ -383,3 +507,4 @@ export const addOfficials = createSafeAction(AddOfficials, addOfficialsHandler);
 export const removeOfficial = createSafeAction(RemoveOfficial, removeOfficialHandler);
 export const declineMatchRequest = createSafeAction(Request, declineMatchRequestHandler);
 export const acceptMatchRequest = createSafeAction(Request, acceptMatchRequestHandler);
+export const initializeMatch = createSafeAction(InitializeMatch, initializeMatchHandler);
