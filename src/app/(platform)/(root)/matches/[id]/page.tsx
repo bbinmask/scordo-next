@@ -54,7 +54,8 @@ import InitializeMatchModal from "../_components/modals/InitializeMatchModal";
 import { type MatchOfficial } from "../_types/types";
 import { AddOfficialModal } from "../_components/AddOfficialsModal";
 import { ControlPad } from "../_components/ControlPad";
-import { TypographyHeading } from "@/components/Typography";
+import ScorecardModal from "../_components/modals/ScorecardModal";
+
 interface MatchIdPageProps {}
 
 interface InfoCardProps {
@@ -82,7 +83,7 @@ const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: 
   </div>
 );
 const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
-  if (!innings) return null;
+  const [scorecardOpen, setScorecardOpen] = useState(false);
 
   const getPartnership = (ballData: Ball[]) => {
     return 0;
@@ -103,14 +104,13 @@ const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
     }
   };
 
+  if (!innings) return null;
   const length = innings.length - 1;
 
-  console.log(length);
-
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 w-full space-y-6 duration-700">
+    <>
       {/* Live Header Banner */}
-      <div className="relative flex items-start justify-between overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
+      <div className="relative mb-4 flex items-start justify-between overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
         <div className="w-[90%]">
           <p className="mb-2 w-full truncate overflow-x-clip font-[inter] text-xs font-bold text-nowrap text-green-500 uppercase">
             Current Innings: {innings[length].battingTeam.name}
@@ -260,28 +260,41 @@ const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
           </div>
         </div>
       </div>
-      <div className="flex w-full flex-col items-end gap-2 md:w-auto">
-        <p className="mb-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
-          Partnership: {getPartnership(innings[length].ballsData)}
-        </p>
-        <div className="flex gap-2">
-          {[4, 1, "wd", ".", 6, "W"].map((ball, i) => (
-            <div
-              key={i}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg border text-[10px] font-black ${
-                ball === "W"
-                  ? "border-red-600 bg-red-500 text-white"
-                  : ball === 4 || ball === 6
-                    ? "border-green-600 bg-green-500 text-white"
-                    : "border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-              }`}
-            >
-              {ball}
-            </div>
-          ))}
+      <div className="flex items-end justify-between">
+        <button
+          className="primary-btn mt-4 rounded-3xl px-12 py-2 text-lg"
+          onClick={() => setScorecardOpen(true)}
+        >
+          Scorecard
+        </button>
+        <div className="flex w-full flex-col items-end gap-1 md:w-auto">
+          <p className="mb-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
+            Partnership: {getPartnership(innings[length].ballsData)}
+          </p>
+          <div className="flex gap-2">
+            {[4, 1, "wd", ".", 6, "W"].map((ball, i) => (
+              <div
+                key={i}
+                className={`flex h-8 w-8 items-center justify-center rounded-lg border text-[10px] font-black dark:border-transparent ${
+                  ball === "W"
+                    ? "border-red-600 bg-red-500 text-white"
+                    : ball === 4 || ball === 6
+                      ? "border-emerald-600 bg-emerald-500 text-white"
+                      : "border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+                }`}
+              >
+                {ball}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+      <ScorecardModal
+        isOpen={scorecardOpen}
+        innings={innings}
+        onClose={() => setScorecardOpen(false)}
+      />
+    </>
   );
 };
 
@@ -613,7 +626,6 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
 
   const [isInitializing, setIsInitializing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
   const handleOpen = () => {
     setIsOpen(true);
   };
