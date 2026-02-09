@@ -11,7 +11,7 @@ import { Carousel } from "@/components/carousel";
 import Spinner from "@/components/Spinner";
 import { toast } from "sonner";
 import { useAction } from "@/hooks/useAction";
-import { MatchWithTeamAndOfficials } from "@/lib/types";
+import { MatchWithDetails } from "@/lib/types";
 import { acceptMatchRequest, declineMatchRequest } from "@/actions/match-actions";
 
 const MatchCard = ({ match }: { match: any }) => {
@@ -137,7 +137,7 @@ function MatchRequests() {
   const [inviteId, setInviteId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: matchRequests, isLoading } = useQuery<MatchWithTeamAndOfficials[]>({
+  const { data: matchRequests, isLoading } = useQuery<MatchWithDetails[]>({
     queryKey: ["match-requests"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/requests");

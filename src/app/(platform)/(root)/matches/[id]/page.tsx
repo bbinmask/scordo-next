@@ -36,7 +36,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { DefaultLoader } from "@/components/Spinner";
-import { InningDetails, MatchWithTeamAndOfficials, PlayerWithUser } from "@/lib/types";
+import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
@@ -81,8 +81,8 @@ const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: 
     </div>
   </div>
 );
-const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
-  if (!inning) return null;
+const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
+  if (!innings) return null;
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 w-full space-y-6 duration-700">
@@ -100,18 +100,22 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
         <div className="relative z-10 flex flex-col items-end justify-between gap-6 md:flex-row">
           <div>
             <p className="mb-2 text-xs font-black tracking-[0.2em] text-green-500 uppercase">
-              Current Innings: {inning.battingTeam.name}
+              Current Innings: {innings[innings.length - 1].battingTeam.name}
             </p>
             <div className="flex items-baseline gap-4">
               <h2 className="text-6xl font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-                {inning.runs}/{inning.wickets}
+                {innings[innings.length - 1].runs}/{innings[innings.length - 1].wickets}
               </h2>
               <p className="text-xl font-bold text-slate-400">
-                ({inning.overs}.{inning.balls} Overs)
+                ({innings[innings.length - 1].overs}.{innings[innings.length - 1].balls} Overs)
               </p>
             </div>
             <p className="mt-4 text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
-              CRR: {(inning.runs / (inning.overs + inning.balls / 6) || 0).toFixed(2)}
+              CRR:{" "}
+              {(
+                innings[innings.length - 1].runs /
+                  (innings[innings.length - 1].overs + innings[innings.length - 1].balls / 6) || 0
+              ).toFixed(2)}
             </p>
           </div>
 
@@ -146,7 +150,9 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
             <h3 className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
               <Target className="h-4 w-4 text-green-500" /> Batting
             </h3>
-            <span className="text-[10px] font-bold text-slate-400">{inning.battingTeam.name}</span>
+            <span className="text-[10px] font-bold text-slate-400">
+              {innings[innings.length - 1].battingTeam.name}
+            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -211,7 +217,9 @@ const LiveScorecard = ({ inning }: { inning: InningDetails }) => {
             <h3 className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
               <Flame className="h-4 w-4 text-green-500" /> Bowling
             </h3>
-            <span className="text-[10px] font-bold text-slate-400">{inning.bowlingTeam.name}</span>
+            <span className="text-[10px] font-bold text-slate-400">
+              {innings[innings.length - 1].bowlingTeam.name}
+            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -464,7 +472,7 @@ type SquadState = {
   players?: PlayerWithUser[];
 };
 
-export const MatchHeroSection = ({ match }: { match: MatchWithTeamAndOfficials }) => {
+export const MatchHeroSection = ({ match }: { match: MatchWithDetails }) => {
   const [squadModalState, setSquadModalState] = useState<SquadState>({ isOpen: false });
 
   const handleOpenSquad = (
@@ -519,7 +527,7 @@ export const MatchHeroSection = ({ match }: { match: MatchWithTeamAndOfficials }
         <div className="group relative">
           <div
             onClick={() => handleOpenSquad(match.teamA.name, match.teamA.logo, match.teamA.players)}
-            className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
+            className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-4 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
           >
             {match.teamA.logo ? (
               <img
@@ -551,7 +559,7 @@ export const MatchHeroSection = ({ match }: { match: MatchWithTeamAndOfficials }
         <div className="group relative">
           <div
             onClick={() => handleOpenSquad(match.teamB.name, match.teamB.logo, match.teamB.players)}
-            className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
+            className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-4 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
           >
             {match.teamB.logo ? (
               <img
@@ -589,7 +597,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
       toast.error(error);
     },
   });
-  const { data: match, isLoading } = useQuery<MatchWithTeamAndOfficials>({
+  const { data: match, isLoading } = useQuery<MatchWithDetails>({
     queryKey: ["match", id],
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/${id}`);
@@ -638,6 +646,8 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   const isOrganizer = useMemo(() => {
     return match?.organizerId === user?.id;
   }, [user, match]);
+
+  console.log(match);
 
   return (
     <div className={`font-sans transition-colors duration-500`}>
@@ -723,7 +733,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   </div>
                   {/* Scorecard */}
                   {match.status === "in_progress" ? (
-                    <LiveScorecard inning={null as any} />
+                    <LiveScorecard innings={match?.innings} />
                   ) : (
                     <div className="animate-in fade-in group hover-card relative overflow-hidden rounded-[3rem] border border-dashed border-slate-200 p-12 text-center font-sans duration-1000 dark:border-white/10">
                       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 transition-transform group-hover:scale-110 dark:bg-white/5">
@@ -739,47 +749,49 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center justify-between px-4">
-                  <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
-                    <MonitorPlay className="primary-heading" /> Match
-                    <span className="primary-heading pr-2">Details</span>
-                  </h3>
-                  <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-                  <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
-                    Powered by Scordo
-                  </span>
-                </div>
+                <div className="">
+                  <div className="flex items-center justify-between px-4">
+                    <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
+                      <MonitorPlay className="primary-heading" /> Match
+                      <span className="primary-heading pr-2">Details</span>
+                    </h3>
+                    <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
+                    <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                      Powered by Scordo
+                    </span>
+                  </div>
 
-                <div className="grid w-full grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
-                  <InfoCard
-                    label="Stadium Venue"
-                    value={match.location || "TBD"}
-                    icon={MapPin}
-                    color="green"
-                    subValue={`${match.venue.city}, ${match.venue.country}`}
-                  />
-                  <InfoCard
-                    label="Match Category"
-                    value={match.category}
-                    icon={Activity}
-                    color="blue"
-                    subValue={`${match.overs} Over Restricted`}
-                  />
-                  <InfoCard
-                    label="Scheduled Kickoff"
-                    value="Jan 31, 2026"
-                    icon={Calendar}
-                    color="amber"
-                    subValue="Match Not Started"
-                  />
-                  <div className="" onClick={handleOpen}>
+                  <div className="grid w-full grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
                     <InfoCard
-                      label="Official Assigned"
-                      value={`${match.matchOfficials.length} Officials`}
-                      icon={Gavel}
+                      label="Stadium Venue"
+                      value={match.location || "TBD"}
+                      icon={MapPin}
                       color="green"
-                      subValue={"See all officials list of the match"}
+                      subValue={`${match.venue.city}, ${match.venue.country}`}
                     />
+                    <InfoCard
+                      label="Match Category"
+                      value={match.category}
+                      icon={Activity}
+                      color="blue"
+                      subValue={`${match.overs} Over Restricted`}
+                    />
+                    <InfoCard
+                      label="Scheduled Kickoff"
+                      value="Jan 31, 2026"
+                      icon={Calendar}
+                      color="amber"
+                      subValue="Match Not Started"
+                    />
+                    <div className="" onClick={handleOpen}>
+                      <InfoCard
+                        label="Official Assigned"
+                        value={`${match.matchOfficials.length} Officials`}
+                        icon={Gavel}
+                        color="green"
+                        subValue={"See all officials list of the match"}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

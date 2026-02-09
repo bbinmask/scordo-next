@@ -384,15 +384,18 @@ const initializeMatchHandler = async (
 
     const bowlingPlayers = bowlingTeamId === match.teamAId ? teamAPlayerIds : teamBPlayerIds;
 
-    if (!battingPlayers.includes(strikerId) || !battingPlayers.includes(nonStrikerId)) {
+    if (
+      battingPlayers.findIndex((pl) => pl.id === strikerId) === -1 ||
+      battingPlayers.findIndex((pl) => pl.id === nonStrikerId) === -1
+    ) {
       return { error: "Strikers must be from batting team" };
     }
 
-    if (battingPlayers.includes(bowlerId)) {
+    if (battingPlayers.findIndex((pl) => pl.id === bowlerId) !== -1) {
       return { error: "Bowler cannot be from batting team" };
     }
 
-    if (!bowlingPlayers.includes(bowlerId)) {
+    if (bowlingPlayers.findIndex((pl) => pl.id === bowlerId) === -1) {
       return { error: "Bowler must be from bowling team" };
     }
 
@@ -402,7 +405,7 @@ const initializeMatchHandler = async (
 
     const validPlayers = await db.player.findMany({
       where: {
-        id: { in: [...teamAPlayerIds, ...teamBPlayerIds] },
+        id: { in: [...teamAPlayerIds.map((pl) => pl.id), ...teamBPlayerIds.map((pl) => pl.id)] },
       },
       select: {
         id: true,
@@ -414,6 +417,7 @@ const initializeMatchHandler = async (
         },
       },
     });
+
     if (validPlayers.length !== teamAPlayerIds.length + teamBPlayerIds.length) {
       return { error: "One or more players do not exist" };
     }
@@ -422,14 +426,14 @@ const initializeMatchHandler = async (
       validPlayers.map((p) => [p.id, { teamId: p.teamId, username: p.user.username }])
     );
 
-    for (const id of teamAPlayerIds) {
-      if (playerMap.get(id)?.teamId !== match.teamAId)
-        return { error: `Player ${playerMap.get(id)?.username} is invalid in Team A` };
+    for (const player of teamAPlayerIds) {
+      if (playerMap.get(player.id)?.teamId !== match.teamAId)
+        return { error: `Player ${playerMap.get(player.id)?.username} is invalid in Team A` };
     }
 
-    for (const id of teamBPlayerIds) {
-      if (playerMap.get(id)?.teamId !== match.teamBId)
-        return { error: `Player ${playerMap.get(id)?.username} is invalid in Team B` };
+    for (const player of teamBPlayerIds) {
+      if (playerMap.get(player.id)?.teamId !== match.teamBId)
+        return { error: `Player ${playerMap.get(player.id)?.username} is invalid in Team B` };
     }
 
     inning = await db.$transaction(async (tx) => {
@@ -446,15 +450,15 @@ const initializeMatchHandler = async (
       });
 
       await tx.inningBatting.createMany({
-        data: battingPlayers.map((id) => ({
-          playerId: id,
+        data: battingPlayers.map((player) => ({
+          playerId: player.id,
           inningId: createdInning.id,
         })),
       });
 
       await tx.inningBowling.createMany({
-        data: bowlingPlayers.map((id) => ({
-          playerId: id,
+        data: bowlingPlayers.map((player) => ({
+          playerId: player.id,
           inningId: createdInning.id,
         })),
       });

@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { MatchWithTeamAndOfficials } from "@/lib/types";
+import { MatchWithDetails } from "@/lib/types";
 import {
   Check,
   CheckCircle2,
@@ -26,6 +26,9 @@ import {
 import { useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { type InputTypeForInitializeMatch as InitializeMatchForm } from "@/actions/match-actions/types";
+import { useAction } from "@/hooks/useAction";
+import { initializeMatch } from "@/actions/match-actions";
+import { toast } from "sonner";
 export const InitializeMatchModal = ({
   isOpen,
   onClose,
@@ -33,10 +36,20 @@ export const InitializeMatchModal = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  match: MatchWithTeamAndOfficials;
+  match: MatchWithDetails;
 }) => {
   const [step, setStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { execute, isLoading: isSubmitting } = useAction(initializeMatch, {
+    onSuccess(data) {
+      toast.success(`Match Started`);
+      onClose();
+    },
+
+    onError(error) {
+      toast.error(error);
+    },
+  });
 
   const {
     handleSubmit,
@@ -76,35 +89,36 @@ export const InitializeMatchModal = ({
     if (!battingTeam) return [];
     const activeIds =
       battingTeam.id === match.teamA.id ? formData.teamAPlayerIds : formData.teamBPlayerIds;
-    return battingTeam.players.filter((p) => activeIds.includes(p.userId));
+    return battingTeam.players.filter((p) =>
+      activeIds.some((player) => player.userId === p.userId)
+    );
   }, [battingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds]);
 
   const activeBowlingPlayers = useMemo(() => {
     if (!bowlingTeam) return [];
     const activeIds =
       bowlingTeam.id === match.teamA.id ? formData.teamAPlayerIds : formData.teamBPlayerIds;
-    return bowlingTeam.players.filter((p) => activeIds.includes(p.userId));
+    return bowlingTeam.players.filter((p) =>
+      activeIds.some((player) => player.userId === p.userId)
+    );
   }, [bowlingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds]);
 
-  const onSubmit: SubmitHandler<InitializeMatchForm> = async (data) => {
-    setIsSubmitting(true);
-    console.log("Scordo Engine Init Payload:", data);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      // onClose();
-    }, 2000);
+  const onSubmit: SubmitHandler<InitializeMatchForm> = (data) => {
+    execute(data);
   };
 
-  const togglePlayer = (team: "A" | "B", playerId: string) => {
+  const togglePlayer = (team: "A" | "B", playerId: string, userId: string) => {
     const field = team === "A" ? "teamAPlayerIds" : "teamBPlayerIds";
     const current = formData[field];
-    if (current.includes(playerId)) {
+    if (current.findIndex((pl) => pl.id === playerId) !== -1) {
       setValue(
         field,
-        current.filter((id) => id !== playerId)
+        current.filter((pl) => pl.id !== playerId)
       );
     } else if (current.length < match.playerLimit) {
-      setValue(field, [...current, playerId]);
+      setValue(field, [...current, { id: playerId, userId }]);
+    } else {
+      toast.error("Player limit exceeds!");
     }
   };
 
@@ -236,15 +250,17 @@ export const InitializeMatchModal = ({
                     <div className="custom-scrollbar max-h-64 space-y-1 overflow-y-auto pr-2">
                       {match.teamA.players
                         .filter(
-                          (pl) => !formData.teamBPlayerIds.some((userId) => pl.userId === userId)
+                          (pl) =>
+                            !formData.teamBPlayerIds.some((player) => pl.userId === player.userId)
                         )
                         .map((p) => (
                           <button
-                            key={p.userId}
+                            key={p.id}
                             type="button"
-                            onClick={() => togglePlayer("A", p.userId)}
+                            onClick={() => togglePlayer("A", p.id, p.userId)}
                             className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                              formData.teamAPlayerIds.includes(p.userId)
+                              formData.teamAPlayerIds.findIndex((pl) => pl.userId === p.userId) !==
+                              -1
                                 ? "border-teal-500 bg-teal-500/10 text-teal-600"
                                 : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
                             }`}
@@ -252,9 +268,8 @@ export const InitializeMatchModal = ({
                             <span className="truncate text-[10px] font-bold uppercase">
                               {p.user.name}
                             </span>
-                            {formData.teamAPlayerIds.includes(p.userId) && (
-                              <Check className="h-3 w-3" />
-                            )}
+                            {formData.teamAPlayerIds.findIndex((pl) => pl.userId === p.userId) !==
+                              -1 && <Check className="h-3 w-3" />}
                           </button>
                         ))}
                     </div>
@@ -271,15 +286,17 @@ export const InitializeMatchModal = ({
                     <div className="custom-scrollbar max-h-64 space-y-1 overflow-y-auto pr-2">
                       {match.teamB.players
                         .filter(
-                          (pl) => !formData.teamAPlayerIds.some((userId) => pl.userId === userId)
+                          (pl) =>
+                            !formData.teamAPlayerIds.some((player) => pl.userId === player.userId)
                         )
                         .map((p) => (
                           <button
-                            key={p.userId}
+                            key={p.id}
                             type="button"
-                            onClick={() => togglePlayer("B", p.userId)}
+                            onClick={() => togglePlayer("B", p.id, p.userId)}
                             className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                              formData.teamBPlayerIds.includes(p.userId)
+                              formData.teamBPlayerIds.findIndex((pl) => pl.userId === p.userId) !==
+                              -1
                                 ? "border-yellow-500 bg-yellow-500/10 text-yellow-600"
                                 : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
                             }`}
@@ -287,9 +304,8 @@ export const InitializeMatchModal = ({
                             <span className="truncate text-[10px] font-bold uppercase">
                               {p.user.name}
                             </span>
-                            {formData.teamBPlayerIds.includes(p.userId) && (
-                              <Check className="h-3 w-3" />
-                            )}
+                            {formData.teamBPlayerIds.findIndex((pl) => pl.userId === p.userId) !==
+                              -1 && <Check className="h-3 w-3" />}
                           </button>
                         ))}
                     </div>
@@ -329,7 +345,7 @@ export const InitializeMatchModal = ({
                             Choose Batter
                           </option>
                           {activeBattingPlayers.map((p) => (
-                            <option key={p.userId} value={p.userId} className="bg-slate-900">
+                            <option key={p.id} value={p.id} className="bg-slate-900">
                               {p.user.name}
                             </option>
                           ))}
@@ -350,9 +366,9 @@ export const InitializeMatchModal = ({
                             Choose Batter
                           </option>
                           {activeBattingPlayers
-                            .filter((p) => p.userId !== formData.strikerId)
+                            .filter((p) => p.id !== formData.strikerId)
                             .map((p) => (
-                              <option key={p.userId} value={p.userId} className="bg-slate-900">
+                              <option key={p.id} value={p.id} className="bg-slate-900">
                                 {p.user.name}
                               </option>
                             ))}
@@ -374,7 +390,7 @@ export const InitializeMatchModal = ({
                           Choose Bowler
                         </option>
                         {activeBowlingPlayers.map((p) => (
-                          <option key={p.userId} value={p.userId} className="bg-slate-900">
+                          <option key={p.id} value={p.id} className="bg-slate-900">
                             {p.user.name}
                           </option>
                         ))}
@@ -393,56 +409,60 @@ export const InitializeMatchModal = ({
                 </div>
               </div>
             )}
-          </form>
-        </div>
+            {/* Footer */}
+            <div className="my-4 flex items-center justify-between gap-2 px-4 py-2">
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
+                className="group center flex w-full gap-2 rounded-2xl bg-slate-300 px-6 py-4 text-center font-[urbanist] text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
+              >
+                {step === 1 ? (
+                  "Cancel"
+                ) : (
+                  <>
+                    <ChevronLeft className="h-4 w-4 transition-all duration-500 group-hover:-translate-x-2" />{" "}
+                    Back
+                  </>
+                )}
+              </button>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between gap-2 px-4 py-2">
-          <button
-            type="button"
-            onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
-            className="group center flex w-full gap-2 rounded-2xl bg-slate-300 px-6 py-4 text-center font-[urbanist] text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
-          >
-            {step === 1 ? (
-              "Cancel"
-            ) : (
-              <>
-                <ChevronLeft className="h-4 w-4 transition-all duration-500 group-hover:-translate-x-2" />{" "}
-                Back
-              </>
-            )}
-          </button>
-
-          {step < 3 ? (
-            <button
-              type="button"
-              disabled={
-                (step === 1 && !formData.tossWinnerId) ||
-                (step === 2 &&
-                  (formData.teamAPlayerIds.length === 0 || formData.teamBPlayerIds.length === 0))
-              }
-              onClick={() => setStep(step + 1)}
-              className="group primary-btn center flex w-full gap-2 rounded-2xl px-8 py-4 font-[urbanist] text-xs font-black tracking-widest uppercase shadow-xl transition-all active:scale-95 disabled:opacity-50"
-            >
-              Next{" "}
-              <ChevronRight className="h-4 w-4 transition-all duration-500 group-hover:translate-x-2" />
-            </button>
-          ) : (
-            <button
-              form="init-form"
-              type="submit"
-              disabled={
-                isSubmitting || !formData.strikerId || !formData.nonStrikerId || !formData.bowlerId
-              }
-              className="center group primary-btn flex gap-3 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
-            >
-              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isSubmitting ? "Starting..." : "Start"}
-              {!isSubmitting && (
-                <ChevronRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-2" />
+              {step < 3 ? (
+                <button
+                  type="button"
+                  disabled={
+                    (step === 1 && !formData.tossWinnerId) ||
+                    (step === 2 &&
+                      (formData.teamAPlayerIds.length === 0 ||
+                        formData.teamBPlayerIds.length === 0))
+                  }
+                  onClick={() => setStep(step + 1)}
+                  className="group primary-btn center flex w-full gap-2 rounded-2xl px-8 py-4 font-[urbanist] text-xs font-black tracking-widest uppercase shadow-xl transition-all active:scale-95 disabled:opacity-50"
+                >
+                  Next{" "}
+                  <ChevronRight className="h-4 w-4 transition-all duration-500 group-hover:translate-x-2" />
+                </button>
+              ) : (
+                <button
+                  form="init-form"
+                  type="submit"
+                  disabled={
+                    isSubmitting ||
+                    !formData.strikerId ||
+                    !formData.nonStrikerId ||
+                    !formData.bowlerId
+                  }
+                  className="center group primary-btn flex gap-3 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
+                >
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {isSubmitting ? <>Starting...</> : <>Start</>}
+                  {!isSubmitting && (
+                    <ChevronRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-2" />
+                  )}
+                </button>
               )}
-            </button>
-          )}
+            </div>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

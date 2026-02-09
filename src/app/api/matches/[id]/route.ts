@@ -31,6 +31,18 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
           },
         },
         matchOfficials: true,
+        innings: {
+          include: {
+            ballsData: true,
+            battingTeam: true,
+            bowlingTeam: true,
+            currentBowler: true,
+            currentNonStriker: true,
+            currentStriker: true,
+            InningBatting: true,
+            InningBowling: true,
+          },
+        },
       },
     });
 

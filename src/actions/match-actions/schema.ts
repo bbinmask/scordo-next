@@ -54,7 +54,17 @@ export const InitializeMatch = z.object({
   strikerId: z.string({ message }),
   nonStrikerId: z.string({ message }),
   bowlerId: z.string({ message }),
-  tossDecision: z.enum(["BAT", "BOWL"], { message, error: "Toss decision must be bat or ball" }),
-  teamAPlayerIds: z.array(z.string({ message })),
-  teamBPlayerIds: z.array(z.string({ message })),
+  tossDecision: z.enum(["BAT", "BOWL"]),
+  teamAPlayerIds: z.array(
+    z.object({
+      id: z.string({ message }),
+      userId: z.string({ message }),
+    })
+  ),
+  teamBPlayerIds: z.array(
+    z.object({
+      id: z.string({ message }),
+      userId: z.string({ message }),
+    })
+  ),
 });
