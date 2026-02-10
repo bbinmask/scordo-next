@@ -1,4 +1,11 @@
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { InningDetails } from "@/lib/types";
 import { Flame, LayoutList, Shield, Sword, Trophy } from "lucide-react";
 import { useState } from "react";
@@ -18,26 +25,26 @@ const ScorecardModal = ({
 
   return (
     <Dialog onOpenChange={onClose} open={isOpen}>
-      <DialogContent className="max-h-[80vh] max-w-full overflow-x-hidden overflow-y-scroll p-0">
+      <DialogContent className="max-h-[80vh] p-0">
         {/* Modal Header */}
-        <div className="flex shrink-0 items-center justify-between bg-gradient-to-br from-green-500/10 to-transparent p-8 pb-4">
+        <DialogHeader className="bg-gradient-to-br from-green-500/10 to-transparent p-4 pb-4">
           <div className="flex items-center gap-4">
             <div className="rounded-2xl bg-green-600 p-3 shadow-lg">
               <LayoutList className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h2 className="font-[poppins] text-xl font-black text-slate-900 uppercase italic dark:text-white">
+              <DialogTitle className="font-[poppins] text-xl font-black text-slate-900 uppercase italic dark:text-white">
                 Full Scorecard
-              </h2>
-              <p className="font-[urbanist] text-[10px] font-bold text-green-500 uppercase">
-                {innings[activeInningIdx].battingTeam.name} Innings
-              </p>
+              </DialogTitle>
+              <DialogDescription className="font-[urbanist] text-[10px] font-bold text-green-500 uppercase">
+                {currentInning.battingTeam.name} Innings
+              </DialogDescription>
             </div>
           </div>
-        </div>
+        </DialogHeader>
 
-        <div className="shrink-0 space-y-4 px-8 py-4 font-sans">
-          <div className="no-scrollbar flex gap-2 overflow-x-auto pb-2">
+        <div className="shrink-0 space-y-4 px-4 font-sans">
+          <div className="no-scrollbar flex flex-wrap gap-2 pb-2">
             {innings.map((_, idx) => (
               <button
                 key={idx}
@@ -52,46 +59,29 @@ const ScorecardModal = ({
               </button>
             ))}
           </div>
-
-          {/* Active Inning Score Summary */}
-          <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-white/5 dark:bg-white/5">
-            <div className="flex items-center gap-3">
-              <Shield className="h-5 w-5 text-indigo-500" />
-              <span className="truncate font-[poppins] text-sm font-bold text-slate-900 uppercase dark:text-white">
-                {String(currentInning?.battingTeam.name || "TBD")}
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="text-xl font-black tracking-tighter text-indigo-600 dark:text-indigo-400">
-                {String(currentInning?.runs || 0)}/{String(currentInning?.wickets || 0)}
-              </span>
-              <span className="ml-2 text-[10px] font-bold text-slate-400 uppercase">
-                ({String(currentInning?.overs || "0.0")} Overs)
-              </span>
-            </div>
-          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-8 py-4">
+        <div className="max-h-[55vh] max-w-full flex-1 overflow-x-hidden overflow-y-scroll px-8 py-4">
           {/* Summary Banner */}
-          <div className="relative flex items-center justify-between overflow-hidden rounded-3xl bg-slate-900 p-6 text-white">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <Trophy className="h-16 w-16" />
-            </div>
-            <div>
-              <p className="mb-1 text-[10px] font-black tracking-widest text-green-400 uppercase">
-                Total Score
-              </p>
-              <h3 className="text-4xl font-black tracking-tighter italic">
-                {innings[activeInningIdx].runs}/{innings[activeInningIdx].wickets}
+          <div className="relative flex items-end justify-between overflow-hidden rounded-3xl bg-slate-900 p-6 text-white">
+            <div className="grid gap-2">
+              <h2 className="truncate font-[inter] text-sm font-bold text-slate-900 uppercase dark:text-white">
+                {String(currentInning?.battingTeam.name || "TBD")}
+              </h2>
+
+              <h3 className="font-[poppins] text-2xl font-bold">
+                {currentInning.runs}/{currentInning.wickets}
               </h3>
             </div>
             <div className="text-right">
-              <p className="mb-1 text-[10px] font-black tracking-widest text-slate-500 uppercase">
+              <p className="mb-2 font-[urbanist] text-[10px] font-bold tracking-widest text-green-600">
+                Inning {activeInningIdx + 1}
+              </p>
+              <p className="font-[urbanist] text-[10px] font-bold tracking-widest text-slate-500 uppercase">
                 Overs
               </p>
-              <p className="text-xl font-black tracking-tight">
-                {innings[activeInningIdx].overs}.{innings[activeInningIdx].balls % 6}
+              <p className="font-[poppins] text-lg font-bold">
+                {currentInning.overs}.{currentInning.balls % 6}
               </p>
             </div>
           </div>
@@ -118,11 +108,11 @@ const ScorecardModal = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/10">
-                    {/* Mocking squad breakdown based on total runs for UI demo */}
+                    {/* Players with runs and details*/}
                     {[
                       {
                         name: "Virat Kohli",
-                        runs: Math.floor(innings[activeInningIdx].runs * 0.4),
+                        runs: Math.floor(currentInning.runs * 0.4),
                         balls: 28,
                         fours: 4,
                         sixes: 1,
@@ -130,7 +120,7 @@ const ScorecardModal = ({
                       },
                       {
                         name: "Faf du Plessis",
-                        runs: Math.floor(innings[activeInningIdx].runs * 0.25),
+                        runs: Math.floor(currentInning.runs * 0.25),
                         balls: 15,
                         fours: 2,
                         sixes: 1,
@@ -138,7 +128,7 @@ const ScorecardModal = ({
                       },
                       {
                         name: "Glenn Maxwell",
-                        runs: Math.floor(innings[activeInningIdx].runs * 0.15),
+                        runs: Math.floor(currentInning.runs * 0.15),
                         balls: 10,
                         fours: 1,
                         sixes: 1,
@@ -150,7 +140,7 @@ const ScorecardModal = ({
                           <p className="text-xs font-bold tracking-tight text-slate-900 uppercase dark:text-white">
                             {player.name}
                           </p>
-                          <p className="mt-0.5 text-[9px] font-semibold text-slate-400 italic">
+                          <p className="mt-0.5 text-[9px] font-medium text-slate-400 italic">
                             {player.status}
                           </p>
                         </td>
