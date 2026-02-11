@@ -518,19 +518,17 @@ const initializeMatchHandler = async (
 const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeForPushBall> => {
   const {
     batsmanId,
-    bowlerId,
     inningId,
     matchId,
     fielderId,
     isBye,
     dismissalType,
-    over,
     runs,
     isLegBye,
     isNoBall,
     isWicket,
     isWide,
-    balls,
+    nextBatsmanId,
   } = data;
 
   const user = await currentUser();
@@ -605,7 +603,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     const bowlingInn = await db.inningBowling.findFirst({
       where: {
         inningId,
-        playerId: bowlerId,
+        playerId: inning.currentBowlerId as string,
       },
     });
 
@@ -614,21 +612,23 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     let striker = inning.currentStrikerId;
     let nonStriker = inning.currentNonStrikerId;
 
-    if (runs % 2 === 1) {
+    const strikerSurvived = !isWicket || dismissalType === "RUN_OUT";
+
+    if (strikerSurvived && runs % 2 === 1) {
       [striker, nonStriker] = [nonStriker, striker];
     }
 
-    if ((inning.balls + 1) % 6 === 0) {
+    if (isLegalDelivery && nextBall % 6 === 0) {
       [striker, nonStriker] = [nonStriker, striker];
     }
 
     ball = await db.$transaction(async (tsx) => {
       const createdBall = await tsx.ball.create({
         data: {
-          ball: balls,
-          over: over,
+          ball: nextBall,
+          over: nextOver,
           batsmanId,
-          bowlerId,
+          bowlerId: inning.currentBowlerId as string,
           inningId,
           runs,
           dismissalType,

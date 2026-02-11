@@ -80,6 +80,8 @@ export const PushBall = z
     isBye: z.boolean({ message: errorMessage("isBye") }).optional(),
     isLegBye: z.boolean({ message: errorMessage("isLegBye") }).optional(),
     isWicket: z.boolean({ message: errorMessage("isWicket") }).optional(),
+    nextBatsmanId: z.string({ message: errorMessage("nextBatsmanId") }).optional(),
+    outBatsmanId: z.string({ message: errorMessage("nextBatsmanId") }).optional(),
     dismissalType: z
       .enum(["BOWLED", "CAUGHT", "RUN_OUT", "LBW", "STUMPED", "HIT_WICKET"])
       .optional(),
@@ -98,6 +100,18 @@ export const PushBall = z
           code: z.ZodIssueCode.custom,
           path: ["dismissalType"],
           message: errorMessage("dismissal is required when wicket falls"),
+        });
+      } else if (!data.nextBatsmanId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["nextBatsmanId"],
+          message: errorMessage("nextBatsmanId is required when wicket falls"),
+        });
+      } else if (data.dismissalType === "RUN_OUT" && !data.outBatsmanId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["outBatsmanId"],
+          message: errorMessage("outBatsmanId is required when wicket falls"),
         });
       }
     }

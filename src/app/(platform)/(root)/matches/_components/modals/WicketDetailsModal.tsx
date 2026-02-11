@@ -1,3 +1,4 @@
+import NotFoundParagraph from "@/components/NotFoundParagraph";
 import {
   Dialog,
   DialogContent,
@@ -63,47 +64,49 @@ interface WicketDetailsModalProps {
     wicket?: {
       fielderId: string;
       batsmanId: string;
+      nextBatsmanId: string;
       type: WicketType;
     }
   ) => void;
-  batters: InningBattingDetails[];
+  batsmanOnCrease: InningBattingDetails[];
+  battingPlayers: InningBattingDetails[];
+  isSubmitting: boolean;
   fielders: InningBowlingDetails[];
 }
 
 export const WicketDetailsModal = ({
   isOpen,
+  battingPlayers,
   onClose,
   onConfirm,
+  isSubmitting,
   fielders,
-  batters,
+  batsmanOnCrease,
 }: WicketDetailsModalProps) => {
-  const [step, setStep] = useState<"type" | "fields">("type");
+  const [step, setStep] = useState<"type" | "fields" | "next">("type");
   const [selectedConfig, setSelectedConfig] = useState<WicketConfig>();
-  const [formData, setFormData] = useState<WicketDetails>({ primary: "", secondary: "" });
   const [runs, setRuns] = useState(0);
   const [selectedFielderID, setSelectedFielderID] = useState<string>("");
-  const [selectedBatsmanId, setSelectedBatmanId] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setStep("type");
-      setSelectedConfig(undefined);
-      setFormData({ primary: "", secondary: "" });
-    }
-  }, [isOpen]);
+  const [selectedBatsmanId, setSelectedBatsmanId] = useState<string>("");
+  const [selectedNextBatsmanId, setSelectedNextBatsmanId] = useState<string>("");
 
   const handleTypeSelect = (config: WicketConfig) => {
     setSelectedConfig(config);
-    if (config.fields.length > 0) {
-      setStep("fields");
+
+    if (config.fields.length === 0 || step === "fields") {
+      setStep("next");
     } else {
-      onConfirm(runs, {
-        fielderId: selectedFielderID,
-        batsmanId: selectedBatsmanId,
-        type: selectedConfig?.id as WicketType,
-      });
+      setStep("fields");
     }
+  };
+
+  const handleDone = () => {
+    onConfirm(runs, {
+      nextBatsmanId: selectedNextBatsmanId,
+      fielderId: selectedFielderID,
+      batsmanId: selectedBatsmanId,
+      type: selectedConfig?.id as WicketType,
+    });
   };
 
   return (
@@ -112,14 +115,18 @@ export const WicketDetailsModal = ({
         {/* Header */}
         <DialogHeader className="flex items-center justify-start">
           <DialogTitle className="text-2xl font-black tracking-tight italic">
-            {step === "type" ? "Dismissal Type" : `${selectedConfig?.label} Details`}
+            {step === "type"
+              ? "Dismissal Type"
+              : step === "next"
+                ? "Select Next Batsman"
+                : `${selectedConfig?.label} Details`}
           </DialogTitle>
           <DialogDescription />
         </DialogHeader>
 
         {/* Content */}
         <div className="max-h-[280px] overflow-y-auto">
-          {step === "type" ? (
+          {step === "type" && (
             <div className="grid grid-cols-2 gap-3">
               {WICKET_CONFIGS.map((config) => (
                 <button
@@ -131,7 +138,8 @@ export const WicketDetailsModal = ({
                 </button>
               ))}
             </div>
-          ) : (
+          )}
+          {step === "fields" && (
             <div className="space-y-4">
               {selectedConfig?.fields.map((field) => (
                 <div key={field.key} className="space-y-1.5">
@@ -166,34 +174,35 @@ export const WicketDetailsModal = ({
                     Player Out
                   </label>
                   <div className="relative grid max-h-48 grid-cols-2 gap-2">
-                    {batters.map((batter) => (
+                    {batsmanOnCrease.map((batsman) => (
                       <button
-                        key={batter.id}
+                        key={batsman.id}
                         type="button"
-                        onClick={() => setSelectedBatmanId(batter.playerId)}
+                        onClick={() => setSelectedBatsmanId(batsman.playerId)}
                         className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                          selectedBatsmanId === batter.playerId
+                          selectedBatsmanId === batsman.playerId
                             ? "border-teal-500 bg-teal-500/10 text-teal-600"
                             : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
                         }`}
                       >
                         <span className="truncate text-[10px] font-bold uppercase">
-                          {batter.player.user.name}
+                          {batsman.player.user.name}
                         </span>
-                        {selectedBatsmanId === batter.playerId && <Check className="h-3 w-3" />}
+                        {selectedBatsmanId === batsman.playerId && <Check className="h-3 w-3" />}
                       </button>
                     ))}
                   </div>
                   <label className="ml-1 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
                     Runs
                   </label>
-                  <div className="relative grid max-h-48 grid-cols-2 gap-2">
+                  <div className="center relative flex w-full gap-2">
                     {[0, 1, 2, 3, 4, 6].map((val) => (
                       <button
+                        key={val}
                         onClick={() => setRuns(val)}
-                        className={`relative flex aspect-square max-h-32 max-w-32 flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`}
+                        className={`relative aspect-square h-14 rounded-2xl p-4 text-center font-[inter] text-lg font-bold transition-colors ease-in-out ${runs === val ? "bg-green-700 shadow-md" : "bg-slate-200 dark:bg-slate-600"}`}
                       >
-                        <span className="font-[inter] text-lg font-bold">{val}</span>
+                        {val}
                       </button>
                     ))}
                   </div>
@@ -201,29 +210,73 @@ export const WicketDetailsModal = ({
               )}
             </div>
           )}
+          {step === "next" && (
+            <div className="custom-scrollbar max-h-64 space-y-1 overflow-y-auto pr-2">
+              {battingPlayers.length === 0 ? (
+                <NotFoundParagraph description="No players left" />
+              ) : (
+                battingPlayers.map((batsman) => (
+                  <button
+                    key={batsman.id}
+                    type="button"
+                    onClick={() => setSelectedNextBatsmanId(batsman.playerId)}
+                    className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
+                      selectedNextBatsmanId === batsman.playerId
+                        ? "border-teal-500 bg-teal-500/10 text-teal-600"
+                        : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
+                    }`}
+                  >
+                    <span className="truncate text-[10px] font-bold uppercase">
+                      {batsman.player.user.name}
+                    </span>
+                    {selectedNextBatsmanId === batsman.playerId && <Check className="h-3 w-3" />}
+                  </button>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* Status bar inside modal */}
-        {step === "fields" && (
+        {step !== "type" && (
           <div className="grid grid-cols-2 items-center justify-between gap-2 py-2">
             <button
-              onClick={() => setStep("type")}
+              onClick={() =>
+                setStep((prev) =>
+                  prev === "next" && selectedConfig?.fields.length === 0
+                    ? "type"
+                    : prev === "fields"
+                      ? "type"
+                      : "fields"
+                )
+              }
               type="button"
               className="group center flex w-full gap-1 rounded-2xl bg-slate-300 px-6 py-4 text-center font-[urbanist] text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
             >
               <ChevronLeft className="h-4 w-4 transition-transform duration-500 group-hover:-translate-x-2" />
               Back
             </button>
-            <button
-              type="submit"
-              className="center group primary-btn flex gap-2 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
-            >
-              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isSubmitting ? "Loading..." : "Done"}
-              {!isSubmitting && (
+            {step === "fields" ? (
+              <button
+                onClick={() => setStep("next")}
+                className="center group primary-btn flex gap-2 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
+              >
+                Next
                 <ChevronRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-2" />
-              )}
-            </button>
+              </button>
+            ) : (
+              <button
+                type="submit"
+                onClick={handleDone}
+                className="center group primary-btn flex gap-2 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
+              >
+                {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isSubmitting ? "Loading..." : "Save"}
+                {!isSubmitting && (
+                  <ChevronRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-2" />
+                )}
+              </button>
+            )}
           </div>
         )}
       </DialogContent>
