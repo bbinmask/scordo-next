@@ -598,3 +598,6 @@ export const teams: TeamProps[] = [
 ];
 
 export const message = "Required parameter is missing";
+export const errorMessage = (term: string) => {
+  return `${message} (${term})`;
+};

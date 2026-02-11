@@ -1,5 +1,5 @@
 import z from "zod";
-import { message } from "@/constants";
+import { errorMessage, message } from "@/constants";
 
 export const CreateMatch = z.object({
   teamAId: z.string({ message }),
@@ -68,3 +68,40 @@ export const InitializeMatch = z.object({
     })
   ),
 });
+
+export const PushBall = z
+  .object({
+    matchId: z.string({ message: errorMessage("matchId") }),
+    inningId: z.string({ message: errorMessage("inningId") }),
+    batsmanId: z.string({ message: errorMessage("batsmanId") }),
+    bowlerId: z.string({ message: errorMessage("bowlerId") }),
+    runs: z.number({ message: errorMessage("runs") }),
+    over: z.number({ message: errorMessage("over") }),
+
+    isWide: z.boolean({ message: errorMessage("isWide") }).optional(),
+    isNoBall: z.boolean({ message: errorMessage("isNoBall") }).optional(),
+    isBye: z.boolean({ message: errorMessage("isBye") }).optional(),
+    isLegBye: z.boolean({ message: errorMessage("isLegBye") }).optional(),
+    isWicket: z.boolean({ message: errorMessage("isWicket") }).optional(),
+    dismissalType: z
+      .enum([" BOWLED", "CAUGHT", "RUN_OUT", "LBW", "STUMPED", "HIT_WICKET"])
+      .optional(),
+    fielderId: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.isWicket) {
+      if (!data.fielderId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["fielderId"],
+          message: errorMessage("fielderId is required when wicket falls"),
+        });
+      } else if (!data.dismissalType) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["dismissalType"],
+          message: errorMessage("dismissal is required when wicket falls"),
+        });
+      }
+    }
+  });

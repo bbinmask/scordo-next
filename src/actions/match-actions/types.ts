@@ -1,7 +1,14 @@
 import z from "zod";
-import { AddOfficials, CreateMatch, Request, RemoveOfficial, InitializeMatch } from "./schema";
+import {
+  AddOfficials,
+  CreateMatch,
+  Request,
+  RemoveOfficial,
+  InitializeMatch,
+  PushBall,
+} from "./schema";
 import { ActionState } from "@/lib/create-safe-action";
-import { Match, MatchOfficial } from "@/generated/prisma";
+import { Ball, Match, MatchOfficial } from "@/generated/prisma";
 
 export type InputTypeForCreate = z.infer<typeof CreateMatch>;
 export type ReturnTypeForCreate = ActionState<InputTypeForCreate, Match>;
@@ -17,3 +24,6 @@ export type ReturnTypeForRequest = ActionState<InputTypeForRequest, any>;
 
 export type InputTypeForInitializeMatch = z.infer<typeof InitializeMatch>;
 export type ReturnTypeForInitialieMatch = ActionState<InputTypeForInitializeMatch, any>;
+
+export type InputTypeForPushBall = z.infer<typeof PushBall>;
+export type ReturnTypeForPushBall = ActionState<InputTypeForPushBall, Ball>;
