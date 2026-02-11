@@ -150,7 +150,41 @@ const inningDetails = Prisma.validator<Prisma.InningDefaultArgs>()({
   },
 });
 
+const inningBattingDetails = Prisma.validator<Prisma.InningBattingDefaultArgs>()({
+  include: {
+    player: {
+      select: {
+        user: {
+          select: {
+            name: true,
+            username: true,
+          },
+        },
+        userId: true,
+      },
+    },
+  },
+});
+
+const inningBowlingDetails = Prisma.validator<Prisma.InningBowlingDefaultArgs>()({
+  include: {
+    player: {
+      select: {
+        user: {
+          select: {
+            name: true,
+            username: true,
+          },
+        },
+        userId: true,
+      },
+    },
+  },
+});
+
 export type InningDetails = Prisma.InningGetPayload<typeof inningDetails>;
+export type InningBattingDetails = Prisma.InningBattingGetPayload<typeof inningBattingDetails>;
+export type InningBowlingDetails = Prisma.InningBowlingGetPayload<typeof inningBowlingDetails>;
 export type MatchWithDetails = Prisma.MatchGetPayload<typeof matchWithTeamsAndOfficials>;
 
 export type TeamRequestWithDetails = Prisma.TeamRequestGetPayload<typeof teamRequestWithDetails>;

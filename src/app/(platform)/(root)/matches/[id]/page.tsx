@@ -4,40 +4,26 @@ import { Ball, OfficialRole, User } from "@/generated/prisma";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Shield,
   Trophy,
-  Sparkles,
-  Loader2,
-  X,
-  BrainCircuit,
   MapPin,
-  Clock,
   Calendar,
   Activity,
   Sword,
   Flame,
   Gavel,
   Share2,
-  MoreVertical,
-  Home,
-  MoreHorizontal,
-  MonitorPlay,
   Target,
   ShieldCheck,
   UserCheck,
-  UserPlus,
   UserCircle2,
-  Plus,
-  Minus,
-  Trash,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { DefaultLoader } from "@/components/Spinner";
 import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
-import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -55,7 +41,7 @@ import { type MatchOfficial } from "../_types/types";
 import { AddOfficialModal } from "../_components/AddOfficialsModal";
 import { ControlPad } from "../_components/ControlPad";
 import ScorecardModal from "../_components/modals/ScorecardModal";
-import { getEcon, getPartnership, getStrikeRate } from "@/utils/helper/scorecard";
+import { getCRR, getEcon, getPartnership, getRR, getStrikeRate } from "@/utils/helper/scorecard";
 
 interface MatchIdPageProps {}
 
@@ -83,20 +69,23 @@ const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: 
     </div>
   </div>
 );
-const LiveScorecard = ({ matchId }: { matchId: string }) => {
-  const [scorecardOpen, setScorecardOpen] = useState(false);
+const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: string }) => {
+  const [isScorecardOpen, setIsScorecardOpen] = useState(false);
 
-  const { data: innings, isLoading: inningsLoading } = useQuery<InningDetails[]>({
-    queryKey: ["match-innings", matchId],
+  const {
+    data: innings,
+    isLoading: inningsLoading,
+    refetch,
+  } = useQuery<InningDetails[]>({
+    queryKey: ["match-innings", match.id],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/matches/${matchId}/innings`);
+      const { data } = await axios.get(`/api/matches/${match.id}/innings`);
 
       if (!data.success) return [];
 
       return data.data;
     },
   });
-
   if (!innings) return null;
   const length = innings.length - 1;
 
@@ -116,11 +105,11 @@ const LiveScorecard = ({ matchId }: { matchId: string }) => {
               ({innings[length].overs}.{innings[length].balls} Overs)
             </p>
           </div>
-          <p className="mt-4 text-xs font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
-            CRR:{" "}
-            {(
-              innings[length].runs / (innings[length].overs + innings[length].balls / 6) || 0
-            ).toFixed(2)}
+          <p className="mt-4 font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            CRR: {getCRR(innings[length].runs, innings[length].balls)}
+          </p>
+          <p className="font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            RR: {`${getRR(innings[length].runs, innings[length].balls)}`}
           </p>
         </div>
         <div className="flex w-[10%] items-center justify-evenly rounded-full border border-red-500/20 bg-red-500/10 px-1 py-0.5">
@@ -255,10 +244,10 @@ const LiveScorecard = ({ matchId }: { matchId: string }) => {
       </div>
       <div className="flex items-end justify-between">
         <button
-          className="primary-btn mt-4 rounded-3xl px-12 py-2 text-lg"
-          onClick={() => setScorecardOpen(true)}
+          onClick={() => setIsScorecardOpen(true)}
+          className="center flex w-full flex-1 gap-1 rounded-2xl bg-slate-900 px-8 py-4 font-[inter] text-white shadow-xl transition-all active:scale-95 dark:bg-white dark:text-slate-900"
         >
-          Scorecard
+          <span className="text-xs font-black uppercase">Scorecard</span>
         </button>
         <div className="flex w-full flex-col items-end gap-1 md:w-auto">
           <p className="mb-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
@@ -282,10 +271,14 @@ const LiveScorecard = ({ matchId }: { matchId: string }) => {
           </div>
         </div>
       </div>
+      {match.status === "in_progress" &&
+        match.matchOfficials.findIndex((official) => official.userId === userId) !== -1 && (
+          <ControlPad innings={innings[length]} />
+        )}
       <ScorecardModal
-        isOpen={scorecardOpen}
+        isOpen={isScorecardOpen}
         innings={innings}
-        onClose={() => setScorecardOpen(false)}
+        onClose={() => setIsScorecardOpen(false)}
       />
     </>
   );
@@ -703,26 +696,11 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   </button>
                 </div>
               </div>
-
-              {/* 
-                {match.status === "in_progress" &&
-                  match.matchOfficials.findIndex((mo) => mo.userId === user?.id) !== -1 && (
-                    
-                  )} */}
-              {match.status === "in_progress" &&
-                match.matchOfficials.findIndex((official) => official.userId === user?.id) !==
-                  -1 && (
-                  <ControlPad
-                    battingPlayers={match.teamA.players}
-                    bowlingPlayers={match.teamB.players}
-                  />
-                )}
-
               <div className="mt-4 w-full space-y-12">
                 <div className="space-y-12">
                   <div className="flex items-center justify-between px-4">
                     <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
-                      <MonitorPlay className="primary-heading" /> Match
+                      Match
                       <span className="primary-heading pr-2">Center</span>
                     </h3>
                     <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
@@ -732,7 +710,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   </div>
                   {/* Scorecard */}
                   {match.status === "in_progress" ? (
-                    <LiveScorecard matchId={match.id} />
+                    <LiveScorecard match={match} userId={user?.id} />
                   ) : (
                     <div className="animate-in fade-in group hover-card relative overflow-hidden rounded-[3rem] border border-dashed border-slate-200 p-12 text-center font-sans duration-1000 dark:border-white/10">
                       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 transition-transform group-hover:scale-110 dark:bg-white/5">
@@ -751,7 +729,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                 <div className="">
                   <div className="flex items-center justify-between px-4">
                     <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
-                      <MonitorPlay className="primary-heading" /> Match
+                      Match
                       <span className="primary-heading pr-2">Details</span>
                     </h3>
                     <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />

@@ -6,7 +6,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Ball, WicketType } from "@/generated/prisma";
-import { PlayerWithUser } from "@/lib/types";
+import {
+  InningBattingDetails,
+  InningBowlingDetails,
+  InningDetails,
+  PlayerWithUser,
+} from "@/lib/types";
 import { ArrowLeft, Check, CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -54,8 +59,8 @@ interface WicketDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (data: Partial<Ball>) => void;
-  batters: PlayerWithUser[];
-  fielders: PlayerWithUser[];
+  batters: InningBattingDetails[];
+  fielders: InningBowlingDetails[];
 }
 
 export const WicketDetailsModal = ({
@@ -124,19 +129,19 @@ export const WicketDetailsModal = ({
                   <div className="relative grid max-h-48 grid-cols-2 gap-2 overflow-y-auto">
                     {fielders.map((fielder) => (
                       <button
-                        key={fielder.userId}
+                        key={fielder.playerId}
                         type="button"
-                        onClick={() => setSelectedFielderID(fielder.userId)}
+                        onClick={() => setSelectedFielderID(fielder.playerId)}
                         className={`flex w-full items-center justify-between overflow-x-hidden rounded-xl border p-3 text-left transition-all ${
-                          selectedFielderID === fielder.userId
+                          selectedFielderID === fielder.playerId
                             ? "border-teal-500 bg-teal-500/10 text-teal-600"
                             : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
                         }`}
                       >
                         <span className="truncate text-[10px] font-bold uppercase">
-                          {fielder.user.name}
+                          {fielder.player.user.name}
                         </span>
-                        {selectedFielderID === fielder.userId && <Check className="h-3 w-3" />}
+                        {selectedFielderID === fielder.playerId && <Check className="h-3 w-3" />}
                       </button>
                     ))}
                   </div>
@@ -153,17 +158,17 @@ export const WicketDetailsModal = ({
                       <button
                         key={batter.id}
                         type="button"
-                        onClick={() => setSelectedBatterID(batter.userId)}
+                        onClick={() => setSelectedBatterID(batter.playerId)}
                         className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                          selectedBatterID === batter.userId
+                          selectedBatterID === batter.playerId
                             ? "border-teal-500 bg-teal-500/10 text-teal-600"
                             : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
                         }`}
                       >
                         <span className="truncate text-[10px] font-bold uppercase">
-                          {batter.user.name}
+                          {batter.player.user.name}
                         </span>
-                        {selectedBatterID === batter.userId && <Check className="h-3 w-3" />}
+                        {selectedBatterID === batter.playerId && <Check className="h-3 w-3" />}
                       </button>
                     ))}
                   </div>

@@ -19,4 +19,12 @@ const getEcon = (runs: number, overs: number, balls: number) => {
   }
 };
 
-export { getPartnership, getEcon, getStrikeRate };
+const getCRR = (runs: number, balls: number) => {
+  return Number(0).toFixed(2);
+};
+
+const getRR = (runs: number, balls: number) => {
+  return Number(0).toFixed(2);
+};
+
+export { getPartnership, getEcon, getStrikeRate, getCRR, getRR };

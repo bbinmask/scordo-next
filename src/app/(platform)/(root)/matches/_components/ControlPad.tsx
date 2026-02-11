@@ -1,18 +1,17 @@
 import { cn } from "@/lib/utils";
 import { RotateCcw, Settings } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import WicketDetailsModal from "./modals/WicketDetailsModal";
-import { PlayerWithUser } from "@/lib/types";
+import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
 
 type ExtraType = "wd" | "nb" | "b";
 
 interface ControlPadProps {
-  battingPlayers: PlayerWithUser[];
-  bowlingPlayers: PlayerWithUser[];
+  innings: InningDetails;
 }
 
-export const ControlPad = ({ battingPlayers, bowlingPlayers }: ControlPadProps) => {
+export const ControlPad = ({ innings }: ControlPadProps) => {
   const onBall = (runs: number, extra?: ExtraType | null, wicket?: boolean) => {
     setExtras({
       isWide: false,
@@ -27,6 +26,13 @@ export const ControlPad = ({ battingPlayers, bowlingPlayers }: ControlPadProps) 
   });
   const [isWicket, setIsWicket] = useState(false);
   const [isRunOut, setIsRunOut] = useState(false);
+
+  const battingPlayers = useMemo(() => {
+    return innings.InningBatting;
+  }, [innings]);
+  const bowlingPlayers = useMemo(() => {
+    return innings.InningBowling;
+  }, [innings]);
 
   const onUndo = () => {};
 
@@ -175,7 +181,11 @@ export const ControlPad = ({ battingPlayers, bowlingPlayers }: ControlPadProps) 
       </div>
       <WicketDetailsModal
         fielders={bowlingPlayers}
-        batters={[battingPlayers[0], battingPlayers[1]]}
+        batters={battingPlayers.filter(
+          (batsman) =>
+            batsman.playerId === innings.currentNonStrikerId ||
+            batsman.playerId === innings.currentStrikerId
+        )}
         isOpen={isWicket}
         onClose={() => setIsWicket(false)}
         onConfirm={() => {}}
