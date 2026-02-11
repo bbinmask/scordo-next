@@ -7,6 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { InningDetails } from "@/lib/types";
+import { getEcon, getStrikeRate } from "@/utils/helper/scorecard";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { Flame, LayoutList, Shield, Sword, Trophy } from "lucide-react";
 import { useState } from "react";
 
@@ -20,6 +23,53 @@ const ScorecardModal = ({
   innings: InningDetails[];
 }) => {
   const [activeInningIdx, setActiveInningIdx] = useState(0);
+
+  const { data: wicketsMap, isLoading } = useQuery<Map<string, string> | null>({
+    queryKey: ["inning-wickets", innings[activeInningIdx].id],
+    queryFn: async function () {
+      const { data } = await axios.get(
+        `/api/matches/${innings[activeInningIdx].matchId}/innings/${innings[activeInningIdx].id}/wickets`
+      );
+
+      if (!data.success) return null;
+
+      const dismissalMap = new Map<string, string>();
+
+      for (const ball of data.data) {
+        let text = "";
+
+        switch (ball.dismissalType) {
+          case "CAUGHT":
+            text = `c. ${ball.fielder?.user.name} b. ${ball.bowler.user.name}`;
+            break;
+
+          case "BOWLED":
+            text = `b. ${ball.bowler.user.name}`;
+            break;
+
+          case "LBW":
+            text = `lbw b. ${ball.bowler.user.name}`;
+            break;
+
+          case "RUN_OUT":
+            text = `run out (${ball.fielder?.user.name})`;
+            break;
+
+          case "STUMPED":
+            text = `st ${ball.fielder?.user.name} b. ${ball.bowler.user.name}`;
+            break;
+
+          case "HIT_WICKET":
+            text = `hit wicket b. ${ball.bowler.user.name}`;
+            break;
+        }
+
+        dismissalMap.set(ball.batsmanId, text);
+      }
+
+      return dismissalMap;
+    },
+  });
 
   const currentInning = innings[activeInningIdx];
 
@@ -109,53 +159,30 @@ const ScorecardModal = ({
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/10">
                     {/* Players with runs and details*/}
-                    {[
-                      {
-                        name: "Virat Kohli",
-                        runs: Math.floor(currentInning.runs * 0.4),
-                        balls: 28,
-                        fours: 4,
-                        sixes: 1,
-                        status: "Not Out",
-                      },
-                      {
-                        name: "Faf du Plessis",
-                        runs: Math.floor(currentInning.runs * 0.25),
-                        balls: 15,
-                        fours: 2,
-                        sixes: 1,
-                        status: "c. Bumrah b. Pandya",
-                      },
-                      {
-                        name: "Glenn Maxwell",
-                        runs: Math.floor(currentInning.runs * 0.15),
-                        balls: 10,
-                        fours: 1,
-                        sixes: 1,
-                        status: "b. Bumrah",
-                      },
-                    ].map((player, i) => (
+                    {currentInning.InningBatting.map((batsman, i) => (
                       <tr key={i} className="group">
                         <td className="px-6 py-4">
                           <p className="text-xs font-bold tracking-tight text-slate-900 uppercase dark:text-white">
-                            {player.name}
+                            {batsman.player.user.name}
                           </p>
-                          <p className="mt-0.5 text-[9px] font-medium text-slate-400 italic">
-                            {player.status}
-                          </p>
+                          {wicketsMap && (
+                            <p className="mt-0.5 text-[9px] font-medium text-slate-400 italic">
+                              {wicketsMap?.get(batsman.playerId)}
+                            </p>
+                          )}
                         </td>
-                        <td className="px-4 py-4 text-center text-xs font-bold">{player.runs}</td>
+                        <td className="px-4 py-4 text-center text-xs font-bold">{batsman.runs}</td>
                         <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
-                          {player.balls}
+                          {batsman.balls}
                         </td>
                         <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
-                          {player.fours}
+                          {batsman.fours}
                         </td>
                         <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
-                          {player.sixes}
+                          {batsman.sixes}
                         </td>
                         <td className="px-4 py-4 text-center text-[10px] font-bold text-green-500">
-                          {((player.runs / player.balls) * 100).toFixed(1)}
+                          {getStrikeRate(batsman.runs, batsman.balls)}
                         </td>
                       </tr>
                     ))}
@@ -185,14 +212,11 @@ const ScorecardModal = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/10">
-                    {[
-                      { name: "Jasprit Bumrah", overs: 4, maidens: 0, runs: 24, wickets: 2 },
-                      { name: "Hardik Pandya", overs: 3.2, maidens: 0, runs: 31, wickets: 1 },
-                    ].map((bowler, i) => (
+                    {currentInning.InningBowling.map((bowler, i) => (
                       <tr key={i}>
                         <td className="px-6 py-4">
                           <p className="text-xs font-bold tracking-tight text-slate-900 uppercase dark:text-white">
-                            {bowler.name}
+                            {bowler.player.user.name}
                           </p>
                         </td>
                         <td className="px-4 py-4 text-center text-xs font-bold">{bowler.overs}</td>
@@ -206,7 +230,7 @@ const ScorecardModal = ({
                           {bowler.wickets}
                         </td>
                         <td className="px-4 py-4 text-center text-[10px] font-bold text-slate-400">
-                          {(bowler.runs / bowler.overs).toFixed(2)}
+                          {getEcon(bowler.runs, bowler.overs, bowler.balls)}
                         </td>
                       </tr>
                     ))}

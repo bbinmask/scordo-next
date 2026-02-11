@@ -55,6 +55,7 @@ import { type MatchOfficial } from "../_types/types";
 import { AddOfficialModal } from "../_components/AddOfficialsModal";
 import { ControlPad } from "../_components/ControlPad";
 import ScorecardModal from "../_components/modals/ScorecardModal";
+import { getEcon, getPartnership, getStrikeRate } from "@/utils/helper/scorecard";
 
 interface MatchIdPageProps {}
 
@@ -82,27 +83,19 @@ const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: 
     </div>
   </div>
 );
-const LiveScorecard = ({ innings }: { innings?: InningDetails[] }) => {
+const LiveScorecard = ({ matchId }: { matchId: string }) => {
   const [scorecardOpen, setScorecardOpen] = useState(false);
 
-  const getPartnership = (ballData: Ball[]) => {
-    return 0;
-  };
+  const { data: innings, isLoading: inningsLoading } = useQuery<InningDetails[]>({
+    queryKey: ["match-innings", matchId],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/matches/${matchId}/innings`);
 
-  const getStrikeRate = (runs: number, balls: number) => {
-    if (balls === 0) return 0;
+      if (!data.success) return [];
 
-    return ((runs / balls) * 100).toFixed(1);
-  };
-
-  const getEcon = (runs: number, overs: number, balls: number) => {
-    if (overs === 0) {
-      if (balls === 0) return 0;
-      return (runs / (balls / 6)).toFixed(2);
-    } else {
-      return (runs / overs).toFixed(2);
-    }
-  };
+      return data.data;
+    },
+  });
 
   if (!innings) return null;
   const length = innings.length - 1;
@@ -655,8 +648,6 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     return match?.organizerId === user?.id;
   }, [user, match]);
 
-  console.log(match);
-
   return (
     <div className={`font-sans transition-colors duration-500`}>
       {isLoading ? (
@@ -741,7 +732,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                   </div>
                   {/* Scorecard */}
                   {match.status === "in_progress" ? (
-                    <LiveScorecard innings={match?.innings} />
+                    <LiveScorecard matchId={match.id} />
                   ) : (
                     <div className="animate-in fade-in group hover-card relative overflow-hidden rounded-[3rem] border border-dashed border-slate-200 p-12 text-center font-sans duration-1000 dark:border-white/10">
                       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 transition-transform group-hover:scale-110 dark:bg-white/5">
