@@ -4,6 +4,9 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import WicketDetailsModal from "./modals/WicketDetailsModal";
 import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
+import { useAction } from "@/hooks/useAction";
+import { pushBall } from "@/actions/match-actions";
+import { useQueryClient } from "@tanstack/react-query";
 
 type ExtraType = "wd" | "nb" | "b";
 
@@ -12,16 +15,41 @@ interface ControlPadProps {
 }
 
 export const ControlPad = ({ innings }: ControlPadProps) => {
-  const onBall = (runs: number, extra?: ExtraType | null, wicket?: boolean) => {
+  const queryClient = useQueryClient();
+
+  const { execute, isLoading } = useAction(pushBall, {
+    onSuccess(data) {
+      queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
+    },
+  });
+
+  const onBall = (runs: number, wicket?: { fielderId: string; batsmanId: string }) => {
+    if (wicket === undefined) {
+      execute({
+        matchId: innings.matchId,
+        balls: innings.balls,
+        batsmanId: innings.currentStrikerId as string,
+        bowlerId: innings.currentBowlerId as string,
+        inningId: innings.id,
+        over: innings.overs,
+        runs: innings.runs,
+        isBye: extras.isBye,
+        isLegBye: extras.isLegBye,
+        isNoBall: extras.isNB,
+      });
+    }
+
     setExtras({
       isWide: false,
       isNB: false,
+      isLegBye: false,
       isBye: false,
     });
   };
   const [extras, setExtras] = useState({
     isWide: false,
     isBye: false,
+    isLegBye: false,
     isNB: false,
   });
   const [isWicket, setIsWicket] = useState(false);
@@ -35,42 +63,12 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
   }, [innings]);
 
   const onUndo = () => {};
-
-  const Btn = ({
-    label,
-    sub,
-    onClick,
-    active,
-    className,
-  }: {
-    label: string;
-    sub?: string;
-    onClick: any;
-    active?: boolean;
-    className?: string;
-  }) => (
-    <button
-      onClick={onClick}
-      className={cn(
-        `relative flex aspect-square max-h-32 max-w-32 flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`,
-        active ? "ring-indigo-500" : "ring-transparent",
-        className
-      )}
-    >
-      <span className="font-[inter] text-lg font-bold">{label}</span>
-      {sub && (
-        <span className="font-[urbanist] text-[8px] font-semibold tracking-wide uppercase opacity-70">
-          {sub}
-        </span>
-      )}
-    </button>
-  );
-
   const handleExtras = (type: ExtraType) => {
     switch (type) {
       case "b":
         setExtras((prev) => ({
           isBye: !prev.isBye,
+          isLegBye: false,
           isWide: prev.isNB ? false : prev.isWide,
           isNB: prev.isWide ? false : prev.isNB,
         }));
@@ -81,6 +79,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
           isBye: prev.isBye,
           isWide: !prev.isWide,
           isNB: false,
+          isLegBye: false,
         }));
 
         break;
@@ -89,6 +88,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
           isBye: prev.isBye,
           isWide: false,
           isNB: !prev.isNB,
+          isLegBye: false,
         }));
 
         break;
@@ -118,38 +118,68 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
       </div>
       <div className="flex w-full flex-col justify-center gap-4 space-y-6 p-8 lg:flex-row">
         <div className="grid w-full max-w-2xl grid-cols-5 gap-3 lg:gap-2">
-          <Btn
+          <PadButton
+            disabled={isLoading}
             label="0"
             onClick={() => onBall(0)}
             className={`${nullClasses} active:translate-y-1 active:scale-90`}
           />
-          <Btn label="1" onClick={() => onBall(1)} className={`${runsClasses}`} />
-          <Btn label="2" onClick={() => onBall(2)} className={`${runsClasses}`} />
-          <Btn
+          <PadButton
+            disabled={isLoading}
+            label="1"
+            onClick={() => onBall(1)}
+            className={`${runsClasses}`}
+          />
+          <PadButton
+            disabled={isLoading}
+            label="2"
+            onClick={() => onBall(2)}
+            className={`${runsClasses}`}
+          />
+          <PadButton
+            disabled={isLoading}
             label="WD"
             sub="Wide"
             active={extras.isWide}
             className={`${nullClasses} border-input border ring-2`}
             onClick={() => handleExtras("wd")}
           />
-          <Btn
+          <PadButton
+            disabled={isLoading}
             label="B"
             active={extras.isBye}
             className={`${nullClasses} ring-2`}
             sub="Bye"
             onClick={() => handleExtras("b")}
           />
-          <Btn label="3" onClick={() => onBall(3)} className={`${runsClasses}`} />
-          <Btn label="4" onClick={() => onBall(4)} className={`${boundaryClasses}`} />
-          <Btn label="6" className={`${boundaryClasses}`} onClick={() => onBall(6)} />
-          <Btn
+          <PadButton
+            disabled={isLoading}
+            label="3"
+            onClick={() => onBall(3)}
+            className={`${runsClasses}`}
+          />
+          <PadButton
+            disabled={isLoading}
+            label="4"
+            onClick={() => onBall(4)}
+            className={`${boundaryClasses}`}
+          />
+          <PadButton
+            disabled={isLoading}
+            label="6"
+            className={`${boundaryClasses}`}
+            onClick={() => onBall(6)}
+          />
+          <PadButton
+            disabled={isLoading}
             label="NB"
             active={extras.isNB}
             className={`${nullClasses} ring-2`}
             sub="No Ball"
             onClick={() => handleExtras("nb")}
           />
-          <Btn
+          <PadButton
+            disabled={isLoading}
             label="W"
             active={isWicket}
             className={`${
@@ -198,8 +228,41 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         )}
         isOpen={isWicket}
         onClose={() => setIsWicket(false)}
-        onConfirm={() => {}}
+        onConfirm={onBall}
       />
     </div>
   );
 };
+
+const PadButton = ({
+  label,
+  sub,
+  onClick,
+  disabled,
+  active,
+  className,
+}: {
+  label: string;
+  sub?: string;
+  onClick: any;
+  disabled: boolean;
+  active?: boolean;
+  className?: string;
+}) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={cn(
+      `relative flex aspect-square max-h-32 max-w-32 flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`,
+      active ? "ring-indigo-500" : "ring-transparent",
+      className
+    )}
+  >
+    <span className="font-[inter] text-lg font-bold">{label}</span>
+    {sub && (
+      <span className="font-[urbanist] text-[8px] font-semibold tracking-wide uppercase opacity-70">
+        {sub}
+      </span>
+    )}
+  </button>
+);

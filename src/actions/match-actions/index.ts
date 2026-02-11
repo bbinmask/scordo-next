@@ -5,16 +5,25 @@ import {
   InputTypeForCreate,
   InputTypeForInitializeMatch,
   InputTypeForOfficials,
+  InputTypeForPushBall,
   InputTypeForRemove,
   InputTypeForRequest,
   ReturnTypeForCreate,
   ReturnTypeForInitialieMatch,
   ReturnTypeForOfficials,
+  ReturnTypeForPushBall,
   ReturnTypeForRemove,
   ReturnTypeForRequest,
 } from "./types";
 import { createSafeAction } from "@/lib/create-safe-action";
-import { AddOfficials, CreateMatch, InitializeMatch, RemoveOfficial, Request } from "./schema";
+import {
+  AddOfficials,
+  CreateMatch,
+  InitializeMatch,
+  PushBall,
+  RemoveOfficial,
+  Request,
+} from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
 import { Inning, Match } from "@/generated/prisma";
@@ -506,9 +515,197 @@ const initializeMatchHandler = async (
   }
 };
 
+const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeForPushBall> => {
+  const {
+    batsmanId,
+    bowlerId,
+    inningId,
+    matchId,
+    fielderId,
+    isBye,
+    dismissalType,
+    over,
+    runs,
+    isLegBye,
+    isNoBall,
+    isWicket,
+    isWide,
+    balls,
+  } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Log in required",
+    };
+
+  const teamRuns = runs + (isWide ? 1 : 0) + (isNoBall ? 1 : 0);
+  const batsmanRuns = isBye || isLegBye ? 0 : runs;
+  let bowlerRuns = 0;
+
+  if (isWide) bowlerRuns = runs + 1;
+  else if (isNoBall) bowlerRuns = runs + 1;
+  else if (!isBye && !isLegBye) bowlerRuns = runs;
+  const isLegalDelivery = !isNoBall && !isWide;
+
+  let match, ball;
+
+  try {
+    match = await db.match.findUnique({
+      where: {
+        id: matchId,
+      },
+      include: {
+        matchOfficials: true,
+      },
+    });
+
+    if (!match)
+      return {
+        error: "Match not found!",
+      };
+
+    const isScorer =
+      match.matchOfficials.findIndex(
+        (official) => official.userId === user.id && official.role === "SCORER"
+      ) !== -1;
+
+    if (!isScorer)
+      return {
+        error: "Only Scorer can update the score!",
+      };
+
+    const inning = await db.inning.findUnique({
+      where: {
+        id: inningId,
+      },
+    });
+
+    if (!inning)
+      return {
+        error: "Inning not found!",
+      };
+
+    const nextBall = isLegalDelivery ? inning.balls + 1 : inning.balls;
+    const nextOver = isLegalDelivery && nextBall % 6 === 0 ? inning.overs + 1 : inning.overs;
+
+    const battingInn = await db.inningBatting.findFirst({
+      where: {
+        inningId,
+        playerId: batsmanId,
+      },
+    });
+
+    if (!battingInn)
+      return {
+        error: "Batsman not found",
+      };
+
+    const bowlingInn = await db.inningBowling.findFirst({
+      where: {
+        inningId,
+        playerId: bowlerId,
+      },
+    });
+
+    if (!bowlingInn) return { error: "Bowler not found" };
+
+    let striker = inning.currentStrikerId;
+    let nonStriker = inning.currentNonStrikerId;
+
+    if (runs % 2 === 1) {
+      [striker, nonStriker] = [nonStriker, striker];
+    }
+
+    if ((inning.balls + 1) % 6 === 0) {
+      [striker, nonStriker] = [nonStriker, striker];
+    }
+
+    ball = await db.$transaction(async (tsx) => {
+      const createdBall = await tsx.ball.create({
+        data: {
+          ball: balls,
+          over: over,
+          batsmanId,
+          bowlerId,
+          inningId,
+          runs,
+          dismissalType,
+          isBye,
+          isLegBye,
+          isNoBall,
+          fielderId,
+          isWicket,
+          isWide,
+        },
+      });
+
+      await tsx.inningBatting.update({
+        where: {
+          id: battingInn.id,
+        },
+        data: {
+          balls: isLegalDelivery ? battingInn.balls + 1 : battingInn.balls,
+          isOut: battingInn.isOut || isWicket,
+          runs: battingInn.runs + batsmanRuns,
+          dots:
+            isLegalDelivery && !isBye && !isLegBye && runs === 0
+              ? battingInn.dots + 1
+              : battingInn.dots,
+          sixes: runs === 6 ? battingInn.sixes + 1 : battingInn.sixes,
+          fours: runs === 4 ? battingInn.fours + 1 : battingInn.fours,
+        },
+      });
+
+      await tsx.inningBowling.update({
+        where: {
+          id: bowlingInn.id,
+        },
+        data: {
+          runs: bowlingInn.runs + bowlerRuns,
+          balls: isLegalDelivery ? bowlingInn.balls + 1 : bowlingInn.balls,
+          overs:
+            isLegalDelivery && (bowlingInn.balls + 1) % 6 === 0
+              ? bowlingInn.overs + 1
+              : bowlingInn.overs,
+
+          wides: isWide ? bowlingInn.wides + 1 : bowlingInn.wides,
+          noBalls: isNoBall ? bowlingInn.noBalls + 1 : bowlingInn.noBalls,
+          wickets:
+            isWicket && dismissalType !== "RUN_OUT" ? bowlingInn.wickets + 1 : bowlingInn.wickets,
+        },
+      });
+
+      await tsx.inning.update({
+        where: { id: inningId },
+        data: {
+          balls: nextBall,
+          overs: nextOver,
+          runs: inning.runs + teamRuns,
+          wickets: isWicket ? inning.wickets + 1 : inning.wickets,
+          currentStrikerId: striker,
+          currentNonStrikerId: nonStriker,
+        },
+      });
+
+      return createdBall;
+    });
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
+  return {
+    data: ball,
+  };
+};
+
 export const createMatch = createSafeAction(CreateMatch, createMatchHandler);
 export const addOfficials = createSafeAction(AddOfficials, addOfficialsHandler);
 export const removeOfficial = createSafeAction(RemoveOfficial, removeOfficialHandler);
 export const declineMatchRequest = createSafeAction(Request, declineMatchRequestHandler);
 export const acceptMatchRequest = createSafeAction(Request, acceptMatchRequestHandler);
 export const initializeMatch = createSafeAction(InitializeMatch, initializeMatchHandler);
+export const pushBall = createSafeAction(PushBall, pushBallHandler);

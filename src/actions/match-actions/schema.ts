@@ -77,14 +77,14 @@ export const PushBall = z
     bowlerId: z.string({ message: errorMessage("bowlerId") }),
     runs: z.number({ message: errorMessage("runs") }),
     over: z.number({ message: errorMessage("over") }),
-
+    balls: z.number({ message: errorMessage("balls") }),
     isWide: z.boolean({ message: errorMessage("isWide") }).optional(),
     isNoBall: z.boolean({ message: errorMessage("isNoBall") }).optional(),
     isBye: z.boolean({ message: errorMessage("isBye") }).optional(),
     isLegBye: z.boolean({ message: errorMessage("isLegBye") }).optional(),
     isWicket: z.boolean({ message: errorMessage("isWicket") }).optional(),
     dismissalType: z
-      .enum([" BOWLED", "CAUGHT", "RUN_OUT", "LBW", "STUMPED", "HIT_WICKET"])
+      .enum(["BOWLED", "CAUGHT", "RUN_OUT", "LBW", "STUMPED", "HIT_WICKET"])
       .optional(),
     fielderId: z.string().optional(),
   })

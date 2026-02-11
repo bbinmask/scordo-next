@@ -58,7 +58,15 @@ const WICKET_CONFIGS: WicketConfig[] = [
 interface WicketDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (data: Partial<Ball>) => void;
+  onConfirm: (
+    runs: number,
+    wicket?:
+      | {
+          fielderId: string;
+          batsmanId: string;
+        }
+      | undefined
+  ) => void;
   batters: InningBattingDetails[];
   fielders: InningBowlingDetails[];
 }
@@ -73,8 +81,9 @@ export const WicketDetailsModal = ({
   const [step, setStep] = useState<"type" | "fields">("type");
   const [selectedConfig, setSelectedConfig] = useState<WicketConfig | null>(null);
   const [formData, setFormData] = useState<WicketDetails>({ primary: "", secondary: "" });
+  const [runs, setRuns] = useState(0);
   const [selectedFielderID, setSelectedFielderID] = useState<string>("");
-  const [selectedBatterID, setSelectedBatterID] = useState<string>("");
+  const [selectedBatsmanId, setSelectedBatmanId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -90,7 +99,7 @@ export const WicketDetailsModal = ({
     if (config.fields.length > 0) {
       setStep("fields");
     } else {
-      onConfirm({ dismissalType: config.label as WicketType });
+      onConfirm(runs, { fielderId: selectedFielderID, batsmanId: selectedBatsmanId });
     }
   };
 
@@ -158,9 +167,9 @@ export const WicketDetailsModal = ({
                       <button
                         key={batter.id}
                         type="button"
-                        onClick={() => setSelectedBatterID(batter.playerId)}
+                        onClick={() => setSelectedBatmanId(batter.playerId)}
                         className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
-                          selectedBatterID === batter.playerId
+                          selectedBatsmanId === batter.playerId
                             ? "border-teal-500 bg-teal-500/10 text-teal-600"
                             : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
                         }`}
@@ -168,7 +177,20 @@ export const WicketDetailsModal = ({
                         <span className="truncate text-[10px] font-bold uppercase">
                           {batter.player.user.name}
                         </span>
-                        {selectedBatterID === batter.playerId && <Check className="h-3 w-3" />}
+                        {selectedBatsmanId === batter.playerId && <Check className="h-3 w-3" />}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="ml-1 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
+                    Runs
+                  </label>
+                  <div className="relative grid max-h-48 grid-cols-2 gap-2">
+                    {[0, 1, 2, 3, 4, 6].map((val) => (
+                      <button
+                        onClick={() => setRuns(val)}
+                        className={`relative flex aspect-square max-h-32 max-w-32 flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`}
+                      >
+                        <span className="font-[inter] text-lg font-bold">{val}</span>
                       </button>
                     ))}
                   </div>
