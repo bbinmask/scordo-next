@@ -27,12 +27,8 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     if (wicket === undefined) {
       execute({
         matchId: innings.matchId,
-        balls: innings.balls,
-        batsmanId: innings.currentStrikerId as string,
-        bowlerId: innings.currentBowlerId as string,
         inningId: innings.id,
-        over: innings.overs,
-        runs: innings.runs,
+        runs: runs,
         isBye: extras.isBye,
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,

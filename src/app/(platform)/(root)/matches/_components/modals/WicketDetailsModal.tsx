@@ -21,7 +21,7 @@ interface WicketDetails {
 }
 
 interface WicketConfig {
-  id: string;
+  id: WicketType;
   label: string;
   icon: string;
   fields: {
@@ -32,27 +32,27 @@ interface WicketConfig {
 }
 
 const WICKET_CONFIGS: WicketConfig[] = [
-  { id: "bowled", label: "Bowled", icon: "🏏", fields: [] },
+  { id: "BOWLED", label: "Bowled", icon: "🏏", fields: [] },
   {
-    id: "caught",
+    id: "CAUGHT",
     label: "Caught",
     icon: "🖐️",
     fields: [{ key: "primary", label: "Caught by", placeholder: "Fielder name" }],
   },
-  { id: "lbw", label: "LBW", icon: "🦵", fields: [] },
+  { id: "LBW", label: "LBW", icon: "🦵", fields: [] },
   {
-    id: "runout",
+    id: "RUN_OUT",
     label: "Run Out",
     icon: "🏃",
     fields: [{ key: "secondary", label: "Thrown by", placeholder: "Fielder name" }],
   },
   {
-    id: "stumped",
+    id: "STUMPED",
     label: "Stumped",
     icon: "🧤",
     fields: [{ key: "primary", label: "Wicketkeeper", placeholder: "Keeper name" }],
   },
-  { id: "hitwicket", label: "Hit Wicket", icon: "💥", fields: [] },
+  { id: "HIT_WICKET", label: "Hit Wicket", icon: "💥", fields: [] },
 ];
 
 interface WicketDetailsModalProps {
@@ -60,12 +60,11 @@ interface WicketDetailsModalProps {
   onClose: () => void;
   onConfirm: (
     runs: number,
-    wicket?:
-      | {
-          fielderId: string;
-          batsmanId: string;
-        }
-      | undefined
+    wicket?: {
+      fielderId: string;
+      batsmanId: string;
+      type: WicketType;
+    }
   ) => void;
   batters: InningBattingDetails[];
   fielders: InningBowlingDetails[];
@@ -79,7 +78,7 @@ export const WicketDetailsModal = ({
   batters,
 }: WicketDetailsModalProps) => {
   const [step, setStep] = useState<"type" | "fields">("type");
-  const [selectedConfig, setSelectedConfig] = useState<WicketConfig | null>(null);
+  const [selectedConfig, setSelectedConfig] = useState<WicketConfig>();
   const [formData, setFormData] = useState<WicketDetails>({ primary: "", secondary: "" });
   const [runs, setRuns] = useState(0);
   const [selectedFielderID, setSelectedFielderID] = useState<string>("");
@@ -89,7 +88,7 @@ export const WicketDetailsModal = ({
   useEffect(() => {
     if (isOpen) {
       setStep("type");
-      setSelectedConfig(null);
+      setSelectedConfig(undefined);
       setFormData({ primary: "", secondary: "" });
     }
   }, [isOpen]);
@@ -99,7 +98,11 @@ export const WicketDetailsModal = ({
     if (config.fields.length > 0) {
       setStep("fields");
     } else {
-      onConfirm(runs, { fielderId: selectedFielderID, batsmanId: selectedBatsmanId });
+      onConfirm(runs, {
+        fielderId: selectedFielderID,
+        batsmanId: selectedBatsmanId,
+        type: selectedConfig?.id as WicketType,
+      });
     }
   };
 
@@ -157,7 +160,7 @@ export const WicketDetailsModal = ({
                 </div>
               ))}
 
-              {selectedConfig?.id === "runout" && (
+              {selectedConfig?.id === "RUN_OUT" && (
                 <div className="space-y-1.5">
                   <label className="ml-1 text-[10px] font-black tracking-[0.15em] text-slate-400 uppercase">
                     Player Out

@@ -73,11 +73,8 @@ export const PushBall = z
   .object({
     matchId: z.string({ message: errorMessage("matchId") }),
     inningId: z.string({ message: errorMessage("inningId") }),
-    batsmanId: z.string({ message: errorMessage("batsmanId") }),
-    bowlerId: z.string({ message: errorMessage("bowlerId") }),
     runs: z.number({ message: errorMessage("runs") }),
-    over: z.number({ message: errorMessage("over") }),
-    balls: z.number({ message: errorMessage("balls") }),
+    batsmanId: z.string({ message: errorMessage("batsmanId") }),
     isWide: z.boolean({ message: errorMessage("isWide") }).optional(),
     isNoBall: z.boolean({ message: errorMessage("isNoBall") }).optional(),
     isBye: z.boolean({ message: errorMessage("isBye") }).optional(),
