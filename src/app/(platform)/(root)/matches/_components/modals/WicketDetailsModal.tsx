@@ -12,7 +12,7 @@ import {
   InningDetails,
   PlayerWithUser,
 } from "@/lib/types";
-import { ArrowLeft, Check, CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface WicketDetails {
@@ -184,13 +184,14 @@ export const WicketDetailsModal = ({
             <button
               onClick={() => setStep("type")}
               type="button"
-              className="group center flex w-full gap-2 rounded-2xl bg-slate-300 px-6 py-4 text-center font-[urbanist] text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
+              className="group center flex w-full gap-1 rounded-2xl bg-slate-300 px-6 py-4 text-center font-[urbanist] text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
             >
-              Cancel
+              <ChevronLeft className="h-4 w-4 transition-transform duration-500 group-hover:-translate-x-2" />
+              Back
             </button>
             <button
               type="submit"
-              className="center group primary-btn flex gap-3 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
+              className="center group primary-btn flex gap-2 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSubmitting ? "Loading..." : "Done"}

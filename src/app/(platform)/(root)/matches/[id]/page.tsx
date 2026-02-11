@@ -93,7 +93,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
     <>
       {/* Live Header Banner */}
       <div className="relative mb-4 flex items-start justify-between overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
-        <div className="w-[90%]">
+        <div className="w-full">
           <p className="mb-2 w-full truncate overflow-x-clip font-[inter] text-xs font-bold text-nowrap text-green-500 uppercase">
             Current Innings: {innings[length].battingTeam.name}
           </p>
@@ -112,7 +112,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
             RR: {`${getRR(innings[length].runs, innings[length].balls)}`}
           </p>
         </div>
-        <div className="flex w-[10%] items-center justify-evenly rounded-full border border-red-500/20 bg-red-500/10 px-1 py-0.5">
+        <div className="flex w-12 items-center justify-evenly rounded-full border border-red-500/20 bg-red-500/10 px-1 py-0.5">
           <div className="h-1 w-1 animate-pulse rounded-full bg-red-500" />
           <span className="text-[8px] font-bold text-red-500 uppercase">Live</span>
         </div>
@@ -245,7 +245,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
       <div className="flex items-end justify-between">
         <button
           onClick={() => setIsScorecardOpen(true)}
-          className="center flex w-full flex-1 gap-1 rounded-2xl bg-slate-900 px-8 py-4 font-[inter] text-white shadow-xl transition-all active:scale-95 dark:bg-white dark:text-slate-900"
+          className="center flex w-full max-w-40 flex-1 gap-1 rounded-2xl bg-slate-900 px-8 py-4 font-[inter] text-white shadow-xl transition-all active:scale-95 dark:bg-white dark:text-slate-900"
         >
           <span className="text-xs font-black uppercase">Scorecard</span>
         </button>
@@ -626,6 +626,27 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     execute({ matchId: match.id, matchOfficials });
   };
 
+  const handleShare = async () => {
+    const matchUrl = `${window.location.origin}/matches/${match?.id}`;
+
+    const shareData = {
+      title: `${match?.teamA} vs ${match?.teamB}`,
+      text: `🏏 ${match?.teamA} vs ${match?.teamB} is live now. Check the score!`,
+      url: matchUrl,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(matchUrl);
+        alert("Match link copied!");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const players: PlayerWithUser[] = useMemo(() => {
     const teamAPlayers = match?.teamA.players || [];
     const teamBPlayers = match?.teamB.players || [];
@@ -691,9 +712,14 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                       {match.status === "not_started" && "Not started yet"}
                     </div>
                   )}
-                  <button className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800">
-                    <Share2 className="h-5 w-5" />
-                  </button>
+                  {match && (
+                    <button
+                      onClick={handleShare}
+                      className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
+                    >
+                      <Share2 className="h-5 w-5" />
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="mt-4 w-full space-y-12">
@@ -726,7 +752,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     </div>
                   )}
                 </div>
-                <div className="">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between px-4">
                     <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
                       Match

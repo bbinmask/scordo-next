@@ -52,7 +52,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     <button
       onClick={onClick}
       className={cn(
-        `relative flex aspect-square flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`,
+        `relative flex aspect-square max-h-32 max-w-32 flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`,
         active ? "ring-indigo-500" : "ring-transparent",
         className
       )}
@@ -105,79 +105,89 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     "border-emerald-600 bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:translate-y-1 active:scale-90";
 
   return (
-    <div className="space-y-6 p-8">
-      <div className="grid grid-cols-5 gap-3">
-        <Btn
-          label="0"
-          onClick={() => onBall(0)}
-          className={`${nullClasses} active:translate-y-1 active:scale-90`}
-        />
-        <Btn label="1" onClick={() => onBall(1)} className={`${runsClasses}`} />
-        <Btn label="2" onClick={() => onBall(2)} className={`${runsClasses}`} />
-        <Btn
-          label="WD"
-          sub="Wide"
-          active={extras.isWide}
-          className={`${nullClasses} border-input border ring-2`}
-          onClick={() => handleExtras("wd")}
-        />
-        <Btn
-          label="B"
-          active={extras.isBye}
-          className={`${nullClasses} ring-2`}
-          sub="Bye"
-          onClick={() => handleExtras("b")}
-        />
-        <Btn label="3" onClick={() => onBall(3)} className={`${runsClasses}`} />
-        <Btn label="4" onClick={() => onBall(4)} className={`${boundaryClasses}`} />
-        <Btn label="6" className={`${boundaryClasses}`} onClick={() => onBall(6)} />
-        <Btn
-          label="NB"
-          active={extras.isNB}
-          className={`${nullClasses} ring-2`}
-          sub="No Ball"
-          onClick={() => handleExtras("nb")}
-        />
-        <Btn
-          label="W"
-          active={isWicket}
-          className={`${
-            isWicket ? "scale-75 text-white ring-red-500" : ""
-          } bg-red-600 text-slate-100 shadow-sm dark:bg-red-800`}
-          sub="Wicket"
-          onClick={() => setIsWicket((prev) => !prev)}
-        />
+    <div className="space-y-2">
+      <div className="flex items-center justify-between px-4">
+        <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
+          Control
+          <span className="primary-heading pr-2">Pad</span>
+        </h3>
+        <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
+        <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
+          Powered by Scordo
+        </span>
       </div>
+      <div className="flex w-full flex-col justify-center gap-4 space-y-6 p-8 lg:flex-row">
+        <div className="grid w-full max-w-2xl grid-cols-5 gap-3 lg:gap-2">
+          <Btn
+            label="0"
+            onClick={() => onBall(0)}
+            className={`${nullClasses} active:translate-y-1 active:scale-90`}
+          />
+          <Btn label="1" onClick={() => onBall(1)} className={`${runsClasses}`} />
+          <Btn label="2" onClick={() => onBall(2)} className={`${runsClasses}`} />
+          <Btn
+            label="WD"
+            sub="Wide"
+            active={extras.isWide}
+            className={`${nullClasses} border-input border ring-2`}
+            onClick={() => handleExtras("wd")}
+          />
+          <Btn
+            label="B"
+            active={extras.isBye}
+            className={`${nullClasses} ring-2`}
+            sub="Bye"
+            onClick={() => handleExtras("b")}
+          />
+          <Btn label="3" onClick={() => onBall(3)} className={`${runsClasses}`} />
+          <Btn label="4" onClick={() => onBall(4)} className={`${boundaryClasses}`} />
+          <Btn label="6" className={`${boundaryClasses}`} onClick={() => onBall(6)} />
+          <Btn
+            label="NB"
+            active={extras.isNB}
+            className={`${nullClasses} ring-2`}
+            sub="No Ball"
+            onClick={() => handleExtras("nb")}
+          />
+          <Btn
+            label="W"
+            active={isWicket}
+            className={`${
+              isWicket ? "scale-75 text-white ring-red-500" : ""
+            } bg-red-600 text-slate-100 shadow-sm dark:bg-red-800`}
+            sub="Wicket"
+            onClick={() => setIsWicket((prev) => !prev)}
+          />
+        </div>
 
-      <div className="grid grid-cols-3 gap-3"></div>
-
-      <div className="flex gap-3 pt-2">
-        <button
-          onClick={onUndo}
-          disabled={history.length === 0}
-          className={cn(
-            "center flex flex-[2] gap-3 rounded-2xl bg-yellow-800 py-4 font-[inter] text-xs font-semibold text-slate-100 transition-all",
-            history.length > 0
-              ? "active:translate-y-1 active:border-b-0"
-              : "cursor-not-allowed opacity-50"
-          )}
-        >
-          <RotateCcw size={16} />
-          Undo Ball
-        </button>
-        <button
-          className={cn(
-            "flex flex-[2] items-center justify-center gap-3 rounded-2xl bg-orange-800 py-3 font-[inter] text-sm font-semibold transition-all active:translate-y-1"
-          )}
-        >
-          Retire Player
-        </button>
-        <button
-          onClick={() => toast.error("Settings coming soon!")}
-          className="flex flex-1 items-center justify-center rounded-2xl bg-teal-700 p-4 text-slate-100 active:translate-y-1"
-        >
-          <Settings size={20} />
-        </button>
+        <div className="flex gap-3 lg:flex-col lg:pb-6">
+          <button
+            onClick={onUndo}
+            disabled={history.length === 0}
+            className={cn(
+              "center flex min-w-40 flex-[2] gap-3 rounded-2xl bg-yellow-800 py-4 font-[inter] text-xs font-semibold text-slate-100 transition-all",
+              history.length > 0
+                ? "active:translate-y-1 active:border-b-0"
+                : "cursor-not-allowed opacity-50"
+            )}
+          >
+            <RotateCcw size={16} />
+            Undo Ball
+          </button>
+          <button
+            className={cn(
+              "flex flex-[2] items-center justify-center gap-3 rounded-2xl bg-orange-800 py-3 font-[inter] text-sm font-semibold transition-all active:translate-y-1"
+            )}
+          >
+            Retire Player
+          </button>
+          <button
+            onClick={() => toast.error("Settings coming soon!")}
+            className="flex flex-1 items-center justify-center rounded-2xl bg-teal-700 p-4 text-slate-100 active:translate-y-1"
+          >
+            <Settings size={20} />
+          </button>
+        </div>
       </div>
       <WicketDetailsModal
         fielders={bowlingPlayers}
