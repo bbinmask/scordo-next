@@ -3,10 +3,12 @@ import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
-export const GET = async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
+export const GET = async (_: any, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   if (!id) return NextResponse.json(new ApiError(ERROR_CODES.BAD_REQUEST));
+
+  console.log("first");
 
   try {
     const innings = await db.inning.findMany({

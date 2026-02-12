@@ -28,7 +28,7 @@ const ScorecardModal = ({
     queryKey: ["inning-wickets", innings[activeInningIdx].id],
     queryFn: async function () {
       const { data } = await axios.get(
-        `/api/matches/${innings[activeInningIdx].matchId}/innings/${innings[activeInningIdx].id}/wickets`
+        `/api/matches/innings/${innings[activeInningIdx].id}/wickets`
       );
 
       if (!data.success) return null;

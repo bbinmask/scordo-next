@@ -182,6 +182,20 @@ const inningBowlingDetails = Prisma.validator<Prisma.InningBowlingDefaultArgs>()
   },
 });
 
+const currentOverBalls = Prisma.validator<Prisma.BallDefaultArgs>()({
+  select: {
+    runs: true,
+    ball: true,
+    id: true,
+    isBye: true,
+    isLegBye: true,
+    isNoBall: true,
+    isWicket: true,
+    isWide: true,
+  },
+});
+
+export type CurrentOverBalls = Prisma.BallGetPayload<typeof currentOverBalls>;
 export type InningDetails = Prisma.InningGetPayload<typeof inningDetails>;
 export type InningBattingDetails = Prisma.InningBattingGetPayload<typeof inningBattingDetails>;
 export type InningBowlingDetails = Prisma.InningBowlingGetPayload<typeof inningBowlingDetails>;

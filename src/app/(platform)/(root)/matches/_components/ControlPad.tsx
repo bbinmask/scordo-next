@@ -14,6 +14,15 @@ interface ControlPadProps {
   innings: InningDetails;
 }
 
+const runsClasses =
+  "border-indigo-100 border dark:border-none border-input bg-indigo-100 text-indigo-600 shadow-md active:translate-y-1 active:scale-90  dark:bg-indigo-500/10 dark:text-indigo-400";
+
+const nullClasses =
+  "bg-slate-100 border border-input dark:border-none text-slate-600 shadow-sm hover:bg-slate-200  dark:bg-slate-800 dark:text-slate-300";
+
+const boundaryClasses =
+  "border-emerald-600 bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:translate-y-1 active:scale-90";
+
 export const ControlPad = ({ innings }: ControlPadProps) => {
   const queryClient = useQueryClient();
 
@@ -55,6 +64,8 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,
         isWide: extras.isWide,
+        outBatsmanId:
+          wicket.batsmanId.trim() !== "" ? wicket.batsmanId : (innings.currentStrikerId as string),
       });
     } else {
       execute({
@@ -85,7 +96,6 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     isNB: false,
   });
   const [isWicket, setIsWicket] = useState(false);
-  const [isRunOut, setIsRunOut] = useState(false);
 
   const battingPlayers = useMemo(() => {
     return innings.InningBatting;
@@ -126,15 +136,6 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         break;
     }
   };
-
-  const runsClasses =
-    "border-indigo-100 border dark:border-none border-input bg-indigo-100 text-indigo-600 shadow-md active:translate-y-1 active:scale-90  dark:bg-indigo-500/10 dark:text-indigo-400";
-
-  const nullClasses =
-    "bg-slate-100 border border-input dark:border-none text-slate-600 shadow-sm hover:bg-slate-200  dark:bg-slate-800 dark:text-slate-300";
-
-  const boundaryClasses =
-    "border-emerald-600 bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:translate-y-1 active:scale-90";
 
   return (
     <div className="space-y-2">
