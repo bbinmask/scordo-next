@@ -48,6 +48,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         runs: runs,
         batsmanId: innings.currentStrikerId as string,
         isBye: extras.isBye,
+        isWide: extras.isWide,
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,
         isWicket: false,

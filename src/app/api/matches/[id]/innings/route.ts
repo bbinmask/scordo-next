@@ -8,8 +8,6 @@ export const GET = async (_: any, { params }: { params: Promise<{ id: string }> 
 
   if (!id) return NextResponse.json(new ApiError(ERROR_CODES.BAD_REQUEST));
 
-  console.log("first");
-
   try {
     const innings = await db.inning.findMany({
       where: {
