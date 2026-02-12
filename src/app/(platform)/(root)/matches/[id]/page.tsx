@@ -45,6 +45,7 @@ import {
   getBallLabel,
   getCRR,
   getEcon,
+  getOvers,
   getPartnership,
   getRR,
   getStrikeRate,
@@ -94,7 +95,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
   });
 
   const { data: ballHistory, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
-    queryKey: ["current-over-history"],
+    queryKey: ["current-over-history", innings?.at(0)?.id],
     queryFn: async () => {
       if (!innings || innings.length === 0) return [];
 
@@ -124,7 +125,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
               {innings[length].runs}/{innings[length].wickets}
             </h2>
             <p className="text-xl font-bold text-slate-400">
-              ({innings[length].overs}.{innings[length].balls} Overs)
+              ({`${getOvers(innings[length].overs, innings[length].balls)} Overs`})
             </p>
           </div>
           <p className="mt-4 font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
@@ -255,7 +256,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
                       {player.wickets}
                     </td>
                     <td className="px-4 py-4 text-center text-[10px] font-semibold text-slate-400">
-                      {getEcon(player.runs, player.overs, player.balls)}
+                      {getEcon(player.runs, player.balls)}
                     </td>
                   </tr>
                 ))}

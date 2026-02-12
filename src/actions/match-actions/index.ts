@@ -545,7 +545,9 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
   if (isWide) bowlerRuns = runs + 1;
   else if (isNoBall) bowlerRuns = runs + 1;
   else if (!isBye && !isLegBye) bowlerRuns = runs;
-  const isLegalDelivery = !isNoBall && !isWide;
+  const isLegalDelivery = isNoBall && !isWide;
+
+  console.log({ isLegalDelivery });
 
   let match, ball;
 

@@ -11,21 +11,26 @@ const getStrikeRate = (runs: number, balls: number) => {
   return ((runs / balls) * 100).toFixed(1);
 };
 
-const getEcon = (runs: number, overs: number, balls: number) => {
-  if (overs === 0) {
-    if (balls === 0) return 0;
-    return (runs / (balls / 6)).toFixed(2);
-  } else {
-    return (runs / overs).toFixed(2);
-  }
+const getEcon = (runs: number, balls: number): number => {
+  if (balls === 0) return 0;
+
+  const economy = runs / (balls / 6);
+
+  return Number(economy.toFixed(2));
+};
+
+const getOvers = (overs: number, balls: number) => {
+  const leftBalls = balls % 6;
+
+  return `${overs}.${leftBalls}`;
 };
 
 const getCRR = (runs: number, balls: number) => {
-  return Number(0).toFixed(2);
+  return ((runs / balls) * 6).toFixed(2);
 };
 
 const getRR = (runs: number, balls: number) => {
-  return Number(0).toFixed(2);
+  return ((runs / balls) * 6).toFixed(2);
 };
 
 const getBallLabel = (ball: CurrentOverBalls): string => {
@@ -44,4 +49,4 @@ const getBallLabel = (ball: CurrentOverBalls): string => {
 
   return `${ball.runs}`;
 };
-export { getPartnership, getEcon, getStrikeRate, getCRR, getRR, getBallLabel };
+export { getPartnership, getEcon, getStrikeRate, getCRR, getOvers, getRR, getBallLabel };

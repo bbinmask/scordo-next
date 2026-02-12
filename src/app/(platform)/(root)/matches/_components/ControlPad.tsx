@@ -41,6 +41,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     wicket?: { fielderId: string; batsmanId: string; nextBatsmanId: string; type: WicketType }
   ) => {
     if (wicket === undefined) {
+      console.log({ wide: extras.isWide });
       execute({
         matchId: innings.matchId,
         inningId: innings.id,
