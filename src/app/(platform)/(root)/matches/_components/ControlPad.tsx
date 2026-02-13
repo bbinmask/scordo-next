@@ -19,6 +19,7 @@ type ExtraType = "wd" | "nb" | "b";
 
 interface ControlPadProps {
   innings: InningDetails;
+  match: MatchWithDetails;
 }
 
 const runsClasses =
@@ -30,7 +31,7 @@ const nullClasses =
 const boundaryClasses =
   "border-emerald-600 bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:translate-y-1 active:scale-90";
 
-export const ControlPad = ({ innings }: ControlPadProps) => {
+export const ControlPad = ({ innings, match }: ControlPadProps) => {
   const queryClient = useQueryClient();
 
   const { execute, isLoading: isSubmitting } = useAction(pushBall, {
@@ -38,8 +39,8 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
       queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
       queryClient.invalidateQueries({ queryKey: ["current-over-history", innings.id] });
 
-      if (innings.balls + (1 % 6) === 0) {
-        setIsOverFinished(true);
+      if ((innings.balls + 1) % 6 === 0) {
+        if (data.over < match.overs) setIsOverFinished(true);
       }
     },
     onError(error) {
@@ -123,7 +124,11 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
   };
 
   const handleChangeBowler = (bowlerId: string) => {
-    executeChangeBowler({ matchId: innings.matchId, inningId: innings.id, bowlerId });
+    executeChangeBowler({
+      matchId: innings.matchId,
+      inningId: innings.id,
+      bowlerId,
+    });
   };
   const [extras, setExtras] = useState({
     isWide: false,
@@ -173,7 +178,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     }
   };
 
-  const [isOverFinished, setIsOverFinished] = useState(true);
+  const [isOverFinished, setIsOverFinished] = useState(false);
 
   const playerLeftToBat = useMemo(() => {
     return battingPlayers.filter(
@@ -313,7 +318,9 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         onConfirm={onBall}
       />
       <SelectBowlerModal
-        bowlers={bowlingPlayers}
+        bowlers={bowlingPlayers.filter(
+          (bowler) => bowler.playerId !== innings.currentBowlerId || bowler.overs < match.overLimit
+        )}
         isOpen={isOverFinished}
         onSubmit={handleChangeBowler}
       />

@@ -10,7 +10,6 @@ import {
 } from "./schema";
 import { ActionState } from "@/lib/create-safe-action";
 import { Ball, Inning, Match, MatchOfficial } from "@/generated/prisma";
-import { InningDetails } from "@/lib/types";
 
 export type InputTypeForCreate = z.infer<typeof CreateMatch>;
 export type ReturnTypeForCreate = ActionState<InputTypeForCreate, Match>;
@@ -31,4 +30,4 @@ export type InputTypeForPushBall = z.infer<typeof PushBall>;
 export type ReturnTypeForPushBall = ActionState<InputTypeForPushBall, Ball>;
 
 export type InputTypeForChangeBowler = z.infer<typeof ChangeBowler>;
-export type ReturnTypeForChangeBowler = ActionState<InputTypeForChangeBowler, Inning>;
+export type ReturnTypeForChangeBowler = ActionState<InputTypeForChangeBowler, any>;

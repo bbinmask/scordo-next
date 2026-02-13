@@ -448,8 +448,8 @@ const initializeMatchHandler = async (
         return { error: `Player ${playerMap.get(player.id)?.username} is invalid in Team B` };
     }
 
-    inning = await db.$transaction(async (tx) => {
-      const createdInning = await tx.inning.create({
+    inning = await db.$transaction(async (tsx) => {
+      const createdInning = await tsx.inning.create({
         data: {
           battingTeamId,
           bowlingTeamId,
@@ -461,21 +461,21 @@ const initializeMatchHandler = async (
         },
       });
 
-      await tx.inningBatting.createMany({
+      await tsx.inningBatting.createMany({
         data: battingPlayers.map((player) => ({
           playerId: player.id,
           inningId: createdInning.id,
         })),
       });
 
-      await tx.inningBowling.createMany({
+      await tsx.inningBowling.createMany({
         data: bowlingPlayers.map((player) => ({
           playerId: player.id,
           inningId: createdInning.id,
         })),
       });
 
-      await tx.match.update({
+      await tsx.match.update({
         where: { id: matchId },
         data: {
           status: "in_progress",
@@ -734,90 +734,88 @@ const changeBowlerHandler = async (
   const { bowlerId, inningId, matchId } = data;
 
   const user = await currentUser();
-
-  if (!user)
-    return {
-      error: "Login required!",
-    };
-
-  let match, inningBowling, inning;
+  if (!user) return { error: "Login required!" };
 
   try {
-    match = await db.match.findUnique({
-      where: {
-        id: matchId,
-      },
-      include: {
-        matchOfficials: true,
-      },
+    const result = await db.$transaction(async (tsx) => {
+      const match = await tsx.match.findUnique({
+        where: { id: matchId },
+        include: { matchOfficials: true },
+      });
+
+      if (!match) return { error: "Match not found!" };
+
+      const isScorer = match.matchOfficials.some(
+        (o) => o.userId === user.id && o.role === "SCORER"
+      );
+
+      if (!isScorer) return { error: "Only Scorer can update the score!" };
+
+      const inning = await tsx.inning.findUnique({
+        where: { id: inningId },
+      });
+
+      if (!inning) return { error: "Inning not found!" };
+
+      const lastLegalBall = await tsx.ball.findFirst({
+        where: {
+          inningId,
+          isWide: false,
+          isNoBall: false,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (lastLegalBall) {
+        const legalBallsThisOver = await tsx.ball.count({
+          where: {
+            inningId,
+            over: lastLegalBall.over,
+            isWide: false,
+            isNoBall: false,
+          },
+        });
+
+        if (legalBallsThisOver === 6) {
+          if (lastLegalBall.bowlerId === bowlerId) {
+            return {
+              error: "A bowler cannot bowl consecutive overs",
+            };
+          }
+        }
+      }
+
+      const legalBallsByBowler = await tsx.ball.count({
+        where: {
+          inningId,
+          bowlerId,
+          isWide: false,
+          isNoBall: false,
+        },
+      });
+
+      const oversBowled = Math.floor(legalBallsByBowler / 6);
+
+      if (oversBowled >= match.overLimit) {
+        return { error: "This bowler completed all his overs" };
+      }
+
+      const updated = await tsx.inning.update({
+        where: { id: inningId },
+        data: { currentBowlerId: bowlerId },
+      });
+
+      return { data: updated };
     });
 
-    if (!match)
-      return {
-        error: "Match not found!",
-      };
-
-    const isScorer =
-      match.matchOfficials.findIndex(
-        (official) => official.userId === user.id && official.role === "SCORER"
-      ) !== -1;
-
-    if (!isScorer)
-      return {
-        error: "Only Scorer can update the score!",
-      };
-
-    inning = await db.inning.findUnique({
-      where: {
-        id: inningId,
-      },
-    });
-
-    if (!inning)
-      return {
-        error: "Inning not found",
-      };
-
-    if (inning.currentBowlerId === bowlerId)
-      return {
-        error: "The last bowler can not be selected!",
-      };
-
-    inningBowling = await db.inningBowling.findFirst({
-      where: {
-        playerId: bowlerId,
-      },
-    });
-
-    if (!inningBowling)
-      return {
-        error: "Bowler not found!",
-      };
-
-    if (inningBowling.overs === match.overLimit)
-      return {
-        error: "This bowler completed all his overs",
-      };
-
-    await db.inning.update({
-      where: {
-        id: inningId,
-      },
-      data: {
-        currentBowlerId: bowlerId,
-      },
-    });
-  } catch (error) {
-    return {
-      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
-    };
+    if ("error" in result) return result;
+  } catch (e) {
+    return { error: ERROR_CODES.INTERNAL_SERVER_ERROR.message };
   }
 
   revalidatePath(`/matches/${matchId}`);
 
-  return {
-    data: inning,
-  };
+  return { data: true };
 };
 
 export const createMatch = createSafeAction(CreateMatch, createMatchHandler);

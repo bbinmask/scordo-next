@@ -300,7 +300,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
       </div>
       {match.status === "in_progress" &&
         match.matchOfficials.findIndex((official) => official.userId === userId) !== -1 && (
-          <ControlPad innings={innings[length]} />
+          <ControlPad match={match} innings={innings[length]} />
         )}
       <ScorecardModal
         isOpen={isScorecardOpen}

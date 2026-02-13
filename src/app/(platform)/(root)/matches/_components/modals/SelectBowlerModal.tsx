@@ -1,5 +1,5 @@
 import { InningBowlingDetails } from "@/lib/types";
-import { ChevronRight, Flame, Info, UserIcon } from "lucide-react";
+import { Flame, Info } from "lucide-react";
 import { useState } from "react";
 
 export const SelectBowlerModal = ({
@@ -42,7 +42,7 @@ export const SelectBowlerModal = ({
         </div>
 
         {/* Bowler List */}
-        <div className="custom-scrollbar max-h-[60vh] space-y-4 overflow-y-auto p-8 pt-4 font-[inter]">
+        <div className="hide_scrollbar max-h-[60vh] space-y-4 overflow-y-auto p-8 pt-4 font-[inter]">
           <p className="mb-2 px-2 text-[10px] font-black tracking-widest text-slate-400 uppercase">
             Available Bowlers
           </p>
