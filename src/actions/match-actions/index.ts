@@ -2,12 +2,14 @@
 
 import { db } from "@/lib/db";
 import {
+  InputTypeForChangeBowler,
   InputTypeForCreate,
   InputTypeForInitializeMatch,
   InputTypeForOfficials,
   InputTypeForPushBall,
   InputTypeForRemove,
   InputTypeForRequest,
+  ReturnTypeForChangeBowler,
   ReturnTypeForCreate,
   ReturnTypeForInitialieMatch,
   ReturnTypeForOfficials,
@@ -18,6 +20,7 @@ import {
 import { createSafeAction } from "@/lib/create-safe-action";
 import {
   AddOfficials,
+  ChangeBowler,
   CreateMatch,
   InitializeMatch,
   PushBall,
@@ -725,6 +728,98 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
   };
 };
 
+const changeBowlerHandler = async (
+  data: InputTypeForChangeBowler
+): Promise<ReturnTypeForChangeBowler> => {
+  const { bowlerId, inningId, matchId } = data;
+
+  const user = await currentUser();
+
+  if (!user)
+    return {
+      error: "Login required!",
+    };
+
+  let match, inningBowling, inning;
+
+  try {
+    match = await db.match.findUnique({
+      where: {
+        id: matchId,
+      },
+      include: {
+        matchOfficials: true,
+      },
+    });
+
+    if (!match)
+      return {
+        error: "Match not found!",
+      };
+
+    const isScorer =
+      match.matchOfficials.findIndex(
+        (official) => official.userId === user.id && official.role === "SCORER"
+      ) !== -1;
+
+    if (!isScorer)
+      return {
+        error: "Only Scorer can update the score!",
+      };
+
+    inning = await db.inning.findUnique({
+      where: {
+        id: inningId,
+      },
+    });
+
+    if (!inning)
+      return {
+        error: "Inning not found",
+      };
+
+    if (inning.currentBowlerId === bowlerId)
+      return {
+        error: "The last bowler can not be selected!",
+      };
+
+    inningBowling = await db.inningBowling.findFirst({
+      where: {
+        playerId: bowlerId,
+      },
+    });
+
+    if (!inningBowling)
+      return {
+        error: "Bowler not found!",
+      };
+
+    if (inningBowling.overs === match.overLimit)
+      return {
+        error: "This bowler completed all his overs",
+      };
+
+    await db.inning.update({
+      where: {
+        id: inningId,
+      },
+      data: {
+        currentBowlerId: bowlerId,
+      },
+    });
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
+  revalidatePath(`/matches/${matchId}`);
+
+  return {
+    data: inning,
+  };
+};
+
 export const createMatch = createSafeAction(CreateMatch, createMatchHandler);
 export const addOfficials = createSafeAction(AddOfficials, addOfficialsHandler);
 export const removeOfficial = createSafeAction(RemoveOfficial, removeOfficialHandler);
@@ -732,3 +827,4 @@ export const declineMatchRequest = createSafeAction(Request, declineMatchRequest
 export const acceptMatchRequest = createSafeAction(Request, acceptMatchRequestHandler);
 export const initializeMatch = createSafeAction(InitializeMatch, initializeMatchHandler);
 export const pushBall = createSafeAction(PushBall, pushBallHandler);
+export const changeBowler = createSafeAction(ChangeBowler, changeBowlerHandler);

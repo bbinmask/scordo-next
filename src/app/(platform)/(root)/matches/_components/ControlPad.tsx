@@ -10,10 +10,11 @@ import {
   WicketsWithPlayerDetails,
 } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
-import { pushBall } from "@/actions/match-actions";
+import { changeBowler, pushBall } from "@/actions/match-actions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { WicketType } from "@/generated/prisma";
 import axios from "axios";
+import { SelectBowlerModal } from "./modals/SelectBowlerModal";
 type ExtraType = "wd" | "nb" | "b";
 
 interface ControlPadProps {
@@ -34,11 +35,22 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
 
   const { execute, isLoading: isSubmitting } = useAction(pushBall, {
     onSuccess(data) {
-      console.log({ data });
       queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
       queryClient.invalidateQueries({ queryKey: ["current-over-history", innings.id] });
 
-      console.log({ balls: innings.balls });
+      if (innings.balls + (1 % 6) === 0) {
+        setIsOverFinished(true);
+      }
+    },
+    onError(error) {
+      console.log(error);
+    },
+  });
+  const { execute: executeChangeBowler, isLoading: isChanging } = useAction(changeBowler, {
+    onSuccess(data) {
+      queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
+      queryClient.invalidateQueries({ queryKey: ["current-over-history", innings.id] });
+      setIsOverFinished(false);
     },
     onError(error) {
       console.log(error);
@@ -109,6 +121,10 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
       isBye: false,
     });
   };
+
+  const handleChangeBowler = (bowlerId: string) => {
+    executeChangeBowler({ matchId: innings.matchId, inningId: innings.id, bowlerId });
+  };
   const [extras, setExtras] = useState({
     isWide: false,
     isBye: false,
@@ -157,7 +173,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     }
   };
 
-  const [isOverFinished, setIsOverFinished] = useState(false);
+  const [isOverFinished, setIsOverFinished] = useState(true);
 
   const playerLeftToBat = useMemo(() => {
     return battingPlayers.filter(
@@ -295,6 +311,11 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         isOpen={isWicket}
         onClose={() => setIsWicket(false)}
         onConfirm={onBall}
+      />
+      <SelectBowlerModal
+        bowlers={bowlingPlayers}
+        isOpen={isOverFinished}
+        onSubmit={handleChangeBowler}
       />
     </div>
   );

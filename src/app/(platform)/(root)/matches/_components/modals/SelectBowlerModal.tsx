@@ -1,15 +1,24 @@
 import { InningBowlingDetails } from "@/lib/types";
 import { ChevronRight, Flame, Info, UserIcon } from "lucide-react";
+import { useState } from "react";
 
-const SelectBowlerModal = ({
+export const SelectBowlerModal = ({
   isOpen,
-  onSelect,
+  onSubmit,
   bowlers,
 }: {
   isOpen: boolean;
-  onSelect: (name: string) => void;
+  onSubmit: (bowlerId: string) => void;
   bowlers: InningBowlingDetails[];
 }) => {
+  const [selectedBowlerId, setSelectedBowlerId] = useState("");
+  const [error, setError] = useState("");
+
+  const onSelect = (bowlerId: string) => {
+    setError(selectedBowlerId === bowlerId ? "Select a bowler" : "");
+    setSelectedBowlerId((prev) => (prev === bowlerId ? "" : bowlerId));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -26,45 +35,58 @@ const SelectBowlerModal = ({
                 Select Bowler
               </h2>
               <p className="text-[10px] font-black tracking-[0.2em] text-green-500 uppercase">
-                New Over Deployment
+                For the next over
               </p>
             </div>
           </div>
         </div>
 
         {/* Bowler List */}
-        <div className="custom-scrollbar max-h-[60vh] space-y-4 overflow-y-auto p-8 pt-4 font-sans">
+        <div className="custom-scrollbar max-h-[60vh] space-y-4 overflow-y-auto p-8 pt-4 font-[inter]">
           <p className="mb-2 px-2 text-[10px] font-black tracking-widest text-slate-400 uppercase">
-            Available Roster
+            Available Bowlers
           </p>
           <div className="space-y-2">
             {bowlers.map((bowler, idx) => (
               <button
                 key={idx}
-                onClick={() => onSelect(bowler.player.user.name)}
-                className="group flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
+                onClick={() => onSelect(bowler.playerId)}
+                className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all ${
+                  selectedBowlerId === bowler.playerId
+                    ? "border-teal-500 bg-teal-500/10 text-teal-600"
+                    : "border-slate-100 bg-slate-50 text-slate-400 dark:border-white/5 dark:bg-white/5"
+                }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition-colors group-hover:text-green-500 dark:border-white/10 dark:bg-slate-800">
-                    <UserIcon className="h-5 w-5" />
-                  </div>
                   <div className="text-left">
-                    <h4 className="text-sm font-black tracking-tight text-slate-900 uppercase dark:text-white">
-                      {bowler.player.user.name}
+                    <h4 className="text-sm font-bold text-slate-900 uppercase dark:text-white">
+                      {bowler.player.user.name}{" "}
+                      <span className="ml-2 font-[poppins] text-xs font-normal text-slate-600 lowercase dark:text-slate-200">
+                        ({bowler.player.user.username})
+                      </span>
                     </h4>
-                    <p className="text-[9px] font-bold tracking-widest text-slate-400 uppercase italic">
-                      {bowler.overs} Overs Bowled
-                    </p>
                   </div>
                 </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 transition-all group-hover:text-green-500" />
+                <p className="text-[9px] font-semibold tracking-widest text-slate-400 uppercase italic">
+                  {bowler.overs} Overs Bowled
+                </p>
               </button>
             ))}
+            {error.trim() !== "" && <p className="text-xs text-red-500">Select a bowler</p>}
           </div>
         </div>
 
+        <button
+          className="primary-btn mx-auto rounded-xl px-12 py-2"
+          onClick={() => {
+            if (selectedBowlerId.trim() === "") setError("Select a bowler");
+            else onSubmit(selectedBowlerId);
+          }}
+        >
+          Save
+        </button>
         {/* Rules Footer */}
-        <div className="flex items-start gap-3 border-t border-slate-100 bg-slate-50 p-6 dark:border-white/10 dark:bg-white/5">
+        <div className="mt-4 flex items-start gap-3 border-t border-slate-100 bg-slate-50 p-6 dark:border-white/10 dark:bg-white/5">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
           <p className="text-[9px] leading-relaxed font-medium tracking-wider text-slate-400 uppercase">
             Standard Match Protocol: A bowler cannot bowl two consecutive overs. Deployment of a new

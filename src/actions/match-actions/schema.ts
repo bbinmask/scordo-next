@@ -87,7 +87,6 @@ export const PushBall = z
       .optional(),
     fielderId: z.string().optional(),
     isLastWicket: z.boolean().optional().default(false),
-    nextBowlerId: z.string({ message: errorMessage("nextBowlerId") }).optional(),
   })
   .superRefine((data, ctx) => {
     if (data.isWicket) {
@@ -118,3 +117,9 @@ export const PushBall = z
       }
     }
   });
+
+export const ChangeBowler = z.object({
+  inningId: z.string({ message: errorMessage("inningId") }),
+  matchId: z.string({ message: errorMessage("matchId") }),
+  bowlerId: z.string({ message: errorMessage("bowlerId") }),
+});
