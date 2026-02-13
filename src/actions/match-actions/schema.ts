@@ -86,6 +86,8 @@ export const PushBall = z
       .enum(["BOWLED", "CAUGHT", "RUN_OUT", "LBW", "STUMPED", "HIT_WICKET"])
       .optional(),
     fielderId: z.string().optional(),
+    isLastWicket: z.boolean().optional().default(false),
+    nextBowlerId: z.string({ message: errorMessage("nextBowlerId") }).optional(),
   })
   .superRefine((data, ctx) => {
     if (data.isWicket) {
@@ -101,7 +103,7 @@ export const PushBall = z
           path: ["dismissalType"],
           message: errorMessage("dismissal is required when wicket falls"),
         });
-      } else if (!data.nextBatsmanId) {
+      } else if (!data.nextBatsmanId && !data.isLastWicket) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["nextBatsmanId"],

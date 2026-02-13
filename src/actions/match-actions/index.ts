@@ -529,6 +529,8 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     isWicket,
     isWide,
     nextBatsmanId,
+    isLastWicket,
+    outBatsmanId,
   } = data;
 
   const user = await currentUser();
@@ -542,10 +544,17 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
   const batsmanRuns = isBye || isLegBye ? 0 : runs;
   let bowlerRuns = 0;
 
-  if (isWide) bowlerRuns = runs + 1;
-  else if (isNoBall) bowlerRuns = runs + 1;
+  if (isWide && !isBye && !isLegBye) bowlerRuns = runs + 1;
+  else if (isNoBall && !isBye && !isLegBye) bowlerRuns = runs + 1;
   else if (!isBye && !isLegBye) bowlerRuns = runs;
   const isLegalDelivery = !isNoBall && !isWide;
+
+  if (isWide) bowlerRuns = 1;
+  else if (isNoBall) {
+    if (isBye || isLegBye) bowlerRuns = 1;
+    else bowlerRuns = runs + 1;
+  } else if (isLegalDelivery) bowlerRuns = runs;
+  else bowlerRuns = 0;
 
   let match, ball;
 
@@ -563,6 +572,9 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       return {
         error: "Match not found!",
       };
+
+    const status = match.status;
+    const isTest = match.category === "Test";
 
     const isScorer =
       match.matchOfficials.findIndex(
@@ -584,6 +596,8 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       return {
         error: "Inning not found!",
       };
+
+    const inningNumber = inning.inningNumber;
 
     const nextBall = isLegalDelivery ? inning.balls + 1 : inning.balls;
     const nextOver = isLegalDelivery && nextBall % 6 === 0 ? inning.overs + 1 : inning.overs;
@@ -612,14 +626,23 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     let striker = inning.currentStrikerId;
     let nonStriker = inning.currentNonStrikerId;
 
-    const strikerSurvived = !isWicket || dismissalType === "RUN_OUT";
+    // A is out
 
-    if (strikerSurvived && runs % 2 === 1) {
+    if (runs % 2 === 1) {
       [striker, nonStriker] = [nonStriker, striker];
+      // A         B            A            B
     }
 
     if (isLegalDelivery && nextBall % 6 === 0) {
       [striker, nonStriker] = [nonStriker, striker];
+    }
+
+    if (isWicket) {
+      if (outBatsmanId === striker && !isLastWicket && nextBatsmanId) {
+        striker = nextBatsmanId;
+      } else if (outBatsmanId === nonStriker && nextBatsmanId && !isLastWicket) {
+        nonStriker = nextBatsmanId;
+      }
     }
 
     ball = await db.$transaction(async (tsx) => {
@@ -653,8 +676,8 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
             isLegalDelivery && !isBye && !isLegBye && runs === 0
               ? battingInn.dots + 1
               : battingInn.dots,
-          sixes: runs === 6 ? battingInn.sixes + 1 : battingInn.sixes,
-          fours: runs === 4 ? battingInn.fours + 1 : battingInn.fours,
+          sixes: batsmanRuns === 6 ? battingInn.sixes + 1 : battingInn.sixes,
+          fours: batsmanRuns === 4 ? battingInn.fours + 1 : battingInn.fours,
         },
       });
 

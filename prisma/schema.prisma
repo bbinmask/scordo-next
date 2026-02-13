@@ -66,6 +66,8 @@ enum WicketType {
 
 enum MatchStatus {
   not_started
+  inning_completed
+  stopped
   in_progress
   completed
 }

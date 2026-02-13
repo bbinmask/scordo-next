@@ -150,6 +150,14 @@ const inningDetails = Prisma.validator<Prisma.InningDefaultArgs>()({
   },
 });
 
+const wicketsWithPlayerDetails = Prisma.validator<Prisma.BallDefaultArgs>()({
+  include: {
+    batsman: { include: { user: true } },
+    bowler: { include: { user: true } },
+    fielder: { include: { user: true } },
+  },
+});
+
 const inningBattingDetails = Prisma.validator<Prisma.InningBattingDefaultArgs>()({
   include: {
     player: {
@@ -195,6 +203,7 @@ const currentOverBalls = Prisma.validator<Prisma.BallDefaultArgs>()({
   },
 });
 
+export type WicketsWithPlayerDetails = Prisma.BallGetPayload<typeof wicketsWithPlayerDetails>;
 export type CurrentOverBalls = Prisma.BallGetPayload<typeof currentOverBalls>;
 export type InningDetails = Prisma.InningGetPayload<typeof inningDetails>;
 export type InningBattingDetails = Prisma.InningBattingGetPayload<typeof inningBattingDetails>;

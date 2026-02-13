@@ -1,4 +1,4 @@
-import { Cal_Sans, Poppins, Urbanist } from "next/font/google";
+import { Cal_Sans, Poppins, Urbanist, Inter } from "next/font/google";
 import "../app/globals.css";
 import { getMetadata } from "@/utils/helper/getMetadata";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -18,6 +18,10 @@ const poppins = Poppins({
   subsets: ["latin"],
 });
 
+const inter = Inter({
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+});
 export const metadata = getMetadata();
 
 export default function RootLayout({
@@ -29,7 +33,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="layout-background">
         <ThemeProvider>
-          <main className={`min-h-[calc(100vh-100px)] w-full antialiased`}>{children}</main>
+          <main
+            className={`min-h-[calc(100vh-100px)] w-full antialiased ${poppins.className} ${urbanist.className} ${cal_sans.className} ${inter.className}`}
+          >
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>

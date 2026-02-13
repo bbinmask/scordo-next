@@ -3,11 +3,17 @@ import { RotateCcw, Settings } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import WicketDetailsModal from "./modals/WicketDetailsModal";
-import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
+import {
+  InningDetails,
+  MatchWithDetails,
+  PlayerWithUser,
+  WicketsWithPlayerDetails,
+} from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { pushBall } from "@/actions/match-actions";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { WicketType } from "@/generated/prisma";
+import axios from "axios";
 type ExtraType = "wd" | "nb" | "b";
 
 interface ControlPadProps {
@@ -30,6 +36,9 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     onSuccess(data) {
       console.log({ data });
       queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
+      queryClient.invalidateQueries({ queryKey: ["current-over-history", innings.id] });
+
+      console.log({ balls: innings.balls });
     },
     onError(error) {
       console.log(error);
@@ -38,9 +47,14 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
 
   const onBall = (
     runs: number,
-    wicket?: { fielderId: string; batsmanId: string; nextBatsmanId: string; type: WicketType }
+    wicket: {
+      fielderId: string;
+      batsmanId: string;
+      nextBatsmanId: string | null;
+      type: WicketType;
+    } | null
   ) => {
-    if (wicket === undefined) {
+    if (!wicket) {
       console.log({ wide: extras.isWide });
       execute({
         matchId: innings.matchId,
@@ -52,6 +66,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,
         isWicket: false,
+        isLastWicket: false,
       });
     } else if (wicket.type === "RUN_OUT") {
       execute({
@@ -66,6 +81,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,
         isWide: extras.isWide,
+        isLastWicket: false,
         outBatsmanId:
           wicket.batsmanId.trim() !== "" ? wicket.batsmanId : (innings.currentStrikerId as string),
       });
@@ -78,9 +94,11 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
         dismissalType: wicket.type,
         fielderId: wicket.fielderId,
         batsmanId: wicket.batsmanId,
+        isLastWicket: false,
         isBye: extras.isBye,
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,
+
         isWide: extras.isWide,
       });
     }
@@ -139,6 +157,17 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
     }
   };
 
+  const [isOverFinished, setIsOverFinished] = useState(false);
+
+  const playerLeftToBat = useMemo(() => {
+    return battingPlayers.filter(
+      (batsman) =>
+        batsman.playerId !== innings.currentNonStrikerId &&
+        batsman.playerId !== innings.currentStrikerId &&
+        !batsman.isOut
+    );
+  }, [innings]);
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between px-4">
@@ -156,19 +185,19 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
           <PadButton
             disabled={isSubmitting}
             label="0"
-            onClick={() => onBall(0)}
+            onClick={() => onBall(0, null)}
             className={`${nullClasses} active:translate-y-1 active:scale-90`}
           />
           <PadButton
             disabled={isSubmitting}
             label="1"
-            onClick={() => onBall(1)}
+            onClick={() => onBall(1, null)}
             className={`${runsClasses}`}
           />
           <PadButton
             disabled={isSubmitting}
             label="2"
-            onClick={() => onBall(2)}
+            onClick={() => onBall(2, null)}
             className={`${runsClasses}`}
           />
           <PadButton
@@ -190,20 +219,20 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
           <PadButton
             disabled={isSubmitting}
             label="3"
-            onClick={() => onBall(3)}
+            onClick={() => onBall(3, null)}
             className={`${runsClasses}`}
           />
           <PadButton
             disabled={isSubmitting}
             label="4"
-            onClick={() => onBall(4)}
+            onClick={() => onBall(4, null)}
             className={`${boundaryClasses}`}
           />
           <PadButton
             disabled={isSubmitting}
             label="6"
             className={`${boundaryClasses}`}
-            onClick={() => onBall(6)}
+            onClick={() => onBall(6, null)}
           />
           <PadButton
             disabled={isSubmitting}
@@ -262,12 +291,7 @@ export const ControlPad = ({ innings }: ControlPadProps) => {
             batsman.playerId === innings.currentNonStrikerId ||
             batsman.playerId === innings.currentStrikerId
         )}
-        battingPlayers={battingPlayers.filter(
-          (batsman) =>
-            batsman.playerId !== innings.currentNonStrikerId &&
-            batsman.playerId !== innings.currentStrikerId &&
-            !batsman.isOut
-        )}
+        playersLeftToBat={playerLeftToBat}
         isOpen={isWicket}
         onClose={() => setIsWicket(false)}
         onConfirm={onBall}

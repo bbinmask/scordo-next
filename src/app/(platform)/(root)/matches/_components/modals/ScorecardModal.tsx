@@ -10,8 +10,8 @@ import { InningDetails } from "@/lib/types";
 import { getEcon, getStrikeRate } from "@/utils/helper/scorecard";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Flame, LayoutList, Shield, Sword, Trophy } from "lucide-react";
-import { useState } from "react";
+import { Flame, LayoutList, Shield, Star, Sword, Trophy } from "lucide-react";
+import { useMemo, useState } from "react";
 
 const ScorecardModal = ({
   isOpen,
@@ -23,17 +23,16 @@ const ScorecardModal = ({
   innings: InningDetails[];
 }) => {
   const [activeInningIdx, setActiveInningIdx] = useState(0);
-
-  const { data: wicketsMap, isLoading } = useQuery<Map<string, string> | null>({
+  const { data: wicketsMap, isLoading } = useQuery<Record<string, string> | null>({
     queryKey: ["inning-wickets", innings[activeInningIdx].id],
-    queryFn: async function () {
+    queryFn: async () => {
       const { data } = await axios.get(
         `/api/matches/innings/${innings[activeInningIdx].id}/wickets`
       );
 
       if (!data.success) return null;
 
-      const dismissalMap = new Map<string, string>();
+      const dismissalMap: Record<string, string> = {};
 
       for (const ball of data.data) {
         let text = "";
@@ -62,13 +61,18 @@ const ScorecardModal = ({
           case "HIT_WICKET":
             text = `hit wicket b. ${ball.bowler.user.name}`;
             break;
+
+          default:
+            text = "";
         }
 
-        dismissalMap.set(ball.batsmanId, text);
+        // key = batsmanId, value = dismissal text
+        dismissalMap[ball.batsmanId] = text;
       }
 
       return dismissalMap;
     },
+    enabled: !!innings[activeInningIdx]?.id, // prevents firing before data exists
   });
 
   const currentInning = innings[activeInningIdx];
@@ -167,7 +171,7 @@ const ScorecardModal = ({
                           </p>
                           {wicketsMap && (
                             <p className="mt-0.5 text-[9px] font-medium text-slate-400 italic">
-                              {wicketsMap?.get(batsman.playerId)}
+                              {wicketsMap?.[batsman.playerId]}
                             </p>
                           )}
                         </td>
@@ -230,7 +234,7 @@ const ScorecardModal = ({
                           {bowler.wickets}
                         </td>
                         <td className="px-4 py-4 text-center text-[10px] font-bold text-slate-400">
-                          {getEcon(bowler.runs, bowler.overs, bowler.balls)}
+                          {getEcon(bowler.runs, bowler.balls)}
                         </td>
                       </tr>
                     ))}
@@ -242,6 +246,69 @@ const ScorecardModal = ({
         </div>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const Scoreboard = ({ state, syncing }: { state: any; syncing: boolean }) => {
+  const runRate = useMemo(() => {
+    const totalBalls = Number(state.totalOversBowled) * 6 + Number(state.ballsInCurrentOver);
+    return totalBalls === 0 ? "0.00" : ((Number(state.totalRuns) / totalBalls) * 6).toFixed(2);
+  }, [state.totalRuns, state.totalOversBowled, state.ballsInCurrentOver]);
+
+  return (
+    <div className="group relative overflow-hidden rounded-t-[2.5rem] bg-indigo-600 p-8 font-sans text-white">
+      <div className="absolute top-0 right-0 p-6">
+        <div
+          className={`rounded-full border border-white/20 px-3 py-1 text-[10px] font-black tracking-widest uppercase backdrop-blur-md ${syncing ? "animate-pulse bg-white/10" : "border-emerald-500/30 bg-emerald-500/20 text-emerald-300"}`}
+        >
+          {syncing ? "Syncing..." : "Live Cloud"}
+        </div>
+      </div>
+
+      <div className="relative z-10 mb-6">
+        <p className="mb-1 text-[10px] font-black tracking-[0.3em] text-indigo-100 uppercase">
+          Scordo Match Engine
+        </p>
+        <div className="flex items-center gap-3">
+          <h2 className="text-3xl font-black tracking-tighter uppercase italic">
+            {String(state.battingTeam)}
+          </h2>
+          <span className="font-bold text-indigo-300 italic">vs</span>
+          <span className="text-lg font-medium text-indigo-200">{String(state.bowlingTeam)}</span>
+        </div>
+      </div>
+
+      <div className="relative z-10 flex items-baseline gap-3">
+        <span className="text-8xl font-black tracking-tighter drop-shadow-lg">
+          {String(state.totalRuns)}
+        </span>
+        <span className="text-4xl font-light tracking-tighter text-indigo-200">
+          / {String(state.wickets)}
+        </span>
+      </div>
+
+      <div className="relative z-10 mt-8 grid grid-cols-2 gap-4">
+        <div className="rounded-2xl border border-white/5 bg-indigo-700/40 p-4 backdrop-blur-sm">
+          <span className="mb-1 block text-[10px] font-black tracking-widest text-indigo-300 uppercase">
+            Overs
+          </span>
+          <p className="font-mono text-2xl font-black tracking-tighter">
+            {String(state.totalOversBowled)}.{String(state.ballsInCurrentOver)}{" "}
+            <span className="text-sm opacity-40">/ {String(state.maxOvers)}</span>
+          </p>
+        </div>
+        <div className="rounded-2xl border border-white/5 bg-indigo-700/40 p-4 text-right backdrop-blur-sm">
+          <span className="mb-1 block text-[10px] font-black tracking-widest text-indigo-300 uppercase">
+            CRR
+          </span>
+          <p className="font-mono text-2xl font-black tracking-tighter text-emerald-400">
+            {String(runRate)}
+          </p>
+        </div>
+      </div>
+
+      <Star className="absolute -right-6 -bottom-6 h-32 w-32 -rotate-12 text-white/5 transition-transform duration-700 group-hover:rotate-0" />
+    </div>
   );
 };
 

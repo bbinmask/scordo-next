@@ -61,22 +61,22 @@ interface WicketDetailsModalProps {
   onClose: () => void;
   onConfirm: (
     runs: number,
-    wicket?: {
+    wicket: {
       fielderId: string;
       batsmanId: string;
-      nextBatsmanId: string;
+      nextBatsmanId: string | null;
       type: WicketType;
-    }
+    } | null
   ) => void;
   batsmanOnCrease: InningBattingDetails[];
-  battingPlayers: InningBattingDetails[];
+  playersLeftToBat: InningBattingDetails[];
   isSubmitting: boolean;
   fielders: InningBowlingDetails[];
 }
 
 export const WicketDetailsModal = ({
   isOpen,
-  battingPlayers,
+  playersLeftToBat,
   onClose,
   onConfirm,
   isSubmitting,
@@ -212,10 +212,10 @@ export const WicketDetailsModal = ({
           )}
           {step === "next" && (
             <div className="custom-scrollbar max-h-64 space-y-1 overflow-y-auto pr-2">
-              {battingPlayers.length === 0 ? (
+              {playersLeftToBat.length === 0 ? (
                 <NotFoundParagraph description="No players left" />
               ) : (
-                battingPlayers.map((batsman) => (
+                playersLeftToBat.map((batsman) => (
                   <button
                     key={batsman.id}
                     type="button"

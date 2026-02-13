@@ -95,7 +95,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
   });
 
   const { data: ballHistory, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
-    queryKey: ["current-over-history", innings?.at(0)?.id],
+    queryKey: ["current-over-history", innings?.at(innings?.length - 1 || 0)?.id],
     queryFn: async () => {
       if (!innings || innings.length === 0) return [];
 
