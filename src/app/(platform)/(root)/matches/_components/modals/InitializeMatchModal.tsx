@@ -23,12 +23,13 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, startTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { type InputTypeForInitializeMatch as InitializeMatchForm } from "@/actions/match-actions/types";
 import { useAction } from "@/hooks/useAction";
 import { initializeMatch } from "@/actions/match-actions";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 export const InitializeMatchModal = ({
   isOpen,
   onClose,
@@ -39,10 +40,15 @@ export const InitializeMatchModal = ({
   match: MatchWithDetails;
 }) => {
   const [step, setStep] = useState(1);
-
+  const router = useRouter();
   const { execute, isLoading: isSubmitting } = useAction(initializeMatch, {
-    onSuccess(data) {
-      toast.success(`Match Started`);
+    onSuccess() {
+      toast.success("Match Started");
+
+      startTransition(() => {
+        router.refresh();
+      });
+
       onClose();
     },
 

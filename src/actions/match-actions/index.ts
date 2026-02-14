@@ -105,6 +105,7 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
         teamBId,
         tossDecision,
         tossWinner,
+        requestStatus: teamA.ownerId === teamB.ownerId ? "accepted" : "pending",
         venue,
         playerLimit,
         organizerId: user.id,

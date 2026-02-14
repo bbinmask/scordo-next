@@ -47,6 +47,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       console.log(error);
     },
   });
+
   const { execute: executeChangeBowler, isLoading: isChanging } = useAction(changeBowler, {
     onSuccess(data) {
       queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
@@ -55,6 +56,21 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     },
     onError(error) {
       console.log(error);
+    },
+  });
+
+  const {} = useQuery<boolean>({
+    queryKey: ["check-change-bowler"],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/matches/innings/${innings.id}/check-bowler-change`);
+
+      console.log({ data });
+
+      if (!data.success) return setIsOverFinished(false);
+
+      setIsOverFinished(data.data);
+
+      return data.data;
     },
   });
 
@@ -130,22 +146,26 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       bowlerId,
     });
   };
+
   const [extras, setExtras] = useState({
     isWide: false,
     isBye: false,
     isLegBye: false,
     isNB: false,
   });
+  const [isOverFinished, setIsOverFinished] = useState(false);
   const [isWicket, setIsWicket] = useState(false);
 
   const battingPlayers = useMemo(() => {
     return innings.InningBatting;
   }, [innings]);
+
   const bowlingPlayers = useMemo(() => {
     return innings.InningBowling;
   }, [innings]);
 
   const onUndo = () => {};
+
   const handleExtras = (type: ExtraType) => {
     switch (type) {
       case "b":
@@ -177,8 +197,6 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         break;
     }
   };
-
-  const [isOverFinished, setIsOverFinished] = useState(false);
 
   const playerLeftToBat = useMemo(() => {
     return battingPlayers.filter(
@@ -319,7 +337,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       />
       <SelectBowlerModal
         bowlers={bowlingPlayers.filter(
-          (bowler) => bowler.playerId !== innings.currentBowlerId || bowler.overs < match.overLimit
+          (bowler) => bowler.playerId !== innings.currentBowlerId || bowler.overs >= match.overLimit
         )}
         isOpen={isOverFinished}
         onSubmit={handleChangeBowler}

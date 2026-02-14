@@ -1,6 +1,15 @@
 "use client";
 
-import React, { ChangeEvent, ComponentRef, Ref, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  ComponentRef,
+  Ref,
+  startTransition,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Trophy,
   Calendar,
@@ -60,7 +69,9 @@ const CreateMatchForm: React.FC = () => {
   const { execute, isLoading: isCreating } = useAction(createMatch, {
     onSuccess(data) {
       toast.success("Match is created!");
-      router.push(`/matches/${data.id}`);
+      startTransition(() => {
+        router.push(`/matches/${data.id}`);
+      });
     },
     onError(error) {
       setIsLoading(false);
