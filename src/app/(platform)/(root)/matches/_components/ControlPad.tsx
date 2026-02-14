@@ -64,8 +64,6 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/innings/${innings.id}/check-bowler-change`);
 
-      console.log({ data });
-
       if (!data.success) return setIsOverFinished(false);
 
       setIsOverFinished(data.data);
@@ -84,13 +82,12 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     } | null
   ) => {
     if (!wicket) {
-      console.log({ wide: extras.isWide });
       execute({
         matchId: innings.matchId,
         inningId: innings.id,
         runs: runs,
         batsmanId: innings.currentStrikerId as string,
-        isBye: extras.isBye,
+        isBye: extras.isBye ? true : extras.isWide && runs > 0 ? true : false,
         isWide: extras.isWide,
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,

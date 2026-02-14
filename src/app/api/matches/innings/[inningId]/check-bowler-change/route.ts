@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
-export const GET = async (req: Request, { params }: { params: Promise<{ inningId: string }> }) => {
+export const GET = async (_: Request, { params }: { params: Promise<{ inningId: string }> }) => {
   const { inningId } = await params;
 
   if (!inningId) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
