@@ -3,42 +3,18 @@
 import { User } from "@/generated/prisma";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useParams } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Shield,
-  Trophy,
-  MapPin,
-  Calendar,
-  Activity,
-  Sword,
-  Flame,
-  Gavel,
-  Share2,
-  Target,
-  ShieldCheck,
-  UserCheck,
-  UserCircle2,
-} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useMemo, useState, startTransition } from "react";
+import { MapPin, Calendar, Activity, Sword, Flame, Gavel, Share2, Target } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
 import { CurrentOverBalls, InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { capitalize } from "lodash";
 import { useAction } from "@/hooks/useAction";
-import { addOfficials } from "@/actions/match-actions";
+import { addOfficials, initializeMatch } from "@/actions/match-actions";
 import { toast } from "sonner";
 import InitializeMatchModal from "../_components/modals/InitializeMatchModal";
 import { type MatchOfficial } from "../_types/types";
-import { AddOfficialModal } from "../_components/AddOfficialsModal";
 import { ControlPad } from "../_components/ControlPad";
 import ScorecardModal from "../_components/modals/ScorecardModal";
 import {
@@ -50,9 +26,10 @@ import {
   getRR,
   getStrikeRate,
 } from "@/utils/helper/scorecard";
-import { SquadModal } from "../_components/modals/SquadModals";
 import { MatchHeroSection } from "../_components/MatchHeroSection";
 import { OfficialsModal } from "../_components/modals/OfficialsModal";
+import { SubmitHandler } from "react-hook-form";
+import { type InputTypeForInitializeMatch as InitializeMatchForm } from "@/actions/match-actions/types";
 
 interface MatchIdPageProps {}
 
@@ -115,8 +92,8 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
   return (
     <>
       {/* Live Header Banner */}
-      <div className="relative mb-4 flex items-start justify-between overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
-        <div className="w-full">
+      <div className="relative mb-4 overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
+        <div className="h-full w-full">
           <p className="mb-2 w-full truncate overflow-x-clip font-[inter] text-xs font-bold text-nowrap text-green-500 uppercase">
             Current Innings: {innings[length].battingTeam.name}
           </p>
@@ -135,7 +112,17 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
             RR: {`${getRR(innings[length].runs, innings[length].balls)}`}
           </p>
         </div>
-        <div className="flex w-12 items-center justify-evenly rounded-full border border-red-500/20 bg-red-500/10 px-1 py-0.5">
+
+        {match.status !== "in_progress" && (
+          <p className="mt-4 font-[urbanist] text-xs font-bold text-nowrap text-slate-900 dark:text-slate-300">
+            {match.status === "completed"
+              ? "Completed"
+              : match.status === "inning_completed"
+                ? `Inning completed`
+                : "Match stopped"}
+          </p>
+        )}
+        <div className="absolute top-8 right-3 flex w-12 items-center justify-evenly rounded-full border border-red-500/20 bg-red-500/10 px-1 py-0.5">
           <div className="h-1 w-1 animate-pulse rounded-full bg-red-500" />
           <span className="text-[8px] font-bold text-red-500 uppercase">Live</span>
         </div>
@@ -166,38 +153,38 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {innings[length].InningBatting.filter(
-                  (inn) =>
-                    inn.playerId === innings[length].currentStrikerId ||
-                    inn.playerId === innings[length].currentNonStrikerId
-                ).map((inn, i) => (
+                  (batsman) =>
+                    (batsman.playerId === innings[length].currentStrikerId && !batsman.isOut) ||
+                    (batsman.playerId === innings[length].currentNonStrikerId && !batsman.isOut)
+                ).map((batsman, i) => (
                   <tr
                     key={i}
-                    className={`${inn.playerId === innings[length].currentStrikerId ? "bg-green-500/5" : ""}`}
+                    className={`${batsman.playerId === innings[length].currentStrikerId ? "bg-green-500/5" : ""}`}
                   >
                     <td className="px-6 py-4 font-[poppins]">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-slate-900 uppercase dark:text-white">
-                          {inn?.player.user.name}
+                          {batsman?.player.user.name}
                         </span>
-                        {inn.playerId === innings[length].currentStrikerId && (
+                        {batsman.playerId === innings[length].currentStrikerId && (
                           <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                         )}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center text-xs font-semibold text-slate-900 dark:text-white">
-                      {inn.runs}
+                      {batsman.runs}
                     </td>
                     <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
-                      {inn.balls}
+                      {batsman.balls}
                     </td>
                     <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
-                      {inn.fours}
+                      {batsman.fours}
                     </td>
                     <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
-                      {inn.sixes}
+                      {batsman.sixes}
                     </td>
                     <td className="px-4 py-4 text-center text-[10px] font-semibold text-green-500">
-                      {getStrikeRate(inn.runs, inn.balls)}
+                      {getStrikeRate(batsman.runs, batsman.balls)}
                     </td>
                   </tr>
                 ))}
@@ -230,7 +217,7 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
               </thead>
               <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/5">
                 {innings[length].InningBowling.filter(
-                  (inn) => inn.playerId === innings[length].currentBowlerId
+                  (batsman) => batsman.playerId === innings[length].currentBowlerId
                 ).map((player, i) => (
                   <tr key={i} className={`bg-green-500/5`}>
                     <td className="px-6 py-4">
@@ -311,16 +298,46 @@ const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: st
   );
 };
 
+const AwaitingCard = ({ title, description }: { title: string; description: string }) => {
+  return (
+    <div className="animate-in fade-in group hover-card relative overflow-hidden rounded-[3rem] border border-dashed border-slate-200 p-12 text-center font-sans duration-1000 dark:border-white/10">
+      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 transition-transform group-hover:scale-110 dark:bg-white/5">
+        <Sword className="h-8 w-8 text-slate-300 dark:text-slate-600" />
+      </div>
+      <h4 className="mb-2 text-xl font-black tracking-tight uppercase">{title}</h4>
+      <p className="mx-auto max-w-sm text-xs leading-relaxed font-bold tracking-widest text-slate-400 uppercase">
+        {description}{" "}
+      </p>
+    </div>
+  );
+};
+
 const MatchIdPage = ({}: MatchIdPageProps) => {
   const { id } = useParams();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { execute } = useAction(addOfficials, {
+  const { execute: executeAddOfficials } = useAction(addOfficials, {
     onSuccess(data) {
       toast.success("Officials Added");
       queryClient.invalidateQueries({ queryKey: ["match", id] });
       handleClose();
     },
+    onError(error) {
+      toast.error(error);
+    },
+  });
+  const { execute: executeInitialize, isLoading: isSubmitting } = useAction(initializeMatch, {
+    onSuccess() {
+      toast.success("Match Started");
+
+      startTransition(() => {
+        router.refresh();
+      });
+
+      setIsInitializing(false);
+    },
+
     onError(error) {
       toast.error(error);
     },
@@ -345,6 +362,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
 
   const [isInitializing, setIsInitializing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
   const handleOpen = () => {
     setIsOpen(true);
   };
@@ -356,7 +374,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   const handleAddOfficial = (matchOfficials: MatchOfficial[]) => {
     if (!match) return;
 
-    execute({ matchId: match.id, matchOfficials });
+    executeAddOfficials({ matchId: match.id, matchOfficials });
   };
 
   const handleShare = async () => {
@@ -379,6 +397,14 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
       console.error(err);
     }
   };
+
+  const handleInitializeMatch: SubmitHandler<InitializeMatchForm> = (data) => {
+    executeInitialize(data);
+  };
+
+  const handleStartInning = () => {};
+
+  const handleRestartMatch = () => {};
 
   const players: PlayerWithUser[] = useMemo(() => {
     const teamAPlayers = match?.teamA.players || [];
@@ -429,13 +455,27 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                         <span className="border-input secondary-text rounded-2xl border bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest shadow-lg transition-all hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700">
                           Request Pending
                         </span>
+                      ) : match.status === "not_started" ? (
+                        <button
+                          onClick={() => setIsInitializing(true)}
+                          className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                        >
+                          Initialize Match
+                        </button>
+                      ) : match.status === "inning_completed" ? (
+                        <button
+                          onClick={() => setIsInitializing(true)}
+                          className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                        >
+                          Restart
+                        </button>
                       ) : (
-                        match.status === "not_started" && (
+                        match.status === "stopped" && (
                           <button
                             onClick={() => setIsInitializing(true)}
                             className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
                           >
-                            Initialize Match
+                            Resume
                           </button>
                         )
                       )}
@@ -468,21 +508,15 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     </span>
                   </div>
                   {/* Scorecard */}
-                  {match.status === "in_progress" ? (
-                    <LiveScorecard match={match} userId={user?.id} />
+                  {match.status === "not_started" ? (
+                    <AwaitingCard
+                      title={"Awaiting Toss Results"}
+                      description={
+                        "The match engine is on standby. The live scoreboard and ball-by-ball feed will initialize once the 2nd inning is started."
+                      }
+                    />
                   ) : (
-                    <div className="animate-in fade-in group hover-card relative overflow-hidden rounded-[3rem] border border-dashed border-slate-200 p-12 text-center font-sans duration-1000 dark:border-white/10">
-                      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 transition-transform group-hover:scale-110 dark:bg-white/5">
-                        <Sword className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-                      </div>
-                      <h4 className="mb-2 text-xl font-black tracking-tight uppercase">
-                        Awaiting Toss Results
-                      </h4>
-                      <p className="mx-auto max-w-sm text-xs leading-relaxed font-bold tracking-widest text-slate-400 uppercase">
-                        The match engine is on standby. The live scoreboard and ball-by-ball feed
-                        will initialize once the toss decision is logged.
-                      </p>
-                    </div>
+                    <LiveScorecard match={match} userId={user?.id} />
                   )}
                 </div>
                 <div className="space-y-4">
@@ -544,6 +578,15 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
 
           {isOrganizer && (
             <InitializeMatchModal
+              onSubmit={
+                match.status === "not_started"
+                  ? handleInitializeMatch
+                  : match.status === "inning_completed"
+                    ? handleStartInning
+                    : handleRestartMatch
+              }
+              isSubmitting={isSubmitting}
+              status={match.status}
               isOpen={isInitializing}
               match={match}
               onClose={() => setIsInitializing(false)}

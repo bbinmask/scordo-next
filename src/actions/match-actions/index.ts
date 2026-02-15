@@ -716,6 +716,17 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         },
       });
 
+      if (isLastWicket) {
+        await db.match.update({
+          where: {
+            id: matchId,
+          },
+          data: {
+            status: "inning_completed",
+          },
+        });
+      }
+
       return createdBall;
     });
   } catch (error) {

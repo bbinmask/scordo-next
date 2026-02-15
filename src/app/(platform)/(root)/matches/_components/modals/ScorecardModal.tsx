@@ -39,7 +39,9 @@ const ScorecardModal = ({
 
         switch (ball.dismissalType) {
           case "CAUGHT":
-            text = `c. ${ball.fielder?.user.name} b. ${ball.bowler.user.name}`;
+            if (ball.fielder?.user.username === ball.bowler?.user.username)
+              text = `c&b ${ball.bowler.user.name}`;
+            else text = `c. ${ball.fielder?.user.name} b. ${ball.bowler.user.name}`;
             break;
 
           case "BOWLED":
@@ -66,13 +68,12 @@ const ScorecardModal = ({
             text = "";
         }
 
-        // key = batsmanId, value = dismissal text
         dismissalMap[ball.batsmanId] = text;
       }
 
       return dismissalMap;
     },
-    enabled: !!innings[activeInningIdx]?.id, // prevents firing before data exists
+    enabled: !!innings[activeInningIdx]?.id,
   });
 
   const currentInning = innings[activeInningIdx];
@@ -223,7 +224,7 @@ const ScorecardModal = ({
                             {bowler.player.user.name}
                           </p>
                         </td>
-                        <td className="px-4 py-4 text-center text-xs font-bold">{bowler.overs}</td>
+                        <td className="px-4 py-4 text-center text-xs font-bold">{`${bowler.overs}.${bowler.balls % 6}`}</td>
                         <td className="px-4 py-4 text-center text-xs font-semibold text-slate-400">
                           {bowler.maidens}
                         </td>

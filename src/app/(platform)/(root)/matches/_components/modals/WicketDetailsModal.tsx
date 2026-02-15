@@ -14,7 +14,9 @@ import {
   PlayerWithUser,
 } from "@/lib/types";
 import { ArrowLeft, Check, CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { setConfig } from "next/config";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface WicketDetails {
   primary?: string; // e.g., Fielder name
@@ -100,13 +102,23 @@ export const WicketDetailsModal = ({
     }
   };
 
-  const handleDone = () => {
-    onConfirm(runs, {
-      nextBatsmanId: selectedNextBatsmanId,
-      fielderId: selectedFielderID,
-      batsmanId: selectedBatsmanId,
-      type: selectedConfig?.id as WicketType,
-    });
+  const handleSave = () => {
+    if (selectedBatsmanId.trim() === "" && selectedConfig?.id === "RUN_OUT") {
+      toast.error("Select out batsman!");
+    } else
+      onConfirm(runs, {
+        nextBatsmanId: selectedNextBatsmanId,
+        fielderId: selectedFielderID,
+        batsmanId: selectedBatsmanId,
+        type: selectedConfig?.id as WicketType,
+      });
+    setSelectedBatsmanId("");
+    setSelectedNextBatsmanId("");
+    setConfig(undefined);
+    setStep("type");
+    setRuns(0);
+    setSelectedFielderID("");
+    onClose();
   };
 
   return (
@@ -267,7 +279,7 @@ export const WicketDetailsModal = ({
             ) : (
               <button
                 type="submit"
-                onClick={handleDone}
+                onClick={handleSave}
                 className="center group primary-btn flex gap-2 rounded-2xl px-12 py-4 text-center text-xs tracking-wide uppercase shadow-xl shadow-emerald-500/20 transition-all disabled:opacity-50"
               >
                 {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}

@@ -107,7 +107,8 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,
         isWide: extras.isWide,
-        isLastWicket: false,
+        nextBatsmanId: wicket.nextBatsmanId as string,
+        isLastWicket: match.playerLimit === innings.wickets + 2,
         outBatsmanId:
           wicket.batsmanId.trim() !== "" ? wicket.batsmanId : (innings.currentStrikerId as string),
       });
@@ -119,12 +120,13 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         isWicket: true,
         dismissalType: wicket.type,
         fielderId: wicket.fielderId,
-        batsmanId: wicket.batsmanId,
-        isLastWicket: false,
+        batsmanId: innings.currentStrikerId as string,
+        outBatsmanId: innings.currentStrikerId as string,
+        nextBatsmanId: wicket.nextBatsmanId as string,
+        isLastWicket: match.playerLimit === innings.wickets + 2,
         isBye: extras.isBye,
         isLegBye: extras.isLegBye,
         isNoBall: extras.isNB,
-
         isWide: extras.isWide,
       });
     }

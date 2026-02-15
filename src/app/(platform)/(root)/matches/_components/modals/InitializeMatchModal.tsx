@@ -23,39 +23,27 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useMemo, useState, startTransition } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 import { type InputTypeForInitializeMatch as InitializeMatchForm } from "@/actions/match-actions/types";
-import { useAction } from "@/hooks/useAction";
-import { initializeMatch } from "@/actions/match-actions";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { MatchStatus } from "@/generated/prisma";
 export const InitializeMatchModal = ({
   isOpen,
   onClose,
+  status,
+  onSubmit,
+  isSubmitting,
   match,
 }: {
+  status: MatchStatus;
+  isSubmitting: boolean;
+  onSubmit: (data: InitializeMatchForm) => void;
   isOpen: boolean;
   onClose: () => void;
   match: MatchWithDetails;
 }) => {
   const [step, setStep] = useState(1);
-  const router = useRouter();
-  const { execute, isLoading: isSubmitting } = useAction(initializeMatch, {
-    onSuccess() {
-      toast.success("Match Started");
-
-      startTransition(() => {
-        router.refresh();
-      });
-
-      onClose();
-    },
-
-    onError(error) {
-      toast.error(error);
-    },
-  });
 
   const {
     handleSubmit,
@@ -108,10 +96,6 @@ export const InitializeMatchModal = ({
       activeIds.some((player) => player.userId === p.userId)
     );
   }, [bowlingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds]);
-
-  const onSubmit: SubmitHandler<InitializeMatchForm> = (data) => {
-    execute(data);
-  };
 
   const togglePlayer = (team: "A" | "B", playerId: string, userId: string) => {
     const field = team === "A" ? "teamAPlayerIds" : "teamBPlayerIds";

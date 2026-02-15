@@ -26,10 +26,13 @@ const getOvers = (overs: number, balls: number) => {
 };
 
 const getCRR = (runs: number, balls: number) => {
+  if (balls === 0) return runs;
   return ((runs / balls) * 6).toFixed(2);
 };
 
 const getRR = (runs: number, balls: number) => {
+  if (balls === 0) return runs;
+
   return ((runs / balls) * 6).toFixed(2);
 };
 

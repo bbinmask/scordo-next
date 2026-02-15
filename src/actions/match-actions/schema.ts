@@ -80,7 +80,7 @@ export const PushBall = z
     isBye: z.boolean({ message: errorMessage("isBye") }).optional(),
     isLegBye: z.boolean({ message: errorMessage("isLegBye") }).optional(),
     isWicket: z.boolean({ message: errorMessage("isWicket") }).optional(),
-    nextBatsmanId: z.string({ message: errorMessage("nextBatsmanId") }).optional(),
+    nextBatsmanId: z.string().optional(),
     outBatsmanId: z.string({ message: errorMessage("nextBatsmanId") }).optional(),
     dismissalType: z
       .enum(["BOWLED", "CAUGHT", "RUN_OUT", "LBW", "STUMPED", "HIT_WICKET"])
