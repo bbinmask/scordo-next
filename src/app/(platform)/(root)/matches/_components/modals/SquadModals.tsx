@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PlayerWithUser } from "@/lib/types";
+import { InningBattingDetails, InningBowlingDetails } from "@/lib/types";
 import { Shield, UserCircle2 } from "lucide-react";
 
 interface SquadModalProps {
@@ -15,7 +15,7 @@ interface SquadModalProps {
   onClose: () => void;
   teamName?: string;
   teamLogo?: string;
-  players?: PlayerWithUser[];
+  players?: InningBattingDetails[] | InningBowlingDetails[];
 }
 export const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: SquadModalProps) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
@@ -47,7 +47,7 @@ export const SquadModal = ({ isOpen, onClose, teamName, teamLogo, players }: Squ
         {!players || players?.length === 0 ? (
           <NotFoundParagraph description="No players in the squad" />
         ) : (
-          players.map((player: any, idx: number) => (
+          players.map(({ player }, idx: number) => (
             <div
               key={idx}
               className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-emerald-500/50 dark:border-white/5 dark:bg-white/5"

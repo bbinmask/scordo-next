@@ -43,7 +43,7 @@ export const InitializeMatchModal = ({
   onClose: () => void;
   match: MatchWithDetails;
 }) => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(status === "not_started" ? 1 : 2);
 
   const {
     handleSubmit,
@@ -125,7 +125,8 @@ export const InitializeMatchModal = ({
                 Start the Match
               </DialogTitle>
               <DialogDescription className="font-[inter] text-xs font-bold tracking-wide text-green-500 uppercase">
-                Step {step} of 3
+                Step {status === "inning_completed" ? step - 1 : step} of{" "}
+                {status === "inning_completed" ? 2 : 3}
               </DialogDescription>
             </div>
           </div>
@@ -404,10 +405,22 @@ export const InitializeMatchModal = ({
               <button
                 type="button"
                 disabled={isSubmitting}
-                onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
+                onClick={() => {
+                  if (status === "inning_completed") {
+                    if (step === 2) {
+                      onClose();
+                    } else setStep(step - 1);
+                  } else {
+                    if (step > 1) {
+                      setStep(step - 1);
+                    } else onClose();
+                  }
+                }}
                 className="group center flex w-full gap-2 rounded-2xl bg-slate-300 px-6 py-4 text-center font-[urbanist] text-xs font-bold uppercase transition-all dark:bg-slate-700 dark:text-slate-300"
               >
                 {step === 1 ? (
+                  "Cancel"
+                ) : step === 2 && status === "inning_completed" ? (
                   "Cancel"
                 ) : (
                   <>

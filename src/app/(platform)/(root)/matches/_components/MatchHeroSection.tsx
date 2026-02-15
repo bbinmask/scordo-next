@@ -1,4 +1,10 @@
-import { MatchWithDetails, PlayerWithUser } from "@/lib/types";
+import {
+  InningBattingDetails,
+  InningBowlingDetails,
+  InningDetails,
+  MatchWithDetails,
+  PlayerWithUser,
+} from "@/lib/types";
 import { Shield, Trophy } from "lucide-react";
 import { useState } from "react";
 import { SquadModal } from "./modals/SquadModals";
@@ -7,22 +13,30 @@ type SquadState = {
   teamName?: string;
   teamLogo?: string;
   isOpen: boolean;
-  players?: PlayerWithUser[];
+  players?: InningBattingDetails[] | InningBowlingDetails[];
 };
 
-export const MatchHeroSection = ({ match }: { match: MatchWithDetails }) => {
+export const MatchHeroSection = ({
+  match,
+  innings,
+}: {
+  match: MatchWithDetails;
+  innings?: InningDetails[];
+}) => {
   const [squadModalState, setSquadModalState] = useState<SquadState>({ isOpen: false });
 
   const handleOpenSquad = (
     teamName: string,
     teamLogo: string | null,
-    players: PlayerWithUser[]
+    players: InningBattingDetails[] | InningBowlingDetails[]
   ) => {
     setSquadModalState({ players, teamName, teamLogo: teamLogo || undefined, isOpen: true });
   };
   const handleCloseSquad = () => {
     setSquadModalState((prev) => ({ ...prev, isOpen: false }));
   };
+
+  if (!innings) return null;
 
   return (
     <>
@@ -64,7 +78,15 @@ export const MatchHeroSection = ({ match }: { match: MatchWithDetails }) => {
         {/* Team A Logo Frame */}
         <div className="group relative">
           <div
-            onClick={() => handleOpenSquad(match.teamA.name, match.teamA.logo, match.teamA.players)}
+            onClick={() =>
+              handleOpenSquad(
+                match.teamA.name,
+                match.teamA.logo,
+                innings[0].battingTeamId === match.teamAId
+                  ? innings[0].InningBatting
+                  : innings[0].InningBowling
+              )
+            }
             className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-4 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
           >
             {match.teamA.logo ? (
@@ -96,7 +118,15 @@ export const MatchHeroSection = ({ match }: { match: MatchWithDetails }) => {
         {/* Team B Logo Frame */}
         <div className="group relative">
           <div
-            onClick={() => handleOpenSquad(match.teamB.name, match.teamB.logo, match.teamB.players)}
+            onClick={() =>
+              handleOpenSquad(
+                match.teamB.name,
+                match.teamB.logo,
+                innings[0].battingTeamId === match.teamAId
+                  ? innings[0].InningBatting
+                  : innings[0].InningBowling
+              )
+            }
             className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-4 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
           >
             {match.teamB.logo ? (

@@ -57,19 +57,16 @@ const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: 
     </div>
   </div>
 );
-const LiveScorecard = ({ match, userId }: { match: MatchWithDetails; userId?: string }) => {
+const LiveScorecard = ({
+  match,
+  userId,
+  innings,
+}: {
+  match: MatchWithDetails;
+  innings?: InningDetails[];
+  userId?: string;
+}) => {
   const [isScorecardOpen, setIsScorecardOpen] = useState(false);
-
-  const { data: innings, isLoading: inningsLoading } = useQuery<InningDetails[]>({
-    queryKey: ["match-innings", match.id],
-    queryFn: async () => {
-      const { data } = await axios.get(`/api/matches/${match.id}/innings`);
-
-      if (!data.success) return [];
-
-      return data.data;
-    },
-  });
 
   const { data: ballHistory, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
     queryKey: ["current-over-history", innings?.at(innings?.length - 1 || 0)?.id],
@@ -350,7 +347,17 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
       return data.data;
     },
   });
+  const { data: innings, isLoading: inningsLoading } = useQuery<InningDetails[]>({
+    queryKey: ["match-innings", match?.id],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/matches/${match?.id}/innings`);
 
+      if (!data.success) return [];
+
+      return data.data;
+    },
+    enabled: !!match?.id,
+  });
   const { data: user } = useQuery<User>({
     queryKey: ["organizer", id],
     queryFn: async () => {
@@ -437,7 +444,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
           <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
             {/* Hero Section */}
 
-            <MatchHeroSection match={match} />
+            <MatchHeroSection innings={innings} match={match} />
 
             <div className="flex flex-col items-center px-4">
               {/* Match Title & Actions */}
@@ -516,7 +523,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                       }
                     />
                   ) : (
-                    <LiveScorecard match={match} userId={user?.id} />
+                    <LiveScorecard innings={innings} match={match} userId={user?.id} />
                   )}
                 </div>
                 <div className="space-y-4">
