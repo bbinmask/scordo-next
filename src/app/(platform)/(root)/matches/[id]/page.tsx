@@ -474,7 +474,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                           onClick={() => setIsInitializing(true)}
                           className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
                         >
-                          Restart
+                          Start Inning
                         </button>
                       ) : (
                         match.status === "stopped" && (

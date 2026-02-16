@@ -3,7 +3,6 @@ import {
   InningBowlingDetails,
   InningDetails,
   MatchWithDetails,
-  PlayerWithUser,
 } from "@/lib/types";
 import { Shield, Trophy } from "lucide-react";
 import { useState } from "react";

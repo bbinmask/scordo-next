@@ -7,6 +7,7 @@ import {
   InitializeMatch,
   PushBall,
   ChangeBowler,
+  StartNextInning,
 } from "./schema";
 import { ActionState } from "@/lib/create-safe-action";
 import { Ball, Inning, Match, MatchOfficial } from "@/generated/prisma";
@@ -31,3 +32,6 @@ export type ReturnTypeForPushBall = ActionState<InputTypeForPushBall, Ball>;
 
 export type InputTypeForChangeBowler = z.infer<typeof ChangeBowler>;
 export type ReturnTypeForChangeBowler = ActionState<InputTypeForChangeBowler, any>;
+
+export type InputTypeForNextInning = z.infer<typeof StartNextInning>;
+export type ReturnTypeForNextInning = ActionState<InputTypeForNextInning, any>;

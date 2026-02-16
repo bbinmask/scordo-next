@@ -5,6 +5,7 @@ import {
   InputTypeForChangeBowler,
   InputTypeForCreate,
   InputTypeForInitializeMatch,
+  InputTypeForNextInning,
   InputTypeForOfficials,
   InputTypeForPushBall,
   InputTypeForRemove,
@@ -12,6 +13,7 @@ import {
   ReturnTypeForChangeBowler,
   ReturnTypeForCreate,
   ReturnTypeForInitialieMatch,
+  ReturnTypeForNextInning,
   ReturnTypeForOfficials,
   ReturnTypeForPushBall,
   ReturnTypeForRemove,
@@ -26,6 +28,7 @@ import {
   PushBall,
   RemoveOfficial,
   Request,
+  StartNextInning,
 } from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
@@ -217,7 +220,7 @@ const declineMatchRequestHandler = async (
 
   if (!user)
     return {
-      error: "Login required!",
+      error: "Please Log in!",
     };
 
   let match;
@@ -270,7 +273,7 @@ const acceptMatchRequestHandler = async (
 
   if (!user)
     return {
-      error: "Login required!",
+      error: "Please Log in!",
     };
 
   let match;
@@ -739,6 +742,105 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     data: ball,
   };
 };
+const startNextInningHandler = async (
+  data: InputTypeForNextInning
+): Promise<ReturnTypeForNextInning> => {
+  const user = await currentUser();
+  if (!user) return { error: "Please Log in!" };
+
+  const { bowlerId, matchId, nonStrikerId, strikerId } = data;
+
+  let inning;
+
+  try {
+    const match = await db.match.findUnique({
+      where: { id: matchId },
+      include: {
+        teamA: { select: { id: true, players: { select: { id: true } } } },
+        teamB: { select: { id: true, players: { select: { id: true } } } },
+        innings: {
+          orderBy: { inningNumber: "asc" },
+        },
+      },
+    });
+
+    if (!match) return { error: "Match not found!" };
+
+    if (match.organizerId !== user.id) return { error: "Only organizer can start!" };
+
+    const inningCount = match.innings.length;
+
+    if (match.category !== "Test" && inningCount >= 2) return { error: "All innings finished!" };
+    if (match.category === "Test" && inningCount >= 4) return { error: "All innings finished!" };
+
+    const lastInning = match.innings.at(-1);
+
+    if (!lastInning) return { error: "First inning must be created before next!" };
+
+    if (strikerId === nonStrikerId) {
+      return { error: "Striker and Non-Striker must be different players!" };
+    }
+
+    const battingTeamId =
+      lastInning.battingTeamId === match.teamA.id ? match.teamB.id : match.teamA.id;
+
+    const bowlingTeamId = battingTeamId === match.teamA.id ? match.teamB.id : match.teamA.id;
+
+    const battingPlayers =
+      battingTeamId === match.teamA.id ? match.teamA.players : match.teamB.players;
+
+    const bowlingPlayers =
+      bowlingTeamId === match.teamA.id ? match.teamA.players : match.teamB.players;
+
+    const battingIds = new Set(battingPlayers.map((p) => p.id));
+    const bowlingIds = new Set(bowlingPlayers.map((p) => p.id));
+
+    if (!battingIds.has(strikerId) || !battingIds.has(nonStrikerId))
+      return { error: "Strikers must belong to batting team" };
+
+    if (!bowlingIds.has(bowlerId)) return { error: "Bowler must belong to bowling team" };
+
+    inning = await db.$transaction(async (tsx) => {
+      const createdInning = await tsx.inning.create({
+        data: {
+          matchId,
+          battingTeamId,
+          bowlingTeamId,
+          currentBowlerId: bowlerId,
+          currentStrikerId: strikerId,
+          currentNonStrikerId: nonStrikerId,
+          inningNumber: inningCount + 1,
+        },
+      });
+
+      await tsx.inningBatting.createMany({
+        data: battingPlayers.map((p) => ({
+          playerId: p.id,
+          inningId: createdInning.id,
+        })),
+      });
+
+      await tsx.inningBowling.createMany({
+        data: bowlingPlayers.map((p) => ({
+          playerId: p.id,
+          inningId: createdInning.id,
+        })),
+      });
+
+      await tsx.match.update({
+        where: { id: matchId },
+        data: { status: "in_progress" },
+      });
+
+      return createdInning;
+    });
+  } catch {
+    return { error: ERROR_CODES.INTERNAL_SERVER_ERROR.message };
+  }
+
+  revalidatePath(`/matches/${matchId}`);
+  return { data: inning };
+};
 
 const changeBowlerHandler = async (
   data: InputTypeForChangeBowler
@@ -746,7 +848,7 @@ const changeBowlerHandler = async (
   const { bowlerId, inningId, matchId } = data;
 
   const user = await currentUser();
-  if (!user) return { error: "Login required!" };
+  if (!user) return { error: "Please Log in!" };
 
   try {
     const result = await db.$transaction(async (tsx) => {
@@ -838,3 +940,4 @@ export const acceptMatchRequest = createSafeAction(Request, acceptMatchRequestHa
 export const initializeMatch = createSafeAction(InitializeMatch, initializeMatchHandler);
 export const pushBall = createSafeAction(PushBall, pushBallHandler);
 export const changeBowler = createSafeAction(ChangeBowler, changeBowlerHandler);
+export const startNextInning = createSafeAction(StartNextInning, startNextInningHandler);

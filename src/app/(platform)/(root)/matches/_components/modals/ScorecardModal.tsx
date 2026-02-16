@@ -166,13 +166,13 @@ const ScorecardModal = ({
                     {/* Players with runs and details*/}
                     {currentInning.InningBatting.map((batsman, i) => (
                       <tr key={i} className="group">
-                        <td className="px-6 py-4">
+                        <td className="px-6 pt-2">
                           <p className="text-xs font-bold tracking-tight text-slate-900 uppercase dark:text-white">
                             {batsman.player.user.name}
                           </p>
                           {wicketsMap && (
-                            <p className="mt-0.5 text-[9px] font-medium text-slate-400 italic">
-                              {wicketsMap?.[batsman.playerId]}
+                            <p className="text-[9px] font-medium text-slate-400 italic">
+                              {wicketsMap?.[batsman.playerId] || "Not out"}
                             </p>
                           )}
                         </td>

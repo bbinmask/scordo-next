@@ -123,3 +123,10 @@ export const ChangeBowler = z.object({
   matchId: z.string({ message: errorMessage("matchId") }),
   bowlerId: z.string({ message: errorMessage("bowlerId") }),
 });
+
+export const StartNextInning = z.object({
+  matchId: z.string({ message }),
+  strikerId: z.string({ message }),
+  nonStrikerId: z.string({ message }),
+  bowlerId: z.string({ message }),
+});
