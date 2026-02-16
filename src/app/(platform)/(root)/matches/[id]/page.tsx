@@ -11,7 +11,7 @@ import NotFoundParagraph from "@/components/NotFoundParagraph";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
 import { CurrentOverBalls, InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
-import { addOfficials, initializeMatch } from "@/actions/match-actions";
+import { addOfficials, initializeMatch, startNextInning } from "@/actions/match-actions";
 import { toast } from "sonner";
 import InitializeMatchModal from "../_components/modals/InitializeMatchModal";
 import { type MatchOfficial } from "../_types/types";
@@ -30,6 +30,7 @@ import { MatchHeroSection } from "../_components/MatchHeroSection";
 import { OfficialsModal } from "../_components/modals/OfficialsModal";
 import { SubmitHandler } from "react-hook-form";
 import { type InputTypeForInitializeMatch as InitializeMatchForm } from "@/actions/match-actions/types";
+import StartNextInningModal from "../_components/modals/StartNextInningModal";
 
 interface MatchIdPageProps {}
 
@@ -324,21 +325,25 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
       toast.error(error);
     },
   });
-  const { execute: executeInitialize, isLoading: isSubmitting } = useAction(initializeMatch, {
-    onSuccess() {
-      toast.success("Match Started");
 
-      startTransition(() => {
-        router.refresh();
-      });
+  const { execute: executeStartNextInning, isLoading: startingNextInning } = useAction(
+    startNextInning,
+    {
+      onSuccess() {
+        toast.success("Match Started");
 
-      setIsInitializing(false);
-    },
+        startTransition(() => {
+          router.refresh();
+        });
 
-    onError(error) {
-      toast.error(error);
-    },
-  });
+        setIsInitializing(false);
+      },
+
+      onError(error) {
+        toast.error(error);
+      },
+    }
+  );
   const { data: match, isLoading } = useQuery<MatchWithDetails>({
     queryKey: ["match", id],
     queryFn: async () => {
@@ -368,6 +373,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   });
 
   const [isInitializing, setIsInitializing] = useState(false);
+  const [isStartingNextInning, setIsStartingNextInning] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = () => {
@@ -405,11 +411,11 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     }
   };
 
-  const handleInitializeMatch: SubmitHandler<InitializeMatchForm> = (data) => {
-    executeInitialize(data);
-  };
+  const handleStartNextInning = (strikerId: string, nonStrikerId: string, bowlerId: string) => {
+    if (!match) return;
 
-  const handleStartInning = () => {};
+    executeStartNextInning({ bowlerId, matchId: match.id, nonStrikerId, strikerId });
+  };
 
   const handleRestartMatch = () => {};
 
@@ -585,18 +591,18 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
 
           {isOrganizer && (
             <InitializeMatchModal
-              onSubmit={
-                match.status === "not_started"
-                  ? handleInitializeMatch
-                  : match.status === "inning_completed"
-                    ? handleStartInning
-                    : handleRestartMatch
-              }
-              isSubmitting={isSubmitting}
               status={match.status}
               isOpen={isInitializing}
               match={match}
               onClose={() => setIsInitializing(false)}
+            />
+          )}
+          {isOrganizer && (
+            <StartNextInningModal
+              innings={innings}
+              match={match}
+              isOpen={true}
+              onClose={() => setIsStartingNextInning(false)}
             />
           )}
         </>
