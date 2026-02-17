@@ -85,6 +85,17 @@ const LiveScorecard = ({
     enabled: !!(innings?.length && innings.length > 0),
   });
 
+  const { data: runsLeft } = useQuery<string | null>({
+    queryKey: ["runs-left", match.id],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/matches/${match.id}/target`);
+
+      if (!data.success) return null;
+
+      return data.data;
+    },
+  });
+
   if (!innings) return null;
   const length = innings.length - 1;
   return (
@@ -103,12 +114,19 @@ const LiveScorecard = ({
               ({`${getOvers(innings[length].overs, innings[length].balls)} Overs`})
             </p>
           </div>
-          <p className="mt-4 font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            CRR: {getCRR(innings[length].runs, innings[length].balls)}
-          </p>
-          <p className="font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            RR: {`${getRR(innings[length].runs, innings[length].balls)}`}
-          </p>
+          <div className="flex w-full items-end justify-between gap-4">
+            <div>
+              <p className="mt-4 font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                CRR: {getCRR(innings[length].runs, innings[length].balls)}
+              </p>
+              <p className="font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                RR: {`${getRR(innings[length].runs, innings[length].balls)}`}
+              </p>
+            </div>
+            {runsLeft && match.status !== "completed" && (
+              <p className="text-xs text-green-500">{runsLeft}</p>
+            )}
+          </div>
         </div>
 
         {match.status !== "in_progress" && (
@@ -203,14 +221,14 @@ const LiveScorecard = ({
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-slate-50 font-[inter] text-[9px] font-black tracking-widest text-slate-400 uppercase dark:bg-white/5">
+              <thead className="bg-slate-50 text-[9px] font-semibold tracking-widest text-slate-400 uppercase dark:bg-white/5">
                 <tr>
                   <th className="px-6 py-3">Bowler</th>
                   <th className="px-4 py-3 text-center">O</th>
                   <th className="px-4 py-3 text-center">M</th>
                   <th className="px-4 py-3 text-center">R</th>
                   <th className="px-4 py-3 text-center">W</th>
-                  <th className="px-4 py-3 text-center">ECON</th>
+                  <th className="px-4 py-3 text-center">E</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/5">
@@ -601,7 +619,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
             <StartNextInningModal
               innings={innings}
               match={match}
-              isOpen={true}
+              isOpen={isStartingNextInning}
               onClose={() => setIsStartingNextInning(false)}
             />
           )}

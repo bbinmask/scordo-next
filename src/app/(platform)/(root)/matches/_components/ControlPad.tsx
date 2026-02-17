@@ -38,6 +38,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     onSuccess(data) {
       queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
       queryClient.invalidateQueries({ queryKey: ["current-over-history", innings.id] });
+      queryClient.invalidateQueries({ queryKey: ["runs-left", match.id] });
 
       if ((innings.balls + 1) % 6 === 0) {
         if (data.over < match.overs) setIsOverFinished(true);

@@ -34,7 +34,7 @@ import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
 import { Inning, Match } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
-
+import { Ball } from "@/generated/prisma";
 const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeForCreate> => {
   const {
     category,
@@ -572,6 +572,18 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       },
       include: {
         matchOfficials: true,
+        teamA: {
+          select: {
+            name: true,
+            abbreviation: true,
+          },
+        },
+        teamB: {
+          select: {
+            name: true,
+            abbreviation: true,
+          },
+        },
       },
     });
 
@@ -605,9 +617,15 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       };
 
     const inningNumber = inning.inningNumber;
+    const totalOvers = match.overs;
 
     const nextBall = isLegalDelivery ? inning.balls + 1 : inning.balls;
     const nextOver = isLegalDelivery && nextBall % 6 === 0 ? inning.overs + 1 : inning.overs;
+
+    const battingTeam = match.teamAId === inning.battingTeamId ? match.teamA : match.teamB;
+    const bowlingTeam = match.teamAId === inning.bowlingTeamId ? match.teamA : match.teamB;
+
+    const playerLimit = match.playerLimit;
 
     const battingInn = await db.inningBatting.findFirst({
       where: {
@@ -719,15 +737,43 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         },
       });
 
-      if (isLastWicket) {
-        await db.match.update({
-          where: {
-            id: matchId,
-          },
-          data: {
-            status: "inning_completed",
-          },
-        });
+      const firstInning = await tsx.inning.findFirst({
+        where: {
+          matchId,
+        },
+      });
+
+      if (!firstInning)
+        return {
+          error: "Error (First inning not found)",
+        };
+
+      if ((isLastWicket || inning.overs === totalOvers) && !isTest) {
+        if (inningNumber == 1) {
+          await tsx.match.update({
+            where: {
+              id: matchId,
+            },
+            data: {
+              status: "inning_completed",
+            },
+          });
+        } else if (inningNumber === 2) {
+          const result =
+            inning.runs > firstInning.runs
+              ? `${battingTeam.name} is won by ${playerLimit - inning.wickets} wickets`
+              : `${bowlingTeam.name} is won by ${firstInning.runs - inning.runs + teamRuns} wickets`;
+
+          await tsx.match.update({
+            where: {
+              id: matchId,
+            },
+            data: {
+              status: "completed",
+              result,
+            },
+          });
+        }
       }
 
       return createdBall;
@@ -739,9 +785,10 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
   }
 
   return {
-    data: ball,
+    data: ball as any,
   };
 };
+
 const startNextInningHandler = async (
   data: InputTypeForNextInning
 ): Promise<ReturnTypeForNextInning> => {
@@ -759,7 +806,10 @@ const startNextInningHandler = async (
         teamA: { select: { id: true, players: { select: { id: true } } } },
         teamB: { select: { id: true, players: { select: { id: true } } } },
         innings: {
-          orderBy: { inningNumber: "asc" },
+          include: {
+            InningBatting: true,
+            InningBowling: true,
+          },
         },
       },
     });
@@ -782,18 +832,19 @@ const startNextInningHandler = async (
     }
 
     const battingTeamId =
-      lastInning.battingTeamId === match.teamA.id ? match.teamB.id : match.teamA.id;
+      lastInning.battingTeamId === match.teamAId ? match.teamBId : match.teamAId;
 
     const bowlingTeamId = battingTeamId === match.teamA.id ? match.teamB.id : match.teamA.id;
 
-    const battingPlayers =
-      battingTeamId === match.teamA.id ? match.teamA.players : match.teamB.players;
+    const battingPlayers = lastInning.InningBowling.map((p) => p.playerId);
+    const bowlingPlayers = lastInning.InningBatting.map((p) => p.playerId);
 
-    const bowlingPlayers =
-      bowlingTeamId === match.teamA.id ? match.teamA.players : match.teamB.players;
+    const battingIds = new Set(battingPlayers.map((id) => id));
+    const bowlingIds = new Set(bowlingPlayers.map((id) => id));
 
-    const battingIds = new Set(battingPlayers.map((p) => p.id));
-    const bowlingIds = new Set(bowlingPlayers.map((p) => p.id));
+    if (match.status !== "inning_completed") {
+      return { error: "Previous inning is still in progress!" };
+    }
 
     if (!battingIds.has(strikerId) || !battingIds.has(nonStrikerId))
       return { error: "Strikers must belong to batting team" };
@@ -814,15 +865,15 @@ const startNextInningHandler = async (
       });
 
       await tsx.inningBatting.createMany({
-        data: battingPlayers.map((p) => ({
-          playerId: p.id,
+        data: battingPlayers.map((playerId) => ({
+          playerId,
           inningId: createdInning.id,
         })),
       });
 
       await tsx.inningBowling.createMany({
-        data: bowlingPlayers.map((p) => ({
-          playerId: p.id,
+        data: bowlingPlayers.map((playerId) => ({
+          playerId,
           inningId: createdInning.id,
         })),
       });
