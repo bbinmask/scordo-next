@@ -108,7 +108,7 @@ const CreateMatchCard = () => (
 );
 
 const EmptyState = ({ type = "managed" }) => (
-  <div className="animate-in fade-in slide-in-from-bottom-2 flex min-h-[16rem] w-full flex-col items-center justify-center rounded-[2.5rem] border border-dashed border-slate-200 bg-white/40 p-8 backdrop-blur-sm transition-all duration-700 dark:border-white/10 dark:bg-slate-900/40">
+  <div className="animate-in fade-in slide-in-from-bottom-2 hover-card flex min-h-[16rem] w-full flex-col items-center justify-center rounded-[2.5rem] border p-8 transition-all duration-700">
     <div className="relative mb-4">
       <div className="animate-bounce rounded-3xl bg-slate-100 p-4 text-slate-400 duration-[3000ms] dark:bg-slate-800 dark:text-slate-600">
         <Sword className="h-10 w-10" />
@@ -128,7 +128,7 @@ const EmptyState = ({ type = "managed" }) => (
       href="/matches/create"
       className="flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-green-500/20 transition-all hover:scale-105 hover:bg-green-700 active:scale-95"
     >
-      <PlusCircle className="h-3 w-3" /> Initialize Match
+      <PlusCircle className="h-3 w-3" /> Create Match
     </Link>
   </div>
 );

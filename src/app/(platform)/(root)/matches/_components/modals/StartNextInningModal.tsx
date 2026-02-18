@@ -101,7 +101,6 @@ export const StartNextInningModal = ({
       const { data } = await axios.get(`/api/matches/${match.id}/next-inning-players`);
 
       if (!data.success) {
-        toast.error("Data not found");
         onClose();
         return null;
       }

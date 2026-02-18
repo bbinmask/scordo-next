@@ -5,13 +5,23 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import React, { useMemo, useState, startTransition } from "react";
-import { MapPin, Calendar, Activity, Sword, Flame, Gavel, Share2, Target } from "lucide-react";
+import {
+  MapPin,
+  Calendar,
+  Activity,
+  Sword,
+  Flame,
+  Gavel,
+  Share2,
+  Target,
+  Star,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
 import { CurrentOverBalls, InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
-import { addOfficials, initializeMatch, startNextInning } from "@/actions/match-actions";
+import { addOfficials, startNextInning } from "@/actions/match-actions";
 import { toast } from "sonner";
 import InitializeMatchModal from "../_components/modals/InitializeMatchModal";
 import { type MatchOfficial } from "../_types/types";
@@ -28,10 +38,8 @@ import {
 } from "@/utils/helper/scorecard";
 import { MatchHeroSection } from "../_components/MatchHeroSection";
 import { OfficialsModal } from "../_components/modals/OfficialsModal";
-import { SubmitHandler } from "react-hook-form";
-import { type InputTypeForInitializeMatch as InitializeMatchForm } from "@/actions/match-actions/types";
 import StartNextInningModal from "../_components/modals/StartNextInningModal";
-
+import { LiveScorecard } from "../_components/LiveScorecard";
 interface MatchIdPageProps {}
 
 interface InfoCardProps {
@@ -44,7 +52,7 @@ interface InfoCardProps {
 
 const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: InfoCardProps) => (
   <div className="group hover-card relative overflow-hidden rounded-3xl p-6">
-    <div className="relative z-10">
+    <div className="relative">
       <div
         className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600 transition-transform group-hover:scale-110 dark:bg-green-500/10 dark:text-green-400`}
       >
@@ -58,276 +66,6 @@ const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: 
     </div>
   </div>
 );
-const LiveScorecard = ({
-  match,
-  userId,
-  innings,
-}: {
-  match: MatchWithDetails;
-  innings?: InningDetails[];
-  userId?: string;
-}) => {
-  const [isScorecardOpen, setIsScorecardOpen] = useState(false);
-
-  const { data: ballHistory, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
-    queryKey: ["current-over-history", innings?.at(innings?.length - 1 || 0)?.id],
-    queryFn: async () => {
-      if (!innings || innings.length === 0) return [];
-
-      const { data } = await axios.get(
-        `/api/matches/innings/${innings[innings.length - 1].id}/balls/current-over`
-      );
-
-      if (!data.success) return [];
-
-      return data.data;
-    },
-    enabled: !!(innings?.length && innings.length > 0),
-  });
-
-  const { data: runsLeft } = useQuery<string | null>({
-    queryKey: ["runs-left", match.id],
-    queryFn: async () => {
-      const { data } = await axios.get(`/api/matches/${match.id}/target`);
-
-      if (!data.success) return null;
-
-      return data.data;
-    },
-  });
-
-  if (!innings) return null;
-  const length = innings.length - 1;
-  return (
-    <>
-      {/* Live Header Banner */}
-      <div className="relative mb-4 overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
-        <div className="h-full w-full">
-          <p className="mb-2 w-full truncate overflow-x-clip font-[inter] text-xs font-bold text-nowrap text-green-500 uppercase">
-            Current Innings: {innings[length].battingTeam.name}
-          </p>
-          <div className="flex items-baseline gap-4">
-            <h2 className="text-6xl font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-              {innings[length].runs}/{innings[length].wickets}
-            </h2>
-            <p className="text-xl font-bold text-slate-400">
-              ({`${getOvers(innings[length].overs, innings[length].balls)} Overs`})
-            </p>
-          </div>
-          <div className="flex w-full items-end justify-between gap-4">
-            <div>
-              <p className="mt-4 font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                CRR: {getCRR(innings[length].runs, innings[length].balls)}
-              </p>
-              <p className="font-[urbanist] text-xs font-bold tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                RR: {`${getRR(innings[length].runs, innings[length].balls)}`}
-              </p>
-            </div>
-            {runsLeft && match.status !== "completed" && (
-              <p className="text-xs text-green-500">{runsLeft}</p>
-            )}
-            {match.status === "completed" && (
-              <p className="text-xs text-green-500">{match.result}</p>
-            )}
-          </div>
-        </div>
-
-        {match.status !== "in_progress" && (
-          <p className="mt-4 font-[urbanist] text-xs font-bold text-nowrap text-slate-900 dark:text-slate-300">
-            {match.status === "completed"
-              ? "Completed"
-              : match.status === "inning_completed"
-                ? `Inning completed`
-                : "Match stopped"}
-          </p>
-        )}
-        <div
-          className={`absolute top-8 right-3 flex max-w-fit items-center justify-evenly rounded-full border ${match.status === "in_progress" || match.status === "inning_completed" ? "border-red-500/20 bg-red-500/10" : "border-teal-500/20 bg-teal-500/10"} px-1 py-0.5`}
-        >
-          {match.status === "in_progress" || match.status === "inning_completed" ? (
-            <div className="h-1 w-1 animate-pulse rounded-full bg-red-500" />
-          ) : null}
-          <span
-            className={`text-[8px] font-bold ${match.status === "in_progress" || match.status === "inning_completed" ? "text-red-500" : "text-teal-800"} uppercase`}
-          >
-            {match.status === "in_progress" || match.status === "inning_completed"
-              ? "Live"
-              : match.status === "completed"
-                ? "Completed"
-                : "Stopped"}
-          </span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 font-[poppins] lg:grid-cols-2">
-        {/* Batting Table */}
-        <div className="border-input overflow-hidden rounded-[2.5rem] border bg-white shadow-sm dark:bg-slate-900">
-          <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-white/5">
-            <h3 className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
-              <Target className="h-4 w-4 text-green-500" /> Batting
-            </h3>
-            <span className="text-[10px] font-bold text-slate-400">
-              {innings[length].battingTeam.name}
-            </span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-slate-50 text-[9px] font-semibold tracking-widest text-slate-400 uppercase dark:bg-white/5">
-                <tr>
-                  <th className="px-6 py-3">Batter</th>
-                  <th className="px-4 py-3 text-center">R</th>
-                  <th className="px-4 py-3 text-center">B</th>
-                  <th className="px-4 py-3 text-center">4s</th>
-                  <th className="px-4 py-3 text-center">6s</th>
-                  <th className="px-4 py-3 text-center">SR</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                {innings[length].InningBatting.filter(
-                  (batsman) =>
-                    (batsman.playerId === innings[length].currentStrikerId && !batsman.isOut) ||
-                    (batsman.playerId === innings[length].currentNonStrikerId && !batsman.isOut)
-                ).map((batsman, i) => (
-                  <tr
-                    key={i}
-                    className={`${batsman.playerId === innings[length].currentStrikerId ? "bg-green-500/5" : ""}`}
-                  >
-                    <td className="px-6 py-4 font-[poppins]">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-slate-900 uppercase dark:text-white">
-                          {batsman?.player.user.name}
-                        </span>
-                        {batsman.playerId === innings[length].currentStrikerId && (
-                          <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center text-xs font-semibold text-slate-900 dark:text-white">
-                      {batsman.runs}
-                    </td>
-                    <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
-                      {batsman.balls}
-                    </td>
-                    <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
-                      {batsman.fours}
-                    </td>
-                    <td className="px-4 py-4 text-center text-xs font-medium text-slate-500">
-                      {batsman.sixes}
-                    </td>
-                    <td className="px-4 py-4 text-center text-[10px] font-semibold text-green-500">
-                      {getStrikeRate(batsman.runs, batsman.balls)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Bowling Table */}
-        <div className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-slate-900">
-          <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-white/5">
-            <h3 className="flex items-center gap-2 text-sm font-black tracking-widest uppercase">
-              <Flame className="h-4 w-4 text-green-500" /> Bowling
-            </h3>
-            <span className="text-[10px] font-bold text-slate-400">
-              {innings[length].bowlingTeam.name}
-            </span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-slate-50 text-[9px] font-semibold tracking-widest text-slate-400 uppercase dark:bg-white/5">
-                <tr>
-                  <th className="px-6 py-3">Bowler</th>
-                  <th className="px-4 py-3 text-center">O</th>
-                  <th className="px-4 py-3 text-center">M</th>
-                  <th className="px-4 py-3 text-center">R</th>
-                  <th className="px-4 py-3 text-center">W</th>
-                  <th className="px-4 py-3 text-center">E</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/5">
-                {innings[length].InningBowling.filter(
-                  (batsman) => batsman.playerId === innings[length].currentBowlerId
-                ).map((player, i) => (
-                  <tr key={i} className={`bg-green-500/5`}>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-slate-900 uppercase dark:text-white">
-                          {player.player.user.name}
-                        </span>
-                        {/* {player.current && (
-                        <Activity className="h-3 w-3 animate-pulse text-green-500" />
-                        )} */}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center text-xs font-bold text-slate-900 dark:text-white">
-                      {`${player.overs} ${player.balls % 6 === 0 ? "" : "." + (player.balls % 6)}`}
-                    </td>
-                    <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
-                      {player.maidens}
-                    </td>
-                    <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
-                      {player.runs}
-                    </td>
-                    <td className="px-4 py-4 text-center text-xs font-bold text-green-500">
-                      {player.wickets}
-                    </td>
-                    <td className="px-4 py-4 text-center text-[10px] font-semibold text-slate-400">
-                      {getEcon(player.runs, player.balls)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-end justify-between">
-        <button
-          onClick={() => setIsScorecardOpen(true)}
-          className="center flex w-full max-w-40 flex-1 gap-1 rounded-2xl bg-slate-900 px-8 py-4 font-[inter] text-white shadow-xl transition-all active:scale-95 dark:bg-white dark:text-slate-900"
-        >
-          <span className="text-xs font-black uppercase">Scorecard</span>
-        </button>
-        <div className="flex w-full flex-col items-end gap-1 md:w-auto">
-          <p className="mb-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
-            Partnership: {getPartnership(innings[length].ballsData)}
-          </p>
-          <div className="flex gap-2">
-            {historyLoading ? (
-              <Spinner />
-            ) : (
-              ballHistory?.map((ball, i) => (
-                <div
-                  key={i}
-                  className={`flex h-8 w-8 items-center justify-center rounded-lg border text-[10px] font-black dark:border-transparent ${
-                    ball.isWicket
-                      ? "border-red-600 bg-red-500 text-white"
-                      : ball.runs === 4 || ball.runs === 6
-                        ? "border-emerald-600 bg-emerald-500 text-white"
-                        : "border-slate-200 bg-slate-100 text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-                  }`}
-                >
-                  {getBallLabel(ball)}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-      {match.status === "in_progress" &&
-        match.matchOfficials.findIndex((official) => official.userId === userId) !== -1 && (
-          <ControlPad match={match} innings={innings[length]} />
-        )}
-      <ScorecardModal
-        isOpen={isScorecardOpen}
-        innings={innings}
-        onClose={() => setIsScorecardOpen(false)}
-      />
-    </>
-  );
-};
 
 const AwaitingCard = ({ title, description }: { title: string; description: string }) => {
   return (

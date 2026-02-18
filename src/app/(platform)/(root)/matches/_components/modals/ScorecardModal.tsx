@@ -2,7 +2,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -10,7 +9,7 @@ import { InningDetails } from "@/lib/types";
 import { getEcon, getStrikeRate } from "@/utils/helper/scorecard";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Flame, LayoutList, Shield, Star, Sword, Trophy, UserCircle2 } from "lucide-react";
+import { Flame, LayoutList, Star, Sword, UserCircle2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const ScorecardModal = ({

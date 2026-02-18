@@ -23,7 +23,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { startTransition, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { type InputTypeForInitializeMatch as InitializeMatchForm } from "@/actions/match-actions/types";
 import { toast } from "sonner";
@@ -48,9 +48,7 @@ export const InitializeMatchModal = ({
     onSuccess() {
       toast.success("Match Started");
 
-      startTransition(() => {
-        router.refresh();
-      });
+      router.refresh();
       onClose();
     },
 
