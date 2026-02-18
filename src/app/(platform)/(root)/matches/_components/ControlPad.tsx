@@ -65,6 +65,8 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/innings/${innings.id}/check-bowler-change`);
 
+      console.log(data);
+
       if (!data.success) return setIsOverFinished(false);
 
       setIsOverFinished(data.data);
@@ -336,6 +338,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         onConfirm={onBall}
       />
       <SelectBowlerModal
+        isSaving={isChanging}
         bowlers={bowlingPlayers.filter(
           (bowler) => bowler.playerId !== innings.currentBowlerId || bowler.overs >= match.overLimit
         )}

@@ -1,3 +1,4 @@
+import Spinner from "@/components/Spinner";
 import { InningBowlingDetails } from "@/lib/types";
 import { Flame, Info } from "lucide-react";
 import { useState } from "react";
@@ -6,8 +7,10 @@ export const SelectBowlerModal = ({
   isOpen,
   onSubmit,
   bowlers,
+  isSaving,
 }: {
   isOpen: boolean;
+  isSaving: boolean;
   onSubmit: (bowlerId: string) => void;
   bowlers: InningBowlingDetails[];
 }) => {
@@ -83,7 +86,7 @@ export const SelectBowlerModal = ({
             else onSubmit(selectedBowlerId);
           }}
         >
-          Save
+          {isSaving ? <Spinner /> : "Save"}
         </button>
         {/* Rules Footer */}
         <div className="mt-4 flex items-start gap-3 border-t border-slate-100 bg-slate-50 p-6 dark:border-white/10 dark:bg-white/5">
