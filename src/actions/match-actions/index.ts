@@ -737,19 +737,8 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         },
       });
 
-      const firstInning = await tsx.inning.findFirst({
-        where: {
-          matchId,
-        },
-      });
-
-      if (!firstInning)
-        return {
-          error: "Error (First inning not found)",
-        };
-
-      if ((isLastWicket || inning.overs === totalOvers) && !isTest) {
-        if (inningNumber == 1) {
+      if (inningNumber === 1) {
+        if (isLastWicket || inning.overs === totalOvers) {
           await tsx.match.update({
             where: {
               id: matchId,
@@ -758,12 +747,25 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
               status: "inning_completed",
             },
           });
-        } else if (inningNumber === 2) {
+        }
+      } else if (inningNumber === 2) {
+        const firstInning = await tsx.inning.findFirst({
+          where: {
+            matchId,
+          },
+        });
+
+        if (!firstInning) return { error: "First inning not found!" };
+
+        if (
+          isLastWicket ||
+          inning.overs === totalOvers ||
+          inning.runs + teamRuns > firstInning.runs
+        ) {
           const result =
             inning.runs > firstInning.runs
-              ? `${battingTeam.name} is won by ${playerLimit - inning.wickets} wickets`
-              : `${bowlingTeam.name} is won by ${firstInning.runs - inning.runs + teamRuns} wickets`;
-
+              ? `${battingTeam.name} won by ${playerLimit - inning.wickets} wickets`
+              : `${bowlingTeam.name} won by ${firstInning.runs - inning.runs + teamRuns} runs`;
           await tsx.match.update({
             where: {
               id: matchId,
@@ -774,9 +776,9 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
             },
           });
         }
-      }
 
-      return createdBall;
+        return createdBall;
+      }
     });
   } catch (error) {
     return {

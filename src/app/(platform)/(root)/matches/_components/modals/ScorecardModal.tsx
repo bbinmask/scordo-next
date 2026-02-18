@@ -10,7 +10,7 @@ import { InningDetails } from "@/lib/types";
 import { getEcon, getStrikeRate } from "@/utils/helper/scorecard";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Flame, LayoutList, Shield, Star, Sword, Trophy } from "lucide-react";
+import { Flame, LayoutList, Shield, Star, Sword, Trophy, UserCircle2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const ScorecardModal = ({
@@ -78,11 +78,22 @@ const ScorecardModal = ({
 
   const currentInning = innings[activeInningIdx];
 
+  const battedPlayers = useMemo(() => {
+    if (!currentInning) return [];
+
+    return currentInning.InningBatting.filter(
+      (b) =>
+        b.isOut ||
+        b.playerId === currentInning.currentStrikerId ||
+        b.playerId === currentInning.currentNonStrikerId
+    );
+  }, [currentInning]);
+
   return (
     <Dialog onOpenChange={onClose} open={isOpen}>
-      <DialogContent className="max-h-[80vh] p-0">
+      <DialogContent className="max-h-[80vh] gap-0 p-0">
         {/* Modal Header */}
-        <DialogHeader className="bg-gradient-to-br from-green-500/10 to-transparent p-4 pb-4">
+        <DialogHeader className="bg-gradient-to-br from-green-500/10 to-transparent p-4">
           <div className="flex items-center gap-4">
             <div className="rounded-2xl bg-green-600 p-3 shadow-lg">
               <LayoutList className="h-6 w-6 text-white" />
@@ -98,27 +109,25 @@ const ScorecardModal = ({
           </div>
         </DialogHeader>
 
-        <div className="shrink-0 space-y-4 px-4 font-sans">
-          <div className="no-scrollbar flex flex-wrap gap-2 pb-2">
-            {innings.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveInningIdx(idx)}
-                className={`min-w-[120px] flex-1 rounded-2xl border py-3 font-[inter] text-xs font-bold tracking-wider uppercase transition-all ${
-                  activeInningIdx === idx
-                    ? "border-green-600 bg-green-600 text-white"
-                    : "border-slate-100 bg-slate-50 text-slate-400 hover:border-green-500/50 dark:border-white/5 dark:bg-white/5"
-                }`}
-              >
-                Inning {idx + 1}
-              </button>
-            ))}
-          </div>
+        <div className="mt-2 flex w-full flex-wrap gap-2 bg-transparent px-4 font-sans">
+          {innings.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveInningIdx(idx)}
+              className={`min-w-fit flex-1 rounded-2xl border py-2 font-[urbanist] text-xs font-semibold uppercase transition-all ${
+                activeInningIdx === idx
+                  ? "border-green-600 bg-gradient-to-r from-green-700 via-green-600 to-green-700 text-white shadow-2xl"
+                  : "border-slate-100 bg-slate-50 text-slate-400 hover:border-green-500/500 dark:border-white/5 dark:bg-white/5"
+              }`}
+            >
+              <span>Inning {idx + 1}</span>
+            </button>
+          ))}
         </div>
 
-        <div className="max-h-[55vh] max-w-full flex-1 overflow-x-hidden overflow-y-scroll px-8 py-4">
+        <div className="max-h-[60vh] max-w-full flex-1 overflow-x-hidden overflow-y-scroll px-8 py-4">
           {/* Summary Banner */}
-          <div className="relative flex items-end justify-between overflow-hidden rounded-3xl bg-slate-900 p-6 text-white">
+          <div className="relative flex items-end justify-between overflow-hidden rounded-3xl bg-slate-100 p-6 dark:bg-slate-900">
             <div className="grid gap-2">
               <h2 className="truncate font-[inter] text-sm font-bold text-slate-900 uppercase dark:text-white">
                 {String(currentInning?.battingTeam.name || "TBD")}
@@ -164,33 +173,36 @@ const ScorecardModal = ({
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/10">
                     {/* Players with runs and details*/}
-                    {currentInning.InningBatting.map((batsman, i) => (
-                      <tr key={i} className="group">
-                        <td className="px-6 pt-2">
-                          <p className="text-xs font-bold tracking-tight text-slate-900 uppercase dark:text-white">
-                            {batsman.player.user.name}
-                          </p>
-                          {wicketsMap && (
-                            <p className="text-[9px] font-medium text-slate-400 italic">
-                              {wicketsMap?.[batsman.playerId] || "Not out"}
+                    {battedPlayers.length > 0 &&
+                      battedPlayers.map((batsman, i) => (
+                        <tr key={i} className="group">
+                          <td className="px-6 pt-2">
+                            <p className="text-xs font-bold tracking-tight text-slate-900 uppercase dark:text-white">
+                              {batsman.player.user.name}
                             </p>
-                          )}
-                        </td>
-                        <td className="px-4 py-4 text-center text-xs font-bold">{batsman.runs}</td>
-                        <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
-                          {batsman.balls}
-                        </td>
-                        <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
-                          {batsman.fours}
-                        </td>
-                        <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
-                          {batsman.sixes}
-                        </td>
-                        <td className="px-4 py-4 text-center text-[10px] font-bold text-green-500">
-                          {getStrikeRate(batsman.runs, batsman.balls)}
-                        </td>
-                      </tr>
-                    ))}
+                            {wicketsMap && (
+                              <p className="text-[9px] font-medium text-slate-400 italic">
+                                {wicketsMap?.[batsman.playerId] || "Not out"}
+                              </p>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 text-center text-xs font-bold">
+                            {batsman.runs}
+                          </td>
+                          <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
+                            {batsman.balls}
+                          </td>
+                          <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
+                            {batsman.fours}
+                          </td>
+                          <td className="px-4 py-4 text-center text-xs font-semibold text-slate-500">
+                            {batsman.sixes}
+                          </td>
+                          <td className="px-4 py-4 text-center text-[10px] font-bold text-green-500">
+                            {getStrikeRate(batsman.runs, batsman.balls)}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -217,7 +229,7 @@ const ScorecardModal = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/10">
-                    {currentInning.InningBowling.map((bowler, i) => (
+                    {currentInning.InningBowling.filter((b) => b.balls > 0).map((bowler, i) => (
                       <tr key={i}>
                         <td className="px-6 py-4">
                           <p className="text-xs font-bold tracking-tight text-slate-900 uppercase dark:text-white">

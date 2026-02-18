@@ -126,6 +126,9 @@ const LiveScorecard = ({
             {runsLeft && match.status !== "completed" && (
               <p className="text-xs text-green-500">{runsLeft}</p>
             )}
+            {match.status === "completed" && (
+              <p className="text-xs text-green-500">{match.result}</p>
+            )}
           </div>
         </div>
 
@@ -138,9 +141,21 @@ const LiveScorecard = ({
                 : "Match stopped"}
           </p>
         )}
-        <div className="absolute top-8 right-3 flex w-12 items-center justify-evenly rounded-full border border-red-500/20 bg-red-500/10 px-1 py-0.5">
-          <div className="h-1 w-1 animate-pulse rounded-full bg-red-500" />
-          <span className="text-[8px] font-bold text-red-500 uppercase">Live</span>
+        <div
+          className={`absolute top-8 right-3 flex max-w-fit items-center justify-evenly rounded-full border ${match.status === "in_progress" || match.status === "inning_completed" ? "border-red-500/20 bg-red-500/10" : "border-teal-500/20 bg-teal-500/10"} px-1 py-0.5`}
+        >
+          {match.status === "in_progress" || match.status === "inning_completed" ? (
+            <div className="h-1 w-1 animate-pulse rounded-full bg-red-500" />
+          ) : null}
+          <span
+            className={`text-[8px] font-bold ${match.status === "in_progress" || match.status === "inning_completed" ? "text-red-500" : "text-teal-800"} uppercase`}
+          >
+            {match.status === "in_progress" || match.status === "inning_completed"
+              ? "Live"
+              : match.status === "completed"
+                ? "Completed"
+                : "Stopped"}
+          </span>
         </div>
       </div>
 
