@@ -78,6 +78,17 @@ const ScorecardModal = ({
 
   const currentInning = innings[activeInningIdx];
 
+  const didNotBatPlayers = useMemo(() => {
+    if (!currentInning) return [];
+
+    return currentInning.InningBatting.filter(
+      (b) =>
+        !b.isOut &&
+        b.playerId !== currentInning.currentStrikerId &&
+        b.playerId !== currentInning.currentNonStrikerId
+    );
+  }, [currentInning]);
+
   const battedPlayers = useMemo(() => {
     if (!currentInning) return [];
 
@@ -207,6 +218,28 @@ const ScorecardModal = ({
                 </table>
               </div>
             </section>
+
+            {/* Did Not Bat (DNB) Section */}
+            {didNotBatPlayers.length > 0 && (
+              <section className="mb-4 space-y-2">
+                <div className="flex items-center gap-2 px-2">
+                  <UserCircle2 className="h-4 w-4 text-slate-400" />
+                  <h3 className="font-[inter] text-[11px] font-black tracking-wider text-slate-400 uppercase">
+                    Did Not Bat
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-2 rounded-3xl border border-slate-100 bg-slate-50/50 px-2 py-2 dark:border-white/5 dark:bg-white/5">
+                  {didNotBatPlayers.map((b, idx) => (
+                    <div
+                      key={idx}
+                      className="px-3 py-1.5 font-[urbanist] text-[10px] font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
+                    >
+                      {`${b.player.user.name}${idx === didNotBatPlayers.length - 1 ? "" : ","}`}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Bowling Section */}
             <section className="space-y-4 pb-4">
