@@ -26,11 +26,13 @@ export const GET = async (_: Request, { params }: { params: Promise<{ inningId: 
       orderBy: { createdAt: "desc" },
     });
 
+    const over = Number(lastLegalBall?.ball) / 6;
+
     if (lastLegalBall) {
       const legalBallsThisOver = await db.ball.findMany({
         where: {
           inningId,
-          over: lastLegalBall.over - 1,
+          over,
           isWide: false,
           isNoBall: false,
         },
