@@ -5,68 +5,22 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import React, { useMemo, useState, startTransition } from "react";
-import {
-  MapPin,
-  Calendar,
-  Activity,
-  Sword,
-  Flame,
-  Gavel,
-  Share2,
-  Target,
-  Star,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { MapPin, Calendar, Activity, Gavel, Share2 } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
-import { CurrentOverBalls, InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
+import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { addOfficials, startNextInning } from "@/actions/match-actions";
 import { toast } from "sonner";
 import InitializeMatchModal from "../_components/modals/InitializeMatchModal";
 import { type MatchOfficial } from "../_types/types";
-import { ControlPad } from "../_components/ControlPad";
-import ScorecardModal from "../_components/modals/ScorecardModal";
-import {
-  getBallLabel,
-  getCRR,
-  getEcon,
-  getOvers,
-  getPartnership,
-  getRR,
-  getStrikeRate,
-} from "@/utils/helper/scorecard";
 import { MatchHeroSection } from "../_components/MatchHeroSection";
 import { OfficialsModal } from "../_components/modals/OfficialsModal";
 import StartNextInningModal from "../_components/modals/StartNextInningModal";
 import { LiveScorecard } from "../_components/LiveScorecard";
 import { AwaitingCard } from "../_components/cards/AwaitingCard";
+import { InfoCard } from "../_components/cards/InfoCard";
 interface MatchIdPageProps {}
-
-interface InfoCardProps {
-  label: string;
-  value: string;
-  icon: LucideIcon;
-  color: string;
-  subValue: string;
-}
-
-const InfoCard = ({ label, value, icon: Icon, color = "green", subValue = "" }: InfoCardProps) => (
-  <div className="group hover-card relative overflow-hidden rounded-3xl p-6">
-    <div className="relative">
-      <div
-        className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600 transition-transform group-hover:scale-110 dark:bg-green-500/10 dark:text-green-400`}
-      >
-        <Icon className="h-5 w-5" />
-      </div>
-      <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase">{label}</p>
-      <p className="mt-1 text-lg font-black tracking-tight text-slate-900 uppercase dark:text-white">
-        {value}
-      </p>
-      {subValue && <p className="mt-1 text-[10px] font-bold text-slate-400">{subValue}</p>}
-    </div>
-  </div>
-);
 
 const MatchIdPage = ({}: MatchIdPageProps) => {
   const { id } = useParams();
