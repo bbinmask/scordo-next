@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowUpRight, MapPin, PlusCircle, Calendar, Sword, Bell } from "lucide-react";
+import { ArrowUpRight, MapPin, PlusCircle, Calendar, Bell } from "lucide-react";
 import Link from "next/link";
 import { Match } from "@/generated/prisma";
 import { formatDate } from "@/utils/helper/formatDate";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useAction } from "@/hooks/useAction";
 import { MatchWithDetails } from "@/lib/types";
 import { acceptMatchRequest, declineMatchRequest } from "@/actions/match-actions";
+import { EmptyCard } from "./_components/cards/EmptyCard";
 
 const MatchCard = ({ match }: { match: any }) => {
   if (!match) return null;
@@ -103,32 +104,6 @@ const CreateMatchCard = () => (
       className="ml-10 inline-block rounded-2xl bg-white px-6 py-3 font-[poppins] text-xs font-bold text-green-900 uppercase shadow-lg hover:bg-green-50"
     >
       Create a match
-    </Link>
-  </div>
-);
-
-const EmptyState = ({ type = "managed" }) => (
-  <div className="animate-in fade-in slide-in-from-bottom-2 hover-card flex min-h-[16rem] w-full flex-col items-center justify-center rounded-[2.5rem] border p-8 transition-all duration-700">
-    <div className="relative mb-4">
-      <div className="animate-bounce rounded-3xl bg-slate-100 p-4 text-slate-400 duration-[3000ms] dark:bg-slate-800 dark:text-slate-600">
-        <Sword className="h-10 w-10" />
-      </div>
-    </div>
-    <div className="mb-6 max-w-xs text-center">
-      <h4 className="mb-1 text-lg font-black tracking-tighter text-slate-900 uppercase dark:text-white">
-        {type === "managed" ? "No Active Contracts" : "No Matches Scheduled"}
-      </h4>
-      <p className="text-xs leading-relaxed font-medium text-slate-500 dark:text-slate-400">
-        {type === "managed"
-          ? "You aren't currently overseeing any professional fixtures."
-          : "The pitch is empty. Explore tournaments to join your next match."}
-      </p>
-    </div>
-    <Link
-      href="/matches/create"
-      className="flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2 text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-green-500/20 transition-all hover:scale-105 hover:bg-green-700 active:scale-95"
-    >
-      <PlusCircle className="h-3 w-3" /> Create Match
     </Link>
   </div>
 );
@@ -320,7 +295,7 @@ const MatchesPage = () => {
                 </Carousel>
               ) : (
                 <div className="px-4">
-                  <EmptyState type="managed" />
+                  <EmptyCard type="managed" />
                 </div>
               )}
             </section>
@@ -345,7 +320,7 @@ const MatchesPage = () => {
                 </div>
               ) : (
                 <div className="px-4">
-                  <EmptyState type="joined" />
+                  <EmptyCard type="joined" />
                 </div>
               )}
             </section>
