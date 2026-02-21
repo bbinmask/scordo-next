@@ -65,8 +65,6 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/innings/${innings.id}/check-bowler-change`);
 
-      console.log(data);
-
       if (!data.success) return setIsOverFinished(false);
 
       setIsOverFinished(data.data);

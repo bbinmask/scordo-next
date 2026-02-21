@@ -9,12 +9,15 @@ import {
   getPartnership,
   getStrikeRate,
 } from "@/utils/helper/scorecard";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Flame, Target } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ControlPad } from "./ControlPad";
 import ScorecardModal from "./modals/ScorecardModal";
+import { ablyClient } from "@/lib/ably-client";
+import { useAbly, usePresence, usePresenceListener } from "ably/react";
+import { useMatchChannel } from "@/hooks/useMatchChannel";
 
 export const LiveScorecard = ({
   match,
@@ -25,6 +28,7 @@ export const LiveScorecard = ({
   innings?: InningDetails[];
   userId?: string;
 }) => {
+  const queryClient = useQueryClient();
   const [isScorecardOpen, setIsScorecardOpen] = useState(false);
 
   const { data: ballHistory, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
@@ -54,6 +58,7 @@ export const LiveScorecard = ({
     },
   });
 
+  const messages = useMatchChannel(match.id);
   if (!innings) return null;
   const length = innings.length - 1;
 

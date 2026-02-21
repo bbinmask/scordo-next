@@ -35,6 +35,7 @@ import { ERROR_CODES } from "@/constants";
 import { Inning, Match } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 import { Ball } from "@/generated/prisma";
+import { ablyServer } from "@/lib/ably-server";
 const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeForCreate> => {
   const {
     category,
@@ -687,6 +688,22 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
           isWicket,
           isWide,
         },
+      });
+
+      await ablyServer.channels.get(`match:${matchId}`).publish("ball-added", {
+        ball: nextBall,
+        over: nextOver,
+        batsmanId,
+        bowlerId: inning.currentBowlerId as string,
+        inningId,
+        runs,
+        dismissalType,
+        isBye,
+        isLegBye,
+        isNoBall,
+        fielderId,
+        isWicket,
+        isWide,
       });
 
       await tsx.inningBatting.update({

@@ -27,7 +27,6 @@ export const useAction = <TInput, TOutput>(
         const result = await action(input);
         if (!result) return;
 
-        console.log({ result });
         setFieldErrors(result.fieldErrors);
 
         if (result.error) {

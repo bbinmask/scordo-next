@@ -1,5 +1,7 @@
 "use client";
 
+import Ably from "ably";
+import { AblyProvider, ChannelProvider } from "ably/react";
 import { User } from "@/generated/prisma";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -20,6 +22,7 @@ import StartNextInningModal from "../_components/modals/StartNextInningModal";
 import { LiveScorecard } from "../_components/LiveScorecard";
 import { AwaitingCard } from "../_components/cards/AwaitingCard";
 import { InfoCard } from "../_components/cards/InfoCard";
+import { ablyClient } from "@/lib/ably-client";
 interface MatchIdPageProps {}
 
 const MatchIdPage = ({}: MatchIdPageProps) => {
@@ -147,179 +150,183 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   }, [user, match]);
 
   return (
-    <div className={`font-sans transition-colors duration-500`}>
-      {isLoading ? (
-        <DefaultLoader />
-      ) : !match?.id ? (
-        <NotFoundParagraph
-          redirect
-          link="/matches"
-          title="Match not found"
-          description="This match is not available"
-        />
-      ) : (
-        <>
-          <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
-            {/* Hero Section */}
+    <AblyProvider client={ablyClient}>
+      <ChannelProvider channelName={`match:${match?.id}`}>
+        <div className={`font-sans transition-colors duration-500`}>
+          {isLoading ? (
+            <DefaultLoader />
+          ) : !match?.id ? (
+            <NotFoundParagraph
+              redirect
+              link="/matches"
+              title="Match not found"
+              description="This match is not available"
+            />
+          ) : (
+            <>
+              <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
+                {/* Hero Section */}
 
-            <MatchHeroSection innings={innings} match={match} />
+                <MatchHeroSection innings={innings} match={match} />
 
-            <div className="flex flex-col items-center px-4">
-              {/* Match Title & Actions */}
-              <div className="w-full max-w-4xl text-center">
-                <div className="center mb-4 flex flex-col text-3xl font-black tracking-tighter uppercase italic md:text-5xl">
-                  <h1 className="text-start">{match.teamA.name}</h1>
-                  <span className="primary-heading pr-2 text-center">vs</span>
-                  <h1 className="text-end"> {match.teamB.name}</h1>
-                </div>
+                <div className="flex flex-col items-center px-4">
+                  {/* Match Title & Actions */}
+                  <div className="w-full max-w-4xl text-center">
+                    <div className="center mb-4 flex flex-col text-3xl font-black tracking-tighter uppercase italic md:text-5xl">
+                      <h1 className="text-start">{match.teamA.name}</h1>
+                      <span className="primary-heading pr-2 text-center">vs</span>
+                      <h1 className="text-end"> {match.teamB.name}</h1>
+                    </div>
 
-                <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
-                  {isOrganizer ? (
-                    <>
-                      {match.requestStatus === "pending" ? (
-                        <span className="border-input secondary-text rounded-2xl border bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest shadow-lg transition-all hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700">
-                          Request Pending
-                        </span>
-                      ) : match.status === "not_started" ? (
-                        <button
-                          onClick={() => setIsInitializing(true)}
-                          className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
-                        >
-                          Initialize Match
-                        </button>
-                      ) : match.status === "inning_completed" ? (
-                        <button
-                          onClick={() => setIsInitializing(true)}
-                          className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
-                        >
-                          Start Inning
-                        </button>
+                    <div className="mb-10 flex flex-wrap items-center justify-center gap-4">
+                      {isOrganizer ? (
+                        <>
+                          {match.requestStatus === "pending" ? (
+                            <span className="border-input secondary-text rounded-2xl border bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest shadow-lg transition-all hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700">
+                              Request Pending
+                            </span>
+                          ) : match.status === "not_started" ? (
+                            <button
+                              onClick={() => setIsInitializing(true)}
+                              className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                            >
+                              Initialize Match
+                            </button>
+                          ) : match.status === "inning_completed" ? (
+                            <button
+                              onClick={() => setIsInitializing(true)}
+                              className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                            >
+                              Start Inning
+                            </button>
+                          ) : (
+                            match.status === "stopped" && (
+                              <button
+                                onClick={() => setIsInitializing(true)}
+                                className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                              >
+                                Resume
+                              </button>
+                            )
+                          )}
+                        </>
                       ) : (
-                        match.status === "stopped" && (
-                          <button
-                            onClick={() => setIsInitializing(true)}
-                            className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
-                          >
-                            Resume
-                          </button>
-                        )
+                        <div className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
+                          {match.status === "not_started" && "Not started yet"}
+                        </div>
                       )}
-                    </>
-                  ) : (
-                    <div className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
-                      {match.status === "not_started" && "Not started yet"}
+                      {match && (
+                        <button
+                          onClick={handleShare}
+                          className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
+                        >
+                          <Share2 className="h-5 w-5" />
+                        </button>
+                      )}
                     </div>
-                  )}
-                  {match && (
-                    <button
-                      onClick={handleShare}
-                      className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
-                    >
-                      <Share2 className="h-5 w-5" />
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div className="mt-4 w-full space-y-12">
-                <div className="space-y-12">
-                  <div className="flex items-center justify-between px-4">
-                    <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
-                      Match
-                      <span className="primary-heading pr-2">Center</span>
-                    </h3>
-                    <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-                    <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
-                      Powered by Scordo
-                    </span>
                   </div>
-                  {/* Scorecard */}
-                  {match.status === "not_started" ? (
-                    <AwaitingCard
-                      title={"Awaiting Toss Results"}
-                      description={
-                        "The match engine is on standby. The live scoreboard and ball-by-ball feed will initialize once the 2nd inning is started."
-                      }
-                    />
-                  ) : (
-                    <LiveScorecard innings={innings} match={match} userId={user?.id} />
-                  )}
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between px-4">
-                    <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
-                      Match
-                      <span className="primary-heading pr-2">Details</span>
-                    </h3>
-                    <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-                    <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
-                      Powered by Scordo
-                    </span>
-                  </div>
+                  <div className="mt-4 w-full space-y-12">
+                    <div className="space-y-12">
+                      <div className="flex items-center justify-between px-4">
+                        <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
+                          Match
+                          <span className="primary-heading pr-2">Center</span>
+                        </h3>
+                        <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
+                        <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                          Powered by Scordo
+                        </span>
+                      </div>
+                      {/* Scorecard */}
+                      {match.status === "not_started" ? (
+                        <AwaitingCard
+                          title={"Awaiting Toss Results"}
+                          description={
+                            "The match engine is on standby. The live scoreboard and ball-by-ball feed will initialize once the 2nd inning is started."
+                          }
+                        />
+                      ) : (
+                        <LiveScorecard innings={innings} match={match} userId={user?.id} />
+                      )}
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between px-4">
+                        <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
+                          Match
+                          <span className="primary-heading pr-2">Details</span>
+                        </h3>
+                        <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
+                        <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                          Powered by Scordo
+                        </span>
+                      </div>
 
-                  <div className="grid w-full grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
-                    <InfoCard
-                      label="Stadium Venue"
-                      value={match.location || "TBD"}
-                      icon={MapPin}
-                      color="green"
-                      subValue={`${match.venue.city}, ${match.venue.country}`}
-                    />
-                    <InfoCard
-                      label="Match Category"
-                      value={match.category}
-                      icon={Activity}
-                      color="blue"
-                      subValue={`${match.overs} Over Restricted`}
-                    />
-                    <InfoCard
-                      label="Scheduled Kickoff"
-                      value="Jan 31, 2026"
-                      icon={Calendar}
-                      color="amber"
-                      subValue="Match Not Started"
-                    />
-                    <div className="" onClick={handleOpen}>
-                      <InfoCard
-                        label="Official Assigned"
-                        value={`${match.matchOfficials.length} Officials`}
-                        icon={Gavel}
-                        color="green"
-                        subValue={"See all officials list of the match"}
-                      />
+                      <div className="grid w-full grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+                        <InfoCard
+                          label="Stadium Venue"
+                          value={match.location || "TBD"}
+                          icon={MapPin}
+                          color="green"
+                          subValue={`${match.venue.city}, ${match.venue.country}`}
+                        />
+                        <InfoCard
+                          label="Match Category"
+                          value={match.category}
+                          icon={Activity}
+                          color="blue"
+                          subValue={`${match.overs} Over Restricted`}
+                        />
+                        <InfoCard
+                          label="Scheduled Kickoff"
+                          value="Jan 31, 2026"
+                          icon={Calendar}
+                          color="amber"
+                          subValue="Match Not Started"
+                        />
+                        <div className="" onClick={handleOpen}>
+                          <InfoCard
+                            label="Official Assigned"
+                            value={`${match.matchOfficials.length} Officials`}
+                            icon={Gavel}
+                            color="green"
+                            subValue={"See all officials list of the match"}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <OfficialsModal
-            isOrganizer={isOrganizer}
-            onSubmit={handleAddOfficial}
-            players={players || []}
-            isOpen={isOpen}
-            officials={match?.matchOfficials || []}
-            onClose={handleClose}
-          />
+              <OfficialsModal
+                isOrganizer={isOrganizer}
+                onSubmit={handleAddOfficial}
+                players={players || []}
+                isOpen={isOpen}
+                officials={match?.matchOfficials || []}
+                onClose={handleClose}
+              />
 
-          {isOrganizer && (
-            <InitializeMatchModal
-              status={match.status}
-              isOpen={isInitializing}
-              match={match}
-              onClose={() => setIsInitializing(false)}
-            />
+              {isOrganizer && (
+                <InitializeMatchModal
+                  status={match.status}
+                  isOpen={isInitializing}
+                  match={match}
+                  onClose={() => setIsInitializing(false)}
+                />
+              )}
+              {isOrganizer && (
+                <StartNextInningModal
+                  innings={innings}
+                  match={match}
+                  isOpen={isStartingNextInning}
+                  onClose={() => setIsStartingNextInning(false)}
+                />
+              )}
+            </>
           )}
-          {isOrganizer && (
-            <StartNextInningModal
-              innings={innings}
-              match={match}
-              isOpen={isStartingNextInning}
-              onClose={() => setIsStartingNextInning(false)}
-            />
-          )}
-        </>
-      )}
-    </div>
+        </div>
+      </ChannelProvider>
+    </AblyProvider>
   );
 };
 
