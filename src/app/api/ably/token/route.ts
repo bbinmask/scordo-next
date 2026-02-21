@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import Ably from "ably";
 import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator";
 
-export const dynamic = "force-dynamic"; // important
-
 export async function GET() {
   try {
     if (!process.env.ABLY_CLIENT_API_KEY) {
@@ -20,7 +18,13 @@ export async function GET() {
       clientId: randomName,
     });
 
-    return NextResponse.json(tokenRequestData);
+    return NextResponse.json(tokenRequestData, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+      },
+    });
   } catch (error) {
     console.error("Error creating token request:", error);
     return NextResponse.json({ error: "Failed to create token request" }, { status: 500 });

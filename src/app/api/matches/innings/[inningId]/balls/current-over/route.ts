@@ -24,6 +24,7 @@ export const GET = async (req: Request, { params }: { params: Promise<{ inningId
       select: {
         runs: true,
         ball: true,
+        bowlerId: true,
         id: true,
         isBye: true,
         isLegBye: true,

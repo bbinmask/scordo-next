@@ -617,6 +617,35 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         error: "Inning not found!",
       };
 
+    const lastLegalBall = await db.ball.findFirst({
+      where: {
+        inningId,
+        isWide: false,
+        isNoBall: false,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (lastLegalBall) {
+      const over = Math.floor(lastLegalBall.ball / 6);
+      const legalBallsThisOver = await db.ball.findMany({
+        where: {
+          inningId,
+          over,
+          isWide: false,
+          isNoBall: false,
+        },
+      });
+
+      if (
+        legalBallsThisOver.length === 6 &&
+        legalBallsThisOver[0].bowlerId === inning.currentBowlerId
+      )
+        return {
+          error: "Bowler change is required before bowling next ball!",
+        };
+    }
+
     const inningNumber = inning.inningNumber;
     const totalOvers = match.overs;
 
@@ -798,6 +827,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       }
     });
   } catch (error) {
+    console.log({ error });
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };

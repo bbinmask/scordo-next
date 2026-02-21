@@ -12,12 +12,10 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Flame, Target } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { ControlPad } from "./ControlPad";
 import ScorecardModal from "./modals/ScorecardModal";
-import { ablyClient } from "@/lib/ably-client";
-import { useAbly, usePresence, usePresenceListener } from "ably/react";
-import { useMatchChannel } from "@/hooks/useMatchChannel";
+import { useChannel } from "ably/react";
 
 export const LiveScorecard = ({
   match,
@@ -45,6 +43,9 @@ export const LiveScorecard = ({
       return data.data;
     },
     enabled: !!(innings?.length && innings.length > 0),
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const { data: runsLeft } = useQuery<string | null>({
@@ -56,11 +57,39 @@ export const LiveScorecard = ({
 
       return data.data;
     },
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
-  const messages = useMatchChannel(match.id);
+  const channelName = `match:${match.id}`;
+
+  useChannel(channelName, "ball-added", async (msg) => {
+    await queryClient.refetchQueries({
+      queryKey: ["match", match.id],
+    });
+
+    await queryClient.refetchQueries({
+      queryKey: ["match-innings", match.id],
+    });
+
+    const lastInningId = innings?.at(innings.length - 1)?.id;
+
+    if (lastInningId) {
+      await queryClient.refetchQueries({
+        queryKey: ["current-over-history", lastInningId],
+      });
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["check-bowler-change"] });
+
+    await queryClient.refetchQueries({
+      queryKey: ["runs-left", match.id],
+    });
+  });
+
   if (!innings) return null;
-  const length = innings.length - 1;
+  const length = innings.length === 0 ? 0 : innings.length - 1;
 
   return (
     <>
@@ -102,10 +131,10 @@ export const LiveScorecard = ({
         <div className="relative flex items-baseline justify-between gap-3">
           <div className="">
             <span className="text-8xl font-black tracking-tighter drop-shadow-lg">
-              {String(innings[length].runs)}
+              {innings[length].runs}
             </span>
             <span className="text-4xl font-light tracking-tighter text-indigo-200">
-              / {String(innings[length].wickets)}
+              / {innings[length].wickets}
             </span>
           </div>
 
@@ -135,18 +164,18 @@ export const LiveScorecard = ({
               <p className="font-[poppins] text-2xl font-bold tracking-tighter text-emerald-400">
                 {String(getCRR(innings[length].runs, innings[length].balls))}
               </p>
-
-              {innings[length].inningNumber === 2 && (
-                <div className="">
-                  <span className="mb-1 block text-[10px] font-black tracking-widest text-indigo-300 uppercase">
-                    RR
-                  </span>
-                  <p className="font-mono text-2xl font-black tracking-tighter text-emerald-400">
-                    {String(getCRR(innings[length].runs, innings[length].balls))}
-                  </p>
-                </div>
-              )}
             </div>
+
+            {innings[length].inningNumber === 2 && (
+              <div className="">
+                <span className="mb-1 block text-[10px] font-black tracking-widest text-indigo-300 uppercase">
+                  RR
+                </span>
+                <p className="font-mono text-2xl font-black tracking-tighter text-emerald-400">
+                  {String(getCRR(innings[length].runs, innings[length].balls))}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -47,9 +47,8 @@ export const InitializeMatchModal = ({
   const { execute: executeInitialize, isLoading: isSubmitting } = useAction(initializeMatch, {
     onSuccess() {
       toast.success("Match Started");
-
-      router.refresh();
       onClose();
+      router.refresh();
     },
 
     onError(error) {

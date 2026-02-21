@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { RotateCcw, Settings } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import WicketDetailsModal from "./modals/WicketDetailsModal";
 import {
@@ -15,6 +15,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { WicketType } from "@/generated/prisma";
 import axios from "axios";
 import { SelectBowlerModal } from "./modals/SelectBowlerModal";
+import { useChannel } from "ably/react";
 type ExtraType = "wd" | "nb" | "b";
 
 interface ControlPadProps {
@@ -45,6 +46,8 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       }
     },
     onError(error) {
+      queryClient.invalidateQueries({ queryKey: ["check-bowler-change"] });
+
       console.log(error);
     },
   });
@@ -61,7 +64,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
   });
 
   const {} = useQuery<boolean>({
-    queryKey: ["check-change-bowler"],
+    queryKey: ["check-bowler-change"],
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/innings/${innings.id}/check-bowler-change`);
 

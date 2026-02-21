@@ -26,9 +26,8 @@ export const GET = async (_: Request, { params }: { params: Promise<{ inningId: 
       orderBy: { createdAt: "desc" },
     });
 
-    const over = Number(lastLegalBall?.ball) / 6;
-
     if (lastLegalBall) {
+      const over = Math.floor(lastLegalBall.ball / 6);
       const legalBallsThisOver = await db.ball.findMany({
         where: {
           inningId,
@@ -39,7 +38,7 @@ export const GET = async (_: Request, { params }: { params: Promise<{ inningId: 
       });
 
       if (
-        legalBallsThisOver.length === 5 &&
+        legalBallsThisOver.length === 6 &&
         legalBallsThisOver[0].bowlerId === inning.currentBowlerId
       )
         return NextResponse.json(new ApiResponse(true));

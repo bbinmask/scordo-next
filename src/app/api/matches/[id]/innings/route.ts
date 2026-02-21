@@ -1,7 +1,10 @@
 import { ERROR_CODES } from "@/constants";
 import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
+
 import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
 
 export const GET = async (_: any, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
