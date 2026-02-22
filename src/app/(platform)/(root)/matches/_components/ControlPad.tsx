@@ -37,18 +37,15 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
 
   const { execute, isLoading: isSubmitting } = useAction(pushBall, {
     onSuccess(data) {
-      queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
-      queryClient.invalidateQueries({ queryKey: ["current-over-history", innings.id] });
-      queryClient.invalidateQueries({ queryKey: ["runs-left", match.id] });
-
+      console.log({ data });
       if ((innings.balls + 1) % 6 === 0) {
-        if (data.over < match.overs) setIsOverFinished(true);
+        if (data.over < match.overs && match.playerLimit > innings.wickets + 1)
+          setIsOverFinished(true);
       }
     },
     onError(error) {
-      queryClient.invalidateQueries({ queryKey: ["check-bowler-change"] });
-
-      console.log(error);
+      console.log({ error });
+      toast.error(error);
     },
   });
 
@@ -117,6 +114,8 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
           wicket.batsmanId.trim() !== "" ? wicket.batsmanId : (innings.currentStrikerId as string),
       });
     } else {
+      console.log({ wicket, limit: match.playerLimit === innings.wickets + 2 });
+
       execute({
         matchId: innings.matchId,
         inningId: innings.id,
@@ -209,6 +208,32 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         !batsman.isOut
     );
   }, [innings]);
+
+  const channelName = `match:${match.id}`;
+
+  useChannel(channelName, "ball-added", async (msg) => {
+    await queryClient.refetchQueries({
+      queryKey: ["match", match.id],
+    });
+
+    await queryClient.refetchQueries({
+      queryKey: ["match-innings", match.id],
+    });
+
+    const lastInningId = innings.id;
+
+    if (lastInningId) {
+      await queryClient.refetchQueries({
+        queryKey: ["current-over-history", lastInningId],
+      });
+    }
+
+    queryClient.invalidateQueries({ queryKey: ["check-bowler-change"] });
+
+    await queryClient.refetchQueries({
+      queryKey: ["runs-left", match.id],
+    });
+  });
 
   return (
     <div className="space-y-2">

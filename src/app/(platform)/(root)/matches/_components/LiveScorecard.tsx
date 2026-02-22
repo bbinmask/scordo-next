@@ -7,15 +7,15 @@ import {
   getCRR,
   getEcon,
   getPartnership,
+  getRR,
   getStrikeRate,
 } from "@/utils/helper/scorecard";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Flame, Target } from "lucide-react";
 import { useState } from "react";
 import { ControlPad } from "./ControlPad";
 import ScorecardModal from "./modals/ScorecardModal";
-import { useChannel } from "ably/react";
 
 export const LiveScorecard = ({
   match,
@@ -26,7 +26,6 @@ export const LiveScorecard = ({
   innings?: InningDetails[];
   userId?: string;
 }) => {
-  const queryClient = useQueryClient();
   const [isScorecardOpen, setIsScorecardOpen] = useState(false);
 
   const { data: ballHistory, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
@@ -60,32 +59,6 @@ export const LiveScorecard = ({
     staleTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
-  });
-
-  const channelName = `match:${match.id}`;
-
-  useChannel(channelName, "ball-added", async (msg) => {
-    await queryClient.refetchQueries({
-      queryKey: ["match", match.id],
-    });
-
-    await queryClient.refetchQueries({
-      queryKey: ["match-innings", match.id],
-    });
-
-    const lastInningId = innings?.at(innings.length - 1)?.id;
-
-    if (lastInningId) {
-      await queryClient.refetchQueries({
-        queryKey: ["current-over-history", lastInningId],
-      });
-    }
-
-    queryClient.invalidateQueries({ queryKey: ["check-bowler-change"] });
-
-    await queryClient.refetchQueries({
-      queryKey: ["runs-left", match.id],
-    });
   });
 
   if (!innings) return null;
@@ -172,7 +145,7 @@ export const LiveScorecard = ({
                   RR
                 </span>
                 <p className="font-mono text-2xl font-black tracking-tighter text-emerald-400">
-                  {String(getCRR(innings[length].runs, innings[length].balls))}
+                  {String(getRR(innings[0].runs, innings[0].balls))}
                 </p>
               </div>
             )}

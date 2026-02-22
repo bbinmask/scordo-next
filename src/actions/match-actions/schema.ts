@@ -90,7 +90,12 @@ export const PushBall = z
   })
   .superRefine((data, ctx) => {
     if (data.isWicket) {
-      if (!data.fielderId) {
+      if (
+        !data.fielderId &&
+        data.dismissalType !== "BOWLED" &&
+        data.dismissalType !== "LBW" &&
+        data.dismissalType !== "HIT_WICKET"
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["fielderId"],

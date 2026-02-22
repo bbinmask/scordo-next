@@ -566,6 +566,8 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
 
   let match, ball;
 
+  console.log("Here", { data });
+
   try {
     match = await db.match.findUnique({
       where: {
@@ -627,20 +629,12 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     });
 
     if (lastLegalBall) {
-      const over = Math.floor(lastLegalBall.ball / 6);
-      const legalBallsThisOver = await db.ball.findMany({
-        where: {
-          inningId,
-          over,
-          isWide: false,
-          isNoBall: false,
-        },
-      });
+      const isOverCompleted =
+        lastLegalBall.ball % 6 === 0 &&
+        lastLegalBall.ball !== 0 &&
+        lastLegalBall.bowlerId === inning.currentBowlerId;
 
-      if (
-        legalBallsThisOver.length === 6 &&
-        legalBallsThisOver[0].bowlerId === inning.currentBowlerId
-      )
+      if (isOverCompleted)
         return {
           error: "Bowler change is required before bowling next ball!",
         };
@@ -713,7 +707,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
           isBye,
           isLegBye,
           isNoBall,
-          fielderId,
+          fielderId: fielderId?.trim() !== "" ? fielderId : undefined,
           isWicket,
           isWide,
         },
@@ -730,7 +724,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         isBye,
         isLegBye,
         isNoBall,
-        fielderId,
+        fielderId: fielderId?.trim() !== "" ? fielderId : undefined,
         isWicket,
         isWide,
       });
