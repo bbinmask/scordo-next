@@ -787,6 +787,8 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
               status: "inning_completed",
             },
           });
+
+          await ablyServer.channels.get(`match:${matchId}`).publish("inning-completed", {});
         }
       } else if (inningNumber === 2) {
         const firstInning = await tsx.inning.findFirst({

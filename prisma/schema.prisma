@@ -227,7 +227,7 @@ model TeamRequest {
   to   User @relation("ReceivedRequests", fields: [toId], references: [id])
   from User @relation("SentRequests", fields: [fromId], references: [id])
   team Team @relation("TeamJoinRequests", fields: [teamId], references: [id])
-
+  isInvite Boolean @default(false)
   status    RequestStatus @default(pending)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt

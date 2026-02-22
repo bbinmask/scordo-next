@@ -16,6 +16,7 @@ import { WicketType } from "@/generated/prisma";
 import axios from "axios";
 import { SelectBowlerModal } from "./modals/SelectBowlerModal";
 import { useChannel } from "ably/react";
+import { set } from "lodash";
 type ExtraType = "wd" | "nb" | "b";
 
 interface ControlPadProps {
@@ -235,6 +236,14 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     });
   });
 
+  useChannel(channelName, "inning-completed", async (msg) => {
+    setIsOverFinished(false);
+
+    await queryClient.refetchQueries({
+      queryKey: ["match", match.id],
+    });
+  });
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between px-4">
@@ -368,7 +377,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         bowlers={bowlingPlayers.filter(
           (bowler) => bowler.playerId !== innings.currentBowlerId || bowler.overs >= match.overLimit
         )}
-        isOpen={isOverFinished}
+        isOpen={isOverFinished && match.status !== "inning_completed"}
         onSubmit={handleChangeBowler}
       />
     </div>
