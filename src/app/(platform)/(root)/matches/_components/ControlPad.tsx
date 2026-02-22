@@ -1,14 +1,9 @@
 import { cn } from "@/lib/utils";
 import { RotateCcw, Settings } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import WicketDetailsModal from "./modals/WicketDetailsModal";
-import {
-  InningDetails,
-  MatchWithDetails,
-  PlayerWithUser,
-  WicketsWithPlayerDetails,
-} from "@/lib/types";
+import { InningDetails, MatchWithDetails } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { changeBowler, pushBall } from "@/actions/match-actions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,7 +11,6 @@ import { WicketType } from "@/generated/prisma";
 import axios from "axios";
 import { SelectBowlerModal } from "./modals/SelectBowlerModal";
 import { useChannel } from "ably/react";
-import { set } from "lodash";
 type ExtraType = "wd" | "nb" | "b";
 
 interface ControlPadProps {

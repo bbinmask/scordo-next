@@ -34,7 +34,6 @@ import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
 import { Inning, Match } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
-import { Ball } from "@/generated/prisma";
 import { ablyServer } from "@/lib/ably-server";
 const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeForCreate> => {
   const {
@@ -566,8 +565,6 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
 
   let match, ball;
 
-  console.log("Here", { data });
-
   try {
     match = await db.match.findUnique({
       where: {
@@ -618,27 +615,6 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       return {
         error: "Inning not found!",
       };
-
-    const lastLegalBall = await db.ball.findFirst({
-      where: {
-        inningId,
-        isWide: false,
-        isNoBall: false,
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    if (lastLegalBall) {
-      const isOverCompleted =
-        lastLegalBall.ball % 6 === 0 &&
-        lastLegalBall.ball !== 0 &&
-        lastLegalBall.bowlerId === inning.currentBowlerId;
-
-      if (isOverCompleted)
-        return {
-          error: "Bowler change is required before bowling next ball!",
-        };
-    }
 
     const inningNumber = inning.inningNumber;
     const totalOvers = match.overs;
@@ -695,6 +671,27 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     }
 
     ball = await db.$transaction(async (tsx) => {
+      const lastLegalBall = await tsx.ball.findFirst({
+        where: {
+          inningId,
+          isWide: false,
+          isNoBall: false,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (lastLegalBall) {
+        const isOverCompleted =
+          lastLegalBall.ball % 6 === 0 &&
+          lastLegalBall.ball !== 0 &&
+          lastLegalBall.bowlerId === inning.currentBowlerId;
+
+        if (isOverCompleted)
+          return {
+            error: "Bowler change is required before bowling next ball!",
+          };
+      }
+
       const createdBall = await tsx.ball.create({
         data: {
           ball: nextBall,
@@ -1028,6 +1025,87 @@ const changeBowlerHandler = async (
   return { data: true };
 };
 
+const deleteMatchHandler = async (data: InputTypeForRequest): Promise<any> => {
+  const user = await currentUser();
+  const { id: matchId } = data;
+  if (!user)
+    return {
+      error: "Please Log in!",
+    };
+
+  let match;
+
+  try {
+    match = await db.match.findUnique({
+      where: {
+        id: matchId,
+      },
+    });
+
+    if (!match)
+      return {
+        error: "Match not found!",
+      };
+
+    if (match.organizerId !== user.id)
+      return {
+        error: "Only match organizer can delete the match!",
+      };
+
+    match = await db.$transaction(async (tsx) => {
+      await tsx.inningBowling.deleteMany({
+        where: {
+          inning: {
+            matchId,
+          },
+        },
+      });
+
+      await tsx.inningBatting.deleteMany({
+        where: {
+          inning: {
+            matchId,
+          },
+        },
+      });
+
+      await tsx.ball.deleteMany({
+        where: {
+          inning: {
+            matchId,
+          },
+        },
+      });
+
+      await tsx.inning.deleteMany({
+        where: {
+          matchId,
+        },
+      });
+
+      await tsx.matchOfficial.deleteMany({
+        where: {
+          matchId,
+        },
+      });
+
+      return await tsx.match.delete({
+        where: { id: matchId },
+      });
+    });
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
+  revalidatePath(`/matches`);
+  revalidatePath(`/matches/${matchId}`);
+  return {
+    data: true,
+  };
+};
+
 export const createMatch = createSafeAction(CreateMatch, createMatchHandler);
 export const addOfficials = createSafeAction(AddOfficials, addOfficialsHandler);
 export const removeOfficial = createSafeAction(RemoveOfficial, removeOfficialHandler);
@@ -1037,3 +1115,4 @@ export const initializeMatch = createSafeAction(InitializeMatch, initializeMatch
 export const pushBall = createSafeAction(PushBall, pushBallHandler);
 export const changeBowler = createSafeAction(ChangeBowler, changeBowlerHandler);
 export const startNextInning = createSafeAction(StartNextInning, startNextInningHandler);
+export const deleteMatch = createSafeAction(Request, deleteMatchHandler);

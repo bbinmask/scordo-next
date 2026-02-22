@@ -21,6 +21,7 @@ import StartNextInningModal from "../_components/modals/StartNextInningModal";
 import { LiveScorecard } from "../_components/LiveScorecard";
 import { AwaitingCard } from "../_components/cards/AwaitingCard";
 import { InfoCard } from "../_components/cards/InfoCard";
+import { formatDate } from "@/utils/helper/formatDate";
 interface MatchIdPageProps {}
 
 const MatchIdPage = ({}: MatchIdPageProps) => {
@@ -267,7 +268,9 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                       value={match.location || "TBD"}
                       icon={MapPin}
                       color="green"
-                      subValue={`${match.venue.city}, ${match.venue.country}`}
+                      subValue={
+                        match.venue ? `${match.venue.city}, ${match.venue.country}` : "Location TBD"
+                      }
                     />
                     <InfoCard
                       label="Match Category"
@@ -278,12 +281,22 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     />
                     <InfoCard
                       label="Scheduled Kickoff"
-                      value="Jan 31, 2026"
+                      value={match.date ? formatDate(new Date(match.date)) : "TBD"}
                       icon={Calendar}
                       color="amber"
-                      subValue="Match Not Started"
+                      subValue={
+                        match.status === "not_started"
+                          ? "Match Not Started"
+                          : match.status.replace(/_/g, " ")
+                      }
                     />
-                    <div className="" onClick={handleOpen}>
+                    <div
+                      className="cursor-pointer"
+                      onClick={handleOpen}
+                      role="button"
+                      onKeyDown={(e) => e.key === "Enter" && handleOpen()}
+                      tabIndex={0}
+                    >
                       <InfoCard
                         label="Official Assigned"
                         value={`${match.matchOfficials.length} Officials`}
