@@ -13,6 +13,7 @@ import { EmptyCard } from "./_components/cards/EmptyCard";
 import { MatchRequests } from "./_components/MatchRequests";
 import { MatchCard } from "./_components/cards/MatchCard";
 import { CreateMatchCard } from "./_components/cards/CreateMatchCard";
+
 const MatchesPage = () => {
   const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<Match[]>({
     queryKey: ["matches-as-official"],
@@ -87,11 +88,11 @@ const MatchesPage = () => {
                   <Spinner />
                 </div>
               ) : matchesAsOfficial && matchesAsOfficial.length > 0 ? (
-                <div className="no-scrollbar flex gap-8 overflow-x-auto scroll-smooth pb-6">
+                <Carousel>
                   {matchesAsOfficial.map((match, i) => (
                     <MatchCard key={i} match={match} />
                   ))}
-                </div>
+                </Carousel>
               ) : (
                 <div className="px-4">
                   <EmptyCard type="joined" />

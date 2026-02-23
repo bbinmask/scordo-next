@@ -1,7 +1,7 @@
 "use client";
 
-import { NewCard } from "./_components/Card";
-import { BarChart2, Newspaper, Users, Video } from "lucide-react";
+import { Card } from "./_components/Card";
+import { BarChart2, Newspaper, Shield, Video } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
 import Tabs from "../_components/Tabs";
 import { useState } from "react";
@@ -19,13 +19,13 @@ const cardData = [
   {
     title: "Teams",
     desc: "Create or edit teams",
-    link: "/teams/my-teams",
-    icon: <Users className="h-6 w-6" />,
+    link: "/teams",
+    icon: <Shield className="h-6 w-6" />,
   },
   {
     title: "Performance",
     desc: "See your performance",
-    link: "/profile/stats",
+    link: "/profile",
     icon: <BarChart2 className="h-6 w-6" />,
   },
 ];
@@ -82,7 +82,7 @@ const DashboardPage = () => {
             <HeroSection user={user} />
             <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
               {cardData.map((item, i) => (
-                <NewCard
+                <Card
                   icon={item.icon}
                   key={i}
                   title={item.title}
