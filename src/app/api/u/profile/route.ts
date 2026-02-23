@@ -1,13 +1,13 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import ApiError from "http-errors";
 import { db } from "@/lib/db";
-import { ApiResponse } from "@/utils/ApiResponse";
+import { ApiResponse, ApiError } from "@/utils/ApiResponse";
+import { ERROR_CODES } from "@/constants";
 export const GET = async (req: NextRequest) => {
   try {
     const clerkUser = await currentUser();
 
-    if (!clerkUser) return NextResponse.json(ApiError.Unauthorized());
+    if (!clerkUser) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
 
     const user = await db.user.findUnique({
       where: {
@@ -22,11 +22,10 @@ export const GET = async (req: NextRequest) => {
       },
     });
 
-    if (!user) return NextResponse.json(ApiError.NotFound("User not found"));
+    if (!user) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
 
-    return NextResponse.json({ user, success: true, status: 201 });
+    return NextResponse.json(new ApiResponse(user));
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(ApiError.InternalServerError("Something went wrong"));
+    return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

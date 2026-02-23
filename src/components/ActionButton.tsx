@@ -34,7 +34,7 @@ export const ActionButton = ({
         }
       }}
       className={cn(
-        "group relative flex items-center justify-between rounded-xl bg-slate-100 p-4 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:scale-[1.03] hover:bg-slate-200/60 hover:shadow-md dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600",
+        "group relative flex w-full items-center justify-between rounded-xl bg-slate-100 p-4 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:scale-[1.03] hover:bg-slate-200/60 hover:shadow-md dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600",
         className
       )}
       {...rest}

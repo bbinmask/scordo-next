@@ -8,11 +8,12 @@ import { useState } from "react";
 import { UpdatesList } from "./_components/NewsList";
 import { VideoList } from "../_components/VideoList";
 import HeroSection from "../_components/Hero";
-import AxiosRequest from "@/utils/AxiosResponse";
 import { useQuery } from "@tanstack/react-query";
 import { DefaultLoader } from "@/components/Spinner";
 import { Carousel } from "@/components/carousel";
-import MatchList from "../_components/MatchList";
+import { LiveMatchCard, UpcomingMatchCard } from "../_components/MatchList";
+import axios from "axios";
+import { MatchWithDetails } from "@/lib/types";
 
 const cardData = [
   {
@@ -37,16 +38,34 @@ const contentTabs = [
 const DashboardPage = () => {
   const [currentTab, setCurrentTab] = useState("updates");
 
-  const { data, isLoading, error } = useQuery({
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const { data } = await AxiosRequest.get("/api/u/profile");
-      return data;
+      const { data } = await axios.get("/api/u/profile");
+      return data.data;
+    },
+  });
+
+  const { data: dashboardMatches } = useQuery<{
+    liveMatches: MatchWithDetails[];
+
+    upcomingMatches: MatchWithDetails[];
+  }>({
+    queryKey: ["dashboard-matches"],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/matches/dashboard");
+      if (!data.success) return null;
+
+      return data.data;
     },
   });
 
   return (
-    <div className="block w-full items-center">
+    <div className="block w-full items-center pb-20">
       {isLoading ? (
         <DefaultLoader className="text-white" />
       ) : (
@@ -60,7 +79,7 @@ const DashboardPage = () => {
               </h1>
             </div>
 
-            <HeroSection user={data.user} />
+            <HeroSection user={user} />
             <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
               {cardData.map((item, i) => (
                 <NewCard
@@ -77,14 +96,30 @@ const DashboardPage = () => {
             <div className="mb-8">
               <TypographyHeading className="mb-4 px-4 font-black" content="Live on Scordo" />
               <Carousel>
-                <MatchList matches={Array.from({ length: 10 }).fill(0)} status="live" />
+                {dashboardMatches?.liveMatches.length ? (
+                  dashboardMatches.liveMatches.map((match) => (
+                    <LiveMatchCard key={match.id} match={match} />
+                  ))
+                ) : (
+                  <p className="text-center text-sm text-gray-500">
+                    No live matches at the moment.
+                  </p>
+                )}
               </Carousel>
             </div>
             <div className="mb-8">
               <TypographyHeading className="mb-4 px-4 font-black" content="Upcoming on Scordo" />
 
               <Carousel>
-                <MatchList matches={Array.from({ length: 10 }).fill(0)} status="upcoming" />
+                {dashboardMatches?.upcomingMatches.length ? (
+                  dashboardMatches.upcomingMatches.map((match) => (
+                    <UpcomingMatchCard key={match.id} match={match} />
+                  ))
+                ) : (
+                  <p className="text-center text-sm text-gray-500">
+                    No upcoming matches at the moment.
+                  </p>
+                )}
               </Carousel>
             </div>
           </section>
