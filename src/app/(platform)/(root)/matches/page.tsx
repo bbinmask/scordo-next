@@ -41,12 +41,6 @@ const MatchesPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
       <div className="max-w-7xl pt-12">
-        <div className="mb-12 flex items-center justify-between px-4">
-          <h1 className="primary-text font-[inter] text-3xl font-black tracking-tighter uppercase italic">
-            Matches <span className="primary-heading pr-2">Dashboard</span>
-          </h1>
-        </div>
-
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
           {/* Main Matches Column */}
           <div className="space-y-12 lg:col-span-8">
