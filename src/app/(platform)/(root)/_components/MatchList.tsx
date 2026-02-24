@@ -46,38 +46,3 @@ export const LiveMatchCard = ({ match }: { match: MatchWithDetails }) => {
     </div>
   );
 };
-
-export const UpcomingMatchCard = ({ match }: { match: any }) => {
-  return (
-    <div className="hover-card group mb-1 flex w-60 flex-shrink-0 transform cursor-pointer flex-row flex-nowrap rounded-xl bg-white p-4 shadow-md transition-transform duration-300 dark:bg-gray-800">
-      <div className="w-full">
-        <Link
-          href="#"
-          className="text-foreground mb-2 font-[urbanist] text-[10px] tracking-wide hover:underline"
-        >
-          Indian Premier League 2025
-        </Link>
-        <div className="mb-2 grid cursor-pointer grid-cols-1">
-          <h2 className="primary-heading font-[poppins] text-base font-bold">
-            {shortenTeamName("Royal Challengers Bangaluru")}
-            <span className="mx-2">vs</span>
-            {shortenTeamName("Chennai Super Kings")}
-          </h2>
-        </div>
-        <p className="text-accent-foreground mb-1 text-sm">
-          <span className="mr-1 font-semibold">{"Jul 10, 2025"}</span>at
-          <span className="ml-1 font-semibold">{"7:30 PM IST"}</span>
-        </p>
-        <p className="text-xs text-gray-600 dark:text-gray-400">
-          Venue: {"Chinnaswami Stadium, Bangaluru"}
-        </p>
-        <div className="mt-1 flex w-full justify-end pr-2">
-          <button className="flex items-center border-none text-sm font-semibold text-green-600 hover:underline dark:text-emerald-400">
-            View Details{" "}
-            <ChevronRight className="ml-2 h-4 w-4 transition-transform duration-500 ease-in-out group-hover:translate-x-2" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
