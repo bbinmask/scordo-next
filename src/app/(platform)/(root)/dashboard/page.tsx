@@ -11,7 +11,8 @@ import HeroSection from "../_components/Hero";
 import { useQuery } from "@tanstack/react-query";
 import { DefaultLoader } from "@/components/Spinner";
 import { Carousel } from "@/components/carousel";
-import { LiveMatchCard, UpcomingMatchCard } from "../_components/MatchList";
+import { LiveMatchCard } from "../_components/cards/LiveMatchCard";
+import { UpcomingMatchCard } from "../_components/cards/UpcomingMatchCard";
 import axios from "axios";
 import { MatchWithDetails } from "@/lib/types";
 
