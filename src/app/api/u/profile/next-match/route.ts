@@ -36,6 +36,8 @@ export const GET = async () => {
       orderBy: { date: "asc" },
     });
 
+    console.log({ nextMatch });
+
     if (!nextMatch) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
 
     return NextResponse.json(new ApiResponse(nextMatch));

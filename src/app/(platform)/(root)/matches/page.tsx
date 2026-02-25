@@ -1,11 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { ArrowUpRight, MapPin, PlusCircle, Calendar, Bell } from "lucide-react";
-import Link from "next/link";
-import { Match } from "@/generated/prisma";
-import { formatDate } from "@/utils/helper/formatDate";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Carousel } from "@/components/carousel";
 import Spinner from "@/components/Spinner";
@@ -13,9 +9,10 @@ import { EmptyCard } from "./_components/cards/EmptyCard";
 import { MatchRequests } from "./_components/MatchRequests";
 import { MatchCard } from "./_components/cards/MatchCard";
 import { CreateMatchCard } from "./_components/cards/CreateMatchCard";
+import { MatchWithDetails } from "@/lib/types";
 
 const MatchesPage = () => {
-  const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<Match[]>({
+  const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<MatchWithDetails[]>({
     queryKey: ["matches-as-official"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/officials");
@@ -25,7 +22,7 @@ const MatchesPage = () => {
       return data.data;
     },
   });
-  const { data: matches, isLoading } = useQuery<Match[]>({
+  const { data: matches, isLoading } = useQuery<MatchWithDetails[]>({
     queryKey: ["matches"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/");

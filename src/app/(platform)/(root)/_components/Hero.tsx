@@ -4,7 +4,7 @@ import { MatchWithDetails, UserWithTeamsProps } from "@/lib/types";
 import { formatDate } from "@/utils/helper/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { PlusCircle, Search } from "lucide-react";
+import { ArrowRight, PlusCircle, Search, Sparkles, Trophy } from "lucide-react";
 import Link from "next/link";
 
 interface HeroSectionProps {
@@ -44,7 +44,51 @@ const HeroSection = ({ user }: HeroSectionProps) => {
 
         <div className="relative grid items-stretch gap-6 lg:grid-cols-5">
           {/* Upcoming Match Card */}
-          {upcomingMatch && (
+          {!upcomingMatch ? (
+            <div className="group relative flex flex-col justify-between overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md lg:col-span-3 dark:border-slate-800 dark:bg-slate-900/40">
+              {/* Background Glow */}
+              <div className="absolute -top-8 -right-8 h-32 w-32 rounded-full bg-emerald-500/5 blur-3xl transition-colors group-hover:bg-emerald-500/10" />
+
+              <div className="relative z-10">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                    <Trophy className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-[poppins] text-sm font-semibold tracking-wider text-emerald-600 uppercase dark:text-emerald-500">
+                      The Pitch is Waiting
+                    </h2>
+                    <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+                      No Scheduled Fixtures
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="text-xl font-black text-slate-800 uppercase italic dark:text-white">
+                    Ready to <span className="text-emerald-500">Dominate?</span>
+                  </h3>
+                  <p className="max-w-md text-sm leading-relaxed font-medium text-slate-500 dark:text-slate-400">
+                    You don't have any upcoming matches currently. Explore active tournaments.
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative z-10 mt-6 flex items-center gap-4 font-sans">
+                <Link
+                  href="/tournaments"
+                  className="group/link flex items-center gap-2 text-xs font-black tracking-widest text-emerald-600 uppercase transition-colors hover:text-emerald-500"
+                >
+                  Browse Leagues{" "}
+                  <ArrowRight className="h-3 w-3 transition-transform group-hover/link:translate-x-1" />
+                </Link>
+                <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
+                <span className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase">
+                  <Sparkles className="h-3 w-3 text-amber-500" /> Professional Track Active
+                </span>
+              </div>
+            </div>
+          ) : (
             <div className="hover-card flex flex-col rounded-xl p-5 ring-1 ring-slate-200/50 transition-all duration-300 hover:ring-slate-300 lg:col-span-3 dark:ring-slate-700/50 dark:hover:ring-slate-600">
               <div className="flex w-full items-center justify-between pb-2">
                 <h2 className="mb-4 font-[poppins] text-sm font-semibold tracking-wider text-green-600 uppercase dark:text-emerald-600">
