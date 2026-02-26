@@ -47,6 +47,7 @@ const inviteInTeamHandler = async (
       data: {
         teamId,
         toId: user.id,
+        isInvite: true,
         fromId,
       },
     });
