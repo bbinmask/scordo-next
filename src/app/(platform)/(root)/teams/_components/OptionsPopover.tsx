@@ -59,8 +59,6 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
 
   const [isRecruiting, setIsRecruiting] = useState(team.isRecruiting);
 
-  const { isOpen: isReqOpen, onClose: onReqClose, onOpen: onReqOpen } = useNotificationModal();
-
   const handleRecruiting = debounce((e: ChangeEvent<HTMLInputElement>) => {
     const recruiting = e.target.checked;
     if (recruiting === team.isRecruiting) return;

@@ -1,6 +1,5 @@
 import { inviteInTeam } from "@/actions/invite-acions";
 import Spinner from "@/components/Spinner";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +8,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Team, TeamRequest, User } from "@/generated/prisma";
+import { TeamRequest, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
 import { TeamWithPlayers } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { ArrowRight, Check, Loader2, Plus, Search, Shield, Trophy, Users, X } from "lucide-react";
+import { ArrowRight, Check, Loader2, Plus, Shield, Trophy, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -57,14 +56,12 @@ export const AskToJoinTeamModal = ({ user, isOpen, onClose }: AskToJoinTeamModal
           <AskToJoinTeam initialRequests={requests} initialTeams={teams} user={user} />
         )}
         <DialogFooter className="h-min py-0">
-          <div className="flex items-center justify-end rounded-xl border-t border-slate-100 bg-slate-200 p-4 text-[11px] font-bold tracking-widest text-slate-400 uppercase dark:border-white/5 dark:bg-white/5">
-            <Link
-              className="border-input tracking-tigher flex items-center gap-1 rounded-xl border bg-white px-4 py-2 font-[urbanist] text-xs text-green-500 transition-colors hover:text-green-600 hover:opacity-80 dark:bg-slate-800"
-              href={"/teams/create"}
-            >
-              Create New <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
+          <Link
+            className="border-input tracking-tigher flex items-center gap-1 rounded-xl border bg-white px-4 py-2 font-[urbanist] text-sm font-bold text-green-500 transition-colors hover:text-green-600 hover:opacity-80 dark:bg-slate-800"
+            href={"/teams/create"}
+          >
+            Create New <ArrowRight className="h-3 w-3" />
+          </Link>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -164,8 +161,8 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
                 <button
                   onClick={() => handleInvite(team.id)}
                   disabled={
-                    requests.findIndex((t) => t.fromId === user.id && t.teamId === team.id) !==
-                      -1 || isLoading
+                    requests?.findIndex((t) => t.toId === user.id && t.teamId === team.id) !== -1 ||
+                    isLoading
                   }
                   className={`relative flex h-10 w-10 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 ${
                     requests?.findIndex((t) => t.teamId === team.id) !== -1
@@ -175,7 +172,7 @@ const AskToJoinTeam = ({ user, initialTeams, initialRequests }: AskToJoinTeamPro
                 >
                   {invitingId === team.id ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : requests.findIndex((t) => t.fromId === user.id && t.teamId === team.id) !==
+                  ) : requests?.findIndex((t) => t.toId === user.id && t.teamId === team.id) !==
                     -1 ? (
                     <Check className="h-5 w-5" />
                   ) : (

@@ -12,7 +12,7 @@ export const GET = async (req: Request) => {
   try {
     const teamInvitations = await db.teamRequest.findMany({
       where: {
-        fromId: user.id,
+        toId: user.id,
         isInvite: true,
       },
       include: {

@@ -18,12 +18,6 @@ export const useUpdateLogoAndBanner = create<UpdateTeamProps>((set) => ({
   onClose: () => set({ isOpen: false }),
 }));
 
-export const useNotificationModal = create<UpdateTeamProps>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
-
 export const usePlayerModal = create<UpdateTeamProps>((set) => ({
   isOpen: false,
   onOpen: () => set({ isOpen: true }),

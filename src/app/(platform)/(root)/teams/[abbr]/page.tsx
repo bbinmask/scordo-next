@@ -110,11 +110,8 @@ const TeamIdPage = () => {
   });
 
   const [alreadyInTeam, setAlreadyInTeam] = useState(false);
-
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithUser | null>(null);
-
   const [alreadySent, setAlreadySent] = useState(Boolean(sentRequest));
-
   const { isOwner, isCaptain } = useIsTeamOwner(team as any, user?.id);
   const { onOpen: onPlayerOpen } = usePlayerModal();
 
@@ -126,7 +123,7 @@ const TeamIdPage = () => {
   }, [user, team]);
 
   return (
-    <div className="w-full pt-4">
+    <div className="w-full pt-4 pb-16">
       {!team && !isLoading && notFound()}
       {team ? (
         <div className="container-bg relative flex rounded-lg border">

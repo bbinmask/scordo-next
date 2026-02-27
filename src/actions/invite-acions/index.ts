@@ -46,9 +46,9 @@ const inviteInTeamHandler = async (
     request = await db.teamRequest.create({
       data: {
         teamId,
-        toId: user.id,
+        fromId: user.id,
         isInvite: true,
-        fromId,
+        toId: fromId,
       },
     });
   } catch (error: any) {

@@ -61,6 +61,7 @@ const ProfilePage = async () => {
   const teamRequests = await db.teamRequest.findMany({
     where: {
       toId: user.id,
+      isInvite: true,
     },
     include: {
       team: true,
@@ -103,6 +104,8 @@ const ProfilePage = async () => {
       team: true,
     },
   });
+
+  console.log({ teamRequests });
 
   return (
     <div className="font-inter container mx-auto min-h-screen p-4">

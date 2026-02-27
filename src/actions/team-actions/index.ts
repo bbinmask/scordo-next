@@ -261,8 +261,8 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
     } else {
       request = await db.teamRequest.create({
         data: {
-          fromId: user.id,
-          toId: team.ownerId,
+          toId: user.id,
+          fromId: team.ownerId,
           teamId,
         },
       });

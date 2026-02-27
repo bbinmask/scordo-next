@@ -21,6 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import React, { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import { useTheme } from "next-themes";
+import { useNotificationModal } from "@/hooks/store/use-notification";
 
 const Bottombar = () => {
   const pathname = usePathname();
@@ -80,7 +81,7 @@ const Bottombar = () => {
           return (
             <div className={`${item.className}`} key={i}>
               {item.title.toLowerCase() === "more" ? (
-                <MorePopover>
+                <MorePopover closeActive={() => setIsMoreActive(false)}>
                   <div
                     ref={moreRef as any}
                     onClick={() => setIsMoreActive(true)}
@@ -118,13 +119,16 @@ const Bottombar = () => {
 };
 
 interface MorePopoverProps {
+  closeActive: () => void;
   children: React.ReactNode;
 }
-const MorePopover = ({ children }: MorePopoverProps) => {
+const MorePopover = ({ children, closeActive }: MorePopoverProps) => {
   const router = useRouter();
 
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  const { onOpen, onClose, isOpen } = useNotificationModal();
 
   useEffect(() => {
     setMounted(true);
@@ -149,6 +153,7 @@ const MorePopover = ({ children }: MorePopoverProps) => {
               color: "blue",
               onClick: () => {
                 router.push("/profile");
+                closeActive();
               },
             },
             {
@@ -157,10 +162,11 @@ const MorePopover = ({ children }: MorePopoverProps) => {
               color: "slate",
               onClick: () => {
                 router.push("/settings");
+                closeActive();
               },
             },
 
-            { icon: Bell, label: "Notifications", color: "amber", onClick: () => {} },
+            { icon: Bell, label: "Notifications", color: "amber", onClick: onOpen },
             {
               icon: theme === "dark" ? Moon : Sun,
               onClick: () => setTheme(theme === "dark" ? "light" : "dark"),
@@ -172,6 +178,7 @@ const MorePopover = ({ children }: MorePopoverProps) => {
               color: "green",
               onClick: () => {
                 router.push("/help/about-us");
+                closeActive();
               },
             },
           ].map((item, idx) => (
