@@ -9,7 +9,7 @@ export const InviteUserToTeam = z.object({
 export const AcceptRequest = z.object({
   teamId: z.string({ message }),
   reqId: z.string({ message }),
-  fromId: z.string({}),
+  toId: z.string({ message }),
 });
 
 export const DeclineRequest = z.object({

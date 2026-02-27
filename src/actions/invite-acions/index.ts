@@ -65,7 +65,7 @@ const inviteInTeamHandler = async (
 };
 
 const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeForAccept> => {
-  const { reqId, teamId, fromId } = data;
+  const { reqId, teamId, toId } = data;
 
   const user = await currentUser();
 
@@ -79,7 +79,7 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
   try {
     player = await db.player.findFirst({
       where: {
-        userId: fromId,
+        userId: toId,
         teamId,
       },
     });
@@ -92,6 +92,7 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
     request = await db.teamRequest.findUnique({
       where: {
         id: reqId,
+        isInvite: true,
       },
     });
 
@@ -121,14 +122,14 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
         error: "Cannot find the team!",
       };
 
-    if (team.players.findIndex((pl) => pl.userId === fromId) !== -1)
+    if (team.players.findIndex((pl) => pl.userId === toId) !== -1)
       return {
         error: "Already in the team!",
       };
 
     player = await db.player.create({
       data: {
-        userId: fromId,
+        userId: toId,
         teamId,
       },
     });

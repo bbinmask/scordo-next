@@ -118,7 +118,7 @@ const TeamIdPage = () => {
   useEffect(() => {
     if (user) {
       const index = team?.players.findIndex((pl) => pl.user.username === user?.username);
-      if (index !== -1) setAlreadyInTeam(true);
+      if (index && index !== -1) setAlreadyInTeam(true);
     }
   }, [user, team]);
 
@@ -361,6 +361,8 @@ const TeamHeader = ({
     if (isAlreadySent || alreadyInTeam) return;
     executeSentRequest({ teamId: team.id });
   };
+
+  console.log({ alreadyInTeam, alreadySent });
 
   return (
     <header className="relative w-full">

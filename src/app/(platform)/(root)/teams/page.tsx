@@ -181,10 +181,10 @@ function Invitations() {
     },
   });
 
-  const handleAccept = (id: string, teamId: string, fromId: string) => {
+  const handleAccept = (id: string, teamId: string, toId: string) => {
     setInviteId(id);
 
-    executeAccept({ teamId, reqId: id, fromId });
+    executeAccept({ teamId, reqId: id, toId });
   };
   const handleDecline = (id: string, teamId: string) => {
     setInviteId(id);
@@ -198,9 +198,6 @@ function Invitations() {
         <h2 className="primary-text flex items-center gap-3 font-[poppins] text-lg font-black tracking-tighter uppercase italic">
           <div className="relative">
             <Bell size={20} className="text-green-600" />
-            {teamInvites?.length ? (
-              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 ring-1 ring-white dark:ring-slate-900" />
-            ) : null}
           </div>
           Inbox
         </h2>
@@ -242,7 +239,7 @@ function Invitations() {
                 <div className="flex space-x-2 font-[poppins]">
                   <button
                     disabled={isAccepting || isCanceling}
-                    onClick={() => handleAccept(invite.id, invite.teamId, invite.fromId)}
+                    onClick={() => handleAccept(invite.id, invite.teamId, invite.toId)}
                     className="flex-1 rounded-xl bg-green-600 py-2 text-[10px] font-bold text-white uppercase transition-opacity hover:opacity-90"
                   >
                     {isAccepting && inviteId === invite.id ? (
