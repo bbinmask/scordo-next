@@ -232,6 +232,13 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
       where: {
         id: teamId,
       },
+      include: {
+        players: {
+          select: {
+            userId: true,
+          },
+        },
+      },
     });
 
     if (!team)
@@ -259,6 +266,11 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
         },
       });
     } else {
+      if (team.players.findIndex((pl) => pl.userId === user.id) !== -1)
+        return {
+          error: `You are already in the team!`,
+        };
+
       request = await db.teamRequest.create({
         data: {
           toId: user.id,
