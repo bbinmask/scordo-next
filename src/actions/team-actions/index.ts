@@ -268,6 +268,8 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
       });
     }
   } catch (error: any) {
+    console.log({ error: error.message });
+
     return {
       error: error.message,
     };
@@ -279,7 +281,7 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
 };
 
 const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeForAccept> => {
-  const { fromId, reqId, teamId } = data;
+  const { id } = data;
 
   const user = await currentUser();
 
@@ -293,7 +295,7 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
   try {
     request = await db.teamRequest.findUnique({
       where: {
-        id: reqId,
+        id,
       },
     });
 
@@ -304,7 +306,7 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
 
     team = await db.team.findUnique({
       where: {
-        id: teamId,
+        id: request.teamId,
       },
       include: {
         players: true,
@@ -318,8 +320,8 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
 
     player = await db.player.findFirst({
       where: {
-        userId: fromId,
-        teamId,
+        userId: request.toId,
+        teamId: request.teamId,
       },
     });
 
@@ -328,21 +330,21 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
         error: `You are already in the team!`,
       };
 
-    if (team.players.findIndex((pl) => pl.id === player?.id))
+    if (team.players.findIndex((pl) => pl.id === player?.id) !== -1)
       return {
         error: "Player is already in the team!",
       };
 
     await db.player.create({
       data: {
-        userId: fromId,
-        teamId,
+        userId: request.toId,
+        teamId: request.teamId,
       },
     });
 
     await db.teamRequest.delete({
       where: {
-        id: reqId,
+        id,
       },
     });
   } catch (error: any) {

@@ -42,13 +42,14 @@ const friendshipWithBoth = Prisma.validator<Prisma.FriendshipDefaultArgs>()({
 const teamRequestWithDetails = Prisma.validator<Prisma.TeamRequestDefaultArgs>()({
   include: {
     team: true,
-    from: true,
+    to: true,
   },
 });
 
 const tournamentRequestWithDetails = Prisma.validator<Prisma.TournamentRequestDefaultArgs>()({
   include: {
     tournament: true,
+    team: true,
   },
 });
 

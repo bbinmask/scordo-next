@@ -2,11 +2,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { EllipsisVertical, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useUpdateLogoAndBanner, useUpdateTeam } from "@/hooks/store/use-team";
-import { useNotificationModal } from "@/hooks/store/use-team";
 import UpdateTeamImgModal from "./modals/UpdateTeamImgModal";
 import { Team } from "@/generated/prisma";
 import UpdateTeamModal from "./modals/UpdateTeamModal";
-import Requests from "./Requests";
 import { ChangeEvent, useRef, useState } from "react";
 import { debounce } from "lodash";
 import { useAction } from "@/hooks/useAction";
@@ -16,11 +14,14 @@ import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { useOnClickOutside } from "usehooks-ts";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import { useRouter } from "next/navigation";
+import { useRequestModal } from "@/hooks/store/use-profile";
 
 interface OptionsPopoverProps {
   team: Team;
 }
 const OptionsPopover = ({ team }: OptionsPopoverProps) => {
+  const router = useRouter();
+
   const {
     isOpen: isProfileOpen,
     onClose: onProfileClose,
@@ -28,7 +29,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
   } = useUpdateLogoAndBanner();
   const { isOpen: isEditOpen, onClose: onEditClose, onOpen: onEditOpen } = useUpdateTeam();
 
-  const router = useRouter();
+  const { onOpen: onNotificationOpen } = useRequestModal();
 
   const popoverRef = useRef<any>(null);
 
@@ -74,7 +75,6 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
       <PopoverTrigger asChild>
         <EllipsisVertical className="h-9 w-9 rounded-lg border border-white/20 bg-white/10 p-2 text-white backdrop-blur-lg transition-all hover:bg-white/20" />
       </PopoverTrigger>
-
       <PopoverContent
         ref={popoverRef}
         align="end"
@@ -99,7 +99,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
             </span>
           </button>
           <button
-            onClick={onEditOpen}
+            onClick={onNotificationOpen}
             className="flex w-full items-center gap-3 rounded-xl p-3 transition-all hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
           >
             <span className="primary-text font-[urbanist] text-base font-semibold">Requests</span>

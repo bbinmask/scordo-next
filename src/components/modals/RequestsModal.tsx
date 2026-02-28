@@ -1,27 +1,16 @@
 "use client";
 
-import { TeamRequest, TournamentRequest } from "@/generated/prisma";
 import {
   FriendshipWithBoth,
   TournamentRequestWithDetails,
   TeamRequestWithDetails,
 } from "@/lib/types";
-import {
-  Check,
-  Inbox,
-  Shield,
-  Trophy,
-  UserPlus,
-  X,
-  ChevronLeft,
-  ChevronUp,
-  ShieldPlus,
-} from "lucide-react";
+import { Check, Trophy, UserPlus, X, ChevronLeft, ChevronUp, ShieldPlus } from "lucide-react";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { useRequestModal } from "@/hooks/store/use-profile";
 import NotFoundParagraph from "../NotFoundParagraph";
-import { capitalize, debounce } from "lodash";
+import { capitalize } from "lodash";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAction } from "@/hooks/useAction";
 import { acceptRequest } from "@/actions/user-actions";
@@ -32,9 +21,9 @@ import { useConfirmModal } from "@/hooks/useConfirmModal";
 
 interface RequestsModalProps {
   initialRequests: {
-    friendRequests: FriendshipWithBoth[];
-    tournamentRequests: TournamentRequestWithDetails[];
-    teamRequests: TeamRequestWithDetails[];
+    friendRequests?: FriendshipWithBoth[];
+    tournamentRequests?: TournamentRequestWithDetails[];
+    teamRequests?: TeamRequestWithDetails[];
   };
 }
 
@@ -76,6 +65,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
   //
 
   const handleFriendAccept = (requestId: string, reqUsername: string) => {
+    if (!requests.friendRequests) return;
     acceptFriendRequest({ reqId: requestId, reqUsername });
 
     const filteredRequests = requests.friendRequests.filter((prev) => prev.id !== requestId);
@@ -84,6 +74,8 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
   };
 
   const handleTeamAccept = (requestId: string) => {
+    if (!requests.teamRequests) return;
+
     const filteredRequests = requests.teamRequests.filter((prev) => prev.id !== requestId);
 
     setRequests((prev) => ({
@@ -93,6 +85,8 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
   };
 
   const handleTournamentAccept = (requestId: string) => {
+    if (!requests.tournamentRequests) return;
+
     const filteredRequests = requests.tournamentRequests.filter((prev) => prev.id !== requestId);
 
     setRequests((prev) => ({
@@ -102,12 +96,16 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
   };
 
   const handleFriendDecline = (requestId: string, reqUsername: string) => {
+    if (!requests.friendRequests) return;
+
     const filteredRequests = requests.friendRequests.filter((prev) => prev.id !== requestId);
 
     setRequests((prev) => ({ ...prev, friendRequests: filteredRequests }));
   };
 
   const handleTeamDecline = (requestId: string) => {
+    if (!requests.teamRequests) return;
+
     const filteredRequests = requests.teamRequests.filter((prev) => prev.id !== requestId);
 
     setRequests((prev) => ({
@@ -117,6 +115,8 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
   };
 
   const handleTournamentDecline = (requestId: string) => {
+    if (!requests.tournamentRequests) return;
+
     const filteredRequests = requests.tournamentRequests.filter((prev) => prev.id !== requestId);
 
     setRequests((prev) => ({
@@ -126,9 +126,11 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
   };
 
   const pendingCount =
-    requests?.friendRequests.length ||
-    requests?.teamRequests.length ||
-    requests?.tournamentRequests.length;
+    (requests?.friendRequests?.length || 0) +
+    (requests?.teamRequests?.length || 0) +
+    (requests?.tournamentRequests?.length || 0);
+
+  console.log({ requests });
 
   const variants = {
     hidden: { height: 0, opacity: 0 },
@@ -148,7 +150,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
           ) : (
             <div className="h-[50vh] items-start justify-start overflow-y-auto pr-2 font-[poppins]">
               {/* FRIEND REQUESTS */}
-              {requests.friendRequests.length !== 0 && (
+              {requests?.friendRequests && requests.friendRequests.length !== 0 && (
                 <>
                   <ToggleButton
                     state={toggle}
@@ -230,7 +232,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
               )}
 
               {/* TEAM REQUESTS */}
-              {requests.teamRequests.length !== 0 && (
+              {requests?.teamRequests && requests.teamRequests.length !== 0 && (
                 <>
                   <ToggleButton
                     state={toggle}
@@ -261,9 +263,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
                               className="rounded-full"
                             />
                             <div className="flex-1">
-                              <p className="primary-text text-sm font-medium">
-                                {request.from.name}
-                              </p>
+                              <p className="primary-text text-sm font-medium">{request.to.name}</p>
                               <p className="secondary-text flex items-center text-xs">
                                 <span className="mr-1">
                                   <ShieldPlus className="h-4 w-4" />
@@ -312,7 +312,7 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
               )}
 
               {/* TOURNAMENT REQUESTS */}
-              {requests.tournamentRequests.length !== 0 && (
+              {requests?.tournamentRequests && requests.tournamentRequests.length !== 0 && (
                 <>
                   <ToggleButton
                     state={toggle}

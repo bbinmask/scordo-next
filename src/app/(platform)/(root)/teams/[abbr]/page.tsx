@@ -44,6 +44,10 @@ import ConfirmModal from "@/components/modals/ConfirmModal";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { Separator } from "@/components/ui/separator";
 import PlayerModal from "./_components/PlayerModal";
+import { useNotificationModal } from "@/hooks/store/use-notification";
+import { formatDate } from "@/utils/helper/formatDate";
+import { RequestsModal } from "../_components/modals/Requests";
+import { useRequestModal } from "@/hooks/store/use-profile";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -347,7 +351,19 @@ const TeamHeader = ({
     },
   });
 
+  const { isOpen, onClose } = useRequestModal();
+
   const { confirmModalState, openConfirmModal, closeConfirmModal } = useConfirmModal();
+
+  const { data: teamRequests } = useQuery({
+    queryKey: ["team-requests", team.id],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/teams/${team.abbreviation}/requests`);
+
+      if (!data.success) return [];
+      return data.data;
+    },
+  });
 
   const handleLeaveTeam = () => {
     executeLeave({ teamId: team.id });
@@ -361,8 +377,6 @@ const TeamHeader = ({
     if (isAlreadySent || alreadyInTeam) return;
     executeSentRequest({ teamId: team.id });
   };
-
-  console.log({ alreadyInTeam, alreadySent });
 
   return (
     <header className="relative w-full">
@@ -419,10 +433,8 @@ const TeamHeader = ({
             </p>
             <div className="secondary-text mt-4 flex items-center justify-center gap-4 font-[urbanist] text-xs font-bold uppercase lg:justify-start">
               <div className="flex items-center gap-1">
-                <Flag className="h-3 w-3 text-emerald-500" /> Est. Nov 2023
-              </div>
-              <div className="flex items-center gap-1">
-                <Users className="h-3 w-3 text-indigo-500" /> 12.4k Following
+                <Flag className="h-3 w-3 text-emerald-500" />{" "}
+                {`Est. ${new Date(team.createdAt).getFullYear()} By ${typeof team.owner !== "string" ? team.owner.name : "NA"}`}
               </div>
             </div>
           </div>
@@ -470,6 +482,14 @@ const TeamHeader = ({
         </div>
       </div>
       <ConfirmModal {...confirmModalState} onClose={closeConfirmModal} />
+      {teamRequests && (
+        <RequestsModal
+          initialRequests={{
+            teamRequests: teamRequests,
+          }}
+          type="team"
+        />
+      )}
     </header>
   );
 };

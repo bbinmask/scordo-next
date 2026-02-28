@@ -20,15 +20,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ abbr
 
     const requests = await db.teamRequest.findMany({
       where: {
-        toId: team.ownerId,
+        fromId: team.ownerId,
+        isInvite: false,
         teamId: team.id,
+        status: "pending",
       },
       include: {
-        from: true,
+        to: true,
+        team: true,
       },
     });
 
-    return NextResponse.json(new ApiResponse(requests, 200));
+    return NextResponse.json(new ApiResponse(requests));
   } catch (error) {
     return NextResponse.error();
   }

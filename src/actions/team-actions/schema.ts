@@ -34,9 +34,7 @@ export const UpdateRecruiting = z.object({
 });
 
 export const AcceptRequest = z.object({
-  fromId: z.string({ message }),
-  teamId: z.string({ message }),
-  reqId: z.string({ message }),
+  id: z.string({ message }),
 });
 
 export const LeaveTeam = z.object({
