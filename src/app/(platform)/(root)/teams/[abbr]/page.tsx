@@ -116,9 +116,9 @@ const TeamIdPage = () => {
   const { onOpen: onPlayerOpen } = usePlayerModal();
 
   useEffect(() => {
-    if (user) {
-      const index = team?.players.findIndex((pl) => pl.user.username === user?.username);
-      if (index && index !== -1) setAlreadyInTeam(true);
+    if (user && team) {
+      const index = team.players.findIndex((pl) => pl.user.username === user?.username);
+      if (index !== -1) setAlreadyInTeam(true);
     }
   }, [user, team]);
 
