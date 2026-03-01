@@ -1,25 +1,20 @@
 "use client";
 
-import React, { useState, useRef, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, useMemo } from "react";
 import { debounce } from "lodash";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, Users, Shield, Trophy } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Search, Users, Shield, Trophy, Swords } from "lucide-react";
 import AfterSearch from "./_components/AfterSearch";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Carousel } from "@/components/carousel";
-
-/* -------------------- Filters -------------------- */
 
 const filters = [
   { label: "All", value: "all", icon: Search },
   { label: "Users", value: "users", icon: Users },
   { label: "Teams", value: "teams", icon: Shield },
+  { label: "Matches", value: "matches", icon: Swords },
   { label: "Tournaments", value: "tournaments", icon: Trophy },
 ] as const;
-
-/* -------------------- Component -------------------- */
 
 const ExplorePage = () => {
   const router = useRouter();
@@ -29,19 +24,17 @@ const ExplorePage = () => {
   const initialQuery = searchParams.get("query") ?? "";
 
   const [query, setQuery] = useState(initialQuery);
-  const [activeFilter, setActiveFilter] = useState<"all" | "users" | "teams" | "tournaments">(
-    "all"
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "users" | "teams" | "tournaments" | "matches"
+  >("all");
+
+  const debouncedSetQuery = useMemo(
+    () =>
+      debounce((value: string) => {
+        router.replace(value ? `${pathname}?query=${encodeURIComponent(value)}` : pathname);
+      }, 500),
+    [router, pathname]
   );
-
-  /* -------------------- Debounce (SAFE) -------------------- */
-
-  const debouncedSetQuery = useRef(
-    debounce((value: string) => {
-      setQuery(value);
-      router.replace(value ? `${pathname}?query=${encodeURIComponent(value)}` : pathname);
-    }, 500)
-  ).current;
-
   useEffect(() => {
     return () => {
       debouncedSetQuery.cancel();
@@ -49,7 +42,9 @@ const ExplorePage = () => {
   }, [debouncedSetQuery]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    debouncedSetQuery(e.target.value);
+    const value = e.target.value;
+    setQuery(value);
+    debouncedSetQuery(value);
   };
 
   const clearSearch = () => {
@@ -58,8 +53,6 @@ const ExplorePage = () => {
     router.replace(pathname);
   };
 
-  /* -------------------- Queries -------------------- */
-
   const usersQuery = useQuery({
     queryKey: ["search-users", query],
     queryFn: async () => {
@@ -67,7 +60,7 @@ const ExplorePage = () => {
 
       return data.data;
     },
-    enabled: query.trim().length > 0,
+    enabled: query.trim().length > 0 && (activeFilter === "all" || activeFilter === "users"),
   });
 
   const teamsQuery = useQuery({
@@ -77,7 +70,7 @@ const ExplorePage = () => {
       return data.data;
     },
 
-    enabled: query.trim().length > 0,
+    enabled: query.trim().length > 0 && (activeFilter === "all" || activeFilter === "teams"),
   });
 
   const tournamentsQuery = useQuery({
@@ -87,7 +80,7 @@ const ExplorePage = () => {
 
       return data.data;
     },
-    enabled: query.trim().length > 0,
+    enabled: query.trim().length > 0 && (activeFilter === "all" || activeFilter === "tournaments"),
   });
 
   const results = {
@@ -98,20 +91,18 @@ const ExplorePage = () => {
 
   const isLoading = usersQuery.isLoading || teamsQuery.isLoading || tournamentsQuery.isLoading;
 
-  /* -------------------- Render -------------------- */
-
   return (
     <div className="min-h-full rounded-xl font-sans">
       {/* Search Bar */}
-      <div className="relative mx-auto p-2">
-        <div className="relative">
-          <Input
+      <div className="relative mx-auto">
+        <div className="relative p-2">
+          <input
             value={query}
             onChange={handleChange}
             placeholder="Search users, teams, tournaments..."
-            className="rounded-full border border-gray-400 p-4 pr-12 text-base focus:ring-2 focus:ring-green-600"
+            className="w-full rounded-full border border-gray-400 px-4 py-2 pr-12 text-base focus:ring-2 focus:ring-green-600"
           />
-          <Search className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-500" />
+          <Search className="absolute top-1/2 right-4 -translate-y-1/2 p-1 text-gray-500" />
         </div>
 
         {/* Filters */}
@@ -144,7 +135,7 @@ const ExplorePage = () => {
           clearSearch={clearSearch}
           isLoading={isLoading}
           results={results}
-          // activeFilter={activeFilter}
+          filter={activeFilter}
         />
       )}
     </div>

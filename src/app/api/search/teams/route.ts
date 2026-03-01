@@ -10,10 +10,20 @@ export async function GET(req: NextRequest) {
   try {
     teams = await db.team.findMany({
       where: {
-        name: {
-          contains: query,
-          mode: "insensitive",
-        },
+        OR: [
+          {
+            name: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+          {
+            abbreviation: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        ],
       },
       select: {
         id: true,

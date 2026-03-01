@@ -7,16 +7,10 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const query = searchParams.get("query")?.trim() || "";
 
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.error();
-  }
   if (!query) return NextResponse.error();
   try {
     const users = await db.user.findMany({
       where: {
-        clerkId: { not: userId },
         OR: [
           { name: { contains: query, mode: "insensitive" } },
           { username: { contains: query, mode: "insensitive" } },

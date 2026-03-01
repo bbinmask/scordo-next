@@ -14,6 +14,7 @@ interface AfterSearchProps {
   query: string;
   isLoading: boolean;
   clearSearch: () => void;
+  filter?: "all" | "users" | "teams" | "tournaments" | "matches";
 }
 
 interface SearchResultItemProps {
@@ -23,7 +24,13 @@ interface SearchResultItemProps {
   href?: string;
 }
 
-const AfterSearch = ({ results, isLoading = true, query, clearSearch }: AfterSearchProps) => {
+const AfterSearch = ({
+  results,
+  isLoading = true,
+  query,
+  clearSearch,
+  filter,
+}: AfterSearchProps) => {
   const { tournaments, teams, users } = results;
   const totalResults = tournaments?.length + teams?.length + users?.length;
 
@@ -50,7 +57,7 @@ const AfterSearch = ({ results, isLoading = true, query, clearSearch }: AfterSea
         />
       ) : (
         <div className="space-y-4">
-          {users.length > 0 && (
+          {users.length > 0 && (filter === "all" || filter === "users") && (
             <div className="space-y-2">
               {users.map((user) => (
                 <SearchResultItem
@@ -64,7 +71,7 @@ const AfterSearch = ({ results, isLoading = true, query, clearSearch }: AfterSea
             </div>
           )}
 
-          {teams.length > 0 && (
+          {teams.length > 0 && (filter === "all" || filter === "teams") && (
             <div className="space-y-2">
               {teams.map((team) => (
                 <SearchResultItem
@@ -80,7 +87,7 @@ const AfterSearch = ({ results, isLoading = true, query, clearSearch }: AfterSea
             </div>
           )}
 
-          {tournaments.length > 0 && (
+          {tournaments.length > 0 && (filter === "all" || filter === "tournaments") && (
             <div className="space-y-2">
               {tournaments.map((item) => (
                 <SearchResultItem
