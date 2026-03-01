@@ -139,7 +139,7 @@ const PlayerModal = ({
                     </span>
                   </button>
                 )}
-                {ownerId !== player.userId && (
+                {ownerId !== player.userId && captainId !== player.userId && (
                   <button
                     onClick={handleRemove}
                     disabled={isRemoving || ownerId === player.userId}
