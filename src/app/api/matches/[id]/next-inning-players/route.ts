@@ -25,48 +25,51 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
 
     if (!match) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
 
-    const lastBatted = match.innings.at(-1)?.battingTeamId === match.teamAId ? "teamA" : "teamB";
-
     const inningId = match.innings.at(-1)?.id as string;
 
-    let battingPlayers = await db.inningBatting.findMany({
+    let nextBowlingPlayers = await db.inningBatting.findMany({
       where: {
-        id: {
-          in: match.innings[0].InningBatting.map((pl) => pl.id),
-        },
         inningId,
       },
-      include: {
+      select: {
         player: {
-          include: {
-            user: true,
+          select: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+                id: true,
+              },
+            },
+            userId: true,
           },
         },
+        playerId: true,
       },
     });
 
-    let bowlingPlayers = await db.inningBowling.findMany({
+    let nextBattingPlayers = await db.inningBowling.findMany({
       where: {
-        id: {
-          in: match.innings[0].InningBowling.map((pl) => pl.id),
-        },
         inningId,
       },
-      include: {
+      select: {
         player: {
-          include: {
-            user: true,
+          select: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+                id: true,
+              },
+            },
+            userId: true,
           },
         },
+        playerId: true,
       },
     });
 
-    if (lastBatted === "teamA") {
-      const temp = battingPlayers;
-      battingPlayers = bowlingPlayers as any;
-      bowlingPlayers = temp as any;
-    }
-    return NextResponse.json(new ApiResponse({ battingPlayers, bowlingPlayers }));
+    return NextResponse.json(new ApiResponse({ nextBattingPlayers, nextBowlingPlayers }));
   } catch (error) {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }

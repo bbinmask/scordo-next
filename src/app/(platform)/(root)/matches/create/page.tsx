@@ -341,7 +341,7 @@ const CreateMatchForm: React.FC = () => {
                           <option value="T10">T10 Professional</option>
                           <option value="T20">T20 Professional</option>
                           <option value="ODI">One Day International (ODI)</option>
-                          <option value="Test">Test Match</option>
+                          {/* <option value="Test">Test Match</option> */}
                           <option value="others">Custom / Others</option>
                         </select>
                       </div>

@@ -93,12 +93,14 @@ export const StartNextInningModal = ({
   };
 
   const { data } = useQuery<{
-    battingPlayers: InningBattingDetails[];
-    bowlingPlayers: InningBowlingDetails[];
+    nextBattingPlayers: InningBattingDetails[];
+    nextBowlingPlayers: InningBowlingDetails[];
   }>({
-    queryKey: ["next-inning-batting-team", match.id],
+    queryKey: ["next-inning-players", match.id],
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/${match.id}/next-inning-players`);
+
+      console.log({ data });
 
       if (!data.success) {
         onClose();
@@ -146,11 +148,9 @@ export const StartNextInningModal = ({
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-[9px] font-black tracking-widest text-slate-400 uppercase">
-                      Opening Striker (
-                      {lastBatted === "teamA" ? match.teamB.abbreviation : match.teamA.abbreviation}
-                      )
+                      Opening Striker
                     </label>
-                    {data?.battingPlayers && (
+                    {data?.nextBattingPlayers && (
                       <select
                         required
                         value={formData.strikerId}
@@ -160,11 +160,11 @@ export const StartNextInningModal = ({
                         <option value="" className="bg-slate-900 text-slate-400">
                           Choose Batter
                         </option>
-                        {data.battingPlayers
+                        {data.nextBattingPlayers
                           .filter((p) => p.playerId !== formData.nonStrikerId)
                           .map((p) => (
                             <option
-                              key={p.id}
+                              key={p.playerId}
                               value={p.playerId}
                               className="bg-slate-900 pr-2 font-[urbanist]"
                             >
@@ -179,7 +179,7 @@ export const StartNextInningModal = ({
                     <label className="text-[9px] font-black tracking-widest text-slate-400 uppercase">
                       Non-Striker
                     </label>
-                    {data?.battingPlayers && (
+                    {data?.nextBattingPlayers && (
                       <select
                         required
                         value={formData.nonStrikerId}
@@ -189,12 +189,12 @@ export const StartNextInningModal = ({
                         <option value="" className="bg-slate-900 text-slate-400">
                           Choose Batter
                         </option>
-                        {data.battingPlayers
+                        {data.nextBattingPlayers
                           .filter((p) => p.playerId !== formData.strikerId)
                           .filter((p) => p.id !== formData.strikerId)
                           .map((p) => (
                             <option
-                              key={p.id}
+                              key={p.playerId}
                               value={p.playerId}
                               className="bg-slate-900 pr-2 font-[urbanist]"
                             >
@@ -211,7 +211,7 @@ export const StartNextInningModal = ({
                     Opening Bowler (
                     {lastBatted === "teamA" ? match.teamA.abbreviation : match.teamB.abbreviation})
                   </label>
-                  {data?.bowlingPlayers && (
+                  {data?.nextBowlingPlayers && (
                     <select
                       required
                       value={formData.bowlerId}
@@ -223,7 +223,7 @@ export const StartNextInningModal = ({
                       <option value="" className="bg-slate-900 text-slate-400">
                         Choose Bowler
                       </option>
-                      {data?.bowlingPlayers.map((p) => (
+                      {data?.nextBowlingPlayers.map((p) => (
                         <option
                           key={p.id}
                           value={p.playerId}
