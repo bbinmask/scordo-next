@@ -1,7 +1,9 @@
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import Spinner from "@/components/Spinner";
 import { Team, Tournament, User as UserProps } from "@/generated/prisma";
-import { ArrowRight, LucideProps, Shield, Trophy, User, X } from "lucide-react";
+import { MatchWithDetails } from "@/lib/types";
+import { formatDate } from "@/utils/helper/formatDate";
+import { ArrowRight, LucideProps, Shield, Swords, Trophy, User, X } from "lucide-react";
 import Link from "next/link";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 
@@ -9,6 +11,7 @@ interface AfterSearchProps {
   results: {
     users: UserProps[];
     teams: Team[];
+    matches: MatchWithDetails[];
     tournaments: Tournament[];
   };
   query: string;
@@ -31,8 +34,8 @@ const AfterSearch = ({
   clearSearch,
   filter,
 }: AfterSearchProps) => {
-  const { tournaments, teams, users } = results;
-  const totalResults = tournaments?.length + teams?.length + users?.length;
+  const { tournaments, teams, users, matches } = results;
+  const totalResults = tournaments?.length + teams?.length + users?.length + matches?.length;
 
   return (
     <div className="min-h-[400px] rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6 dark:bg-white/10">
@@ -82,6 +85,20 @@ const AfterSearch = ({
                     team.address?.city ? `${team.address?.city} (${team.address.state})` : "Go to"
                   }
                   href={`/teams/${team.abbreviation}`}
+                />
+              ))}
+            </div>
+          )}
+
+          {matches.length > 0 && (filter === "all" || filter === "teams") && (
+            <div className="space-y-2">
+              {matches.map((match) => (
+                <SearchResultItem
+                  key={match.id}
+                  icon={Swords}
+                  title={`${match.teamA.name} vs ${match.teamB.name}`}
+                  subtitle={`${match.status === "in_progress" ? "Live Now from " + match.location : match.result ? match.result : "Scheduled for " + formatDate(new Date(match.date || ""))}`}
+                  href={`/matches/${match.id}`}
                 />
               ))}
             </div>

@@ -73,6 +73,16 @@ const ExplorePage = () => {
     enabled: query.trim().length > 0 && (activeFilter === "all" || activeFilter === "teams"),
   });
 
+  const matchesQuery = useQuery({
+    queryKey: ["search-matches", query],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/search/matches?query=${query}`);
+      return data.data;
+    },
+
+    enabled: query.trim().length > 0 && (activeFilter === "all" || activeFilter === "matches"),
+  });
+
   const tournamentsQuery = useQuery({
     queryKey: ["search-tournaments", query],
     queryFn: async () => {
@@ -86,6 +96,7 @@ const ExplorePage = () => {
   const results = {
     users: usersQuery.data ?? [],
     teams: teamsQuery.data ?? [],
+    matches: matchesQuery.data ?? [],
     tournaments: tournamentsQuery.data ?? [],
   };
 
