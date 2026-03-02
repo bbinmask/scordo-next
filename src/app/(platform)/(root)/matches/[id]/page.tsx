@@ -8,7 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import React, { useMemo, useState, startTransition } from "react";
 import { MapPin, Calendar, Activity, Gavel, Share2 } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
-import Spinner, { DefaultLoader } from "@/components/Spinner";
+import { DefaultLoader } from "@/components/Spinner";
 import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { addOfficials, startNextInning } from "@/actions/match-actions";
@@ -94,6 +94,21 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   const [isStartingNextInning, setIsStartingNextInning] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+  const players: PlayerWithUser[] = useMemo(() => {
+    const teamAPlayers = match?.teamA.players || [];
+    const teamBPlayers = match?.teamB.players || [];
+
+    const uniquePlayers = Array.from(
+      new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
+    ).filter((pl) => !match?.matchOfficials.some((official) => official.userId === pl.userId));
+
+    return uniquePlayers as PlayerWithUser[];
+  }, [match]);
+
+  const isOrganizer = useMemo(() => {
+    return match?.organizerId === user?.id;
+  }, [user, match]);
+
   const handleOpen = () => {
     setIsOpen(true);
   };
@@ -136,21 +151,6 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   };
 
   const handleRestartMatch = () => {};
-
-  const players: PlayerWithUser[] = useMemo(() => {
-    const teamAPlayers = match?.teamA.players || [];
-    const teamBPlayers = match?.teamB.players || [];
-
-    const uniquePlayers = Array.from(
-      new Map([...teamAPlayers, ...teamBPlayers].map((p) => [p.userId, p])).values()
-    ).filter((pl) => !match?.matchOfficials.some((official) => official.userId === pl.userId));
-
-    return uniquePlayers as PlayerWithUser[];
-  }, [match]);
-
-  const isOrganizer = useMemo(() => {
-    return match?.organizerId === user?.id;
-  }, [user, match]);
 
   return (
     <div className={`font-sans transition-colors duration-500`}>

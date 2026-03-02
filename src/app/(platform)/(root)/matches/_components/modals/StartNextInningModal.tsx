@@ -37,8 +37,9 @@ import { MatchStatus } from "@/generated/prisma";
 import { startNextInning } from "@/actions/match-actions";
 import { useAction } from "@/hooks/useAction";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { useChannel } from "ably/react";
 
 interface StartNextInningModalProps {
   isOpen: boolean;
@@ -54,7 +55,7 @@ export const StartNextInningModal = ({
   match,
 }: StartNextInningModalProps) => {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const { execute, isLoading: isSubmitting } = useAction(startNextInning, {
     onSuccess() {
       toast.success("Match Started");
@@ -96,7 +97,7 @@ export const StartNextInningModal = ({
     nextBattingPlayers: InningBattingDetails[];
     nextBowlingPlayers: InningBowlingDetails[];
   }>({
-    queryKey: ["next-inning-players", match.id],
+    queryKey: ["next-inning", match.id],
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/${match.id}/next-inning-players`);
 
@@ -108,6 +109,12 @@ export const StartNextInningModal = ({
       }
       return data.data;
     },
+  });
+
+  useChannel(`match:${match.id}`, "next-inning", async (msg) => {
+    await queryClient.refetchQueries({
+      queryKey: ["match", match.id],
+    });
   });
 
   if (!innings) return null;

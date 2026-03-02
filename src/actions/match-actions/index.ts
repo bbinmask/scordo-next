@@ -925,6 +925,12 @@ const startNextInningHandler = async (
         data: { status: "in_progress" },
       });
 
+      ablyServer.channels.get(`match:${matchId}`).publish("next-inning", {
+        inningId: createdInning.id,
+        battingTeamId,
+        bowlingTeamId,
+      });
+
       return createdInning;
     });
   } catch {

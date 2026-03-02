@@ -105,6 +105,8 @@ export const WicketDetailsModal = ({
   const handleSave = () => {
     if (selectedBatsmanId.trim() === "" && selectedConfig?.id === "RUN_OUT") {
       toast.error("Select out batsman!");
+    } else if (selectedNextBatsmanId.trim() === "" && playersLeftToBat.length > 0) {
+      toast.error("Select next batsman!");
     } else
       onConfirm(runs, {
         nextBatsmanId: selectedNextBatsmanId,
