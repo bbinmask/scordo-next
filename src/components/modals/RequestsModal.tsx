@@ -57,13 +57,6 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
     },
   });
 
-  // const {} = useAction(reject);
-  // const {} = useAction();
-  // const {} = useAction();
-  // const {} = useAction();
-
-  //
-
   const handleFriendAccept = (requestId: string, reqUsername: string) => {
     if (!requests.friendRequests) return;
     acceptFriendRequest({ reqId: requestId, reqUsername });
@@ -129,8 +122,6 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
     (requests?.friendRequests?.length || 0) +
     (requests?.teamRequests?.length || 0) +
     (requests?.tournamentRequests?.length || 0);
-
-  console.log({ requests });
 
   const variants = {
     hidden: { height: 0, opacity: 0 },

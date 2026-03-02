@@ -16,7 +16,6 @@ export function MatchRequests() {
     queryKey: ["match-requests"],
     queryFn: async () => {
       const { data } = await axios.get("/api/me/matches/requests");
-
       return data.data;
     },
   });
