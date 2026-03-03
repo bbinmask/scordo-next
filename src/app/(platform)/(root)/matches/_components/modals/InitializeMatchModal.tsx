@@ -31,6 +31,8 @@ import { MatchStatus } from "@/generated/prisma";
 import { initializeMatch } from "@/actions/match-actions";
 import { useAction } from "@/hooks/useAction";
 import { useRouter } from "next/navigation";
+import { useChannel } from "ably/react";
+import { useQueryClient } from "@tanstack/react-query";
 export const InitializeMatchModal = ({
   isOpen,
   onClose,
@@ -43,7 +45,7 @@ export const InitializeMatchModal = ({
   match: MatchWithDetails;
 }) => {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const { execute: executeInitialize, isLoading: isSubmitting } = useAction(initializeMatch, {
     onSuccess() {
       toast.success("Match Started");
@@ -127,6 +129,10 @@ export const InitializeMatchModal = ({
       toast.error("Player limit exceeds!");
     }
   };
+
+  useChannel(`match:${match.id}`, "match-start", (msg) => {
+    queryClient.invalidateQueries({ queryKey: ["matches", match.id] });
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

@@ -62,7 +62,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
 
       if (!data.success) return setIsOverFinished(false);
 
-      setIsOverFinished(data.data);
+      setIsOverFinished(data.data && match.status !== "inning_completed");
 
       return data.data;
     },
@@ -238,6 +238,8 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     });
   });
 
+  console.log({ match });
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between px-4">
@@ -369,7 +371,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       <SelectBowlerModal
         isSaving={isChanging}
         bowlers={bowlingPlayers.filter(
-          (bowler) => bowler.playerId !== innings.currentBowlerId || bowler.overs >= match.overLimit
+          (bowler) => bowler.playerId !== innings.currentBowlerId || bowler.overs > match.overLimit
         )}
         isOpen={isOverFinished && match.status !== "inning_completed"}
         onSubmit={handleChangeBowler}

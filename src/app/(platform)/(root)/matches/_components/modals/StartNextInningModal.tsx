@@ -232,7 +232,7 @@ export const StartNextInningModal = ({
                       </option>
                       {data?.nextBowlingPlayers.map((p) => (
                         <option
-                          key={p.id}
+                          key={p.playerId}
                           value={p.playerId}
                           className="bg-slate-900 pr-2 font-[urbanist]"
                         >

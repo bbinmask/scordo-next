@@ -57,6 +57,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
       },
     }
   );
+
   const { data: match, isLoading } = useQuery<MatchWithDetails>({
     queryKey: ["match", id],
     queryFn: async () => {
@@ -68,6 +69,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
+
   const { data: innings, isLoading: inningsLoading } = useQuery<InningDetails[]>({
     queryKey: ["match-innings", id],
     queryFn: async () => {
@@ -81,6 +83,7 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
+
   const { data: user } = useQuery<User>({
     queryKey: ["organizer", id],
     queryFn: async () => {
@@ -91,7 +94,9 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   });
 
   const [isInitializing, setIsInitializing] = useState(false);
+
   const [isStartingNextInning, setIsStartingNextInning] = useState(false);
+
   const [isOpen, setIsOpen] = useState(false);
 
   const players: PlayerWithUser[] = useMemo(() => {
@@ -200,15 +205,21 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                         >
                           Start Inning
                         </button>
+                      ) : match.status === "stopped" ? (
+                        <button
+                          onClick={() => setIsInitializing(true)}
+                          className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                        >
+                          Resume
+                        </button>
+                      ) : match.status === "in_progress" ? (
+                        <span className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
+                          <span className="h-2 w-2 animate-pulse rounded-full bg-red-600" /> Live
+                        </span>
                       ) : (
-                        match.status === "stopped" && (
-                          <button
-                            onClick={() => setIsInitializing(true)}
-                            className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
-                          >
-                            Resume
-                          </button>
-                        )
+                        <span className="rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">
+                          Completed
+                        </span>
                       )}
                     </>
                   ) : (

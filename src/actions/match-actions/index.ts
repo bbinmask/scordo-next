@@ -512,6 +512,11 @@ const initializeMatchHandler = async (
       };
 
     revalidatePath(`/matches/${matchId}`);
+
+    ablyServer.channels.get(`match:${matchId}`).publish("match-start", {
+      inning: foundInning,
+    });
+
     return {
       data: foundInning,
     };
@@ -775,7 +780,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       });
 
       if (inningNumber === 1) {
-        if (isLastWicket || inning.overs === totalOvers) {
+        if (isLastWicket || nextOver === totalOvers) {
           await tsx.match.update({
             where: {
               id: matchId,
@@ -796,15 +801,16 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
 
         if (!firstInning) return { error: "First inning not found!" };
 
-        if (
-          isLastWicket ||
-          inning.overs === totalOvers ||
-          inning.runs + teamRuns > firstInning.runs
-        ) {
-          const result =
-            inning.runs > firstInning.runs
-              ? `${battingTeam.name} won by ${playerLimit - inning.wickets} wickets`
-              : `${bowlingTeam.name} won by ${firstInning.runs - inning.runs + teamRuns} runs`;
+        if (isLastWicket || nextOver === totalOvers) {
+          let result = null;
+
+          if (inning.runs + teamRuns > firstInning.runs) {
+            result = `${battingTeam.name} won by ${playerLimit - inning.wickets} wickets`;
+          } else if (inning.runs + teamRuns < firstInning.runs) {
+            result = `${bowlingTeam.name} won by ${firstInning.runs - inning.runs + teamRuns} runs`;
+          } else {
+            result = "Match Drawn";
+          }
           await tsx.match.update({
             where: {
               id: matchId,
@@ -820,7 +826,6 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       }
     });
   } catch (error) {
-    console.log({ error });
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };

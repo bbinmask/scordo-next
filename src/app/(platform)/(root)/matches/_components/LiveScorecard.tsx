@@ -134,7 +134,7 @@ export const LiveScorecard = ({
               <span className="mb-1 block text-[10px] font-black tracking-widest text-indigo-300 uppercase">
                 CRR
               </span>
-              <p className="font-[poppins] text-2xl font-bold tracking-tighter text-emerald-400">
+              <p className="font-[poppins] text-lg font-bold tracking-tighter text-emerald-400 md:text-2xl">
                 {String(getCRR(innings[length].runs, innings[length].balls))}
               </p>
             </div>
@@ -144,7 +144,7 @@ export const LiveScorecard = ({
                 <span className="mb-1 block text-[10px] font-black tracking-widest text-indigo-300 uppercase">
                   RR
                 </span>
-                <p className="font-mono text-2xl font-black tracking-tighter text-emerald-400">
+                <p className="font-mono text-lg font-black tracking-tighter text-emerald-400 md:text-2xl">
                   {String(getRR(innings[0].runs, innings[0].balls))}
                 </p>
               </div>
