@@ -1,12 +1,10 @@
-import { getMetadata } from "@/utils/helper/getMetadata";
-import { Metadata } from "next";
 import { ReactNode } from "react";
 
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ abbr: string }>;
-}): Promise<Metadata> {
+}): Promise<any> {
   const { abbr } = await params;
 
   return {
