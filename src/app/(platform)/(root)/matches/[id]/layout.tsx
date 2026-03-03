@@ -2,7 +2,11 @@ import { db } from "@/lib/db";
 import { Metadata } from "next";
 import React from "react";
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
 
   const match = await db.match.findUnique({

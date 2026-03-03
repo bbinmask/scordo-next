@@ -399,7 +399,7 @@ const ToggleButton = ({ state, name, onClick }: ToggleButtonProps) => {
       onClick={onClick}
       className="mb-2 flex w-full items-center justify-between transition-all duration-200"
     >
-      <h3 className="font-[cal_sans]">{capitalize(`${name} Requests`)}</h3>
+      <h3 className="font-[poppins]">{capitalize(`${name} Requests`)}</h3>
       {state[name] ? <ChevronUp /> : <ChevronLeft />}
     </button>
   );

@@ -4,7 +4,7 @@ import React from "react";
 const MatchStats = ({ user }: { user: User }) => {
   return (
     <div className="container-bg p-6">
-      <h6 className="mb-4 flex items-center font-[cal_sans] text-xl">Matches Analytics</h6>
+      <h6 className="mb-4 flex items-center font-[poppins] text-xl">Matches Analytics</h6>
       <h4 className="mb-4 text-center font-[poppins] text-lg font-semibold">Winning Percentage</h4>
       <div className="mb-4">
         <small className="font-[poppins] font-semibold">Won</small>

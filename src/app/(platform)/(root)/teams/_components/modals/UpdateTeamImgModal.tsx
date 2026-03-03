@@ -32,7 +32,7 @@ const UpdateTeamImgModal = ({ isOpen, onClose, team }: UpdateTeamImgModalProps) 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-full max-w-sm rounded-lg font-[poppins]">
         <DialogHeader>
-          <DialogTitle className="p-0 font-[cal_sans] text-2xl font-normal tracking-wide">
+          <DialogTitle className="p-0 font-[poppins] text-2xl font-normal tracking-wide">
             {`Update`}
             <span className="primary-heading ml-1">{team.abbreviation.toUpperCase()}</span>
           </DialogTitle>

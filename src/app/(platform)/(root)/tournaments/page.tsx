@@ -46,7 +46,7 @@ const NavLinkCard = ({
       <div className="mb-4 rounded-full bg-blue-50 p-4 text-green-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-100">
         {IconComponent && <IconComponent className="h-8 w-8" />}
       </div>
-      <h3 className="primary-text mb-4 font-[cal_sans] text-xl transition-colors duration-300 group-hover:text-green-500">
+      <h3 className="primary-text mb-4 font-[poppins] text-xl transition-colors duration-300 group-hover:text-green-500">
         {title}
       </h3>
       <p className="secondary-text text-center font-[poppins] text-[12px] tracking-wide">
@@ -83,7 +83,7 @@ const TournamentPage = () => {
       <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-3xl p-8 md:p-12">
         {/* Header Section */}
         <div className="mb-10 text-center">
-          <h1 className="mb-4 font-[cal_sans] text-5xl leading-tight font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
+          <h1 className="mb-4 font-[poppins] text-5xl leading-tight font-extrabold tracking-tight text-gray-900 dark:text-gray-50">
             Discover & Organize Tournaments
           </h1>
           <p className="secondary-text mx-auto max-w-2xl font-[urbanist] text-lg dark:text-gray-300">

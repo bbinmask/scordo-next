@@ -21,7 +21,7 @@ const EditDetailsModal = ({ user }: EditDetailsModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="flex max-h-[80vh] w-full max-w-sm flex-col rounded-lg bg-white font-[poppins] dark:bg-gray-800">
         <DialogHeader>
-          <DialogTitle className="font-[cal_sans] text-lg font-normal tracking-wide">
+          <DialogTitle className="font-[poppins] text-lg font-normal tracking-wide">
             Update Details
           </DialogTitle>
           <Separator />

@@ -3,11 +3,6 @@ import "../app/globals.css";
 import { getMetadata } from "@/utils/helper/getMetadata";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
-const cal_sans = Cal_Sans({
-  weight: "400",
-  subsets: ["latin"],
-});
-
 const urbanist = Urbanist({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
@@ -34,7 +29,7 @@ export default function RootLayout({
       <body className="layout-background">
         <ThemeProvider>
           <main
-            className={`min-h-[calc(100vh-100px)] w-full antialiased ${poppins.className} ${urbanist.className} ${cal_sans.className} ${inter.className}`}
+            className={`min-h-[calc(100vh-100px)] w-full antialiased ${poppins.className} ${urbanist.className} ${inter.className}`}
           >
             {children}
           </main>

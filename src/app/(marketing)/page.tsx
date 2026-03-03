@@ -14,7 +14,7 @@ const MarketingPage = () => {
             <h1 className="text-main font-[poppins] text-5xl font-black saturate-200 lg:text-7xl dark:brightness-125">
               Scordo
             </h1>
-            <h3 className="mb-2 font-[cal_sans] text-xl font-bold text-wrap text-gray-800 lg:mb-6 lg:text-3xl dark:text-gray-50">
+            <h3 className="mb-2 font-[poppins] text-xl font-bold text-wrap text-gray-800 lg:mb-6 lg:text-3xl dark:text-gray-50">
               Cricket
               <span className="text-main dark:text-main mx-2">Tournament</span>
               Manager
@@ -48,13 +48,13 @@ const MarketingPage = () => {
 
         {/* Features Section */}
         <section className="mb-10">
-          <h3 className="mb-6 flex items-center font-[cal_sans] text-3xl font-bold text-gray-800 dark:text-gray-100">
+          <h3 className="mb-6 flex items-center font-[poppins] text-3xl font-bold text-gray-800 dark:text-gray-100">
             <Trophy className="text-main mr-2 h-8 w-8 contrast-50 saturate-200" /> Key Features
           </h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="transform rounded-xl border border-gray-200 bg-white p-6 text-center shadow-md transition-transform duration-300 hover:scale-105 dark:border-gray-700 dark:bg-gray-800">
               <Users className="text-main mx-auto mb-4 h-12 w-12 contrast-50 saturate-200" />
-              <h4 className="text-accent-foreground mb-2 font-[cal_sans] text-xl font-semibold">
+              <h4 className="text-accent-foreground mb-2 font-[poppins] text-xl font-semibold">
                 Teams & Players
               </h4>
               <p className="text-accent-foreground font-[urbanist] font-medium">
@@ -63,7 +63,7 @@ const MarketingPage = () => {
             </div>
             <div className="transform rounded-xl border border-gray-200 bg-white p-6 text-center shadow-md transition-transform duration-300 hover:scale-105 dark:border-gray-700 dark:bg-gray-800">
               <BarChart2 className="text-main mx-auto mb-4 h-12 w-12 contrast-50 saturate-200" />
-              <h4 className="text-accent-foreground mb-2 font-[cal_sans] text-xl font-semibold">
+              <h4 className="text-accent-foreground mb-2 font-[poppins] text-xl font-semibold">
                 Detailed Stats
               </h4>
               <p className="text-accent-foreground font-[urbanist] font-medium">
@@ -72,7 +72,7 @@ const MarketingPage = () => {
             </div>
             <div className="transform rounded-xl border border-gray-200 bg-white p-6 text-center shadow-md transition-transform duration-300 hover:scale-105 dark:border-gray-700 dark:bg-gray-800">
               <Trophy className="text-main mx-auto mb-4 h-12 w-12 contrast-50 saturate-200" />
-              <h4 className="text-accent-foreground mb-2 font-[cal_sans] text-xl font-semibold">
+              <h4 className="text-accent-foreground mb-2 font-[poppins] text-xl font-semibold">
                 Tournament Info
               </h4>
               <p className="text-accent-foreground font-[urbanist] font-medium">
@@ -83,7 +83,7 @@ const MarketingPage = () => {
         </section>
 
         <section className="bg-main dark:bg-main/80 transform rounded-2xl p-8 text-center text-white shadow-lg transition-transform duration-300 hover:scale-105 md:p-12">
-          <h3 className="mb-4 font-[cal_sans] text-3xl md:text-4xl">Ready to Catch the Action?</h3>
+          <h3 className="mb-4 font-[poppins] text-3xl md:text-4xl">Ready to Catch the Action?</h3>
           <p className="mb-6 font-[urbanist] text-lg font-semibold md:text-xl">
             Join Scordo today and never miss a moment of your favorite cricket matches!
           </p>

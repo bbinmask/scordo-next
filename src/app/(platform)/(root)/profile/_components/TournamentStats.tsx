@@ -4,7 +4,7 @@ import React from "react";
 const TournamentStats = ({ user }: { user: User }) => {
   return (
     <div className="container-bg h-full rounded-xl p-6">
-      <h6 className="mb-4 flex items-center font-[cal_sans] text-xl">Tournament Analytics</h6>
+      <h6 className="mb-4 flex items-center font-[poppins] text-xl">Tournament Analytics</h6>
       <h4 className="mb-4 text-center font-[poppins] text-lg font-semibold">Total Tournaments</h4>
       <div className="mb-4">
         <small className="font-[poppins] font-semibold">Won</small>

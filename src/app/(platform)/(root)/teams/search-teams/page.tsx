@@ -12,7 +12,7 @@ const SearchPage = () => {
   return (
     <div className="container-bg mt-10 flex w-full flex-col gap-4 rounded-xl px-4">
       <div className="h-full w-full rounded-md px-2 py-4">
-        <h1 className="text-main dark:text-hover mb-8 w-full text-center font-[cal_sans] text-2xl font-black">
+        <h1 className="text-main dark:text-hover mb-8 w-full text-center font-[poppins] text-2xl font-black">
           Search Teams
         </h1>
         <div className="relative mb-8 flex w-full items-center gap-2">

@@ -33,7 +33,7 @@ const HeroSection = ({ user }: HeroSectionProps) => {
       <div className="relative z-10">
         <header className="mb-8">
           <div>
-            <h1 className="font-[cal_sans] text-2xl font-bold text-slate-800 lg:text-3xl dark:text-slate-100">
+            <h1 className="font-[poppins] text-2xl font-bold text-slate-800 lg:text-3xl dark:text-slate-100">
               Welcome back,
             </h1>
             <span className="primary-heading font-[poppins] text-3xl font-bold lg:text-4xl">

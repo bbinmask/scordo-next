@@ -143,7 +143,7 @@ export const InitializeMatchModal = ({
               <Rocket className="h-6 w-6 text-white" />
             </div>
             <div className="flex flex-col items-start">
-              <DialogTitle className="font-[cal_sans] text-xl font-bold text-slate-900 uppercase italic dark:text-white">
+              <DialogTitle className="font-[poppins] text-xl font-bold text-slate-900 uppercase italic dark:text-white">
                 Start the Match
               </DialogTitle>
               <DialogDescription className="font-[inter] text-xs font-bold tracking-wide text-green-500 uppercase">

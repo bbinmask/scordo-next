@@ -74,7 +74,7 @@ const ProfileForm = ({ update }: { update?: boolean }) => {
   return (
     <div className="flex min-h-screen items-center justify-center p-4 font-sans">
       <div className="container-bg w-full max-w-4xl rounded-2xl border p-8 shadow-2xl backdrop-blur-sm md:p-12">
-        <h1 className="mb-2 font-[cal_sans] text-3xl md:text-4xl">Complete Your Profile</h1>
+        <h1 className="mb-2 font-[poppins] text-3xl md:text-4xl">Complete Your Profile</h1>
         <p className="text-foreground mb-8 font-[poppins]">Provide information below.</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="">

@@ -188,7 +188,7 @@ const ProfilePage = ({ user }: { user: User }) => {
           <div className="flex w-full items-center justify-between md:mt-28">
             <div className="flex-1 pb-2 text-left">
               <div className="flex flex-wrap items-center justify-start gap-3">
-                <h1 className="font-[cal_sans] text-3xl font-semibold tracking-wide md:text-5xl">
+                <h1 className="font-[poppins] text-3xl font-semibold tracking-wide md:text-5xl">
                   {user.name}
                 </h1>
               </div>
