@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 export async function generateMetadata({
   params,
 }: {
-  params: { abbr: string };
+  params: Promise<{ abbr: string }>;
 }): Promise<Metadata> {
   const { abbr } = await params;
 
