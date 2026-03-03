@@ -90,7 +90,7 @@ const AfterSearch = ({
             </div>
           )}
 
-          {matches.length > 0 && (filter === "all" || filter === "teams") && (
+          {matches.length > 0 && (filter === "all" || filter === "matches") && (
             <div className="space-y-2">
               {matches.map((match) => (
                 <SearchResultItem
