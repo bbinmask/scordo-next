@@ -1,7 +1,6 @@
 import { debounce } from "lodash";
 import { Search } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useRouter } from "next/router";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useMemo } from "react";
 
 interface SearchBarProps {
