@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, ChangeEvent, useMemo } from "react";
+import React, { useState, useEffect, ChangeEvent, useMemo, Suspense } from "react";
 import { debounce } from "lodash";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, Users, Shield, Trophy, Swords } from "lucide-react";
 import AfterSearch from "./_components/AfterSearch";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import SearchBar from "./_components/SearchBar";
+import Spinner from "@/components/Spinner";
 
 const filters = [
   { label: "All", value: "all", icon: Search },
@@ -104,17 +106,12 @@ const ExplorePage = () => {
 
   return (
     <div className="min-h-full rounded-xl font-sans">
-      {/* Search Bar */}
       <div className="relative mx-auto">
-        <div className="relative p-2">
-          <input
-            value={query}
-            onChange={handleChange}
-            placeholder="Search users, teams, tournaments..."
-            className="w-full rounded-full border border-gray-400 px-4 py-2 pr-12 text-base focus:ring-2 focus:ring-green-600"
-          />
-          <Search className="absolute top-1/2 right-4 -translate-y-1/2 p-1 text-gray-500" />
-        </div>
+        {/* Search Bar */}
+
+        <Suspense fallback={<Spinner />}>
+          <SearchBar query={query} handleChange={handleChange} />
+        </Suspense>
 
         {/* Filters */}
         <div className="mt-3 flex justify-center overflow-hidden rounded-lg border">
