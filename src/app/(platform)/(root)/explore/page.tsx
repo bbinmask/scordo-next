@@ -21,39 +21,10 @@ const filters = [
 const ExplorePage = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const initialQuery = searchParams.get("query") ?? "";
-
-  const [query, setQuery] = useState(initialQuery);
+  const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<
     "all" | "users" | "teams" | "tournaments" | "matches"
   >("all");
-
-  const debouncedSetQuery = useMemo(
-    () =>
-      debounce((value: string) => {
-        router.replace(value ? `${pathname}?query=${encodeURIComponent(value)}` : pathname);
-      }, 500),
-    [router, pathname]
-  );
-  useEffect(() => {
-    return () => {
-      debouncedSetQuery.cancel();
-    };
-  }, [debouncedSetQuery]);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-    debouncedSetQuery(value);
-  };
-
-  const clearSearch = () => {
-    debouncedSetQuery.cancel();
-    setQuery("");
-    router.replace(pathname);
-  };
 
   const usersQuery = useQuery({
     queryKey: ["search-users", query],
@@ -102,6 +73,11 @@ const ExplorePage = () => {
     tournaments: tournamentsQuery.data ?? [],
   };
 
+  const clearSearch = () => {
+    setQuery("");
+    router.replace(pathname);
+  };
+
   const isLoading = usersQuery.isLoading || teamsQuery.isLoading || tournamentsQuery.isLoading;
 
   return (
@@ -110,7 +86,7 @@ const ExplorePage = () => {
         {/* Search Bar */}
 
         <Suspense fallback={<Spinner />}>
-          <SearchBar query={query} handleChange={handleChange} />
+          <SearchBar query={query} setQuery={setQuery} />
         </Suspense>
 
         {/* Filters */}
