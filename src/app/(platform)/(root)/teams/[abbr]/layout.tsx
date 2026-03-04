@@ -1,14 +1,12 @@
 import { ReactNode } from "react";
 
-export async function generateMetadata({ params }: any) {
-  const { abbr } = await params;
-
+export async function generateMetadata() {
   return {
-    title: `${abbr} Details`.toUpperCase(),
-    description: `View ${abbr}'s detailed profile, stats, and activity.`,
+    title: "Team Details",
+    description: `View team's detailed profile, stats, and activity.`,
     openGraph: {
-      title: `${abbr}'s Profile`,
-      description: `Explore ${abbr}'s achievements and info.`,
+      title: "Team Profile",
+      description: `Explore team's achievements and info.`,
     },
   };
 }
