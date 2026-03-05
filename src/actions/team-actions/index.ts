@@ -280,7 +280,6 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
       });
     }
   } catch (error: any) {
-    console.log({ error: error.message });
 
     return {
       error: error.message,

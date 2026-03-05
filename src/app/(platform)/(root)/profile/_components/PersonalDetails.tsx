@@ -132,8 +132,6 @@ const PersonalDetails = ({
     },
   ];
 
-  console.log({ requests });
-
   return (
     <>
       <div className="bg-slate-50 pb-12 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">

@@ -129,6 +129,11 @@ export const ChangeBowler = z.object({
   bowlerId: z.string({ message: errorMessage("bowlerId") }),
 });
 
+export const ChangeStrike = z.object({
+  inningId: z.string({ message: errorMessage("inningId") }),
+  matchId: z.string({ message: errorMessage("matchId") }),
+});
+
 export const StartNextInning = z.object({
   matchId: z.string({ message }),
   strikerId: z.string({ message }),

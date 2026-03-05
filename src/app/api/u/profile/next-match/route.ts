@@ -15,15 +15,16 @@ export const GET = async () => {
     const month = now.getMonth();
     const day = now.getDate();
 
-    const startOfDayUTC = new Date(Date.UTC(year, month, day, 0, 0, 0));
-    const endOfDayUTC = new Date(Date.UTC(year, month, day, 23, 59, 59, 999));
+    // const startOfDayUTC = new Date(Date.UTC(year, month, day, 0, 0, 0));
+    // const endOfDayUTC = new Date(Date.UTC(year, month, day, 23, 59, 59, 999));
 
     const nextMatch = await db.match.findFirst({
       where: {
-        date: {
-          gte: startOfDayUTC,
-          lte: endOfDayUTC,
-        },
+        // date: {
+        //   gte: startOfDayUTC,
+        //   lte: endOfDayUTC,
+        // },
+        status: "not_started",
         OR: [
           { teamA: { players: { some: { userId: user.id } } } },
           { teamB: { players: { some: { userId: user.id } } } },
@@ -35,8 +36,6 @@ export const GET = async () => {
       },
       orderBy: { date: "asc" },
     });
-
-    console.log({ nextMatch });
 
     if (!nextMatch) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
 

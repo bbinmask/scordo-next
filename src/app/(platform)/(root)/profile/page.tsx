@@ -3,6 +3,7 @@ import PersonalDetails from "./_components/PersonalDetails";
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 import { getFriendRequests, getFriends } from "@/utils/helper/getFriends";
+import { TeamRequestWithDetails } from "@/lib/types";
 
 export interface ProfileFormData {
   newUsername: string;
@@ -58,14 +59,14 @@ const ProfilePage = async () => {
     },
   });
 
-  const teamRequests = await db.teamRequest.findMany({
+  const teamRequests : TeamRequestWithDetails[] = await db.teamRequest.findMany({
     where: {
       toId: user.id,
       isInvite: true,
     },
     include: {
       team: true,
-      from: true,
+      to: true,
     },
   });
   const tournaments = await db.tournament.findMany({
@@ -105,7 +106,6 @@ const ProfilePage = async () => {
     },
   });
 
-  console.log({ teamRequests });
 
   return (
     <div className="font-inter container mx-auto min-h-screen p-4">

@@ -101,7 +101,7 @@ export const StartNextInningModal = ({
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/${match.id}/next-inning-players`);
 
-      console.log({ data });
+      ({ data });
 
       if (!data.success) {
         onClose();

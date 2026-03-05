@@ -32,14 +32,12 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
 
   const { execute, isLoading: isSubmitting } = useAction(pushBall, {
     onSuccess(data) {
-      console.log({ data });
       if ((innings.balls + 1) % 6 === 0) {
         if (data.over < match.overs && match.playerLimit > innings.wickets + 1)
           setIsOverFinished(true);
       }
     },
     onError(error) {
-      console.log({ error });
       toast.error(error);
     },
   });
@@ -51,7 +49,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       setIsOverFinished(false);
     },
     onError(error) {
-      console.log(error);
+      toast.error(error);
     },
   });
 
@@ -109,8 +107,6 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
           wicket.batsmanId.trim() !== "" ? wicket.batsmanId : (innings.currentStrikerId as string),
       });
     } else {
-      console.log({ wicket, limit: match.playerLimit === innings.wickets + 2 });
-
       execute({
         matchId: innings.matchId,
         inningId: innings.id,
@@ -237,8 +233,6 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       queryKey: ["match", match.id],
     });
   });
-
-  console.log({ match });
 
   return (
     <div className="space-y-2">
