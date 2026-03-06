@@ -17,13 +17,7 @@ export const GET = async (req: Request) => {
 
     const upcomingMatches = await db.match.findMany({
       where: {
-        OR: [
-          {
-            date: { gte: new Date() },
-            status: "not_started",
-          },
-          { date: { lte: new Date() }, status: "not_started" },
-        ],
+        status: "not_started",
       },
       include: {
         teamA: true,
