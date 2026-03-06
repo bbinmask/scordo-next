@@ -228,7 +228,6 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
 
   useChannel(channelName, "inning-completed", async (msg) => {
     setIsOverFinished(false);
-
     await queryClient.refetchQueries({
       queryKey: ["match", match.id],
     });

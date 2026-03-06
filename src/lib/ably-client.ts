@@ -7,7 +7,7 @@ let ably: Ably.Realtime | null = null;
 export function getAblyClient() {
   if (!ably) {
     ably = new Ably.Realtime({
-      authUrl: `${process.env.NEXT_PUBLIC_HOSTNAME}/api/ably/token`,
+      authUrl: `api/ably/token`,
       autoConnect: true,
     });
   }
