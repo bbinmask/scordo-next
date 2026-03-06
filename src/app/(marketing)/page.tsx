@@ -9,9 +9,9 @@ const MarketingPage = () => {
       <Navbar />
       <div className="container mx-auto px-4 pt-16 pb-8 sm:px-6 md:px-8">
         {/* Hero Section */}
-        <section className="mt-4 mb-10 flex flex-col items-start justify-between rounded-2xl bg-white bg-gradient-to-br p-6 shadow-xl md:flex-row xl:p-10">
+        <section className="container-bg mt-4 mb-10 flex flex-col items-start justify-between rounded-2xl p-6 shadow-xl md:flex-row xl:p-10">
           <div className="mb-6 xl:pt-4">
-            <h1 className="text-main font-[poppins] text-5xl font-black saturate-200 lg:text-7xl dark:brightness-125">
+            <h1 className="primary-heading font-[poppins] text-5xl font-black saturate-200 lg:text-7xl dark:brightness-125">
               Scordo
             </h1>
             <h3 className="mb-2 font-[poppins] text-xl font-bold text-wrap text-gray-800 lg:mb-6 lg:text-3xl dark:text-gray-50">
@@ -36,10 +36,11 @@ const MarketingPage = () => {
             </Button>
           </div>
           <div className="relative flex items-center justify-center md:w-1/2">
-            {/* Placeholder for a cricket-related visual (e.g., a stylized bat or ball) */}
-            <div className="absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full opacity-30 blur-3xl sm:h-64 sm:w-64 md:opacity-40"></div>
+            <div className="absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full opacity-30 blur-3xl sm:h-64 sm:w-64 md:opacity-40" />
             <img
-              src={"/hero.png"}
+              src={
+                "https://res.cloudinary.com/irfanulmadar/image/upload/v1757671381/hero_rqiked.png"
+              }
               alt="Cricket hero"
               className="relative z-10 ml-6 h-auto w-full max-w-xs rotate-3 transform rounded-xl transition-transform duration-500 hover:rotate-0 md:max-w-sm xl:max-w-md"
             />
