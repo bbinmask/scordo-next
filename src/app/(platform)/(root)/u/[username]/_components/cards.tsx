@@ -11,7 +11,7 @@ import { Friendship, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { BentoCard } from "../../../_components/cards/bento-card";
 import {
   UserPlus,
@@ -31,6 +31,11 @@ import {
   Trophy,
   LucideIcon,
   Check,
+  AlertCircle,
+  Activity,
+  Target,
+  Sword,
+  Flame,
 } from "lucide-react";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { toast } from "sonner";
@@ -44,6 +49,7 @@ import OptionsPopover from "@/components/modals/OptionsPopover";
 import { useAskToJoinModal, useJoinTheirTeamModal } from "@/hooks/store/use-user";
 import { AskToJoinTeamModal } from "./modal";
 import { getFullAddress } from "@/utils";
+import { DoughnutChart } from "../../../_components/charts/doughnut-chart";
 interface ProfileCardProps {
   user: User;
   currentUser: User;
@@ -159,6 +165,29 @@ const ProfilePage = ({ user }: { user: User }) => {
       }
     }
   };
+
+  const LoadingState = () => (
+    <div className="relative flex min-h-[400px] items-center justify-center overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 dark:border-white/10 dark:bg-slate-900/30">
+      <div className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-5">
+        <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-green-500 blur-[100px]"></div>
+        <div className="absolute right-10 bottom-10 h-64 w-64 rounded-full bg-emerald-500 blur-[100px]"></div>
+      </div>
+
+      <div className="relative z-10 text-center">
+        <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
+          {currentTab === "statschart" && <BarChart3 className="h-12 w-12 text-green-500" />}
+          {currentTab === "match-stats" && <Gamepad2 className="h-12 w-12 text-emerald-500" />}
+          {currentTab === "tournament-stats" && <Trophy className="h-12 w-12 text-amber-500" />}
+        </div>
+        <h3 className="text-2xl font-black tracking-tighter uppercase italic">
+          Loading {capitalize(currentTab)}...
+        </h3>
+        <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
+          Synchronizing with match servers
+        </p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="bg-slate-50 pb-20 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
@@ -380,10 +409,7 @@ const ProfilePage = ({ user }: { user: User }) => {
             </div>
 
             <div className="relative flex min-h-[400px] items-center justify-center overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 dark:border-white/10 dark:bg-slate-900/30">
-              <div className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-5">
-                <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-green-500 blur-[100px]"></div>
-                <div className="absolute right-10 bottom-10 h-64 w-64 rounded-full bg-emerald-500 blur-[100px]"></div>
-              </div>
+              <div className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-5"></div>
 
               <div className="relative z-10 text-center">
                 <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
@@ -609,3 +635,177 @@ export const FriendsCard = ({
     </div>
   );
 };
+
+interface RawBattingStat {
+  id: string;
+  runs: number;
+  balls: number;
+  fours: number;
+  sixes: number;
+  isOut: boolean;
+  dots: number;
+}
+
+interface RawBowlingStat {
+  id: string;
+  overs: number;
+  balls: number;
+  runs: number;
+  wickets: number;
+  maidens: number;
+  noBalls: number;
+  wides: number;
+}
+
+interface StatsProps {
+  user: User;
+  battingRecords: RawBattingStat[];
+  bowlingRecords: RawBowlingStat[];
+}
+
+export const Stats = ({ user, battingRecords, bowlingRecords }: StatsProps) => {
+  const batting = useMemo(() => {
+    const runs = battingRecords.reduce((acc, curr) => acc + curr.runs, 0);
+    const balls = battingRecords.reduce((acc, curr) => acc + curr.balls, 0);
+    const fours = battingRecords.reduce((acc, curr) => acc + curr.fours, 0);
+    const sixes = battingRecords.reduce((acc, curr) => acc + curr.sixes, 0);
+    const dots = battingRecords.reduce((acc, curr) => acc + curr.dots, 0);
+    const outs = battingRecords.filter((r) => r.isOut).length;
+
+    return {
+      runs,
+      balls,
+      fours,
+      sixes,
+      dots,
+      avg: outs > 0 ? (runs / outs).toFixed(2) : runs.toFixed(2),
+      sr: balls > 0 ? ((runs / balls) * 100).toFixed(2) : "0.00",
+      boundaryRuns: fours * 4 + sixes * 6,
+      fieldRuns: runs - (fours * 4 + sixes * 6),
+    };
+  }, [battingRecords]);
+
+  const bowling = useMemo(() => {
+    const wickets = bowlingRecords.reduce((acc, curr) => acc + curr.wickets, 0);
+    const runsConceded = bowlingRecords.reduce((acc, curr) => acc + curr.runs, 0);
+    const totalBalls = bowlingRecords.reduce((acc, curr) => acc + (curr.overs * 6 + curr.balls), 0);
+    const extras = bowlingRecords.reduce((acc, curr) => acc + curr.wides + curr.noBalls, 0);
+
+    return {
+      wickets,
+      runsConceded,
+      extras,
+      econ: totalBalls > 0 ? ((runsConceded / totalBalls) * 6).toFixed(2) : "0.00",
+      pressureShare:
+        totalBalls > 0 ? Math.round(((totalBalls - runsConceded / 4) / totalBalls) * 100) : 0,
+    };
+  }, [bowlingRecords]);
+
+  // Chart Data Constructions
+  const battingChartData = [
+    { name: "Boundary Runs", value: batting.boundaryRuns, fill: "#10b981" },
+    { name: "Field Runs", value: batting.fieldRuns, fill: "#3b82f6" },
+  ];
+
+  const bowlingChartData = [
+    { name: "Legal Runs", value: bowling.runsConceded, fill: "#ef4444" },
+    { name: "Extras", value: bowling.extras, fill: "#f59e0b" },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+      {/* Batting Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3 px-4">
+          <Sword className="text-emerald-500" />
+          <h3 className="text-2xl font-black tracking-tight uppercase italic">Batting Intensity</h3>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <DoughnutChart
+            title="Impact Breakdown"
+            description="Boundary vs Running Runs"
+            data={battingChartData}
+            centerValue={batting.runs}
+            centerLabel="Total Runs"
+            footerText="Power output increased by 12%"
+            colorScheme="emerald"
+          />
+          <div className="grid grid-cols-1 gap-4">
+            <StatBox
+              label="Career Avg"
+              value={batting.avg}
+              icon={Target}
+              color="emerald"
+              subLabel="Elite"
+            />
+            <StatBox label="Strike Rate" value={batting.sr} icon={Zap} color="emerald" />
+            <StatBox label="Dot Balls" value={batting.dots} icon={Clock} color="emerald" />
+          </div>
+        </div>
+      </div>
+
+      {/* Bowling Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3 px-4">
+          <Flame className="text-indigo-500" />
+          <h3 className="text-2xl font-black tracking-tight uppercase italic">Bowling Precision</h3>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <DoughnutChart
+            title="Control Analysis"
+            description="Runs vs Extra Distribution"
+            data={bowlingChartData}
+            centerValue={bowling.wickets}
+            centerLabel="Wickets"
+            footerText="Accuracy stable at 94%"
+            colorScheme="indigo"
+          />
+          <div className="grid grid-cols-1 gap-4">
+            <StatBox
+              label="Economy"
+              value={bowling.econ}
+              icon={Activity}
+              color="indigo"
+              subLabel="RPO"
+            />
+            <StatBox
+              label="Total Extras"
+              value={bowling.extras}
+              icon={AlertCircle}
+              color="indigo"
+            />
+            <StatBox
+              label="Pressure"
+              value={`${bowling.pressureShare}%`}
+              icon={ShieldCheck}
+              color="indigo"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const StatBox = ({ label, value, subLabel, icon: Icon, color = "emerald" }: any) => (
+  <div className="group rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-slate-900">
+    <div className="mb-3 flex items-start justify-between">
+      <div
+        className={`rounded-xl p-2.5 bg-${color}-500/10 text-${color}-500 transition-transform group-hover:scale-110`}
+      >
+        <Icon size={18} />
+      </div>
+      {subLabel && (
+        <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
+          {subLabel}
+        </span>
+      )}
+    </div>
+    <p className="mb-1 text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase">{label}</p>
+    <p className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+      {value}
+    </p>
+  </div>
+);
