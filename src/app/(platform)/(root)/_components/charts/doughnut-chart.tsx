@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
 import { TrendingUp } from "lucide-react";
-import { Label, Pie, PieChart } from "recharts";
+import { Cell, Label, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 import {
   Card,
@@ -12,69 +11,96 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartTooltip } from "@/components/ui/chart";
 
 export const description = "A donut chart with text";
 
-export function DoughnutChart({ data, config }: { data: any; config: ChartConfig }) {
-  const totalVisitors = useMemo(() => {
-    return data.reduce((acc, curr) => acc + curr.visitors, 0);
-  }, []);
-
+export function DoughnutChart({
+  title,
+  description,
+  data,
+  centerLabel,
+  centerValue,
+  footerText,
+  colorScheme = "emerald",
+}: {
+  title: string;
+  description: string;
+  data: { name: string; value: number; fill: string }[];
+  centerLabel: string;
+  centerValue: string | number;
+  footerText: string;
+  colorScheme?: string;
+}) {
   return (
-    <Card className="container-bg w-full border-none shadow-none">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Stats</CardTitle>
-        <CardDescription>January - Now 2025</CardDescription>
+    <Card className="w-full shadow-lg transition-all hover:shadow-xl">
+      <CardHeader className="items-center text-center">
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer config={config} className="mx-auto aspect-square max-h-[250px]">
-          <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-            <Pie data={data} dataKey="visitors" nameKey="browser" innerRadius={60} strokeWidth={5}>
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
+        <div className="relative mx-auto aspect-square max-h-[250px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <ChartTooltip
+                contentStyle={{
+                  borderRadius: "16px",
+                  border: "none",
+                  fontWeight: "bold",
+                  fontSize: "10px",
+                }}
+                itemStyle={{ textTransform: "uppercase" }}
+              />
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={60}
+                outerRadius={80}
+                strokeWidth={5}
+                paddingAngle={5}
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
                         >
-                          {totalVisitors.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Visitors
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 leading-none font-medium">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-slate-900 text-2xl font-black tracking-tighter italic dark:fill-white"
+                          >
+                            {centerValue}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 20}
+                            className="fill-slate-400 text-[9px] font-black tracking-widest uppercase"
+                          >
+                            {centerLabel}
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-        <div className="text-muted-foreground leading-none">Showing status from January to Now</div>
+      </CardContent>
+      <CardFooter className="items-center text-center">
+        <div className="flex items-center gap-2 text-[10px] leading-none font-black tracking-widest text-slate-500 uppercase">
+          {footerText} <TrendingUp className={`h-3 w-3 text-${colorScheme}-500`} />
+        </div>
       </CardFooter>
     </Card>
   );
