@@ -1,0 +1,39 @@
+import UserProfile from "./cards";
+import { db } from "@/lib/db";
+import { notFound, redirect } from "next/navigation";
+import { currentUser as getCurrentUser } from "@/lib/currentUser";
+
+interface UserDetailsProps {
+  params: Promise<{ username: string }>;
+}
+
+const UserDetails = async ({ params }: UserDetailsProps) => {
+  const { username } = await params;
+
+  if (!username) return notFound();
+
+  const user = await db.user.findUnique({
+    where: {
+      username,
+    },
+    include: {
+      teamsOwned: true,
+    },
+  });
+
+  const currentUser = await getCurrentUser();
+
+  if (!user || !currentUser) return notFound();
+
+  if (user.id === currentUser.id) {
+    redirect("/profile");
+  }
+
+  return (
+    <div className="min-h-[400px] w-full">
+      <UserProfile key={user.id} user={user} />
+    </div>
+  );
+};
+
+export default UserDetails;
