@@ -84,8 +84,11 @@ const ProfilePage = ({ user }: { user: User }) => {
       label: "Join their team",
     },
   ];
+  const tabs = ["statschart", "match-stats", "tournament-stats"];
 
-  const [currentTab, setCurrentTab] = useState("statschart");
+  const [currentTab, setCurrentTab] = useState<"statschart" | "match-stats" | "tournament-stats">(
+    "statschart"
+  );
   const [friendshipStatus, setFriendshipStatus] = useState<
     "accepted" | "none" | "declined" | "pending" | "recieved" | "blocked"
   >("none");
@@ -389,10 +392,12 @@ const ProfilePage = ({ user }: { user: User }) => {
           <div className="mt-4 md:col-span-12">
             <div className="mb-6 flex flex-col items-center justify-between gap-4 px-2 md:flex-row">
               <div className="flex w-full gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
-                {["statschart", "match-stats", "tournament-stats"].map((tab) => (
+                {tabs.map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => setCurrentTab(tab)}
+                    onClick={() =>
+                      setCurrentTab(tab as "statschart" | "match-stats" | "tournament-stats")
+                    }
                     className={`rounded-xl px-6 py-2 font-[urbanist] text-sm font-semibold whitespace-nowrap transition-all ${
                       currentTab === tab
                         ? "bg-white text-green-600 shadow-sm dark:bg-green-600 dark:text-white"
