@@ -33,7 +33,7 @@ export function DoughnutChart({
   colorScheme?: string;
 }) {
   return (
-    <Card className="w-full shadow-lg transition-all hover:shadow-xl">
+    <Card className="w-full border border-slate-50 bg-slate-200 p-5 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-slate-900">
       <CardHeader className="items-center text-center">
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -57,7 +57,8 @@ export function DoughnutChart({
                 nameKey="name"
                 innerRadius={60}
                 outerRadius={80}
-                strokeWidth={5}
+                strokeWidth={3}
+                blendStroke
                 paddingAngle={5}
               >
                 {data.map((entry, index) => (

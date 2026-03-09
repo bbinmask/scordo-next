@@ -59,7 +59,7 @@ const ProfilePage = async () => {
     },
   });
 
-  const teamRequests : TeamRequestWithDetails[] = await db.teamRequest.findMany({
+  const teamRequests: TeamRequestWithDetails[] = await db.teamRequest.findMany({
     where: {
       toId: user.id,
       isInvite: true,
@@ -106,9 +106,8 @@ const ProfilePage = async () => {
     },
   });
 
-
   return (
-    <div className="font-inter container mx-auto min-h-screen p-4">
+    <div className="font-inter container mx-auto min-h-screen">
       <PersonalDetails
         user={user}
         requests={{ friendRequests, tournamentRequests, teamRequests }}

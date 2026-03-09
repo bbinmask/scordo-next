@@ -6,35 +6,31 @@ import { capitalize } from "lodash";
 import {
   BarChart3,
   Calendar,
-  CalendarIcon,
   Clock,
   ExternalLink,
   Gamepad2,
   Info,
   Mail,
-  MailIcon,
   MapPin,
   ShieldCheck,
   Trophy,
   UserIcon,
   Users,
-  Verified,
   Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { CgGenderFemale, CgGenderMale } from "react-icons/cg";
-import { MdLeaderboard, MdLocationPin, MdOutlineEventAvailable } from "react-icons/md";
-import StatsChart from "./StatsChart";
+import { MdLeaderboard } from "react-icons/md";
+import { BattingStats } from "../../_components/cards/BattingStats";
 import MatchStats from "./MatchStats";
 import TournamentStats from "./TournamentStats";
-import Tabs from "../../_components/Tabs";
-import FriendRequests from "./FriendRequests";
 import { useForm } from "react-hook-form";
 import { ProfileFormData } from "../page";
 import { useFriendsModal } from "@/hooks/store/use-friends";
 import FriendsModal from "@/components/modals/FriendsModal";
 import {
   FriendshipWithBoth,
+  InningBattingDetails,
+  InningBowlingDetails,
   TeamRequestWithDetails,
   TournamentRequestWithDetails,
 } from "@/lib/types";
@@ -45,6 +41,9 @@ import EditDetailsModal from "./EditDetailsModal";
 import RequestsModal from "@/components/modals/RequestsModal";
 import { BentoCard } from "../../_components/cards/bento-card";
 import { formatDate } from "@/utils/helper/formatDate";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { BowlingStats } from "../../_components/cards/BowlingStats";
 
 const PersonalDetails = ({
   user,
@@ -59,27 +58,39 @@ const PersonalDetails = ({
   };
   friends: User[];
 }) => {
-  const [isEditProfile, setIsEditProfile] = useState(false);
-  const [avatar, setAvatar] = useState<File | null>(null);
   const [currentTab, setCurrentTab] = useState("batting-stats");
 
-  const contentTabs = [
-    {
-      label: "Stats",
-      id: "batting-stats",
-      icon: <MdLeaderboard className="mr-1 h-4 w-4" />,
+  const { data: battingRecords, isLoading: battingRecordsLoading } = useQuery<
+    InningBattingDetails[]
+  >({
+    queryKey: ["batting-stats", user.id],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/stats/batting?userId=${user.id}`, {
+        params: {
+          userId: user.id,
+        },
+      });
+
+      if (!data.success) return [];
+      return data.data;
     },
-    {
-      label: "Matches",
-      id: "bowling-stats",
-      icon: <MdLeaderboard className="mr-1 h-4 w-4" />,
+  });
+  const { data: bowlingRecords, isLoading: bowlingRecordsLoading } = useQuery<
+    InningBowlingDetails[]
+  >({
+    queryKey: ["bowling-stats", user.id],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/stats/bowling?userId=${user.id}`, {
+        params: {
+          userId: user.id,
+        },
+      });
+
+      if (!data.success) return [];
+
+      return data.data;
     },
-    {
-      label: "Tournaments",
-      href: `/profile/${user.id}/tournament-stats`,
-      icon: <MdLeaderboard className="mr-1 h-4 w-4" />,
-    },
-  ];
+  });
 
   const {
     reset,
@@ -93,14 +104,12 @@ const PersonalDetails = ({
     },
   });
 
-  const { onOpen: openFriends } = useFriendsModal();
-
   const {
     isOpen: isProfileOpen,
     onClose: onProfileClose,
     onOpen: onProfileOpen,
   } = useProfileModal();
-  const { isOpen: isDetailOpen, onClose: onDetailClose, onOpen: onDetailOpen } = useDetailsModal();
+  const { onOpen: onDetailOpen } = useDetailsModal();
   const {
     isOpen: isRequestOpen,
     onClose: onRequestClose,
@@ -129,9 +138,11 @@ const PersonalDetails = ({
     },
   ];
 
+  console.log({ battingRecords, bowlingRecords });
+
   return (
     <>
-      <div className="bg-slate-50 pb-12 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
+      <div className="bg-slate-100 pb-20 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
         {/* Hero Banner Area */}
         <div className="relative h-64 w-full overflow-hidden bg-gradient-to-r from-emerald-600 via-green-600 to-green-800 md:h-80">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
@@ -172,7 +183,7 @@ const PersonalDetails = ({
         </div>
 
         {/* Main Bento Grid */}
-        <div className="grid grid-cols-1 gap-6 px-2 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-6 px-2 md:grid-cols-12 lg:px-8">
           {/* Bio - Large Box */}
           <BentoCard className="md:col-span-8" title="Bio" icon={Info}>
             <p className="secondary-text font-[urbanist] text-base leading-relaxed font-semibold md:text-lg">
@@ -221,32 +232,36 @@ const PersonalDetails = ({
           </BentoCard>
 
           {/* Personal Info Grid - Columnized */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:col-span-12 lg:grid-cols-4">
-            <BentoCard title="Email Address" icon={Mail}>
+          <div className="grid grid-cols-3 gap-4 lg:col-span-12 lg:grid-cols-4">
+            <BentoCard className="col-span-2 lg:col-span-1" title="Email Address" icon={Mail}>
               <p className="truncate font-[urbanist] text-sm font-semibold">{user.email}</p>
             </BentoCard>
-            <BentoCard title="Date of Birth" icon={Calendar}>
+            <BentoCard title="Availability" icon={Zap}>
+              <p className="font-[urbanist] text-sm font-semibold text-green-500">
+                {checkAvailability(user.availability)}
+              </p>
+            </BentoCard>{" "}
+            <BentoCard title="Date of Birth" className="col-span-2 lg:col-span-1" icon={Calendar}>
               <p className="font-[urbanist] text-sm font-semibold">
                 {formatDate(new Date(user.dob))}
               </p>
             </BentoCard>
-            <BentoCard title="Availability" icon={Zap}>
-              <p className="font-[urbanist] text-sm font-semibold text-green-500">
-                {user.availability}
-              </p>
-            </BentoCard>
             <BentoCard title="Friends" icon={Users}>
               <button onClick={() => {}} className="font-[urbanist] text-sm font-semibold">
-                {friends?.length}
+                {friends?.length ?? 0} Friends
               </button>
             </BentoCard>
           </div>
 
-          {/* Main Content Tabs Area */}
+          {/* Performance Tabs Area */}
           <div className="mt-4 md:col-span-12">
             <div className="mb-6 flex flex-col items-center justify-between gap-4 px-2 md:flex-row">
               <div className="flex w-full gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
-                {["batting-stats", "bowling-stats", "tournament-stats"].map((tab) => (
+                {[
+                  "batting-stats",
+                  "bowling-stats",
+                  //  "tournament-stats"
+                ].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setCurrentTab(tab)}
@@ -265,31 +280,52 @@ const PersonalDetails = ({
               </button>
             </div>
 
-            <div className="relative flex min-h-[400px] items-center justify-center overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 dark:border-white/10 dark:bg-slate-900/30">
-              <div className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-5">
-                <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-green-500 blur-[100px]"></div>
-                <div className="absolute right-10 bottom-10 h-64 w-64 rounded-full bg-emerald-500 blur-[100px]"></div>
-              </div>
-
-              <div className="relative z-10 text-center">
-                <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
-                  {currentTab === "batting-stats" && (
-                    <BarChart3 className="h-12 w-12 text-green-500" />
-                  )}
-                  {currentTab === "bowling-stats" && (
-                    <Gamepad2 className="h-12 w-12 text-emerald-500" />
-                  )}
-                  {currentTab === "tournament-stats" && (
-                    <Trophy className="h-12 w-12 text-amber-500" />
-                  )}
+            <div className="hover-card relative min-h-[400px] w-full overflow-hidden rounded-[2rem] border border-slate-200 p-8 dark:border-white/10 dark:bg-slate-900/30">
+              {battingRecordsLoading || bowlingRecordsLoading ? (
+                <div className="relative z-10 text-center">
+                  <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
+                    {currentTab === "batting-stats" && (
+                      <BarChart3 className="h-12 w-12 text-green-500" />
+                    )}
+                    {currentTab === "bowling-stats" && (
+                      <Gamepad2 className="h-12 w-12 text-emerald-500" />
+                    )}
+                    {currentTab === "tournament-stats" && (
+                      <Trophy className="h-12 w-12 text-amber-500" />
+                    )}
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tighter uppercase italic">
+                    Loading {capitalize(currentTab)}...
+                  </h3>
+                  <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
+                    Synchronizing with match servers
+                  </p>
                 </div>
-                <h3 className="text-2xl font-black tracking-tighter uppercase italic">
-                  Loading {capitalize(currentTab)}...
-                </h3>
-                <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
-                  Synchronizing with match servers
-                </p>
-              </div>
+              ) : currentTab === "batting-stats" && battingRecords?.length ? (
+                <BattingStats user={user} battingRecords={battingRecords} />
+              ) : currentTab === "bowling-stats" && bowlingRecords?.length ? (
+                <BowlingStats user={user} bowlingRecords={bowlingRecords} />
+              ) : (
+                <div className="relative z-10 text-center">
+                  <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
+                    {currentTab === "batting-stats" && (
+                      <BarChart3 className="h-12 w-12 text-green-500" />
+                    )}
+                    {currentTab === "bowling-stats" && (
+                      <Gamepad2 className="h-12 w-12 text-emerald-500" />
+                    )}
+                    {currentTab === "tournament-stats" && (
+                      <Trophy className="h-12 w-12 text-amber-500" />
+                    )}
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tighter uppercase italic">
+                    {capitalize(currentTab)}...
+                  </h3>
+                  <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
+                    No Data found
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
