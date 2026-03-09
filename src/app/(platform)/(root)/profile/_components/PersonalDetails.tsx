@@ -236,7 +236,7 @@ const PersonalDetails = ({
             <BentoCard className="col-span-2 lg:col-span-1" title="Email Address" icon={Mail}>
               <p className="truncate font-[urbanist] text-sm font-semibold">{user.email}</p>
             </BentoCard>
-            <BentoCard title="Availability" icon={Zap}>
+            <BentoCard title="Availability" className="col-span-1" icon={Zap}>
               <p className="font-[urbanist] text-sm font-semibold text-green-500">
                 {checkAvailability(user.availability)}
               </p>
@@ -246,7 +246,7 @@ const PersonalDetails = ({
                 {formatDate(new Date(user.dob))}
               </p>
             </BentoCard>
-            <BentoCard title="Friends" icon={Users}>
+            <BentoCard title="Friends" icon={Users} className="col-span-1">
               <button onClick={() => {}} className="font-[urbanist] text-sm font-semibold">
                 {friends?.length ?? 0} Friends
               </button>
@@ -256,7 +256,7 @@ const PersonalDetails = ({
           {/* Performance Tabs Area */}
           <div className="mt-4 md:col-span-12">
             <div className="mb-6 flex flex-col items-center justify-between gap-4 px-2 md:flex-row">
-              <div className="flex w-full gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
+              <div className="flex w-full justify-between gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
                 {[
                   "batting-stats",
                   "bowling-stats",
@@ -265,7 +265,7 @@ const PersonalDetails = ({
                   <button
                     key={tab}
                     onClick={() => setCurrentTab(tab)}
-                    className={`rounded-xl px-6 py-2 font-[urbanist] text-sm font-semibold whitespace-nowrap transition-all ${
+                    className={`w-full rounded-xl px-6 py-2 text-center font-[urbanist] text-sm font-semibold whitespace-nowrap transition-all ${
                       currentTab === tab
                         ? "bg-white text-green-600 shadow-sm dark:bg-green-600 dark:text-white"
                         : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"

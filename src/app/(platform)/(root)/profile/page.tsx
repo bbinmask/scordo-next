@@ -107,7 +107,7 @@ const ProfilePage = async () => {
   });
 
   return (
-    <div className="font-inter container mx-auto min-h-screen">
+    <div className="min-h-screen">
       <PersonalDetails
         user={user}
         requests={{ friendRequests, tournamentRequests, teamRequests }}

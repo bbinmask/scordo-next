@@ -56,7 +56,7 @@ export const BowlingStats = ({ user, bowlingRecords }: StatsProps) => {
           footerText={`Best bowling: ${bowling.bbi}`}
           colorScheme="emerald"
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <StatBox
             label="Matches"
             value={`${bowlingRecords.length}`}
