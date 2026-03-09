@@ -61,25 +61,22 @@ const PersonalDetails = ({
 }) => {
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [currentTab, setCurrentTab] = useState("statschart");
+  const [currentTab, setCurrentTab] = useState("batting-stats");
 
   const contentTabs = [
     {
       label: "Stats",
-      id: "statschart",
-      href: `/profile/${user.id}/stats`,
+      id: "batting-stats",
       icon: <MdLeaderboard className="mr-1 h-4 w-4" />,
     },
     {
       label: "Matches",
-      id: "match-stats",
-      href: `/profile/${user.id}/match-stats`,
+      id: "bowling-stats",
       icon: <MdLeaderboard className="mr-1 h-4 w-4" />,
     },
     {
       label: "Tournaments",
       href: `/profile/${user.id}/tournament-stats`,
-      id: "tournament-stats",
       icon: <MdLeaderboard className="mr-1 h-4 w-4" />,
     },
   ];
@@ -249,7 +246,7 @@ const PersonalDetails = ({
           <div className="mt-4 md:col-span-12">
             <div className="mb-6 flex flex-col items-center justify-between gap-4 px-2 md:flex-row">
               <div className="flex w-full gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
-                {["statschart", "match-stats", "tournament-stats"].map((tab) => (
+                {["batting-stats", "bowling-stats", "tournament-stats"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setCurrentTab(tab)}
@@ -276,10 +273,10 @@ const PersonalDetails = ({
 
               <div className="relative z-10 text-center">
                 <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
-                  {currentTab === "statschart" && (
+                  {currentTab === "batting-stats" && (
                     <BarChart3 className="h-12 w-12 text-green-500" />
                   )}
-                  {currentTab === "match-stats" && (
+                  {currentTab === "bowling-stats" && (
                     <Gamepad2 className="h-12 w-12 text-emerald-500" />
                   )}
                   {currentTab === "tournament-stats" && (
