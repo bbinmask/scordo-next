@@ -11,7 +11,7 @@ import { Friendship, User } from "@/generated/prisma";
 import { useAction } from "@/hooks/useAction";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { BentoCard } from "../../../_components/cards/bento-card";
 import {
   UserPlus,
@@ -29,27 +29,19 @@ import {
   ExternalLink,
   Gamepad2,
   Trophy,
-  LucideIcon,
   Check,
-  AlertCircle,
-  Activity,
-  Target,
-  Sword,
-  Flame,
 } from "lucide-react";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { toast } from "sonner";
-import { useFriendsModal } from "@/hooks/store/use-friends";
-import { FriendshipWithBoth } from "@/lib/types";
-import { getFriends } from "@/utils/helper/getFriends";
-import { formatDate } from "@/utils/helper/formatDate";
+import { FriendshipWithBoth, InningBattingDetails, InningBowlingDetails } from "@/lib/types";
 import ConfirmModal from "@/components/modals/ConfirmModal";
-import { getAvailabilityClass } from "@/utils/helper/classes";
 import OptionsPopover from "@/components/modals/OptionsPopover";
 import { useAskToJoinModal, useJoinTheirTeamModal } from "@/hooks/store/use-user";
 import { AskToJoinTeamModal } from "./modal";
 import { getFullAddress } from "@/utils";
-import { DoughnutChart } from "../../../_components/charts/doughnut-chart";
+import { BattingStats } from "../../../_components/cards/BattingStats";
+import { BowlingStats } from "../../../_components/cards/BowlingStats";
+import { formatDate } from "@/utils/helper/formatDate";
 interface ProfileCardProps {
   user: User;
   currentUser: User;
@@ -85,10 +77,8 @@ const ProfilePage = ({ user }: { user: User }) => {
     },
   ];
   const tabs = ["statschart", "match-stats", "tournament-stats"];
+  const [currentTab, setCurrentTab] = useState("batting-stats");
 
-  const [currentTab, setCurrentTab] = useState<"statschart" | "match-stats" | "tournament-stats">(
-    "statschart"
-  );
   const [friendshipStatus, setFriendshipStatus] = useState<
     "accepted" | "none" | "declined" | "pending" | "recieved" | "blocked"
   >("none");
@@ -111,6 +101,38 @@ const ProfilePage = ({ user }: { user: User }) => {
       }
 
       return res.data.data;
+    },
+  });
+
+  const { data: battingRecords, isLoading: battingRecordsLoading } = useQuery<
+    InningBattingDetails[]
+  >({
+    queryKey: ["batting-stats", user.id],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/stats/batting?userId=${user.id}`, {
+        params: {
+          userId: user.id,
+        },
+      });
+
+      if (!data.success) return [];
+      return data.data;
+    },
+  });
+  const { data: bowlingRecords, isLoading: bowlingRecordsLoading } = useQuery<
+    InningBowlingDetails[]
+  >({
+    queryKey: ["bowling-stats", user.id],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/stats/bowling?userId=${user.id}`, {
+        params: {
+          userId: user.id,
+        },
+      });
+
+      if (!data.success) return [];
+
+      return data.data;
     },
   });
 
@@ -388,17 +410,19 @@ const ProfilePage = ({ user }: { user: User }) => {
             </BentoCard>
           </div>
 
-          {/* Main Content Tabs Area */}
+          {/* Performance Tabs Area */}
           <div className="mt-4 md:col-span-12">
             <div className="mb-6 flex flex-col items-center justify-between gap-4 px-2 md:flex-row">
-              <div className="flex w-full gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
-                {tabs.map((tab) => (
+              <div className="flex w-full justify-between gap-1 overflow-x-auto rounded-2xl bg-slate-200/50 p-1 backdrop-blur-sm md:w-auto dark:bg-white/5">
+                {[
+                  "batting-stats",
+                  "bowling-stats",
+                  //  "tournament-stats"
+                ].map((tab) => (
                   <button
                     key={tab}
-                    onClick={() =>
-                      setCurrentTab(tab as "statschart" | "match-stats" | "tournament-stats")
-                    }
-                    className={`rounded-xl px-6 py-2 font-[urbanist] text-sm font-semibold whitespace-nowrap transition-all ${
+                    onClick={() => setCurrentTab(tab)}
+                    className={`w-full rounded-xl px-6 py-2 text-center font-[urbanist] text-sm font-semibold whitespace-nowrap transition-all ${
                       currentTab === tab
                         ? "bg-white text-green-600 shadow-sm dark:bg-green-600 dark:text-white"
                         : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
@@ -413,28 +437,52 @@ const ProfilePage = ({ user }: { user: User }) => {
               </button>
             </div>
 
-            <div className="relative flex min-h-[400px] items-center justify-center overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 dark:border-white/10 dark:bg-slate-900/30">
-              <div className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-5"></div>
-
-              <div className="relative z-10 text-center">
-                <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
-                  {currentTab === "statschart" && (
-                    <BarChart3 className="h-12 w-12 text-green-500" />
-                  )}
-                  {currentTab === "match-stats" && (
-                    <Gamepad2 className="h-12 w-12 text-emerald-500" />
-                  )}
-                  {currentTab === "tournament-stats" && (
-                    <Trophy className="h-12 w-12 text-amber-500" />
-                  )}
+            <div className="hover-card relative min-h-[400px] w-full overflow-hidden rounded-[2rem] border border-slate-200 p-8 dark:border-white/10 dark:bg-slate-900/30">
+              {battingRecordsLoading || bowlingRecordsLoading ? (
+                <div className="relative z-10 text-center">
+                  <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
+                    {currentTab === "batting-stats" && (
+                      <BarChart3 className="h-12 w-12 text-green-500" />
+                    )}
+                    {currentTab === "bowling-stats" && (
+                      <Gamepad2 className="h-12 w-12 text-emerald-500" />
+                    )}
+                    {currentTab === "tournament-stats" && (
+                      <Trophy className="h-12 w-12 text-amber-500" />
+                    )}
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tighter uppercase italic">
+                    Loading {capitalize(currentTab)}...
+                  </h3>
+                  <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
+                    Synchronizing with match servers
+                  </p>
                 </div>
-                <h3 className="text-2xl font-black tracking-tighter uppercase italic">
-                  Loading {capitalize(currentTab)}...
-                </h3>
-                <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
-                  Synchronizing with match servers
-                </p>
-              </div>
+              ) : currentTab === "batting-stats" && battingRecords?.length ? (
+                <BattingStats user={user} battingRecords={battingRecords} />
+              ) : currentTab === "bowling-stats" && bowlingRecords?.length ? (
+                <BowlingStats user={user} bowlingRecords={bowlingRecords} />
+              ) : (
+                <div className="relative z-10 text-center">
+                  <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
+                    {currentTab === "batting-stats" && (
+                      <BarChart3 className="h-12 w-12 text-green-500" />
+                    )}
+                    {currentTab === "bowling-stats" && (
+                      <Gamepad2 className="h-12 w-12 text-emerald-500" />
+                    )}
+                    {currentTab === "tournament-stats" && (
+                      <Trophy className="h-12 w-12 text-amber-500" />
+                    )}
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tighter uppercase italic">
+                    {capitalize(currentTab)}...
+                  </h3>
+                  <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
+                    No Data found
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

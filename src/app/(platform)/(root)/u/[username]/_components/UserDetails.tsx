@@ -30,8 +30,8 @@ const UserDetails = async ({ params }: UserDetailsProps) => {
   }
 
   return (
-    <div className="min-h-[400px] w-full">
-      <UserProfile key={user.id} user={user} />
+    <div className="min-h-screen w-full">
+      <UserProfile user={user} />
     </div>
   );
 };
