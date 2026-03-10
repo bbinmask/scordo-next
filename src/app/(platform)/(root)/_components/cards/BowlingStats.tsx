@@ -35,8 +35,9 @@ export const BowlingStats = ({ user, bowlingRecords }: StatsProps) => {
   }, [bowlingRecords]);
 
   const bowlingChartData = [
-    { name: "Legal Runs", value: bowling.runsConceded, fill: "#ef4444" },
+    { name: "Runs", value: bowling.runsConceded, fill: "#ef4444" },
     { name: "Extras", value: bowling.extras, fill: "#f59e0b" },
+    { name: "Wickets", value: bowling.wickets, fill: "#10b981" },
   ];
 
   return (
@@ -48,8 +49,8 @@ export const BowlingStats = ({ user, bowlingRecords }: StatsProps) => {
 
       <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2">
         <DoughnutChart
-          title="Control Analysis"
-          description={`${bowling.runsConceded} runs conceded`}
+          title={`${bowling.runsConceded} runs conceded`}
+          description={`in ${bowling.overs} overs`}
           data={bowlingChartData}
           centerValue={bowling.wickets}
           centerLabel="Wickets"

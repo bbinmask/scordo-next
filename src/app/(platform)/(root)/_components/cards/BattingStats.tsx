@@ -51,8 +51,8 @@ export const BattingStats = ({ user, battingRecords }: StatsProps) => {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <DoughnutChart
-          title="Impact Breakdown"
-          description="Boundary vs Running Runs"
+          title={`${batting.runs} runs scored`}
+          description={`In ${batting.matches} matches`}
           data={battingChartData}
           centerValue={batting.runs}
           centerLabel="Total Runs"
