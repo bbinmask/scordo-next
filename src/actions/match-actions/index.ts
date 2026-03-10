@@ -10,6 +10,7 @@ import {
   InputTypeForPushBall,
   InputTypeForRemove,
   InputTypeForRequest,
+  InputTypeForUndoBall,
   ReturnTypeForChangeBowler,
   ReturnTypeForCreate,
   ReturnTypeForInitialieMatch,
@@ -18,6 +19,7 @@ import {
   ReturnTypeForPushBall,
   ReturnTypeForRemove,
   ReturnTypeForRequest,
+  ReturnTypeForUndoBall,
 } from "./types";
 import { createSafeAction } from "@/lib/create-safe-action";
 import {
@@ -1112,6 +1114,17 @@ const deleteMatchHandler = async (data: InputTypeForRequest): Promise<any> => {
 
   revalidatePath(`/matches`);
   revalidatePath(`/matches/${matchId}`);
+  return {
+    data: true,
+  };
+};
+
+const undoMatchHandler = async (data: InputTypeForUndoBall): Promise<ReturnTypeForUndoBall> => {
+  const user = await currentUser();
+  if (!user) return { error: "Please Log in!" };
+
+  const { matchId, inningId } = data;
+
   return {
     data: true,
   };

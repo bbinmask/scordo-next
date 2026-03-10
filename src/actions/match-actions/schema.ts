@@ -140,3 +140,8 @@ export const StartNextInning = z.object({
   nonStrikerId: z.string({ message }),
   bowlerId: z.string({ message }),
 });
+
+export const UndoBall = z.object({
+  matchId: z.string({ message: errorMessage("matchId") }),
+  inningId: z.string({ message: errorMessage("inningId") }),
+});
