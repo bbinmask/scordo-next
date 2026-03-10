@@ -31,6 +31,7 @@ import {
   RemoveOfficial,
   Request,
   StartNextInning,
+  UndoBall,
 } from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
@@ -1125,6 +1126,92 @@ const undoMatchHandler = async (data: InputTypeForUndoBall): Promise<ReturnTypeF
 
   const { matchId, inningId } = data;
 
+  try {
+    const match = await db.match.findUnique({
+      where: {
+        id: matchId,
+      },
+    });
+
+    if (!match) return { error: "Match not found!" };
+
+    const isScorer = await db.matchOfficial.findFirst({
+      where: {
+        matchId,
+        userId: user.id,
+        role: "SCORER",
+      },
+    });
+
+    if (!isScorer) return { error: "Only Scorer can update the score!" };
+
+    const inning = await db.inning.findUnique({
+      where: {
+        id: inningId,
+      },
+    });
+
+    if (!inning) return { error: "Inning not found!" };
+
+    const lastBall = await db.ball.findFirst({
+      where: {
+        inningId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (!lastBall) return { error: "No balls to undo!" };
+
+    await db.$transaction(async (tsx) => {
+      await tsx.ball.delete({
+        where: {
+          id: lastBall.id,
+        },
+      });
+
+      await tsx.inning.update({
+        where: {
+          id: inningId,
+        },
+        data: {
+          runs: inning.runs - lastBall.runs,
+          wickets: lastBall.isWicket ? inning.wickets - 1 : inning.wickets,
+        },
+      });
+
+      if (lastBall.isWicket) {
+        await tsx.inningBatting.updateMany({
+          where: {
+            inningId,
+            playerId: lastBall.batsmanId,
+          },
+          data: {
+            runs: { decrement: lastBall.runs },
+          },
+        });
+      }
+
+      if (!lastBall.isBye && !lastBall.isLegBye) {
+        await tsx.inningBowling.updateMany({
+          where: {
+            inningId,
+            playerId: lastBall.bowlerId,
+          },
+          data: {
+            runs: { decrement: lastBall.runs },
+            wickets: lastBall.isWicket && lastBall.dismissalType !== "RUN_OUT" ? -1 : 0,
+          },
+        });
+      }
+    });
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
+
   return {
     data: true,
   };
@@ -1140,3 +1227,4 @@ export const pushBall = createSafeAction(PushBall, pushBallHandler);
 export const changeBowler = createSafeAction(ChangeBowler, changeBowlerHandler);
 export const startNextInning = createSafeAction(StartNextInning, startNextInningHandler);
 export const deleteMatch = createSafeAction(Request, deleteMatchHandler);
+export const undoBall = createSafeAction(UndoBall, undoMatchHandler);
