@@ -1178,6 +1178,15 @@ const undoMatchHandler = async (data: InputTypeForUndoBall): Promise<ReturnTypeF
         data: {
           runs: inning.runs - lastBall.runs,
           wickets: lastBall.isWicket ? inning.wickets - 1 : inning.wickets,
+          balls: lastBall.isNoBall || lastBall.isWide ? inning.balls : inning.balls - 1,
+          overs:
+            lastBall.isNoBall || lastBall.isWide
+              ? inning.overs
+              : (inning.balls - 1) % 6 === 0
+                ? inning.overs - 1
+                : inning.overs,
+          currentStrikerId: lastBall.batsmanId,
+          currentBowlerId: lastBall.bowlerId,
         },
       });
 
