@@ -19,7 +19,7 @@ export const BattingStats = ({ user, battingRecords }: StatsProps) => {
     const outs = battingRecords.filter((r) => r.isOut).length;
     const highScore = battingRecords.reduce((max, curr) => (curr.runs > max ? curr.runs : max), 0);
     const notOuts = battingRecords.filter((r) => !r.isOut).length;
-    const ducks = battingRecords.filter((r) => r.runs === 0).length;
+    const ducks = battingRecords.filter((r) => r.runs === 0 && r.isOut).length;
     return {
       runs,
       balls,
