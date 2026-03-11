@@ -4,6 +4,7 @@ import {
   Activity,
   ArrowUpRightIcon,
   CheckCircle2,
+  Clock,
   Crown,
   Flame,
   History,
@@ -31,9 +32,21 @@ export const TeamStats = ({
 }: TeamStatsData) => {
   const stats = useMemo(() => {
     const played = results.length;
-    const wins = results.filter((r) => r === "W").length;
-    const losses = results.filter((r) => r === "L").length;
-    const draws = results.filter((r) => r === "D").length;
+
+    const { wins, losses, draws } = results.reduce(
+      (acc, curr) => {
+        if (curr === "W") acc.wins++;
+        if (curr === "D") acc.draws++;
+        if (curr === "L") acc.losses++;
+
+        return acc;
+      },
+      {
+        wins: 0,
+        losses: 0,
+        draws: 0,
+      }
+    );
     const winRate = played > 0 ? ((wins / played) * 100).toFixed(1) : "0.0";
     const winLossRatio = losses > 0 ? (wins / losses).toFixed(2) : wins.toFixed(2);
 
@@ -48,6 +61,7 @@ export const TeamStats = ({
     const totalLegalBallsBowled = allBowlingStats?.balls || 0;
     const totalMaidens = allBowlingStats?.maidens || 0;
 
+    const totalOversBowled = inningsBowled.reduce((acc, curr) => acc + curr.overs, 0);
     const totalOversBatted = inningsBatted.reduce((acc, curr) => acc + curr.overs, 0);
     const teamRR = totalOversBatted > 0 ? (totalRunsScored / totalOversBatted).toFixed(2) : "0.00";
     const teamEconomy =
@@ -68,6 +82,7 @@ export const TeamStats = ({
       winRate,
       winLossRatio,
       teamRR,
+      totalOversBowled,
       teamEconomy,
       bowlingAvg,
       avgRunsPerInning,
@@ -75,15 +90,29 @@ export const TeamStats = ({
       totalWicketsTaken,
       totalMaidens,
       totalDotsBatted,
+      fours: totalFours,
+      totalRunsScored,
+      totalRunsConceded,
+      sixes: totalSixes,
       boundaryRuns,
       fieldRuns: totalRunsScored - boundaryRuns,
     };
   }, [inningsBatted, inningsBowled, allBattingStats, allBowlingStats, results]);
 
+  const battingImpactData = [
+    { name: "Boundaries", value: stats.boundaryRuns, fill: "#10b981" },
+    { name: "Field Runs", value: stats.fieldRuns, fill: "#3b82f6" },
+  ];
+
+  const bowlingControlData = [
+    { name: "Runs", value: stats.totalRunsConceded, fill: "#ef4444" },
+    { name: "Wickets", value: stats.totalWicketsTaken, fill: "#f59e0b" },
+  ];
+
   return (
-    <div className="w-full space-y-16 font-sans">
+    <div className="w-full space-y-16 px-4">
       <div>
-        <div className="mb-6 flex items-center gap-3 px-4">
+        <div className="mb-6 flex items-center gap-3">
           <div className={`rounded-xl bg-emerald-500/10 p-2 text-emerald-500`}>
             <Trophy size={20} />
           </div>
@@ -94,24 +123,33 @@ export const TeamStats = ({
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <DoughnutChart
-            title="Victory Distribution"
-            description=""
-            footerText=""
+            title="Victory Ratio"
+            description={`Won ${stats.wins} in ${stats.played} matches`}
+            footerText={
+              results.at(-1) === "D"
+                ? `Last match is drawn`
+                : results.at(-1) === "L"
+                  ? `This team lost the last match`
+                  : results.at(-1) === "W"
+                    ? "This team won the last match"
+                    : `No data found`
+            }
             data={[
-              { name: "Won", value: stats.wins, fill: "#10b981" },
-              { name: "Lost", value: stats.losses, fill: "#ef4444" },
-              { name: "Draw", value: stats.draws, fill: "#3b82f6" },
+              { name: "Won", value: 5, fill: "#10b981" },
+              { name: "Lost", value: 2, fill: "#ef4444" },
+              { name: "Draw", value: 3, fill: "#3b82f6" },
             ]}
             centerValue={stats.winLossRatio}
             centerLabel="W/L Ratio"
           />
           <DoughnutChart
-            title="Scoring Profile"
-            description=""
-            footerText=""
+            title="Scores"
+            description={`Scored ${stats.fieldRuns + stats.boundaryRuns} runs in ${stats.played} matches`}
+            footerText={`Highest team score: ${stats.highestTeamScore} runs`}
             data={[
-              { name: "Boundaries", value: stats.boundaryRuns, fill: "#f59e0b" },
-              { name: "Running", value: stats.fieldRuns, fill: "#6366f1" },
+              { name: "Field Runs", value: stats.fieldRuns, fill: "#f59e0b" },
+              { name: "Fours", value: stats.fours, fill: "#3b82f6" },
+              { name: "Sixes", value: stats.sixes, fill: "#10b981" },
             ]}
             centerValue={`${((stats.boundaryRuns / (stats.boundaryRuns + stats.fieldRuns || 1)) * 100).toFixed(0)}%`}
             centerLabel="Boundary Impact"
@@ -134,68 +172,48 @@ export const TeamStats = ({
         </div>
       </div>
 
-      {/* HEADING: BATTING ANALYTICS */}
+      {/*  BATTING ANALYTICS */}
       <div>
         <div className="mb-6 flex items-center gap-3 px-4">
           <div className={`rounded-xl bg-emerald-500/10 p-2 text-emerald-500`}>
             <Sword size={20} />
           </div>
           <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-            Batting Performance Analysis
+            Batting Analysis
           </h3>
           <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <StatBox
-            label="Total Fixtures"
-            value={stats.played}
-            icon={Swords}
-            color="indigo"
-            subLabel="Matches"
-          />
-          <StatBox
-            label="Innings High"
-            value={stats.highestTeamScore}
-            icon={Trophy}
-            color="emerald"
-            subLabel="Best Team Total"
-          />
-          <StatBox
-            label="Avg Per Inning"
-            value={stats.avgRunsPerInning}
-            icon={Activity}
-            color="emerald"
-            subLabel="Mean Score"
-          />
-          <StatBox
-            label="Run Rate"
-            value={stats.teamRR}
-            icon={Zap}
-            color="amber"
-            subLabel="Strike Intent"
-          />
-
-          <BentoCard
-            title="Innings Pressure"
-            icon={Crown}
-            className="group relative flex items-center justify-between overflow-hidden rounded-[2rem] bg-slate-900 p-8 text-white lg:col-span-4"
-          >
-            <div className="relative z-10">
-              <h4 className="text-2xl font-black uppercase italic">Total Dot Balls Faced</h4>
-            </div>
-            <div className="relative z-10 text-right">
-              <p className="text-4xl font-black tracking-tighter text-emerald-400">
-                {stats.totalDotsBatted}
-              </p>
-              <p className="text-[9px] font-black tracking-widest text-slate-500 uppercase italic">
-                Across all batted innings
-              </p>
-            </div>
-          </BentoCard>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <DoughnutChart
+              title="Scoring Profile"
+              description="Boundary vs Field Runs"
+              footerText={`${stats.totalRunsScored} runs scored with a run-rate of ${stats.teamRR}`}
+              data={battingImpactData}
+              centerValue={`${((stats.boundaryRuns / (stats.totalRunsScored || 1)) * 100).toFixed(0)}%`}
+              centerLabel="Boundary Impact"
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-8">
+            <StatBox label="Total Fixtures" value={stats.played} icon={Swords} subLabel="Matches" />
+            <StatBox
+              label="Innings High"
+              value={stats.highestTeamScore}
+              icon={Trophy}
+              subLabel="Best Team Total"
+            />
+            <StatBox
+              label="Avg Per Inning"
+              value={stats.avgRunsPerInning}
+              icon={Activity}
+              subLabel="Mean Score"
+            />
+            <StatBox label="Run Rate" value={stats.teamRR} icon={Zap} subLabel="Strike Intent" />
+          </div>
         </div>
       </div>
 
-      {/* HEADING: BOWLING ANALYTICS */}
+      {/*  BOWLING ANALYTICS */}
       <div>
         <div className="mb-6 flex items-center gap-3 px-4">
           <div className={`rounded-xl bg-emerald-500/10 p-2 text-emerald-500`}>
@@ -206,35 +224,38 @@ export const TeamStats = ({
           </h3>
           <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <StatBox
-            label="Wickets Taken"
-            value={stats.totalWicketsTaken}
-            icon={Medal}
-            color="indigo"
-            subLabel="Defensive Power"
-          />
-          <StatBox
-            label="Economy"
-            value={stats.teamEconomy}
-            icon={Flame}
-            color="indigo"
-            subLabel="Runs/Over"
-          />
-          <StatBox
-            label="Bowl Average"
-            value={stats.bowlingAvg}
-            icon={ShieldCheck}
-            color="indigo"
-            subLabel="Runs/Wicket"
-          />
-          <StatBox
-            label="Total Maidens"
-            value={stats.totalMaidens}
-            icon={Star}
-            color="indigo"
-            subLabel="Control Overs"
-          />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div className="order-2 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:order-1 lg:col-span-8">
+            <StatBox
+              label="Wickets Taken"
+              value={stats.totalWicketsTaken}
+              icon={Medal}
+              subLabel="Defensive Power"
+            />
+            <StatBox label="Economy" value={stats.teamEconomy} icon={Flame} subLabel="Runs/Over" />
+            <StatBox
+              label="Bowl Average"
+              value={stats.bowlingAvg}
+              icon={ShieldCheck}
+              subLabel="Runs/Wicket"
+            />
+            <StatBox
+              label="Total Maidens"
+              value={stats.totalMaidens}
+              icon={Star}
+              subLabel="Control Overs"
+            />
+          </div>
+          <div className="order-1 lg:order-2 lg:col-span-4">
+            <DoughnutChart
+              title="Run Control"
+              description="Runs and wickets"
+              footerText={`${stats.totalWicketsTaken} wickets taken in ${stats.totalOversBowled}`}
+              data={bowlingControlData}
+              centerValue={stats.totalWicketsTaken}
+              centerLabel="Total Extras"
+            />
+          </div>
         </div>
       </div>
 
@@ -245,14 +266,14 @@ export const TeamStats = ({
             <History size={20} />
           </div>
           <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-            Tactical History
+            Match History
           </h3>
           <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
         </div>
         <div className="flex flex-col items-center justify-between gap-8 rounded-[3rem] border border-slate-200 bg-white p-8 shadow-sm md:flex-row dark:border-white/5 dark:bg-slate-900">
           <div className="flex items-center gap-6">
             <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
-              Recent Form Pattern:
+              Recent Matches:
             </span>
             <div className="flex gap-2">
               {results.slice(-5).map((res, i) => (
@@ -274,8 +295,8 @@ export const TeamStats = ({
 
           <div className="flex w-full items-center gap-4 md:w-auto">
             <div className="mx-4 hidden h-12 w-px bg-slate-100 lg:block dark:bg-white/5" />
-            <button className="flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-10 py-4 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all hover:translate-x-1 active:scale-95 md:w-auto dark:bg-white dark:text-slate-950">
-              Detailed Match Dossier <ArrowUpRightIcon size={16} />
+            <button className="flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-10 py-4 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 md:w-auto dark:bg-white dark:text-slate-950">
+              Detailed Match <ArrowUpRightIcon size={16} />
             </button>
           </div>
         </div>

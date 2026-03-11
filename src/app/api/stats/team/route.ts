@@ -7,8 +7,6 @@ export const GET = async (req: Request) => {
   const params = new URL(req.url).searchParams;
   const teamId = params.get("teamId");
 
-  console.log({ teamId });
-
   if (!teamId) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND), { status: 400 });
 
   try {

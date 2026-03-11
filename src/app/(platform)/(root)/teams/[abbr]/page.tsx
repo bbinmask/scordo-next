@@ -139,8 +139,6 @@ const TeamIdPage = () => {
     }
   }, [user, team]);
 
-  console.log({ teamStats });
-
   return (
     <div className="w-full pt-4 pb-16 dark:bg-[#020617]">
       {!team && !isLoading && notFound()}

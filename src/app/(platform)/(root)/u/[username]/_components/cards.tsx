@@ -124,7 +124,7 @@ const ProfilePage = ({ user }: { user: User }) => {
   >({
     queryKey: ["bowling-stats", user.id],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/stats/bowling?userId=${user.id}`, {
+      const { data } = await axios.get(`/api/stats/user/bowling?userId=${user.id}`, {
         params: {
           userId: user.id,
         },
@@ -190,29 +190,6 @@ const ProfilePage = ({ user }: { user: User }) => {
       }
     }
   };
-
-  const LoadingState = () => (
-    <div className="relative flex min-h-[400px] items-center justify-center overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 dark:border-white/10 dark:bg-slate-900/30">
-      <div className="pointer-events-none absolute top-0 left-0 h-full w-full opacity-5">
-        <div className="absolute top-10 left-10 h-64 w-64 rounded-full bg-green-500 blur-[100px]"></div>
-        <div className="absolute right-10 bottom-10 h-64 w-64 rounded-full bg-emerald-500 blur-[100px]"></div>
-      </div>
-
-      <div className="relative z-10 text-center">
-        <div className="mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800">
-          {currentTab === "statschart" && <BarChart3 className="h-12 w-12 text-green-500" />}
-          {currentTab === "match-stats" && <Gamepad2 className="h-12 w-12 text-emerald-500" />}
-          {currentTab === "tournament-stats" && <Trophy className="h-12 w-12 text-amber-500" />}
-        </div>
-        <h3 className="text-2xl font-black tracking-tighter uppercase italic">
-          Loading {capitalize(currentTab)}...
-        </h3>
-        <p className="mt-2 font-medium text-slate-500 dark:text-slate-400">
-          Synchronizing with match servers
-        </p>
-      </div>
-    </div>
-  );
 
   return (
     <div className="bg-slate-50 pb-20 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
