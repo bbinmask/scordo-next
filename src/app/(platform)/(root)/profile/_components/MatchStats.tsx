@@ -1,7 +1,9 @@
 import { User } from "@/generated/prisma";
 import React from "react";
 
-const MatchStats = ({ user }: { user: User }) => {
+interface MatchStatsProps {}
+
+const MatchStats = ({}: MatchStatsProps) => {
   return (
     <div className="container-bg p-6">
       <h6 className="mb-4 flex items-center font-[poppins] text-xl">Matches Analytics</h6>

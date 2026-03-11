@@ -269,7 +269,7 @@ model Match {
   requestStatus RequestStatus? @default(pending)
   organizerId String @db.ObjectId
   organizer   User   @relation("MatchOrganizer", fields: [organizerId], references: [id])
-
+  winnerId String? @db.ObjectId 
 
   status MatchStatus @default(not_started)
   result String?

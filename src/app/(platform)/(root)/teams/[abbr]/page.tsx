@@ -9,6 +9,7 @@ import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { useIsTeamOwner } from "@/hooks/useTeam";
 import Link from "next/link";
 import {
+  ArrowRight,
   ArrowUpRight,
   Building,
   BuildingIcon,
@@ -19,6 +20,7 @@ import {
   Info,
   Lock,
   LucideProps,
+  Mail,
   MapPin,
   MapPinIcon,
   MinusCircle,
@@ -48,6 +50,8 @@ import { useNotificationModal } from "@/hooks/store/use-notification";
 import { formatDate } from "@/utils/helper/formatDate";
 import { RequestsModal } from "../_components/modals/Requests";
 import { useRequestModal } from "@/hooks/store/use-profile";
+import { BentoCard } from "../../_components/cards/bento-card";
+import { TeamStats } from "../_components/TeamStats";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -127,10 +131,10 @@ const TeamIdPage = () => {
   }, [user, team]);
 
   return (
-    <div className="w-full pt-4 pb-16">
+    <div className="w-full pt-4 pb-16 dark:bg-[#020617]">
       {!team && !isLoading && notFound()}
       {team ? (
-        <div className="container-bg relative flex rounded-lg border">
+        <div className="relative flex rounded-lg">
           <div className="w-full transform overflow-hidden transition-all duration-300 ease-in-out">
             <TeamHeader
               alreadyInTeam={alreadyInTeam}
@@ -149,19 +153,19 @@ const TeamIdPage = () => {
                 {/* Quick Info */}
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 gap-4">
-                    <StatCard
-                      label="Location"
-                      value={`${team.address?.city}, ${team.address?.state}`}
-                      icon={MapPin}
-                      color="emerald"
-                    />
-                    <StatCard label="Team Type" value={team.type} icon={Building} color="indigo" />
-                    <StatCard
-                      label="Organization Status"
-                      value={team.isRecruiting ? "Open" : "Invite Only"}
-                      icon={Shield}
-                      color="purple"
-                    />
+                    <BentoCard title="Address" icon={MapPinIcon} className="text-sm">
+                      <p className="truncate font-[urbanist] text-sm font-semibold">
+                        {`${team.address?.city}, ${team.address?.state}`}
+                      </p>
+                    </BentoCard>
+                    <BentoCard title="Team Type" icon={Building}>
+                      <p className="truncate font-[urbanist] text-sm font-semibold">{team.type}</p>
+                    </BentoCard>
+                    <BentoCard title="Status" icon={Shield}>
+                      <p className="truncate font-[urbanist] text-sm font-semibold">
+                        {team.isRecruiting ? "Open" : "Invite Only"}
+                      </p>
+                    </BentoCard>
                   </div>
 
                   {team.isRecruiting && !alreadyInTeam && !alreadySent && (
@@ -190,35 +194,9 @@ const TeamIdPage = () => {
 
               {/* Right Column  */}
               <div className="space-y-8 lg:col-span-2">
-                {/* Description Section */}
-                <section className="hover-card rounded-xl p-5">
-                  <h2 className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white">
-                    <span className="mr-2 text-green-600">
-                      <Info />
-                    </span>
-                    About the Team
-                  </h2>
-                  <p className="secondary-text font-[urbanist] leading-relaxed">
-                    {"Nothing to show here"}
-                  </p>
-                </section>
-
-                {/* Key Stats Section */}
-                <section className="hover-card rounded-xl p-5">
-                  <Link
-                    href={`/teams/${team.abbreviation}/stats`}
-                    className="mb-3 flex items-center font-[poppins] text-xl font-bold text-gray-900 lg:text-2xl dark:text-white"
-                  >
-                    <span className="mr-2 text-green-500 dark:text-green-400">
-                      <TrophyIcon />
-                    </span>
-                    Season Statistics
-                  </Link>
-                </section>
-
                 {/* Players Section */}
 
-                <section className="hover-card rounded-2xl pt-8">
+                <section className="hover-card rounded-3xl border border-slate-200 bg-white p-6 pt-8 shadow-sm backdrop-blur-md transition-all hover:shadow-md dark:border-white/10 dark:bg-slate-900/50">
                   <div className="mb-6 flex items-center justify-between px-8">
                     <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
                       <Users className="text-purple-500" /> Players
@@ -263,23 +241,16 @@ const TeamIdPage = () => {
                     ))}
                   </div>
                 </section>
-                {/* Match History Section */}
-                <section className="hover-card rounded-xl p-5">
-                  <div className="mb-6 flex items-center justify-between">
-                    <h2 className="flex items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
-                      <History className="text-amber-500" /> Match Timeline
-                    </h2>
-                  </div>
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-100 dark:bg-white/5">
-                      <Trophy className="h-8 w-8 text-slate-300" />
-                    </div>
-                    <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
-                      Awaiting verified season results
-                    </p>
-                  </div>
-                </section>
               </div>
+            </div>
+            <div className="mt-6">
+              <TeamStats
+                results={[]}
+                allBattingStats={[]}
+                allBowlingStats={[]}
+                inningsBatted={[]}
+                inningsBowled={[]}
+              />
             </div>
           </div>
         </div>
@@ -451,7 +422,8 @@ const TeamHeader = ({
               }}
               className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-400 px-3 py-2 font-[inter] text-sm font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-400"
             >
-              <MinusCircle size={20} className="mr-1" /> Leave
+              Leave
+              <ArrowRight size={16} className="" />
             </button>
           ) : isAlreadySent ? (
             <button
@@ -493,32 +465,5 @@ const TeamHeader = ({
     </header>
   );
 };
-
-interface StatCardProps {
-  label: string;
-  value: string;
-  icon: React.ComponentType<LucideProps>;
-  color: string;
-}
-const StatCard = ({ label, value, icon: Icon, color = "indigo" }: StatCardProps) => (
-  <div className="group hover-card rounded-3xl p-5">
-    <div className="mb-2 flex items-start justify-between">
-      <div
-        className={`rounded-xl p-2 bg-${color}-50 dark:bg-${color}-500/10 text-${color}-600 dark:text-${color}-400 transition-transform group-hover:scale-110`}
-      >
-        <Icon className="h-5 w-5" />
-      </div>
-      {/* <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase transition-colors group-hover:text-slate-900 dark:group-hover:text-white">
-        Verified
-      </span> */}
-    </div>
-    <p className="text-[11px] font-bold tracking-widest text-slate-500 uppercase dark:text-slate-400">
-      {label}
-    </p>
-    <p className="mt-1 text-lg font-black tracking-tight text-slate-900 uppercase dark:text-white">
-      {value}
-    </p>
-  </div>
-);
 
 export default TeamIdPage;

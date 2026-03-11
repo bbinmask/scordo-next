@@ -204,6 +204,53 @@ const currentOverBalls = Prisma.validator<Prisma.BallDefaultArgs>()({
   },
 });
 
+const inningsBattedStats = Prisma.validator<Prisma.InningDefaultArgs>()({
+  select: {
+    overs: true,
+    runs: true,
+    wickets: true,
+    inningNumber: true,
+    InningBatting: true,
+  },
+});
+
+const inningsBowledStats = Prisma.validator<Prisma.InningDefaultArgs>()({
+  select: {
+    overs: true,
+    runs: true,
+    wickets: true,
+    inningNumber: true,
+    InningBowling: true,
+  },
+});
+
+type AllBattingStats = {
+  runs: number;
+  balls: number;
+  fours: number;
+  sixes: number;
+  dots: number;
+};
+
+type AllBowlingStats = {
+  balls: number;
+  maidens: number;
+  noBalls: number;
+  overs: number;
+  runs: number;
+  wickets: number;
+};
+
+type Results = ("W" | "L" | "D")[];
+
+export type TeamStatsData = {
+  inningsBatted: Prisma.InningGetPayload<typeof inningsBattedStats>[];
+  inningsBowled: Prisma.InningGetPayload<typeof inningsBowledStats>[];
+  allBattingStats: AllBattingStats | null;
+  allBowlingStats: AllBowlingStats | null;
+  results: Results;
+};
+
 export type WicketsWithPlayerDetails = Prisma.BallGetPayload<typeof wicketsWithPlayerDetails>;
 export type CurrentOverBalls = Prisma.BallGetPayload<typeof currentOverBalls>;
 export type InningDetails = Prisma.InningGetPayload<typeof inningDetails>;

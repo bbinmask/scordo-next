@@ -65,7 +65,7 @@ const PersonalDetails = ({
   >({
     queryKey: ["batting-stats", user.id],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/stats/batting?userId=${user.id}`, {
+      const { data } = await axios.get(`/api/stats/user/batting?userId=${user.id}`, {
         params: {
           userId: user.id,
         },
@@ -137,8 +137,6 @@ const PersonalDetails = ({
       label: "Settings",
     },
   ];
-
-  console.log({ battingRecords, bowlingRecords });
 
   return (
     <>

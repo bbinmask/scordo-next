@@ -27,6 +27,7 @@ export const BowlingStats = ({ user, bowlingRecords }: StatsProps) => {
       overs,
       maidens,
       bbi,
+      balls: totalBalls,
       runsConceded,
       extras,
       accuracy: totalBalls > 0 ? ((wickets / totalBalls) * 6).toFixed(2) : "0.00",
@@ -50,7 +51,7 @@ export const BowlingStats = ({ user, bowlingRecords }: StatsProps) => {
       <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2">
         <DoughnutChart
           title={`${bowling.runsConceded} runs conceded`}
-          description={`in ${bowling.overs} overs`}
+          description={`in ${bowling.overs}.${bowling.balls % 6} overs`}
           data={bowlingChartData}
           centerValue={bowling.wickets}
           centerLabel="Wickets"
