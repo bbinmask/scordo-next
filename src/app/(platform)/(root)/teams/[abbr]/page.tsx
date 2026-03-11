@@ -38,7 +38,7 @@ import {
 import { Player as IPlayer, Team as ITeam, User } from "@/generated/prisma";
 import { usePlayerModal, useUpdateTeam } from "@/hooks/store/use-team";
 import OptionsPopover from "../_components/OptionsPopover";
-import { PlayerWithUser, TeamRequestWithDetails } from "@/lib/types";
+import { PlayerWithUser, TeamRequestWithDetails, TeamStatsData } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { leaveTeam, sendTeamRequest } from "@/actions/team-actions";
 import { toast } from "sonner";
@@ -117,6 +117,15 @@ const TeamIdPage = () => {
     },
   });
 
+  const { data: teamStats } = useQuery<TeamStatsData>({
+    queryKey: ["team-stats", params.abbr],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/stats/team?teamId=${team?.id}`);
+      return data.data;
+    },
+    enabled: !!team?.id,
+  });
+
   const [alreadyInTeam, setAlreadyInTeam] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerWithUser | null>(null);
   const [alreadySent, setAlreadySent] = useState(Boolean(sentRequest));
@@ -129,6 +138,8 @@ const TeamIdPage = () => {
       if (index !== -1) setAlreadyInTeam(true);
     }
   }, [user, team]);
+
+  console.log({ teamStats });
 
   return (
     <div className="w-full pt-4 pb-16 dark:bg-[#020617]">
@@ -245,11 +256,11 @@ const TeamIdPage = () => {
             </div>
             <div className="mt-6">
               <TeamStats
-                results={[]}
-                allBattingStats={[]}
-                allBowlingStats={[]}
-                inningsBatted={[]}
-                inningsBowled={[]}
+                results={teamStats?.results || []}
+                inningsBatted={teamStats?.inningsBatted || []}
+                inningsBowled={teamStats?.inningsBowled || []}
+                allBattingStats={teamStats?.allBattingStats || null}
+                allBowlingStats={teamStats?.allBowlingStats || null}
               />
             </div>
           </div>
