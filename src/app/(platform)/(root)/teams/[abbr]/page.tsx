@@ -52,6 +52,7 @@ import { RequestsModal } from "../_components/modals/Requests";
 import { useRequestModal } from "@/hooks/store/use-profile";
 import { BentoCard } from "../../_components/cards/bento-card";
 import { TeamStats } from "../_components/TeamStats";
+import { capitalize } from "lodash";
 
 interface PlayerProps extends IPlayer {
   user: User;
@@ -164,11 +165,15 @@ const TeamIdPage = () => {
                   <div className="grid grid-cols-1 gap-4">
                     <BentoCard title="Address" icon={MapPinIcon} className="text-sm">
                       <p className="truncate font-[urbanist] text-sm font-semibold">
-                        {`${team.address?.city}, ${team.address?.state}`}
+                        {team?.address
+                          ? `${capitalize(team.address?.city)}, ${capitalize(team.address?.state)}`
+                          : "NA"}
                       </p>
                     </BentoCard>
                     <BentoCard title="Team Type" icon={Building}>
-                      <p className="truncate font-[urbanist] text-sm font-semibold">{team.type}</p>
+                      <p className="truncate font-[urbanist] text-sm font-semibold">
+                        {capitalize(team.type)}
+                      </p>
                     </BentoCard>
                     <BentoCard title="Status" icon={Shield}>
                       <p className="truncate font-[urbanist] text-sm font-semibold">

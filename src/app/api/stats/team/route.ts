@@ -104,6 +104,7 @@ export const GET = async (req: Request) => {
     });
 
     const results = matchResults.map((match) => {
+      if (!match.result) return;
       if (!match.winnerId) return "D";
       if (match.winnerId === teamId) return "W";
       return "L";

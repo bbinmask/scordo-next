@@ -3,6 +3,7 @@ import {
   InningBowlingDetails,
   InningDetails,
   MatchWithDetails,
+  PlayerWithUser,
 } from "@/lib/types";
 import { Shield, Trophy } from "lucide-react";
 import { useState } from "react";
@@ -12,7 +13,8 @@ type SquadState = {
   teamName?: string;
   teamLogo?: string;
   isOpen: boolean;
-  players?: InningBattingDetails[] | InningBowlingDetails[];
+  players?: Map<string, string>;
+  squad: PlayerWithUser[];
 };
 
 export const MatchHeroSection = ({
@@ -22,14 +24,15 @@ export const MatchHeroSection = ({
   match: MatchWithDetails;
   innings?: InningDetails[];
 }) => {
-  const [squadModalState, setSquadModalState] = useState<SquadState>({ isOpen: false });
+  const [squadModalState, setSquadModalState] = useState<SquadState>({ isOpen: false, squad: [] });
 
   const handleOpenSquad = (
     teamName: string,
     teamLogo: string | null,
-    players: InningBattingDetails[] | InningBowlingDetails[]
+    players: Map<string, string>,
+    squad: PlayerWithUser[]
   ) => {
-    setSquadModalState({ players, teamName, teamLogo: teamLogo || undefined, isOpen: true });
+    setSquadModalState({ players, teamName, teamLogo: teamLogo || undefined, isOpen: true, squad });
   };
   const handleCloseSquad = () => {
     setSquadModalState((prev) => ({ ...prev, isOpen: false }));
@@ -77,15 +80,29 @@ export const MatchHeroSection = ({
         {/* Team A Logo Frame */}
         <div className="group relative">
           <div
-            onClick={() =>
+            onClick={() => {
+              const map = new Map(
+                innings[0].InningBowling.map((bat) => [bat.player.userId, bat.player.userId])
+              );
               handleOpenSquad(
                 match.teamA.name,
                 match.teamA.logo,
                 innings[0].battingTeamId === match.teamAId
-                  ? innings[0].InningBatting
-                  : innings[0].InningBowling
-              )
-            }
+                  ? new Map(
+                      innings[0].InningBatting.map((bat) => [
+                        bat.player.userId,
+                        bat.player.user.name,
+                      ])
+                    )
+                  : new Map(
+                      innings[0].InningBowling.map((bowl) => [
+                        bowl.player.userId,
+                        bowl.player.user.name,
+                      ])
+                    ),
+                match.teamA.players
+              );
+            }}
             className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-4 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
           >
             {match.teamA.logo ? (
@@ -121,9 +138,20 @@ export const MatchHeroSection = ({
               handleOpenSquad(
                 match.teamB.name,
                 match.teamB.logo,
-                innings[0].battingTeamId === match.teamAId
-                  ? innings[0].InningBatting
-                  : innings[0].InningBowling
+                innings[0].battingTeamId === match.teamBId
+                  ? new Map(
+                      innings[0].InningBatting.map((bat) => [
+                        bat.player.userId,
+                        bat.player.user.name,
+                      ])
+                    )
+                  : new Map(
+                      innings[0].InningBowling.map((bowl) => [
+                        bowl.player.userId,
+                        bowl.player.user.name,
+                      ])
+                    ),
+                match.teamB.players
               )
             }
             className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-4 border-slate-50 bg-white shadow-2xl transition-transform group-hover:scale-105 md:h-52 md:w-52 dark:border-[#020617] dark:bg-slate-900"
