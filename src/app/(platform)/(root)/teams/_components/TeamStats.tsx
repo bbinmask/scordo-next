@@ -105,8 +105,8 @@ export const TeamStats = ({
   ];
 
   const bowlingControlData = [
-    { name: "Runs", value: stats.totalRunsConceded, fill: "#ef4444" },
-    { name: "Wickets", value: stats.totalWicketsTaken, fill: "#f59e0b" },
+    { name: "Runs", value: stats.totalRunsConceded, fill: "#10b981" },
+    { name: "Wickets", value: stats.totalWicketsTaken, fill: "#ef4444" },
   ];
 
   return (
@@ -195,7 +195,7 @@ export const TeamStats = ({
             />
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-8">
-            <StatBox label="Total Fixtures" value={stats.played} icon={Swords} subLabel="Matches" />
+            <StatBox label="Total Matches" value={stats.played} icon={Swords} subLabel="Played" />
             <StatBox
               label="Innings High"
               value={stats.highestTeamScore}
@@ -227,10 +227,10 @@ export const TeamStats = ({
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="order-2 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:order-1 lg:col-span-8">
             <StatBox
-              label="Wickets Taken"
-              value={stats.totalWicketsTaken}
+              label="Total Overs"
+              value={stats.totalOversBowled}
               icon={Medal}
-              subLabel="Defensive Power"
+              subLabel={`${stats.played} Matches`}
             />
             <StatBox label="Economy" value={stats.teamEconomy} icon={Flame} subLabel="Runs/Over" />
             <StatBox
@@ -293,12 +293,14 @@ export const TeamStats = ({
             </div>
           </div>
 
-          <div className="flex w-full items-center gap-4 md:w-auto">
-            <div className="mx-4 hidden h-12 w-px bg-slate-100 lg:block dark:bg-white/5" />
-            <button className="flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-10 py-4 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 md:w-auto dark:bg-white dark:text-slate-950">
-              Detailed Match <ArrowUpRightIcon size={16} />
-            </button>
-          </div>
+          {results.length > 0 && (
+            <div className="flex w-full items-center gap-4 md:w-auto">
+              <div className="mx-4 hidden h-12 w-px bg-slate-100 lg:block dark:bg-white/5" />
+              <button className="flex w-full items-center justify-center gap-3 rounded-2xl bg-slate-950 px-10 py-4 text-[10px] font-black tracking-widest text-white uppercase shadow-xl transition-all active:scale-95 md:w-auto dark:bg-white dark:text-slate-950">
+                Detailed Match <ArrowUpRightIcon size={16} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
