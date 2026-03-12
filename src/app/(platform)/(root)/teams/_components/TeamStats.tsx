@@ -135,9 +135,9 @@ export const TeamStats = ({
                     : `No data found`
             }
             data={[
-              { name: "Won", value: 5, fill: "#10b981" },
-              { name: "Lost", value: 2, fill: "#ef4444" },
-              { name: "Draw", value: 3, fill: "#3b82f6" },
+              { name: "Won", value: stats.wins, fill: "#10b981" },
+              { name: "Lost", value: stats.losses, fill: "#ef4444" },
+              { name: "Draw", value: stats.draws, fill: "#3b82f6" },
             ]}
             centerValue={stats.winLossRatio}
             centerLabel="W/L Ratio"
