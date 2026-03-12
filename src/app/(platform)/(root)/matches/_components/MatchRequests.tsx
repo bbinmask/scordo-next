@@ -56,7 +56,7 @@ export function MatchRequests() {
   };
 
   return (
-    <div className="group hover-card border-input relative h-52 w-full rounded-3xl border p-6 font-[urbanist] font-semibold lg:mt-16">
+    <div className="group hover-card border-input relative h-52 w-full rounded-3xl border p-6 font-[urbanist] font-semibold lg:h-[400px]">
       <div className="flex items-center justify-between">
         <h2 className="primary-text flex items-center gap-3 font-[inter] text-lg font-bold uppercase italic">
           <div className="relative">

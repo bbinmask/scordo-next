@@ -10,6 +10,7 @@ import { MatchRequests } from "./_components/MatchRequests";
 import { MatchCard } from "./_components/cards/MatchCard";
 import { CreateMatchCard } from "./_components/cards/CreateMatchCard";
 import { MatchWithDetails } from "@/lib/types";
+import { Activity, Gavel } from "lucide-react";
 
 const MatchesPage = () => {
   const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<MatchWithDetails[]>({
@@ -36,72 +37,77 @@ const MatchesPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-32 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
-      <div className="max-w-7xl pt-12">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-          {/* Main Matches Column */}
-          <div className="space-y-12 lg:col-span-8">
-            <section>
-              <div className="mb-6 flex items-center justify-between px-4">
-                <h3 className="flex items-center gap-3 font-[inter] text-2xl font-black uppercase italic">
-                  Team <span className="primary-heading pr-2">Matches</span>
-                </h3>
-                <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
+    <div className="mt-4 grid grid-cols-1 gap-10 px-4 pb-20 lg:grid-cols-12">
+      {/* Main Matches Column (8 Span) */}
+      <div className="container-bg rounded-3xl border border-slate-100 lg:col-span-8 dark:border-white/5">
+        {/* Section: Team Matches */}
+        <div className="relative overflow-hidden py-6">
+          <section className="relative z-10">
+            <div className="mb-6 flex items-center justify-between px-4">
+              <h3 className="flex items-center gap-3 text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+                Team <span className={"primary-heading pr-2"}>Matches</span>
+              </h3>
+              <div className="mx-6 h-px flex-1 bg-slate-100 dark:bg-white/5" />
+              <span className="text-[8px] font-black tracking-widest text-slate-400 uppercase">
+                Active Circuit
+              </span>
+            </div>
+
+            {isLoading ? (
+              <div className="flex h-52 items-center justify-center">
+                <Spinner className="" />
               </div>
-
-              {isLoading ? (
-                <div className="center flex w-full">
-                  <Spinner />
-                </div>
-              ) : matches && matches.length > 0 ? (
-                <Carousel>
-                  {matches.map((match) => (
-                    <MatchCard key={match.id} match={match} />
-                  ))}
-                </Carousel>
-              ) : (
-                <div className="px-4">
-                  <EmptyCard type="managed" />
-                </div>
-              )}
-            </section>
-
-            <section>
-              <div className="mb-6 flex items-center justify-between px-4">
-                <h3 className="flex items-center gap-2 font-[inter] text-2xl font-black tracking-tighter uppercase italic">
-                  Matches As <span className="primary-heading pr-2">Official</span>
-                </h3>
-                <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
+            ) : matches && matches.length > 0 ? (
+              <Carousel>
+                {matches.map((match) => (
+                  <MatchCard key={match.id} match={match} />
+                ))}
+              </Carousel>
+            ) : (
+              <div className="px-6">
+                <EmptyCard type="matches" />
               </div>
+            )}
+          </section>
+        </div>
 
-              {officialsLoading ? (
-                <div className="center flex w-full">
-                  <Spinner />
-                </div>
-              ) : matchesAsOfficial && matchesAsOfficial.length > 0 ? (
-                <Carousel>
-                  {matchesAsOfficial.map((match, i) => (
-                    <MatchCard key={i} match={match} />
-                  ))}
-                </Carousel>
-              ) : (
-                <div className="px-4">
-                  <EmptyCard type="joined" />
-                </div>
-              )}
-            </section>
-          </div>
+        {/* Matches as Official */}
+        <div className="relative overflow-hidden py-6">
+          <section className="relative z-10">
+            <div className="mb-6 flex items-center justify-between px-4">
+              <h3 className="flex items-center gap-2 text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+                Matches As <span className={"primary-heading pr-2"}>Official</span>
+              </h3>
+              <div className="mx-6 h-px flex-1 bg-slate-100 dark:bg-white/5" />
+              <span className="text-[8px] font-black tracking-widest text-slate-400 uppercase">
+                Deployment
+              </span>
+            </div>
 
-          {/* Sidebar Column */}
-          <aside className="gap-2 space-y-8 px-4 sm:flex lg:col-span-4 lg:block lg:px-0 lg:pr-2">
-            {/* Create Match */}
-            <CreateMatchCard />
-
-            {/* Match Requests */}
-            <MatchRequests />
-          </aside>
+            {officialsLoading ? (
+              <div className="flex h-52 items-center justify-center">
+                <Spinner className="" />
+              </div>
+            ) : matchesAsOfficial && matchesAsOfficial.length > 0 ? (
+              <Carousel>
+                {matchesAsOfficial.map((match, i) => (
+                  <MatchCard key={match.id + i} match={match} />
+                ))}
+              </Carousel>
+            ) : (
+              <div className="px-6">
+                <EmptyCard type="officials" />
+              </div>
+            )}
+          </section>
         </div>
       </div>
+
+      {/* Sidebar Column (4 Span) */}
+      <aside className="flex gap-6 lg:col-span-4 lg:flex-col">
+        <MatchRequests />
+        <CreateMatchCard />
+      </aside>
     </div>
   );
 };

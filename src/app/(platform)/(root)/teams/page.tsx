@@ -13,6 +13,11 @@ import {
   Trophy,
   Search,
   Bell,
+  LayoutGrid,
+  Loader2,
+  Crown,
+  Activity,
+  Zap,
 } from "lucide-react";
 import { TeamForListComponent, TeamRequestWithDetails, TeamWithPlayers } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -137,7 +142,7 @@ function Invitations() {
   };
 
   return (
-    <div className="group hover-card border-input relative h-52 w-full rounded-3xl border p-6 font-[urbanist] font-semibold lg:mt-16">
+    <div className="group hover-card border-input relative h-52 w-full rounded-3xl border p-6 font-[urbanist] font-semibold lg:h-[400px]">
       <div className="flex items-center justify-between">
         <h2 className="primary-text flex items-center gap-3 font-[poppins] text-lg font-black tracking-tighter uppercase italic">
           <div className="relative">
@@ -230,7 +235,7 @@ const TeamsPage = () => {
   });
 
   return (
-    <div className="mx-auto mt-4 pb-[60px]">
+    <div className="mx-auto mt-4 px-4 pb-20">
       {/* Dashboard Header */}
       <div className="mb-6">
         <h1 className="font-[poppins] text-4xl font-extrabold">
@@ -241,56 +246,74 @@ const TeamsPage = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="container-bg grid grid-cols-1 gap-6 rounded-xl py-4 lg:grid-cols-3 lg:gap-1">
-        {/* Main Column */}
-        <div className="flex flex-col justify-between gap-4 lg:col-span-2 lg:h-[36rem]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        {/* MAIN COLUMN (2 Span) */}
+        <div className="container-bg relative space-y-12 overflow-hidden rounded-3xl border border-slate-100 py-6 shadow-sm lg:col-span-2 dark:border-white/5">
+          <div className="absolute top-0 right-0 p-12 opacity-5">
+            <LayoutGrid size={200} />
+          </div>
+
           {isLoading || isTeamLoading ? (
-            <div className="flex items-center justify-center">
-              <DefaultLoader className="primary-heading" />
+            <div className="flex h-full items-center justify-center py-40">
+              <Loader2 size={48} className="animate-spin text-emerald-50" />
             </div>
           ) : (
-            <>
-              <div className="h-[17rem]">
-                <h3 className="my-2 ml-4 flex h-12 items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
-                  Managed <span className="primary-heading pr-2">By You</span>
-                </h3>
-                {/* Managed Teams */}
+            <div className="relative z-10 space-y-16">
+              {/* Section: Managed Teams */}
+              <>
+                <div className="mb-6 flex items-center gap-3 px-6">
+                  <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-500">
+                    <Crown size={20} />
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+                    Managed <span className="primary-heading pr-2">By You</span>
+                  </h3>
+                  <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
+                </div>
+
                 {managedTeams && managedTeams.length > 0 ? (
-                  <Carousel className="max-h-52">
-                    {managedTeams?.map((team) => (
+                  <Carousel>
+                    {managedTeams.map((team) => (
                       <TeamCard key={team.id} team={team} />
                     ))}
                   </Carousel>
                 ) : (
-                  <div className="px-2">
+                  <div className="px-6">
                     <EmptyCard type="managed" />
                   </div>
                 )}
-              </div>
+              </>
 
-              <div className="h-[17rem]">
-                <h3 className="my-2 ml-4 flex h-12 items-center gap-3 text-2xl font-black tracking-tighter uppercase italic">
-                  Joined <span className="primary-heading pr-2">Squads</span>
-                </h3>
-                {/* Managed Teams */}
+              {/* Section: Joined Teams */}
+              <>
+                <div className="mb-6 flex items-center gap-3 px-6">
+                  <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-500">
+                    <Activity size={20} />
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+                    Joined <span className={"primary-heading pr-2"}>Squads</span>
+                  </h3>
+                  <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
+                </div>
+
                 {playerTeams && playerTeams.length > 0 ? (
-                  <Carousel className="h-52 max-h-52">
+                  <Carousel>
                     {playerTeams.map((team) => (
                       <TeamCard key={team.id} team={team} />
                     ))}
                   </Carousel>
                 ) : (
-                  <div className="px-2">
+                  <div className="px-6">
                     <EmptyCard type="joined" />
                   </div>
                 )}
-              </div>
-            </>
+              </>
+            </div>
           )}
         </div>
 
-        {/* Sidebar Column */}
-        <div className="flex flex-col gap-4 px-2 lg:col-span-1 lg:h-[36rem] lg:justify-between">
+        {/* SIDEBAR COLUMN (1 Span) */}
+        <div className="flex gap-6 lg:flex-col">
           <Invitations />
           <CreateTeamCard />
         </div>
