@@ -132,8 +132,8 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     const matchUrl = `${window.location.origin}/matches/${id}`;
 
     const shareData = {
-      title: `${match?.teamA} vs ${match?.teamB}`,
-      text: `🏏 ${match?.teamA} vs ${match?.teamB} is live now. Check the score!`,
+      title: `${match?.teamA.abbreviation} vs ${match?.teamB.abbreviation}`,
+      text: `🏏 ${match?.teamA.name} vs ${match?.teamB.name} is live now. Check the score!`,
       url: matchUrl,
     };
 
