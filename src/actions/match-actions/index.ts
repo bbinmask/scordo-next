@@ -272,6 +272,7 @@ const declineMatchRequestHandler = async (
     data: match,
   };
 };
+
 const acceptMatchRequestHandler = async (
   data: InputTypeForRequest
 ): Promise<ReturnTypeForRequest> => {
@@ -809,12 +810,14 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
 
         if (!firstInning) return { error: "First inning not found!" };
 
-        if (isLastWicket || nextOver === totalOvers) {
+        if (isLastWicket || nextOver === totalOvers || inning.runs + teamRuns > firstInning.runs) {
           let result = null;
-
+          let winnerId;
           if (inning.runs + teamRuns > firstInning.runs) {
+            winnerId = inning.battingTeamId;
             result = `${battingTeam.name} won by ${playerLimit - inning.wickets} wickets`;
           } else if (inning.runs + teamRuns < firstInning.runs) {
+            winnerId = inning.bowlingTeamId;
             result = `${bowlingTeam.name} won by ${firstInning.runs - inning.runs + teamRuns} runs`;
           } else {
             result = "Match Drawn";
@@ -826,6 +829,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
             data: {
               status: "completed",
               result,
+              winnerId,
             },
           });
         }

@@ -145,7 +145,7 @@ export const LiveScorecard = ({
                   RR
                 </span>
                 <p className="font-mono text-lg font-black tracking-tighter text-emerald-400 md:text-2xl">
-                  {String(getRR(innings[0].runs, innings[0].balls))}
+                  {String(getRR(innings[0].runs, match.overs * 6 - innings[length].balls))}
                 </p>
               </div>
             )}

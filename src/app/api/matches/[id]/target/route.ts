@@ -23,11 +23,16 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
             wickets: true,
           },
         },
+        result: true,
         overs: true,
       },
     });
 
     if (!match) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
+
+    console.log({ result: match.result });
+
+    if (match.result) return NextResponse.json(new ApiResponse(match.result));
 
     if (match.innings.length === 2) {
       const firstInningRuns = match.innings[0].runs;
