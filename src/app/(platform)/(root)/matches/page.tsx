@@ -48,9 +48,6 @@ const MatchesPage = () => {
                 Team <span className={"primary-heading pr-2"}>Matches</span>
               </h3>
               <div className="mx-6 h-px flex-1 bg-slate-100 dark:bg-white/5" />
-              <span className="text-[8px] font-black tracking-widest text-slate-400 uppercase">
-                Active Circuit
-              </span>
             </div>
 
             {isLoading ? (
@@ -79,9 +76,6 @@ const MatchesPage = () => {
                 Matches As <span className={"primary-heading pr-2"}>Official</span>
               </h3>
               <div className="mx-6 h-px flex-1 bg-slate-100 dark:bg-white/5" />
-              <span className="text-[8px] font-black tracking-widest text-slate-400 uppercase">
-                Deployment
-              </span>
             </div>
 
             {officialsLoading ? (

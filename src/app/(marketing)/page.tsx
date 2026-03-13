@@ -11,12 +11,12 @@ const MarketingPage = () => {
         {/* Hero Section */}
         <section className="container-bg mt-4 mb-10 flex flex-col items-start justify-between rounded-2xl p-6 shadow-xl md:flex-row xl:p-10">
           <div className="mb-6 xl:pt-4">
-            <h1 className="primary-heading font-[poppins] text-5xl font-black saturate-200 lg:text-7xl dark:brightness-125">
+            <h1 className="font-[poppins] text-5xl font-black text-green-600 lg:text-7xl">
               Scordo
             </h1>
             <h3 className="mb-2 font-[poppins] text-xl font-bold text-wrap text-gray-800 lg:mb-6 lg:text-3xl dark:text-gray-50">
               Cricket
-              <span className="text-main dark:text-main mx-2">Tournament</span>
+              <span className="mx-2 text-green-500">Tournament</span>
               Manager
             </h3>
             <p className="mx-auto mb-6 max-w-lg pr-4 font-[poppins] text-sm font-medium text-gray-700 antialiased sm:pr-20 sm:text-lg md:mx-0 dark:text-gray-300">

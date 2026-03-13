@@ -22,7 +22,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import { useTheme } from "next-themes";
 import { useNotificationModal } from "@/hooks/store/use-notification";
-
+import { SignOutButton } from "@clerk/nextjs";
 const Bottombar = () => {
   const pathname = usePathname();
   const moreRef = useRef<HTMLDivElement>(null);
@@ -194,12 +194,12 @@ const MorePopover = ({ children, closeActive }: MorePopoverProps) => {
             </button>
           ))}
           <div className="mx-2 my-2 h-px bg-slate-100 dark:bg-white/5" />
-          <button className="group flex w-full items-center gap-3 rounded-2xl p-3 transition-all hover:bg-red-50 dark:hover:bg-red-500/10">
+          <div className="group flex w-full items-center gap-3 rounded-2xl p-3 transition-all hover:bg-red-50 dark:hover:bg-red-500/10">
             <LogOut className="h-4 w-4 text-red-600 dark:text-red-400" />
             <span className="text-sm font-bold tracking-tight text-red-600 uppercase">
-              Sign Out
+              <SignOutButton />
             </span>
-          </button>
+          </div>
         </div>
       </PopoverContent>
     </Popover>
