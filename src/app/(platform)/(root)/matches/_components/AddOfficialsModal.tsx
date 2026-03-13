@@ -70,7 +70,7 @@ export const AddOfficialModal = ({ onClose, onSubmit, isOpen, players }: AddOffi
             </label>
             <select
               onChange={(e) => setSelectedPlayer(JSON.parse(e.target.value) as any)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
+              className="container-bg w-full rounded-xl border border-slate-200 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10"
             >
               <option value={""}>Select a Player</option>
               {players
@@ -88,7 +88,7 @@ export const AddOfficialModal = ({ onClose, onSubmit, isOpen, players }: AddOffi
             </label>
             <select
               onChange={(e) => setSelectedRole(e.target.value as OfficialRole)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10 dark:bg-white/5"
+              className="container-bg w-full rounded-xl border border-slate-200 px-3 py-2 font-[poppins] text-xs font-normal transition-all outline-none focus:ring-2 focus:ring-green-500 dark:border-white/10"
             >
               <option value={""}>Select Role</option>
               {["UMPIRE", "SCORER", "COMMENTATOR"].map((role) => (

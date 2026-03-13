@@ -242,7 +242,7 @@ export const LiveScorecard = ({
               </thead>
               <tbody className="divide-y divide-slate-100 font-[urbanist] dark:divide-white/5">
                 {innings[length].InningBowling.filter(
-                  (batsman) => batsman.playerId === innings[length].currentBowlerId
+                  (bowler) => bowler.playerId === innings[length].currentBowlerId
                 ).map((player, i) => (
                   <tr key={i} className={`bg-green-500/5`}>
                     <td className="px-6 py-4">

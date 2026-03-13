@@ -15,7 +15,7 @@ export const InfoCard = ({
   color = "green",
   subValue = "",
 }: InfoCardProps) => (
-  <div className="group hover-card relative overflow-hidden rounded-3xl p-6">
+  <div className="group hover-card relative overflow-hidden rounded-3xl border border-slate-300 p-6 shadow-lg dark:border-white/10">
     <div className="relative">
       <div
         className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600 transition-transform group-hover:scale-110 dark:bg-green-500/10 dark:text-green-400`}
