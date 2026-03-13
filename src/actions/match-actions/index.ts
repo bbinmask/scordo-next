@@ -724,22 +724,6 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         },
       });
 
-      await ablyServer.channels.get(`match:${matchId}`).publish("ball-added", {
-        ball: nextBall,
-        over: nextOver,
-        batsmanId,
-        bowlerId: inning.currentBowlerId as string,
-        inningId,
-        runs,
-        dismissalType,
-        isBye,
-        isLegBye,
-        isNoBall,
-        fielderId: fielderId?.trim() !== "" ? fielderId : undefined,
-        isWicket,
-        isWide,
-      });
-
       await tsx.inningBatting.update({
         where: {
           id: battingInn.id,
@@ -815,14 +799,14 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
           let winnerId;
           if (inning.runs + teamRuns > firstInning.runs) {
             winnerId = inning.battingTeamId;
-            result = `${battingTeam.name} won by ${playerLimit - inning.wickets} wickets`;
+            result = `${battingTeam.name} won by ${playerLimit - inning.wickets - 1} wickets`;
           } else if (inning.runs + teamRuns < firstInning.runs) {
             winnerId = inning.bowlingTeamId;
             result = `${bowlingTeam.name} won by ${firstInning.runs - inning.runs + teamRuns} runs`;
           } else {
             result = "Match Drawn";
           }
-          await tsx.match.update({
+          match = await tsx.match.update({
             where: {
               id: matchId,
             },
@@ -832,8 +816,24 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
               winnerId,
             },
           });
-        }
 
+          await ablyServer.channels.get(`match:${matchId}`).publish("ball-added", {
+            ball: nextBall,
+            over: nextOver,
+            batsmanId,
+            bowlerId: inning.currentBowlerId as string,
+            inningId,
+            isCompleted: match.status === "completed" || match.status === "inning_completed",
+            runs,
+            dismissalType,
+            isBye,
+            isLegBye,
+            isNoBall,
+            fielderId: fielderId?.trim() !== "" ? fielderId : undefined,
+            isWicket,
+            isWide,
+          });
+        }
         return createdBall;
       }
     });

@@ -1,15 +1,10 @@
-import {
-  InningBattingDetails,
-  InningBowlingDetails,
-  InningDetails,
-  MatchWithDetails,
-  PlayerWithUser,
-} from "@/lib/types";
+import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
 import { Shield, Trophy } from "lucide-react";
 import { useState } from "react";
 import { SquadModal } from "./modals/SquadModals";
 
 type SquadState = {
+  teamAbbr?: string;
   teamName?: string;
   teamLogo?: string;
   isOpen: boolean;
@@ -27,12 +22,20 @@ export const MatchHeroSection = ({
   const [squadModalState, setSquadModalState] = useState<SquadState>({ isOpen: false, squad: [] });
 
   const handleOpenSquad = (
+    teamAbbr: string,
     teamName: string,
     teamLogo: string | null,
     players: Map<string, string>,
     squad: PlayerWithUser[]
   ) => {
-    setSquadModalState({ players, teamName, teamLogo: teamLogo || undefined, isOpen: true, squad });
+    setSquadModalState({
+      players,
+      teamName,
+      teamAbbr,
+      teamLogo: teamLogo || undefined,
+      isOpen: true,
+      squad,
+    });
   };
   const handleCloseSquad = () => {
     setSquadModalState((prev) => ({ ...prev, isOpen: false }));
@@ -81,10 +84,8 @@ export const MatchHeroSection = ({
         <div className="group relative">
           <div
             onClick={() => {
-              const map = new Map(
-                innings[0].InningBowling.map((bat) => [bat.player.userId, bat.player.userId])
-              );
               handleOpenSquad(
+                match.teamA.abbreviation,
                 match.teamA.name,
                 match.teamA.logo,
                 innings[0].battingTeamId === match.teamAId
@@ -136,6 +137,7 @@ export const MatchHeroSection = ({
           <div
             onClick={() =>
               handleOpenSquad(
+                match.teamB.abbreviation,
                 match.teamB.name,
                 match.teamB.logo,
                 innings[0].battingTeamId === match.teamBId

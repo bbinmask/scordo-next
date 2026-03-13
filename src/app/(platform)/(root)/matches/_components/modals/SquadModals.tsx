@@ -9,12 +9,14 @@ import {
 } from "@/components/ui/dialog";
 import { InningBattingDetails, InningBowlingDetails, PlayerWithUser } from "@/lib/types";
 import { Shield, UserCircle2 } from "lucide-react";
+import Link from "next/link";
 import { useMemo } from "react";
 
 interface SquadModalProps {
   isOpen: boolean;
   onClose: () => void;
   teamName?: string;
+  teamAbbr?: string;
   teamLogo?: string;
   players?: Map<string, string>;
   squad: PlayerWithUser[];
@@ -23,6 +25,7 @@ export const SquadModal = ({
   isOpen,
   onClose,
   teamName,
+  teamAbbr,
   teamLogo,
   players,
   squad,
@@ -48,7 +51,12 @@ export const SquadModal = ({
       <DialogContent className="overflow-hidden p-0 font-[poppins]">
         <DialogHeader className={`bg-gradient-to-br from-green-500/10 to-transparent p-6 pb-4`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <Link
+              href={`/teams/${teamAbbr ? teamAbbr : "#"}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4"
+            >
               <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border-2 border-white bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
                 {teamLogo ? (
                   <img src={teamLogo} alt={teamName} className="h-full w-full object-cover" />
@@ -66,7 +74,7 @@ export const SquadModal = ({
                   {players?.size} Active
                 </DialogDescription>
               </div>
-            </div>
+            </Link>
           </div>
         </DialogHeader>
         <div className="hide_scrollbar mt-4 max-h-[40vh] space-y-3 overflow-y-auto px-4 pr-2">

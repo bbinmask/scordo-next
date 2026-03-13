@@ -213,6 +213,12 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
 
     const lastInningId = innings.id;
 
+    const { data } = msg;
+
+    if (data.isCompleted) {
+      setIsOverFinished(false);
+    }
+
     if (lastInningId) {
       await queryClient.refetchQueries({
         queryKey: ["current-over-history", lastInningId],
