@@ -105,7 +105,7 @@ export const TeamStats = ({
   ];
 
   const bowlingControlData = [
-    { name: "Runs", value: stats.totalRunsConceded, fill: "#10b981" },
+    { name: "Overs", value: stats.totalOversBowled, fill: "#10b981" },
     { name: "Wickets", value: stats.totalWicketsTaken, fill: "#ef4444" },
   ];
 
@@ -249,11 +249,11 @@ export const TeamStats = ({
           <div className="order-1 lg:order-2 lg:col-span-4">
             <DoughnutChart
               title="Run Control"
-              description="Runs and wickets"
+              description={`${stats.totalRunsConceded} runs conceded in ${stats.totalOversBowled} overs`}
               footerText={`${stats.totalWicketsTaken} wickets taken in ${stats.totalOversBowled}`}
               data={bowlingControlData}
               centerValue={stats.totalWicketsTaken}
-              centerLabel="Total Extras"
+              centerLabel="Total Wickets"
             />
           </div>
         </div>
