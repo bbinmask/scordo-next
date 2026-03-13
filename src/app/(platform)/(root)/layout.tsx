@@ -20,5 +20,3 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default RootLayout;
-
-// 1200px

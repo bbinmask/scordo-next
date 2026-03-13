@@ -181,6 +181,11 @@ const addOfficialsHandler = async (
         error: "Only 5 officials are allowed!",
       };
 
+    if (match.organizerId !== user.id)
+      return {
+        error: "Only organizer can add a new official",
+      };
+
     await db.matchOfficial.createMany({
       data: matchOfficials.map((official) => ({
         ...official,
