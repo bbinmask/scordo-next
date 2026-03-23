@@ -1,10 +1,14 @@
+import { currentUser } from "@/lib/currentUser";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request, { params }: { params: Promise<{ userId?: string }> }) {
   const { userId } = await params;
   try {
-    if (!userId) return NextResponse.error();
+    const user = await currentUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    if (!userId) return NextResponse.json({ error: "Missing userId" }, { status: 400 });
 
     const friends = await db.friendship.findMany({
       where: {
@@ -33,6 +37,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ userId?:
 
     return NextResponse.json(friends);
   } catch (error) {
-    return NextResponse.error();
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

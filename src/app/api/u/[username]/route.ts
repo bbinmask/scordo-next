@@ -1,17 +1,20 @@
+import { ERROR_CODES } from "@/constants";
 import { db } from "@/lib/db";
+import { ApiError } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
 interface Params {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
 
 export async function GET(req: Request, { params }: Params) {
   const { username } = await params;
 
   try {
-    if (!username || username.trim() === "") return NextResponse.error();
+    if (!username || username.trim() === "")
+      return NextResponse.json(new ApiError(ERROR_CODES.BAD_REQUEST));
 
-    const user = await db.user.findFirst({
+    const user = await db.user.findUnique({
       where: {
         username,
       },

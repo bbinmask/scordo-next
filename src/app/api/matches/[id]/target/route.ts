@@ -1,5 +1,4 @@
 import { ERROR_CODES } from "@/constants";
-import { currentUser } from "@/lib/currentUser";
 import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";

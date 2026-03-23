@@ -45,6 +45,10 @@ export const GET = async (request: Request) => {
           },
         ],
       },
+      include: {
+        teamA: true,
+        teamB: true,
+      },
     });
 
     return NextResponse.json(new ApiResponse(matches));
