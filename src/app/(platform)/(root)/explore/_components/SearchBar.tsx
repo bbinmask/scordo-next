@@ -37,11 +37,12 @@ const SearchBar = ({ query, setQuery }: SearchBarProps) => {
         value={query}
         onChange={handleChange}
         placeholder="Search users, teams, tournaments..."
-        className="w-full rounded-full border border-slate-100 bg-white px-4 py-2 pr-12 pl-6 text-base font-semibold tracking-tight italic shadow-sm transition-all outline-none placeholder:text-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-green-600 dark:border-white/5 dark:bg-slate-900 dark:placeholder:text-slate-700 dark:focus:border-emerald-500"
+        className="w-full rounded-full border border-slate-100 bg-white px-4 py-2 pr-12 pl-6 font-[poppins] text-base font-medium tracking-tight shadow-sm transition-all outline-none placeholder:text-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-green-600 dark:border-white/5 dark:bg-slate-900 dark:placeholder:text-slate-700 dark:focus:border-emerald-500"
       />
       <Search className="absolute top-1/2 right-4 -translate-y-1/2 p-1 text-gray-500" />
     </div>
   );
 };
+1;
 
 export default SearchBar;

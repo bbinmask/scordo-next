@@ -151,6 +151,9 @@ model Tournament {
   startDate           DateTime
   endDate             DateTime
   tournamentOfficials TournamentOfficial[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {
@@ -183,8 +186,7 @@ model User {
   updatedAt           DateTime             @updatedAt
   matchOfficials      MatchOfficial[]
   tournamentOfficials TournamentOfficial[]
-  organizedMatches Match[] @relation("MatchOrganizer")
-
+  organizedMatches    Match[]              @relation("MatchOrganizer")
 }
 
 model Friendship {
@@ -224,10 +226,10 @@ model TeamRequest {
   fromId String @db.ObjectId
   teamId String @db.ObjectId
 
-  to   User @relation("ReceivedRequests", fields: [toId], references: [id])
-  from User @relation("SentRequests", fields: [fromId], references: [id])
-  team Team @relation("TeamJoinRequests", fields: [teamId], references: [id])
-  isInvite Boolean @default(false)
+  to        User          @relation("ReceivedRequests", fields: [toId], references: [id])
+  from      User          @relation("SentRequests", fields: [fromId], references: [id])
+  team      Team          @relation("TeamJoinRequests", fields: [teamId], references: [id])
+  isInvite  Boolean       @default(false)
   status    RequestStatus @default(pending)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
@@ -249,15 +251,15 @@ model TournamentTeam {
 }
 
 model Match {
-  id           String      @id @default(auto()) @map("_id") @db.ObjectId
-  teamAId      String      @db.ObjectId
-  teamBId      String      @db.ObjectId
-  tournamentId String?     @db.ObjectId
-  overs        Int
-  overLimit    Int
-  teamA        Team        @relation("TeamA", fields: [teamAId], references: [id])
-  teamB        Team        @relation("TeamB", fields: [teamBId], references: [id])
-  tournament   Tournament? @relation("TournamentMatches", fields: [tournamentId], references: [id])
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  teamAId       String         @db.ObjectId
+  teamBId       String         @db.ObjectId
+  tournamentId  String?        @db.ObjectId
+  overs         Int
+  overLimit     Int
+  teamA         Team           @relation("TeamA", fields: [teamAId], references: [id])
+  teamB         Team           @relation("TeamB", fields: [teamBId], references: [id])
+  tournament    Tournament?    @relation("TournamentMatches", fields: [tournamentId], references: [id])
   playerLimit   Int
   innings       Inning[]       @relation("MatchInnings")
   venue         Address
@@ -267,19 +269,18 @@ model Match {
   date          DateTime?
   location      String?
   requestStatus RequestStatus? @default(pending)
-  organizerId String @db.ObjectId
-  organizer   User   @relation("MatchOrganizer", fields: [organizerId], references: [id])
-  winnerId String? @db.ObjectId 
+  organizerId   String         @db.ObjectId
+  organizer     User           @relation("MatchOrganizer", fields: [organizerId], references: [id])
+  winnerId      String?        @db.ObjectId
 
-  status MatchStatus @default(not_started)
-  result String?
+  status         MatchStatus     @default(not_started)
+  result         String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   matchOfficials MatchOfficial[]
 
   @@index([teamAId])
   @@index([teamBId])
-
 }
 
 model Inning {
@@ -301,18 +302,16 @@ model Inning {
   currentNonStrikerId String? @db.ObjectId
   currentBowlerId     String? @db.ObjectId
 
-
   currentStriker    Player? @relation("StrikerInnings", fields: [currentStrikerId], references: [id])
   currentNonStriker Player? @relation("NonStrikerInnings", fields: [currentNonStrikerId], references: [id])
   currentBowler     Player? @relation("BowlerInnings", fields: [currentBowlerId], references: [id])
-  
 
   ballsData     Ball[]          @relation("InningBalls")
   InningBatting InningBatting[] @relation("InningBatsmenStats")
   InningBowling InningBowling[] @relation("InningBowlerStats")
-  inningNumber Int @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  inningNumber  Int             @default(1)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model Player {
@@ -337,12 +336,12 @@ model Player {
   nonStrikerInnings Inning[] @relation("NonStrikerInnings")
   bowlerInnings     Inning[] @relation("BowlerInnings")
 
-  /// Constraints
-  @@unique([userId, teamId]) // prevents same user joining same team twice
-
   /// Tracking (VERY IMPORTANT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  /// Constraints
+  @@unique([userId, teamId]) // prevents same user joining same team twice
 }
 
 model InningBatting {

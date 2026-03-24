@@ -38,11 +38,15 @@ const AfterSearch = ({
   const totalResults = tournaments?.length + teams?.length + users?.length + matches?.length;
 
   return (
-    <div className="min-h-[400px] rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6 dark:bg-white/10">
+    <div className="hover-card max-h-[500px] min-h-80 w-full overflow-x-hidden overflow-y-auto rounded-xl border border-white/20 bg-white/30 p-4 shadow-lg backdrop-blur-lg md:p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          Results for "{query}" ({totalResults})
-        </h2>
+        {
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            {query.trim().length === 0
+              ? "Search for anything..."
+              : `Results for "${query}" (${totalResults})`}
+          </h2>
+        }
         <button
           onClick={clearSearch}
           className="flex items-center text-sm font-semibold text-gray-700 hover:text-green-500 dark:text-gray-300 dark:hover:text-green-400"
@@ -56,7 +60,7 @@ const AfterSearch = ({
       ) : totalResults === 0 ? (
         <NotFoundParagraph
           description="
-          No results found. Try Link different search term."
+          No results found. Try different search term."
         />
       ) : (
         <div className="space-y-4">
@@ -81,9 +85,7 @@ const AfterSearch = ({
                   key={team.id}
                   icon={Shield}
                   title={team.name}
-                  subtitle={
-                    team.address?.city ? `${team.address?.city} (${team.address.state})` : "Go to"
-                  }
+                  subtitle={team.abbreviation}
                   href={`/teams/${team.abbreviation}`}
                 />
               ))}

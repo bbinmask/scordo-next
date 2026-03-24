@@ -21,4 +21,45 @@ export interface BreadScrumbLinkProps {
   name: string;
 }
 
+export interface ExploreResultsProps {
+  teams: {
+    id: string;
+    type: "all" | "teams" | "matches" | "users" | "tournaments";
+    title: string;
+    subtitle: string;
+    image: string | null;
+    meta: string;
+    href: string;
+    trending: boolean;
+  }[];
+  matches: {
+    id: string;
+    type: "all" | "teams" | "matches" | "users" | "tournaments";
+    title: string;
+    subtitle: string;
+    meta: string;
+    href: string;
+    status: string;
+    badge?: string | null;
+  }[];
+  users: {
+    id: string;
+    type: "all" | "teams" | "matches" | "users" | "tournaments";
+    title: string;
+    subtitle: string;
+    image: string | null;
+    meta: string;
+    href: string;
+  }[];
+  tournaments: {
+    id: string;
+    type: "all" | "teams" | "matches" | "users" | "tournaments";
+    title: string;
+    subtitle: string;
+    meta: string;
+    href: string;
+    badge?: string;
+  }[];
+}
+
 export type IImageType = "logo" | "banner" | "avatar";
