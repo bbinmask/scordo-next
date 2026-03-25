@@ -8,7 +8,7 @@ interface layoutProps {
 export const metadata = getMetadata("Explore | Scordo", "Search for users, teams and tournaments");
 
 const ExploreLayout = ({ children }: layoutProps) => {
-  return <div className="pb-24">{children}</div>;
+  return <div className="pb-12">{children}</div>;
 };
 
 export default ExploreLayout;

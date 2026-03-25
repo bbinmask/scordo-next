@@ -110,7 +110,7 @@ export const ExploreHub = () => {
               <h2 className="mb-2 text-[10px] font-black tracking-[0.5em] text-emerald-500 uppercase">
                 Global Discovery
               </h2>
-              <h1 className="text-5xl font-black tracking-tighter text-slate-900 uppercase italic md:text-7xl dark:text-white">
+              <h1 className="text-3xl font-black tracking-tighter text-slate-900 uppercase italic md:text-5xl dark:text-white">
                 Explore <span className="text-emerald-500">Hub</span>
               </h1>
             </div>
@@ -158,9 +158,9 @@ export const ExploreHub = () => {
         </header>
 
         {/* MAIN GRID - RESULTS & TRENDING */}
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* Left Column: Result Feed */}
-          <div className="space-y-8 lg:col-span-8">
+          <div className="container-bg relative space-y-12 overflow-hidden rounded-3xl border-2 border-slate-200 py-6 shadow-sm lg:col-span-2 dark:border-white/10">
             <div className="flex items-center justify-between px-4">
               <h3 className="text-xl font-black tracking-tighter text-slate-400 uppercase italic">
                 Broadcast Feed
@@ -203,7 +203,7 @@ export const ExploreHub = () => {
           </div>
 
           {/* Right Column: Featured Bento */}
-          <aside className="space-y-8 lg:col-span-4">
+          <aside className="space-y-8">
             {/* Featured Tournament Card */}
             <div className="group relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-green-700 to-green-800 p-8 text-white shadow-2xl">
               <div className="absolute top-0 right-0 -mt-16 -mr-16 h-32 w-32 rounded-full bg-white/10 blur-3xl transition-transform duration-700 group-hover:scale-150" />
@@ -225,7 +225,7 @@ export const ExploreHub = () => {
                 </p>
                 <Link
                   href="/tournaments/create"
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-4 text-[10px] font-black tracking-widest text-slate-900 uppercase shadow-xl transition-all hover:translate-x-1 active:scale-95"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-4 text-[10px] font-black tracking-widest text-slate-900 uppercase shadow-xl transition-all active:scale-95"
                 >
                   Create Tournament <ArrowUpRight size={14} />
                 </Link>

@@ -20,6 +20,7 @@ interface ExploreItem {
   title: string;
   subtitle: string;
   href: string;
+  short?: string;
   meta: string;
   image?: string | null;
   status?: string;
@@ -38,7 +39,7 @@ const ResultCard = ({ item }: { item: ExploreItem }) => {
     }[item.type] || Globe;
 
   return (
-    <div className="group relative min-w-80 overflow-hidden rounded-3xl border border-slate-200 bg-white p-3 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-slate-900">
+    <div className="group hover-card relative min-w-80 overflow-hidden rounded-3xl border border-slate-200 p-3 shadow-sm transition-all hover:shadow-xl dark:border-white/10">
       <div className="absolute top-0 right-0 p-4">
         {item.trending && (
           <div className="flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-2 py-1 text-amber-600">
@@ -50,7 +51,7 @@ const ResultCard = ({ item }: { item: ExploreItem }) => {
 
       <div className="relative z-10 flex items-start gap-5">
         <div className="relative">
-          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 transition-transform group-hover:scale-110 dark:border-white/5 dark:bg-slate-800">
+          <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border border-slate-100 bg-slate-50 dark:border-white/5 dark:bg-slate-800">
             {item.image ? (
               <img src={item.image} className="h-full w-full object-cover" alt={item.title} />
             ) : (
@@ -74,9 +75,12 @@ const ResultCard = ({ item }: { item: ExploreItem }) => {
           <p className="mb-1 text-[9px] font-semibold tracking-widest text-emerald-500 uppercase">
             {item.meta}
           </p>
-          <h3 className="truncate font-[poppins] text-sm font-semibold text-slate-900 uppercase dark:text-white">
-            {item.title}
-          </h3>
+          <div className="font-[urbanist]">
+            <h5 className="block truncate text-sm font-semibold text-slate-900 uppercase dark:text-white">
+              {item.title}
+            </h5>
+            {item.type === "teams" && <span className="text-[10px]">@{item?.short}</span>}
+          </div>
           <p
             className={`mt-1 truncate text-[10px] font-medium text-slate-400 ${item.type === "users" ? "lowercase" : "uppercase"}`}
           >

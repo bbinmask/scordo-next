@@ -27,6 +27,7 @@ export const GET = async (req: NextRequest) => {
       id: team.id,
       type: "teams" as any,
       href: `/teams/${team.abbreviation}`,
+      short: team.abbreviation,
       title: team.name,
       subtitle: `${team.players.length} players`,
       image: team.logo,
@@ -51,7 +52,7 @@ export const GET = async (req: NextRequest) => {
       id: match.id,
       type: "matches" as any,
       href: `/matches/${match.id}`,
-      title: `${match.teamA.name} vs ${match.teamB.name}`,
+      title: `${match.teamA.abbreviation} vs ${match.teamB.abbreviation}`,
       subtitle: match.date
         ? new Date(match.date).toDateString()
         : `Match is in ${match.venue.city}(${match.venue.state})`,

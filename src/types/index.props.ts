@@ -26,6 +26,7 @@ export interface ExploreResultsProps {
     id: string;
     type: "all" | "teams" | "matches" | "users" | "tournaments";
     title: string;
+    short: string;
     subtitle: string;
     image: string | null;
     meta: string;

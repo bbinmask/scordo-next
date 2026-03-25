@@ -54,9 +54,12 @@ const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
 const isPublicApiRoute = createRouteMatcher([
   "/api/webhooks/clerk(.*)",
   "/api/ably/token",
-  "/matches(.*)",
-  "/u(.*)",
-  "/teams(.*)",
+  "/api/explore",
+  "/matches/(.*)",
+  "/u/(.*)",
+  "/tournament/(.*)",
+  "/teams/(.*)",
+  "/explore(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

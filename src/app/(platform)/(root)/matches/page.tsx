@@ -10,8 +10,6 @@ import { MatchRequests } from "./_components/MatchRequests";
 import { MatchCard } from "./_components/cards/MatchCard";
 import { CreateMatchCard } from "./_components/cards/CreateMatchCard";
 import { MatchWithDetails } from "@/lib/types";
-import { Activity, Gavel } from "lucide-react";
-
 const MatchesPage = () => {
   const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<MatchWithDetails[]>({
     queryKey: ["matches-as-official"],
