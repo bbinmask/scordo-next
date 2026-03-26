@@ -49,7 +49,7 @@ const Navbar = () => {
         >
           {/* LOGO */}
           <div className="flex items-center gap-4">
-            {headingText !== "dashboard" && (
+            {headingText !== "dashboard" && headingText !== "" && (
               <button
                 onClick={() => router.back()}
                 className="cursor-pointer leading-none font-black tracking-tighter text-slate-900 uppercase italic dark:text-white"
@@ -59,7 +59,7 @@ const Navbar = () => {
             )}
             <Link href={`/${headingText}`} className="group flex cursor-pointer items-center gap-2">
               <h1 className="text-2xl leading-none font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-                {headingText === "dashboard" ? "SCORDO" : headingText}
+                {headingText === "dashboard" || headingText === "" ? "SCORDO" : headingText}
                 <span className="text-emerald-500">.</span>
               </h1>
             </Link>
