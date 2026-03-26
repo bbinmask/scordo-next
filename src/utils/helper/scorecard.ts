@@ -1,8 +1,27 @@
 import { Ball } from "@/generated/prisma";
 import { CurrentOverBalls } from "@/lib/types";
 
-const getPartnership = (ballData: Ball[]) => {
-  return 0;
+const getPartnership = (ballData: Ball[]): number => {
+  if (!ballData || ballData.length === 0) return 0;
+
+  let partnership = 0;
+
+  // Walk backwards from the most recent ball
+  for (let i = ballData.length - 1; i >= 0; i--) {
+    const ball = ballData[i];
+
+    if (ball.isWicket) {
+      // Stop at the previous wicket — don't include it in this partnership
+      break;
+    }
+
+    partnership += ball.runs;
+    // Add wide/no-ball extras to partnership too
+    if (ball.isWide) partnership += 1;
+    if (ball.isNoBall) partnership += 1;
+  }
+
+  return partnership;
 };
 
 const getStrikeRate = (runs: number, balls: number) => {

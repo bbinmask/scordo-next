@@ -15,7 +15,7 @@ const TeamCard = ({ team }: TeamCardProps) => {
 
   return (
     <div
-      className={`group hover-card relative flex h-48 w-80 flex-shrink-0 flex-col justify-between overflow-hidden rounded-3xl border p-6 transition-all duration-500`}
+      className={`group hover-card relative flex h-48 w-80 flex-shrink-0 flex-col justify-between overflow-hidden rounded-3xl border border-slate-300 p-6 transition-all duration-500 dark:border-white/10`}
     >
       <div className="relative z-10 flex items-start justify-between">
         <div className="relative">

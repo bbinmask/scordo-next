@@ -72,14 +72,6 @@ const DashboardPage = () => {
       ) : (
         <div className="py-4">
           <section className="px-4" title="Dashboard">
-            <div className="mb-6 text-left">
-              <h1 className="font-[poppins] text-4xl font-extrabold">
-                <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
-                  Dashboard
-                </span>
-              </h1>
-            </div>
-
             <HeroSection user={user} />
             <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2">
               {cardData.map((item, i) => (

@@ -236,15 +236,6 @@ const TeamsPage = () => {
 
   return (
     <div className="mx-auto mt-4 px-4 pb-20">
-      {/* Dashboard Header */}
-      <div className="mb-6">
-        <h1 className="font-[poppins] text-4xl font-extrabold">
-          <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
-            Teams
-          </span>
-        </h1>
-      </div>
-
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* MAIN COLUMN (2 Span) */}

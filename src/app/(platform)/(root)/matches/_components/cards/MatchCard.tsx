@@ -7,8 +7,8 @@ export const MatchCard = ({ match }: { match?: MatchWithDetails }) => {
   if (!match) return null;
 
   return (
-    <div className="group relative h-56 w-80 flex-shrink-0 p-1">
-      <div className="hover-card relative flex h-full w-full flex-col justify-between overflow-hidden rounded-[2rem] p-6">
+    <div className="">
+      <div className="hover-card group relative flex h-52 w-72 flex-shrink-0 flex-col justify-between overflow-hidden rounded-[2rem] border border-slate-300 p-6 dark:border-white/10">
         {/* Visual Versus Header */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex -space-x-3">

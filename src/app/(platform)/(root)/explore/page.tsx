@@ -104,18 +104,7 @@ export const ExploreHub = () => {
     <div className="min-h-screen p-4 font-sans text-slate-900 transition-colors duration-500 md:p-8 dark:text-slate-100">
       <div className="mx-auto max-w-7xl">
         {/* Header & Tactical Search */}
-        <header className="animate-in fade-in slide-in-from-top-4 mb-12 space-y-8 duration-700">
-          <div className="flex flex-col items-end justify-between gap-6 border-b border-slate-200 pb-8 md:flex-row dark:border-white/5">
-            <div>
-              <h2 className="mb-2 text-[10px] font-black tracking-[0.5em] text-emerald-500 uppercase">
-                Global Discovery
-              </h2>
-              <h1 className="text-3xl font-black tracking-tighter text-slate-900 uppercase italic md:text-5xl dark:text-white">
-                Explore <span className="text-emerald-500">Hub</span>
-              </h1>
-            </div>
-          </div>
-
+        <div className="animate-in fade-in slide-in-from-top-4 mb-12 space-y-8 duration-700">
           {/* SearchBar */}
 
           <Suspense>
@@ -155,7 +144,7 @@ export const ExploreHub = () => {
               onClick={() => setActiveFilter("tournaments")}
             />
           </div>
-        </header>
+        </div>
 
         {/* MAIN GRID - RESULTS & TRENDING */}
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
