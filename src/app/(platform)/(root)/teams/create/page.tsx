@@ -37,7 +37,7 @@ const CreateTeamPage = () => {
   };
 
   return (
-    <div className="bg-slate-50 pb-24 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
+    <div className="bg-slate-50 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
       <TeamForm onSubmit={onSubmit}>
         <div className="center mt-6 flex w-full">
           <button

@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { getMetadata } from "@/utils/helper/getMetadata";
 import { auth } from "@clerk/nextjs/server";
+import { Footer } from "@/components/Footer";
 export const metadata = getMetadata();
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
@@ -16,6 +17,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
         <div className="mt-20 flex justify-center">
           <div className="w-full max-w-[1600px]">{children}</div>
         </div>
+        <Footer />
         {userId && userId.trim() !== "" && <Bottombar />}
       </AblyProviders>
     </QueryProvider>

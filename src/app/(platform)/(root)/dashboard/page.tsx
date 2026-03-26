@@ -5,8 +5,6 @@ import { BarChart2, Newspaper, Shield, Video } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
 import Tabs from "../_components/Tabs";
 import { useState } from "react";
-import { UpdatesList } from "./_components/NewsList";
-import { VideoList } from "../_components/VideoList";
 import HeroSection from "../_components/Hero";
 import { useQuery } from "@tanstack/react-query";
 import { DefaultLoader } from "@/components/Spinner";
@@ -37,8 +35,6 @@ const contentTabs = [
 ];
 
 const DashboardPage = () => {
-  const [currentTab, setCurrentTab] = useState("updates");
-
   const {
     data: user,
     isLoading,
@@ -114,21 +110,6 @@ const DashboardPage = () => {
                   </p>
                 )}
               </Carousel>
-            </div>
-          </section>
-          <section className="px-4" title="Featured">
-            <div className="mb-6 text-center md:text-left">
-              <h2 className="font-[poppins] text-4xl font-extrabold text-gray-800 dark:text-white">
-                <span className="bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400">
-                  Featured
-                </span>
-              </h2>
-            </div>
-            <div className="container-bg w-full rounded-xl p-4 sm:p-6">
-              <Tabs setCurrentTab={setCurrentTab} currentTab={currentTab} tabs={contentTabs} />
-
-              {currentTab === "updates" && <UpdatesList />}
-              {currentTab === "videos" && <VideoList />}
             </div>
           </section>
         </div>

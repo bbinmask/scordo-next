@@ -64,7 +64,7 @@ export default function ProfileHistoryPage() {
       : bowlingRecords && bowlingRecords.length > 0;
 
   return (
-    <div className="min-h-screen bg-slate-100 pb-24 font-sans transition-colors duration-500 dark:bg-[#020617]">
+    <div className="min-h-screen bg-slate-100 font-sans transition-colors duration-500 dark:bg-[#020617]">
       {/* Hero */}
       <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-emerald-600 via-green-600 to-green-800 md:h-52">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
