@@ -138,7 +138,8 @@ model Team {
 
 model Tournament {
   id          String            @id @default(auto()) @map("_id") @db.ObjectId
-  title       String            @unique
+  title       String            
+  uniqueTitle String @unique
   details     TournamentDetails
   description String?
   organizerId String            @db.ObjectId
