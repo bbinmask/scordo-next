@@ -57,9 +57,16 @@ const Navbar = () => {
                 <ArrowLeft />
               </button>
             )}
-            <Link href={`/${headingText}`} className="group flex cursor-pointer items-center gap-2">
+            <Link
+              href={`/${headingText === "u" ? "/" : headingText}`}
+              className="group flex cursor-pointer items-center gap-2"
+            >
               <h1 className="text-2xl leading-none font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-                {headingText === "dashboard" || headingText === "" ? "SCORDO" : headingText}
+                {headingText === "dashboard" || headingText === ""
+                  ? "SCORDO"
+                  : headingText === "u"
+                    ? "User Details"
+                    : headingText}
                 <span className="text-emerald-500">.</span>
               </h1>
             </Link>

@@ -121,7 +121,7 @@ export default function SettingsPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-slate-100 font-sans text-slate-900 transition-colors duration-500 dark:bg-[#020617] dark:text-slate-100">
+    <div className="min-h-screen pb-8 font-sans text-slate-900 transition-colors duration-500 dark:text-slate-100">
       {/* Hero Banner */}
       <div className="relative h-40 w-full overflow-hidden bg-gradient-to-r from-emerald-600 via-green-600 to-green-800 md:h-52">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />

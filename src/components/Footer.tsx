@@ -56,7 +56,7 @@ export const Footer = () => {
         {/* Top Section: Brand & Newsletter */}
         <div className="flex w-full flex-col justify-between lg:flex-row">
           <div className="mb-8 w-full space-y-6">
-            <div className="group flex cursor-pointer items-center gap-3">
+            <div className="group flex items-center gap-3">
               <h1 className="text-3xl leading-none font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
                 SCORDO<span className="text-emerald-500">.</span>
               </h1>
@@ -81,7 +81,10 @@ export const Footer = () => {
               {[
                 { icon: TwitterIcon, path: "https://x.com/bbinmask" },
                 { icon: GithubIcon, path: "https://github.com/bbinmask" },
-                { icon: LinkedinIcon, path: "/" },
+                {
+                  icon: LinkedinIcon,
+                  path: "https://www.linkedin.com/in/irfanul-madar-84a70a333/",
+                },
               ].map((link, i) => (
                 <Link
                   href={link.path}

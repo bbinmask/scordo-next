@@ -155,7 +155,7 @@
 }
 
 .layout-background {
-  @apply bg-slate-100 dark:bg-[#010e15];
+  @apply bg-slate-100 dark:bg-[#020617];
   /* bg-gradient-to-br from-slate-200 to-slate-200 text-gray-800 transition-all dark:from-gray-950 dark:to-emerald-900 dark:text-gray-100; */
 }
 

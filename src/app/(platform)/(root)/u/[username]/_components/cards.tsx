@@ -109,7 +109,7 @@ const ProfilePage = ({ user }: { user: User }) => {
   >({
     queryKey: ["batting-stats", user.id],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/stats/user/batting?userId=${user.id}`, {
+      const { data } = await axios.get(`/api/stats/user/batting`, {
         params: {
           userId: user.id,
         },
@@ -124,7 +124,7 @@ const ProfilePage = ({ user }: { user: User }) => {
   >({
     queryKey: ["bowling-stats", user.id],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/stats/user/bowling?userId=${user.id}`, {
+      const { data } = await axios.get(`/api/stats/user/bowling`, {
         params: {
           userId: user.id,
         },
@@ -192,7 +192,7 @@ const ProfilePage = ({ user }: { user: User }) => {
   };
 
   return (
-    <div className="bg-slate-50 pb-20 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:bg-[#020617] dark:text-slate-100">
+    <div className="pb-8 font-sans text-slate-900 transition-colors duration-500 xl:rounded-md dark:text-slate-100">
       {/* Hero Banner Area */}
       <div className="relative h-64 w-full overflow-hidden bg-gradient-to-r from-emerald-600 via-green-600 to-green-800 md:h-80">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />

@@ -56,9 +56,13 @@ const isPublicApiRoute = createRouteMatcher([
   "/api/ably/token",
   "/api/explore",
   "/matches/(.*)",
+  "/api/matches/(.*)",
   "/u/(.*)",
+  "/api/u/(.*)",
   "/tournament/(.*)",
+  "/api/tournament/(.*)",
   "/teams/(.*)",
+  "/api/teams/(.*)",
   "/explore(.*)",
 ]);
 
