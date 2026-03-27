@@ -1,8 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { FaUser } from "react-icons/fa6";
-import { BiSolidMessage } from "react-icons/bi";
 import { Bell, BellDot } from "lucide-react";
 import { useRequestModal } from "@/hooks/store/use-profile";
 import RequestsModal from "@/components/modals/RequestsModal";
@@ -42,7 +40,7 @@ const FriendRequests = ({ className, requests }: FriendRequestsProps) => {
           {requests?.length > 9 ? "9+" : requests?.length || 0}
         </span> */}
       </div>
-      <RequestsModal initialRequests={requests} />
+      <RequestsModal enabled={false} initialRequests={requests} />
     </div>
   );
 };

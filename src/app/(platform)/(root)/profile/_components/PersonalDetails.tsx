@@ -19,13 +19,9 @@ import {
   Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { MdLeaderboard } from "react-icons/md";
 import { BattingStats } from "../../_components/cards/BattingStats";
-import MatchStats from "./MatchStats";
-import TournamentStats from "./TournamentStats";
 import { useForm } from "react-hook-form";
 import { ProfileFormData } from "../page";
-import { useFriendsModal } from "@/hooks/store/use-friends";
 import FriendsModal from "@/components/modals/FriendsModal";
 import {
   FriendshipWithBoth,
@@ -331,7 +327,7 @@ const PersonalDetails = ({
       <UpdateProfileModal user={user} />
       <EditDetailsModal user={user} />
       <FriendsModal friends={friends} isOwnProfile />
-      <RequestsModal initialRequests={requests} />
+      <RequestsModal enabled={false} initialRequests={requests} />
     </>
   );
 };

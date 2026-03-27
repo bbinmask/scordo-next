@@ -49,15 +49,15 @@ const ProfilePage = async () => {
 
   const friendRequests: any = getFriendRequests(friendReqs, user.id);
 
-  const teams = await db.team.findMany({
-    where: {
-      players: {
-        some: {
-          userId: user.id,
-        },
-      },
-    },
-  });
+  // const teams = await db.team.findMany({
+  //   where: {
+  //     players: {
+  //       some: {
+  //         userId: user.id,
+  //       },
+  //     },
+  //   },
+  // });
 
   const teamRequests: TeamRequestWithDetails[] = await db.teamRequest.findMany({
     where: {
@@ -69,21 +69,21 @@ const ProfilePage = async () => {
       to: true,
     },
   });
-  const tournaments = await db.tournament.findMany({
-    where: {
-      participatingTeams: {
-        some: {
-          team: {
-            players: {
-              some: {
-                userId: user.id,
-              },
-            },
-          },
-        },
-      },
-    },
-  });
+  // const tournaments = await db.tournament.findMany({
+  //   where: {
+  //     participatingTeams: {
+  //       some: {
+  //         team: {
+  //           players: {
+  //             some: {
+  //               userId: user.id,
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  // });
 
   const tournamentRequests = await db.tournamentRequest.findMany({
     where: {

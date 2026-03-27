@@ -18,31 +18,32 @@ import { toast } from "sonner";
 
 import { ConfirmModal } from "./ConfirmModal";
 import { useConfirmModal } from "@/hooks/useConfirmModal";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { getFriendRequests } from "@/utils/helper/getFriends";
 
 interface RequestsModalProps {
-  initialRequests: {
+  initialRequests?: {
     friendRequests?: FriendshipWithBoth[];
     tournamentRequests?: TournamentRequestWithDetails[];
     teamRequests?: TeamRequestWithDetails[];
   };
+  enabled: boolean;
 }
 
-export default function RequestsModal({ initialRequests }: RequestsModalProps) {
-  const [requests, setRequests] = useState(initialRequests);
+export default function RequestsModal({ initialRequests, enabled }: RequestsModalProps) {
+  const [requests, setRequests] = useState(
+    initialRequests || {
+      friendRequests: [],
+      teamRequests: [],
+      tournamentRequests: [],
+    }
+  );
   const [toggle, setToggle] = useState({
     friend: true,
     team: true,
     tournament: true,
   });
-
-  interface ConfirmModalState {
-    isOpen: boolean;
-    title: string;
-    description: string;
-    confirmText: string;
-    confirmVariant: "primary" | "destructive";
-    onConfirm: () => void;
-  }
 
   const { confirmModalState, closeConfirmModal, openConfirmModal } = useConfirmModal();
 
@@ -117,6 +118,30 @@ export default function RequestsModal({ initialRequests }: RequestsModalProps) {
       tournamentRequests: filteredRequests,
     }));
   };
+
+  const {} = useQuery({
+    queryKey: ["user-all-requests"],
+    queryFn: async () => {
+      const { data } = await axios.get(`/api/me/requests`);
+
+      if (!data.success) return requests;
+
+      const userId = data.data.userId;
+
+      const friendReqs = data.data.friendReqs;
+
+      const friendRequests: any = getFriendRequests(friendReqs, userId);
+
+      setRequests({
+        friendRequests,
+        teamRequests: data.data.teamRequests,
+        tournamentRequests: data.data.tournamentRequests,
+      });
+
+      return data.data;
+    },
+    enabled: enabled,
+  });
 
   const pendingCount =
     (requests?.friendRequests?.length || 0) +

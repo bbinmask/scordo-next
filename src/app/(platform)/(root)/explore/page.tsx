@@ -165,7 +165,7 @@ export const ExploreHub = () => {
                   {initialData ? (
                     <InitialResultsList filter={activeFilter} data={initialData} />
                   ) : (
-                    <div className="col-span-full rounded-[3rem] border-2 border-dashed border-slate-200 bg-white/40 py-20 text-center backdrop-blur-sm dark:border-white/5 dark:bg-white/5">
+                    <div className="col-span-full mx-6 rounded-[3rem] border-2 border-dashed border-slate-200 bg-white/40 py-20 text-center backdrop-blur-sm dark:border-white/5 dark:bg-white/5">
                       <Zap size={48} className="mx-auto mb-4 animate-pulse text-slate-300" />
                       <p className="text-sm font-black tracking-widest text-slate-400 uppercase">
                         Tactical data out of range
@@ -180,13 +180,15 @@ export const ExploreHub = () => {
                   )}
                 </div>
               ) : (
-                <AfterSearch
-                  query={query}
-                  clearSearch={clearSearch}
-                  isLoading={isLoading}
-                  results={results}
-                  filter={activeFilter}
-                />
+                <div className="px-6">
+                  <AfterSearch
+                    query={query}
+                    clearSearch={clearSearch}
+                    isLoading={isLoading}
+                    results={results}
+                    filter={activeFilter}
+                  />
+                </div>
               )}
             </div>
           </div>

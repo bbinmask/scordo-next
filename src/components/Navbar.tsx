@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { usePathname, useRouter } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
+import { useRequestModal } from "@/hooks/store/use-profile";
+import RequestsModal from "@/components/modals/RequestsModal";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -16,6 +18,7 @@ const Navbar = () => {
   const { user } = useUser();
 
   const router = useRouter();
+  const { onOpen } = useRequestModal();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -91,10 +94,15 @@ const Navbar = () => {
                 {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
               </button>
 
-              <button className="relative rounded-xl border border-slate-200 bg-white p-3 text-slate-400 shadow-sm transition-all hover:text-indigo-500 dark:border-white/10 dark:bg-slate-900">
-                <Bell size={18} />
-                <div className="absolute top-2 right-2 h-2 w-2 animate-pulse rounded-full border-2 border-white bg-red-500 dark:border-slate-900" />
-              </button>
+              {user && (
+                <button
+                  onClick={onOpen}
+                  className="relative rounded-xl border border-slate-200 bg-white p-3 text-slate-400 shadow-sm transition-all hover:text-indigo-500 dark:border-white/10 dark:bg-slate-900"
+                >
+                  <Bell size={18} />
+                  <div className="absolute top-2 right-2 h-2 w-2 animate-pulse rounded-full border-2 border-white bg-red-500 dark:border-slate-900" />
+                </button>
+              )}
 
               {/* User Profile Trigger */}
               {user && (
@@ -114,6 +122,7 @@ const Navbar = () => {
           }
         </div>
       </div>
+      <RequestsModal enabled />
     </nav>
   );
 };
