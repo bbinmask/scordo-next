@@ -13,10 +13,10 @@ export const CreateTournament = z.object({
   winnerPrice: z.number().optional(),
   runnerUpPrice: z.number().optional(),
   entryFee: z.number().optional(),
-  halfBoundary: z.boolean().default(false),
+  halfBoundary: z.boolean(),
   startDate: z.string({ message }),
   endDate: z.string({ message }),
-  rules: z.array(z.string()).default([]),
+  rules: z.array(z.string()),
   location: z
     .object({
       city: z.string().min(1),
