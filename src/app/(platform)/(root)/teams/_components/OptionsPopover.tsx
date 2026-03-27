@@ -130,7 +130,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
               </div>
             </label>
             <div
-              className={`switch bg-gradient-to-r ${isRecruiting ? "from-lime-500 via-green-600 to-emerald-600" : "from-teal-900 via-green-900/80 to-gray-400/70"}`}
+              className={`switch bg-gradient-to-r ${isRecruiting ? "from-green-500 via-green-600 to-green-700" : "from-green-500/30 via-green-600/30 to-green-700/30"}`}
             >
               <Input
                 id="isRecruiting"

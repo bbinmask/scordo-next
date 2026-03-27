@@ -206,7 +206,7 @@
 /* Toggle  CSS */
 
 .switch {
-  @apply relative h-[30px] w-[52px] rounded-full border border-gray-600 p-0 shadow-inner shadow-gray-800 transition-all duration-400 ease-in-out;
+  @apply border-input relative h-[30px] w-[52px] rounded-full border p-0 shadow-inner shadow-gray-800 transition-all duration-500 ease-in-out;
 }
 
 .switch input {
@@ -228,7 +228,7 @@
   background-color: white;
   -webkit-transition: 0.4s;
   transition: 0.4s;
-  @apply shadow-md shadow-gray-400;
+  @apply shadow-md shadow-black/80;
 }
 
 input:checked + .slider:before {

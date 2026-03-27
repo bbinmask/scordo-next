@@ -51,7 +51,7 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="w-full border-t border-slate-200 bg-slate-50 px-6 pt-10 pb-10 font-sans transition-colors duration-500 md:px-12 dark:border-white/5 dark:bg-[#0f1223]">
+    <footer className="w-full border-t border-slate-200 bg-slate-50 px-6 pt-10 pb-20 font-sans transition-colors duration-500 md:px-12 lg:pb-10 dark:border-white/5 dark:bg-[#0f1223]">
       <div className="mx-auto max-w-7xl">
         {/* Top Section: Brand & Newsletter */}
         <div className="flex w-full flex-col justify-between lg:flex-row">
