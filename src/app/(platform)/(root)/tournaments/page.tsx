@@ -1,3 +1,5 @@
+"use client";
+
 import { Carousel } from "@/components/carousel";
 import { Gavel, Globe, LayoutGrid, PlusCircle, Search, Star, Trophy } from "lucide-react";
 import TournamentCard from "../_components/TournamentCard";
@@ -5,76 +7,31 @@ import Link from "next/link";
 import { TournamentWithDetails } from "@/lib/types";
 import Spinner from "@/components/Spinner";
 import { EmptyCard } from "../matches/_components/cards/EmptyCard";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const TournamentsPage = () => {
-  const tournaments: TournamentWithDetails[] = [
-    {
-      id: "tr1",
-      title: "Global Ashes 2026",
-      details: {
-        season: 4,
-        maxTeams: 16,
-        matchesPerTeam: 5,
-        totalOvers: 20,
-        minAge: 18,
-        maxAge: null,
-        winnerPrice: 15000,
-        runnerUpPrice: 7500,
-        entryFee: 1000,
-        halfBoundary: false,
-        location: { city: "London", state: "UK", country: "England" },
-      },
+  const { data: myTournaments, isLoading: isLoadingMyTournaments } = useQuery<
+    TournamentWithDetails[]
+  >({
+    queryKey: ["tournaments"],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/me/tournaments");
 
-      startDate: new Date("2026-06-01"),
-      endDate: new Date("2026-07-01"),
-      matches: [],
-      requests: [],
-      banner:
-        "https://res.cloudinary.com/dxfq3iotg/image/upload/v1565955916/Screen_Shot_2019-08-15_at_11.45.16_AM.png",
-      description: "The Global",
-      organizerId: "org1",
-      rules: [],
-      uniqueTitle: "global-ashes-2026",
-      participatingTeams: [],
-      tournamentOfficials: [],
-      _count: { participatingTeams: 0 },
-      status: "NOT_STARTED",
-    },
-    {
-      id: "tr2",
-      title: "Neon Strike Invitational",
-      details: {
-        season: null,
-        maxTeams: 8,
-        matchesPerTeam: 3,
-        totalOvers: 10,
-        minAge: 16,
-        maxAge: null,
-        winnerPrice: 5000,
-        runnerUpPrice: 2500,
-        entryFee: 500,
-        halfBoundary: true,
-        location: { city: "Singapore", state: "SG", country: "" },
-      },
-      rules: [],
-      description: "A fast-paced T10 tournament featuring top teams from Asia.",
-      banner:
-        "https://res.cloudinary.com/dxfq3iotg/image/upload/v1565955916/Screen_Shot_2019-08-15_at_11.45.16_AM.png",
-      organizerId: "org2",
-      uniqueTitle: "neon-strike-invitational",
-      startDate: new Date("2026-04-15"),
-      endDate: new Date("2026-04-20"),
-      matches: [],
-      requests: [],
-      participatingTeams: [],
-      tournamentOfficials: [],
-      _count: { participatingTeams: 5 },
-      status: "NOT_STARTED",
-    },
-  ];
+      if (!data.success) return [];
 
-  const isLoading1 = false;
-  const isLoading2 = false;
+      return data.data;
+    },
+  });
+
+  const { data: tournaments, isLoading: isLoadingTournaments } = useQuery<TournamentWithDetails[]>({
+    queryKey: ["active-tournaments"],
+    queryFn: async () => {
+      const { data } = await axios.get("/api/tournaments/active");
+      if (!data.success) return [];
+      return data.data;
+    },
+  });
 
   return (
     <div className="animate-in fade-in min-h-screen p-4 duration-700 md:p-8">
@@ -95,13 +52,13 @@ const TournamentsPage = () => {
                   <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
                 </div>
 
-                {isLoading1 ? (
+                {isLoadingMyTournaments ? (
                   <div className="flex h-52 items-center justify-center">
                     <Spinner className="" />
                   </div>
-                ) : tournaments.length > 0 ? (
+                ) : myTournaments && myTournaments.length > 0 ? (
                   <Carousel>
-                    {tournaments.map((t) => (
+                    {myTournaments.map((t) => (
                       <TournamentCard key={t.id} tournament={t} />
                     ))}
                   </Carousel>
@@ -116,26 +73,6 @@ const TournamentsPage = () => {
                       description="You are not currently managing any tournaments. Create a new tournament."
                     />
                   </div>
-                )}
-                {isLoading2 ? (
-                  <div className="flex h-52 items-center justify-center">
-                    <Spinner className="" />
-                  </div>
-                ) : tournaments.length > 0 ? (
-                  <Carousel>
-                    {tournaments.map((t) => (
-                      <TournamentCard key={t.id} tournament={t} />
-                    ))}
-                  </Carousel>
-                ) : (
-                  <EmptyCard
-                    linkText="Explore"
-                    href="/explore"
-                    type="tournaments"
-                    title="No tournament available to join"
-                    description=" There are currently no active tournaments available for you to join. Please check back later or explore other sections of the platform."
-                    Icon={<Star size={24} />}
-                  />
                 )}
               </div>
             </section>
@@ -155,11 +92,26 @@ const TournamentsPage = () => {
                   </h3>
                   <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
                 </div>
-                <Carousel>
-                  {tournaments.map((t) => (
-                    <TournamentCard key={`d-${t.id}`} tournament={t} />
-                  ))}
-                </Carousel>
+                {isLoadingTournaments ? (
+                  <div className="flex h-52 items-center justify-center">
+                    <Spinner className="" />
+                  </div>
+                ) : tournaments && tournaments.length > 0 ? (
+                  <Carousel>
+                    {tournaments.map((t) => (
+                      <TournamentCard key={t.id} tournament={t} />
+                    ))}
+                  </Carousel>
+                ) : (
+                  <EmptyCard
+                    linkText="Explore"
+                    href="/explore"
+                    type="tournaments"
+                    title="No tournament available to join"
+                    description=" There are currently no active tournaments available for you to join. Please check back later or explore other sections of the platform."
+                    Icon={<Star size={24} />}
+                  />
+                )}
               </div>
             </section>
           </div>

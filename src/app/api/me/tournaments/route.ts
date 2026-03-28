@@ -11,7 +11,6 @@ export const GET = async () => {
   try {
     const tournaments = await db.tournament.findMany({
       where: {
-        // Exclude ones the user organized (shown separately)
         NOT: { organizerId: user.id },
         participatingTeams: {
           some: {
