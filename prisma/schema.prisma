@@ -72,6 +72,14 @@ enum MatchStatus {
   completed
 }
 
+enum TournamentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  STOPPED
+  COMPLETED
+  CANCELED
+}
+
 enum FriendshipStatus {
   PENDING
   ACCEPTED
@@ -138,8 +146,9 @@ model Team {
 
 model Tournament {
   id          String            @id @default(auto()) @map("_id") @db.ObjectId
-  title       String            
-  uniqueTitle String @unique
+  title       String
+  banner      String?
+  uniqueTitle String            @unique
   details     TournamentDetails
   description String?
   organizerId String            @db.ObjectId
@@ -152,6 +161,7 @@ model Tournament {
   startDate           DateTime
   endDate             DateTime
   tournamentOfficials TournamentOfficial[]
+  status              TournamentStatus     @default(NOT_STARTED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -10,6 +10,7 @@ import { MatchRequests } from "./_components/MatchRequests";
 import { MatchCard } from "./_components/cards/MatchCard";
 import { CreateMatchCard } from "./_components/cards/CreateMatchCard";
 import { MatchWithDetails } from "@/lib/types";
+import { Crown, Sword } from "lucide-react";
 const MatchesPage = () => {
   const { data: matchesAsOfficial, isLoading: officialsLoading } = useQuery<MatchWithDetails[]>({
     queryKey: ["matches-as-official"],
@@ -60,7 +61,14 @@ const MatchesPage = () => {
               </Carousel>
             ) : (
               <div className="px-6">
-                <EmptyCard type="matches" />
+                <EmptyCard
+                  Icon={<Sword size={24} />}
+                  type="matches"
+                  title="No match found"
+                  linkText="Create Match"
+                  href="/matches/create"
+                  description="The pitch is empty. Explore tournaments to join your next match."
+                />
               </div>
             )}
           </section>
@@ -88,7 +96,14 @@ const MatchesPage = () => {
               </Carousel>
             ) : (
               <div className="px-6">
-                <EmptyCard type="officials" />
+                <EmptyCard
+                  Icon={<Crown size={24} />}
+                  type="matches"
+                  title="No matches found"
+                  linkText="Create Match"
+                  href="/matches/create"
+                  description="You are not currently scheduled for any matches. Create a new match or join an existing one."
+                />
               </div>
             )}
           </section>

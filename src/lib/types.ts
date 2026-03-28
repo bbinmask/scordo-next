@@ -283,3 +283,25 @@ const userWithTeams = Prisma.validator<Prisma.UserDefaultArgs>()({
 export type UserWithTeamsProps = Prisma.UserGetPayload<typeof userWithTeams>;
 
 export type PlayerWithUser = Prisma.PlayerGetPayload<typeof playerWithUser>;
+
+// Tournament Types;
+
+const tournamentWithDetails = Prisma.validator<Prisma.TournamentDefaultArgs>()({
+  include: {
+    _count: {
+      select: {
+        participatingTeams: true,
+      },
+    },
+    matches: true,
+    requests: true,
+    participatingTeams: true,
+    tournamentOfficials: true,
+  },
+  omit: {
+    createdAt: true,
+    updatedAt: true,
+  },
+});
+
+export type TournamentWithDetails = Prisma.TournamentGetPayload<typeof tournamentWithDetails>;

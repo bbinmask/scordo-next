@@ -53,10 +53,7 @@ const Navbar = () => {
           {/* LOGO */}
           <div className="flex items-center gap-4">
             {headingText !== "dashboard" && headingText !== "" && (
-              <button
-                onClick={() => router.back()}
-                className="cursor-pointer leading-none font-black tracking-tighter text-slate-900 uppercase italic dark:text-white"
-              >
+              <button onClick={() => router.back()} className="cursor-pointer">
                 <ArrowLeft />
               </button>
             )}
@@ -64,7 +61,7 @@ const Navbar = () => {
               href={`/${headingText === "u" ? "/" : headingText}`}
               className="group flex cursor-pointer items-center gap-2"
             >
-              <h1 className="text-2xl leading-none font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+              <h1 className="text-[2vw] leading-none font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
                 {headingText === "dashboard" || headingText === ""
                   ? "SCORDO"
                   : headingText === "u"

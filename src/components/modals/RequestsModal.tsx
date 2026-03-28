@@ -157,7 +157,7 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
     <>
       <Dialog onOpenChange={onClose} open={isOpen}>
         <DialogTitle />
-        <DialogContent className="mx-4 w-full max-w-md overflow-y-auto rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+        <DialogContent className="w-full max-w-md overflow-y-auto rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
           <DialogHeader>
             <DialogTitle>Requests</DialogTitle>
           </DialogHeader>

@@ -1,12 +1,13 @@
 import { Carousel } from "@/components/carousel";
-import { Tournament } from "@/generated/prisma";
-import { Activity, Gavel, Globe, LayoutGrid, PlusCircle, Search, Star } from "lucide-react";
+import { Gavel, Globe, LayoutGrid, PlusCircle, Search, Star, Trophy } from "lucide-react";
 import TournamentCard from "../_components/TournamentCard";
-import { useState } from "react";
 import Link from "next/link";
+import { TournamentWithDetails } from "@/lib/types";
+import Spinner from "@/components/Spinner";
+import { EmptyCard } from "../matches/_components/cards/EmptyCard";
 
 const TournamentsPage = () => {
-  const tournaments = [
+  const tournaments: TournamentWithDetails[] = [
     {
       id: "tr1",
       title: "Global Ashes 2026",
@@ -23,8 +24,21 @@ const TournamentsPage = () => {
         halfBoundary: false,
         location: { city: "London", state: "UK", country: "England" },
       },
+
       startDate: new Date("2026-06-01"),
       endDate: new Date("2026-07-01"),
+      matches: [],
+      requests: [],
+      banner:
+        "https://res.cloudinary.com/dxfq3iotg/image/upload/v1565955916/Screen_Shot_2019-08-15_at_11.45.16_AM.png",
+      description: "The Global",
+      organizerId: "org1",
+      rules: [],
+      uniqueTitle: "global-ashes-2026",
+      participatingTeams: [],
+      tournamentOfficials: [],
+      _count: { participatingTeams: 0 },
+      status: "NOT_STARTED",
     },
     {
       id: "tr2",
@@ -42,22 +56,34 @@ const TournamentsPage = () => {
         halfBoundary: true,
         location: { city: "Singapore", state: "SG", country: "" },
       },
+      rules: [],
+      description: "A fast-paced T10 tournament featuring top teams from Asia.",
+      banner:
+        "https://res.cloudinary.com/dxfq3iotg/image/upload/v1565955916/Screen_Shot_2019-08-15_at_11.45.16_AM.png",
+      organizerId: "org2",
+      uniqueTitle: "neon-strike-invitational",
       startDate: new Date("2026-04-15"),
       endDate: new Date("2026-04-20"),
+      matches: [],
+      requests: [],
+      participatingTeams: [],
+      tournamentOfficials: [],
+      _count: { participatingTeams: 5 },
+      status: "NOT_STARTED",
     },
   ];
 
+  const isLoading1 = false;
+  const isLoading2 = false;
+
   return (
     <div className="animate-in fade-in min-h-screen p-4 duration-700 md:p-8">
-      <div className="mx-auto max-w-7xl space-y-12">
+      <div className="mx-auto space-y-12">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
           {/* Main Feed (8 Columns) */}
           <div className="space-y-16 lg:col-span-8">
             {/* Managed Section */}
             <section className="relative overflow-hidden rounded-[3.5rem] border border-slate-100 bg-white p-8 shadow-sm md:p-10 dark:border-white/5 dark:bg-white/5">
-              <div className="absolute top-0 right-0 p-12 opacity-5">
-                <LayoutGrid size={200} />
-              </div>
               <div className="relative z-10">
                 <div className="mb-8 flex items-center gap-3 px-4">
                   <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-500">
@@ -69,18 +95,47 @@ const TournamentsPage = () => {
                   <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
                 </div>
 
-                {tournaments.length > 0 ? (
+                {isLoading1 ? (
+                  <div className="flex h-52 items-center justify-center">
+                    <Spinner className="" />
+                  </div>
+                ) : tournaments.length > 0 ? (
                   <Carousel>
                     {tournaments.map((t) => (
                       <TournamentCard key={t.id} tournament={t} />
                     ))}
                   </Carousel>
                 ) : (
-                  <div className="rounded-[2.5rem] border-2 border-dashed border-slate-200 py-20 text-center dark:border-white/5">
-                    <p className="text-xs font-black tracking-widest text-slate-400 uppercase">
-                      No active management protocols
-                    </p>
+                  <div className="px-6">
+                    <EmptyCard
+                      Icon={<Trophy size={24} />}
+                      type="matches"
+                      title="No matches found"
+                      linkText="Create Tournament"
+                      href="/tournaments/create"
+                      description="You are not currently managing any tournaments. Create a new tournament."
+                    />
                   </div>
+                )}
+                {isLoading2 ? (
+                  <div className="flex h-52 items-center justify-center">
+                    <Spinner className="" />
+                  </div>
+                ) : tournaments.length > 0 ? (
+                  <Carousel>
+                    {tournaments.map((t) => (
+                      <TournamentCard key={t.id} tournament={t} />
+                    ))}
+                  </Carousel>
+                ) : (
+                  <EmptyCard
+                    linkText="Explore"
+                    href="/explore"
+                    type="tournaments"
+                    title="No tournament available to join"
+                    description=" There are currently no active tournaments available for you to join. Please check back later or explore other sections of the platform."
+                    Icon={<Star size={24} />}
+                  />
                 )}
               </div>
             </section>
@@ -92,7 +147,7 @@ const TournamentsPage = () => {
               </div>
               <div className="relative z-10">
                 <div className="mb-8 flex items-center gap-3 px-4">
-                  <div className="rounded-xl bg-indigo-500/10 p-2 text-indigo-500">
+                  <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-600">
                     <Globe size={22} />
                   </div>
                   <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
