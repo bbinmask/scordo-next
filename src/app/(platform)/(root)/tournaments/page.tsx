@@ -67,7 +67,7 @@ const TournamentsPage = () => {
                     <EmptyCard
                       Icon={<Trophy size={24} />}
                       type="matches"
-                      title="No matches found"
+                      title="No tournaments found"
                       linkText="Create Tournament"
                       href="/tournaments/create"
                       description="You are not currently managing any tournaments. Create a new tournament."
@@ -107,7 +107,7 @@ const TournamentsPage = () => {
                     linkText="Explore"
                     href="/explore"
                     type="tournaments"
-                    title="No tournament available to join"
+                    title="No tournament available"
                     description=" There are currently no active tournaments available for you to join. Please check back later or explore other sections of the platform."
                     Icon={<Star size={24} />}
                   />

@@ -51,7 +51,7 @@ const Navbar = () => {
           className={`flex h-16 items-center justify-between transition-all duration-500 ${isScrolled ? "px-6" : "px-2"}`}
         >
           {/* LOGO */}
-          <div className="flex items-center gap-4">
+          <div className="flex w-full items-center gap-4">
             {headingText !== "dashboard" && headingText !== "" && (
               <button onClick={() => router.back()} className="cursor-pointer">
                 <ArrowLeft />
@@ -59,9 +59,9 @@ const Navbar = () => {
             )}
             <Link
               href={`/${headingText === "u" ? "/" : headingText}`}
-              className="group flex cursor-pointer items-center gap-2"
+              className="group flex w-full cursor-pointer items-center gap-2"
             >
-              <h1 className="text-[2vw] leading-none font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
+              <h1 className="w-full text-[100%] leading-none font-black tracking-tighter text-slate-900 uppercase italic sm:text-[2vw] dark:text-white">
                 {headingText === "dashboard" || headingText === ""
                   ? "SCORDO"
                   : headingText === "u"

@@ -28,6 +28,7 @@ export const GET = async (req: Request) => {
 
     return NextResponse.json(new ApiResponse(activeTournaments), { status: 200 });
   } catch (error) {
+    console.log({ error });
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR), { status: 500 });
   }
 };

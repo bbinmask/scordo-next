@@ -18,7 +18,7 @@ export const EmptyCard = ({ type, Icon, title, linkText, href, description }: Em
       </div>
     </div>
     <div className="mb-6 max-w-xs text-center">
-      <h4 className="mb-1 text-lg font-black tracking-tighter text-slate-900 uppercase dark:text-white">
+      <h4 className="mb-1 font-[poppins] text-lg font-black text-slate-900 uppercase dark:text-white">
         {title}
       </h4>
       <p className="text-xs leading-relaxed font-medium text-slate-500 dark:text-slate-400">
