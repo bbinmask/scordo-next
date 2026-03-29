@@ -83,7 +83,6 @@ const Navbar = () => {
                   <Search size={18} />
                 </Link>
               )}
-              {/* Theme Toggle */}
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="rounded-xl border border-slate-200 bg-white p-3 text-slate-400 shadow-sm transition-all hover:text-emerald-500 dark:border-white/10 dark:bg-slate-900"
