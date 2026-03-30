@@ -63,12 +63,21 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
       },
     });
 
+    let phone;
+
+    if (contact?.trim() !== "") {
+      phone = await clerk.phoneNumbers.createPhoneNumber({
+        userId,
+        phoneNumber: contact as string,
+      });
+    }
+
     const [firstName, lastName] = name.split(" ");
     await clerk.users.updateUser(userId, {
       username,
       firstName,
       lastName,
-      primaryPhoneNumberID: contact,
+      primaryPhoneNumberID: phone?.id,
     });
 
     if (!res.publicMetadata?.isProfileCompleted) {

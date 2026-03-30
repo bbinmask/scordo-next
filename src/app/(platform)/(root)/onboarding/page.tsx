@@ -45,7 +45,7 @@ const CompleteProfilePage = () => {
   const { user } = useUser();
   const [isProfileCompleted, setIsProfileCompleted] = useState(false);
   const router = useRouter();
-  const { execute, isLoading, fieldErrors } = useAction(createUser, {
+  const { execute, isLoading } = useAction(createUser, {
     onSuccess: (data) => {
       setIsProfileCompleted(true);
       toast.success(`${data.name}, Your account is successfully created.`);
@@ -67,7 +67,7 @@ const CompleteProfilePage = () => {
       gender: "male",
       role: "fan",
       email: user?.primaryEmailAddress?.emailAddress,
-      name: user?.firstName || undefined,
+      name: user?.firstName || "",
     },
   });
 
