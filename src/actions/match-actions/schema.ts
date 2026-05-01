@@ -18,6 +18,7 @@ export const CreateMatch = z.object({
   category: z.enum(["T10", "T20", "ODI", "Test", "others"]),
   date: z.string({ message }),
   location: z.string({ message }).optional(),
+  commentaryEnabled: z.boolean().default(false).optional(),
   matchOfficials: z
     .array(
       z.object({
@@ -85,8 +86,24 @@ export const PushBall = z
     dismissalType: z
       .enum(["BOWLED", "CAUGHT", "RUN_OUT", "LBW", "STUMPED", "HIT_WICKET"])
       .optional(),
+
     fielderId: z.string().optional(),
     isLastWicket: z.boolean().optional().default(false),
+    shotSide: z
+      .enum([
+        "covers",
+        "point",
+        "third-man",
+        "fine-leg",
+        "square-leg",
+        "mid-wicket",
+        "mid-on",
+        "mid-off",
+        "long-on",
+        "long-off",
+      ])
+      .nullable()
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.isWicket) {

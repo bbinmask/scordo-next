@@ -35,9 +35,11 @@ import {
 } from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
-import { Inning, Match } from "@/generated/prisma";
+import { Ball, Commentary, Inning, Match } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 import { ablyServer } from "@/lib/ably-server";
+import { generateCommentary, ShotSide } from "@/lib/commentary/engine";
+
 const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeForCreate> => {
   const {
     category,
@@ -213,6 +215,40 @@ const addOfficialsHandler = async (
 
 const removeOfficialHandler = async (data: InputTypeForRemove): Promise<ReturnTypeForRemove> => {
   const user = await currentUser();
+
+  if (!user)
+    return {
+      error: ERROR_CODES.UNAUTHORIZED.message,
+    };
+
+  const { id } = data;
+
+  try {
+    const official = await db.matchOfficial.findUnique({
+      where: { id },
+      include: { match: true },
+    });
+
+    if (!official)
+      return {
+        error: "Official not found",
+      };
+
+    if (official.match.organizerId !== user.id)
+      return {
+        error: "Only the organizer can remove an official",
+      };
+
+    await db.matchOfficial.delete({
+      where: { id },
+    });
+
+    revalidatePath(`/matches/${official.matchId}`);
+  } catch (error) {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
+  }
 
   return {
     data: true,
@@ -552,6 +588,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     nextBatsmanId,
     isLastWicket,
     outBatsmanId,
+    shotSide,
   } = data;
 
   const user = await currentUser();
@@ -608,6 +645,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
 
     const status = match.status;
     const isTest = match.category === "Test";
+    const isCommentaryEnabled = match.commentaryEnabled;
 
     const isScorer =
       match.matchOfficials.findIndex(
@@ -630,6 +668,9 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         error: "Inning not found!",
       };
 
+    const ballsLeft: number = match.overs * 6 - inning.balls;
+    const overContext = `${inning.overs}.${inning.balls % 6}`;
+    const teamScore = `${inning.runs}/${inning.wickets}`;
     const inningNumber = inning.inningNumber;
     const totalOvers = match.overs;
 
@@ -722,6 +763,38 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
           isWicket,
           isWide,
         },
+        include: {
+          batsman: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                  username: true,
+                },
+              },
+            },
+          },
+          bowler: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                  username: true,
+                },
+              },
+            },
+          },
+          fielder: {
+            select: {
+              user: {
+                select: {
+                  name: true,
+                  username: true,
+                },
+              },
+            },
+          },
+        },
       });
 
       await tsx.inningBatting.update({
@@ -771,6 +844,9 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
           currentNonStrikerId: nonStriker,
         },
       });
+      let commentary;
+      let target: number | undefined;
+      let runsNeeded: number | undefined;
 
       if (inningNumber === 1) {
         if (isLastWicket || nextOver === totalOvers) {
@@ -793,6 +869,8 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         });
 
         if (!firstInning) return { error: "First inning not found!" };
+        target = firstInning.runs;
+        runsNeeded = firstInning.runs - inning.runs;
 
         if (isLastWicket || nextOver === totalOvers || inning.runs + teamRuns > firstInning.runs) {
           let result = null;
@@ -816,26 +894,62 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
               winnerId,
             },
           });
-
-          await ablyServer.channels.get(`match:${matchId}`).publish("ball-added", {
-            ball: nextBall,
-            over: nextOver,
-            batsmanId,
-            bowlerId: inning.currentBowlerId as string,
-            inningId,
-            isCompleted: match.status === "completed" || match.status === "inning_completed",
-            runs,
-            dismissalType,
-            isBye,
-            isLegBye,
-            isNoBall,
-            fielderId: fielderId?.trim() !== "" ? fielderId : undefined,
-            isWicket,
-            isWide,
-          });
         }
-        return createdBall;
       }
+      if (isCommentaryEnabled) {
+        const eventType = isWicket ? "WICKET" : "RUN_SCORED";
+        const { text, label } = await generateCommentary({
+          eventType,
+          ball: createdBall as Ball,
+          batterName: createdBall.batsman.user.name,
+          bowlerName: createdBall.bowler.user.name,
+          fielderName: createdBall.fielder?.user.name,
+          overContext,
+          teamScore,
+          inningNumber,
+          shotSide: shotSide as ShotSide,
+          target,
+          runsNeeded,
+          ballsLeft,
+        });
+
+        commentary = await tsx.commentary.create({
+          data: {
+            eventType,
+            label,
+            text,
+            ballId: createdBall.id,
+          },
+          include: {
+            ball: {
+              select: {
+                over: true,
+                ball: true,
+              },
+            },
+          },
+        });
+      }
+
+      await ablyServer.channels.get(`match:${matchId}`).publish("ball-added", {
+        ball: nextBall,
+        over: nextOver,
+        batsmanId,
+        bowlerId: inning.currentBowlerId as string,
+        inningId,
+        isCompleted: status === "completed" || status === "inning_completed",
+        runs,
+        dismissalType,
+        isBye,
+        isLegBye,
+        isNoBall,
+        fielderId: fielderId?.trim() !== "" ? fielderId : undefined,
+        isWicket,
+        isWide,
+        ballData: createdBall,
+        commentary: commentary || null,
+      });
+      return createdBall;
     });
   } catch (error) {
     return {
@@ -1199,17 +1313,16 @@ const undoMatchHandler = async (data: InputTypeForUndoBall): Promise<ReturnTypeF
         },
       });
 
-      if (lastBall.isWicket) {
-        await tsx.inningBatting.updateMany({
-          where: {
-            inningId,
-            playerId: lastBall.batsmanId,
-          },
-          data: {
-            runs: { decrement: lastBall.runs },
-          },
-        });
-      }
+      await tsx.inningBatting.updateMany({
+        where: {
+          inningId,
+          playerId: lastBall.batsmanId,
+        },
+        data: {
+          runs: { decrement: lastBall.runs },
+          ...(lastBall.isWicket && { isOut: false }),
+        },
+      });
 
       if (!lastBall.isBye && !lastBall.isLegBye) {
         await tsx.inningBowling.updateMany({
@@ -1219,7 +1332,10 @@ const undoMatchHandler = async (data: InputTypeForUndoBall): Promise<ReturnTypeF
           },
           data: {
             runs: { decrement: lastBall.runs },
-            wickets: lastBall.isWicket && lastBall.dismissalType !== "RUN_OUT" ? -1 : 0,
+            ...(lastBall.isWicket &&
+              lastBall.dismissalType !== "RUN_OUT" && {
+                wickets: { decrement: 1 },
+              }),
           },
         });
       }

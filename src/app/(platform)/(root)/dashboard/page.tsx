@@ -3,8 +3,6 @@
 import { Card } from "./_components/Card";
 import { BarChart2, Newspaper, Shield, Video } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
-import Tabs from "../_components/Tabs";
-import { useState } from "react";
 import HeroSection from "../_components/Hero";
 import { useQuery } from "@tanstack/react-query";
 import { DefaultLoader } from "@/components/Spinner";
@@ -27,11 +25,6 @@ const cardData = [
     link: "/profile",
     icon: <BarChart2 className="h-6 w-6" />,
   },
-];
-
-const contentTabs = [
-  { id: "updates", label: "Latest Updates", icon: <Newspaper className="mr-2 h-5 w-5" /> },
-  { id: "videos", label: "Featured Videos", icon: <Video className="mr-2 h-5 w-5" /> },
 ];
 
 const DashboardPage = () => {

@@ -5,8 +5,9 @@ import { User } from "@/generated/prisma";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
-import React, { useMemo, useState, startTransition } from "react";
-import { MapPin, Calendar, Activity, Gavel, Share2 } from "lucide-react";
+import Link from "next/link";
+import React, { useMemo, useState, startTransition, useEffect } from "react";
+import { MapPin, Calendar, Activity, Gavel, Share2, ClipboardList } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { DefaultLoader } from "@/components/Spinner";
 import { InningDetails, MatchWithDetails, PlayerWithUser } from "@/lib/types";
@@ -22,6 +23,9 @@ import { LiveScorecard } from "../_components/LiveScorecard";
 import { AwaitingCard } from "../_components/cards/AwaitingCard";
 import { InfoCard } from "../_components/cards/InfoCard";
 import { formatDate } from "@/utils/helper/formatDate";
+import { useCommentaryStore } from "@/hooks/store/use-commentary";
+import { CommentaryEnableModal } from "../_components/commentary/CommentaryEnableModal";
+import { CommentaryFeed } from "../_components/commentary/CommentaryFeed";
 interface MatchIdPageProps {}
 
 const MatchIdPage = ({}: MatchIdPageProps) => {
@@ -93,6 +97,16 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
     },
   });
 
+  const {
+    isEnabled,
+    hasPrompted,
+    setHasPrompted,
+    enableCommentary,
+    disableCommentary,
+    reset: resetCommentary,
+  } = useCommentaryStore();
+  const [showCommentaryPrompt, setShowCommentaryPrompt] = useState(false);
+
   const [isInitializing, setIsInitializing] = useState(false);
 
   const [isStartingNextInning, setIsStartingNextInning] = useState(false);
@@ -113,6 +127,18 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
   const isOrganizer = useMemo(() => {
     return match?.organizerId === user?.id;
   }, [user, match]);
+
+  // Show commentary prompt when match goes in_progress for the first time
+  useEffect(() => {
+    if (match?.status === "in_progress" && !hasPrompted) {
+      setShowCommentaryPrompt(true);
+    }
+  }, [match?.status, hasPrompted]);
+
+  // Reset commentary feed when navigating to a different match
+  useEffect(() => {
+    return () => resetCommentary();
+  }, [id]);
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -234,12 +260,21 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     </div>
                   )}
                   {match && (
-                    <button
-                      onClick={handleShare}
-                      className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
-                    >
-                      <Share2 className="h-5 w-5" />
-                    </button>
+                    <>
+                      <button
+                        onClick={handleShare}
+                        className="rounded-2xl border border-slate-200 bg-white p-4 text-slate-400 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800"
+                      >
+                        <Share2 className="h-5 w-5" />
+                      </button>
+                      <Link
+                        href={`/matches/${id}/scorecard`}
+                        className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-4 font-[urbanist] text-xs font-semibold text-slate-500 shadow-lg transition-all hover:text-green-500 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300"
+                      >
+                        <ClipboardList className="h-4 w-4" />
+                        Scorecard
+                      </Link>
+                    </>
                   )}
                 </div>
               </div>
@@ -267,6 +302,13 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
                     <LiveScorecard innings={innings} match={match} userId={user?.id} />
                   )}
                 </div>
+
+                {/* ── AI Commentary Feed ───────────────────────────────────── */}
+                {match.status === "in_progress" && (
+                  <div className="space-y-4 px-4">
+                    <CommentaryFeed matchId={match.id} />
+                  </div>
+                )}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between px-4">
                     <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
@@ -352,6 +394,23 @@ const MatchIdPage = ({}: MatchIdPageProps) => {
               onClose={() => setIsStartingNextInning(false)}
             />
           )}
+
+          {/* AI Commentary enable prompt — shown once when match goes live */}
+          <CommentaryEnableModal
+            isOpen={showCommentaryPrompt}
+            onEnable={() => {
+              enableCommentary();
+              setHasPrompted();
+              setShowCommentaryPrompt(false);
+              toast.success("AI commentary enabled! 🎙️");
+            }}
+            onClose={() => setShowCommentaryPrompt(false)}
+            onSkip={() => {
+              disableCommentary();
+              setHasPrompted();
+              setShowCommentaryPrompt(false);
+            }}
+          />
         </ChannelProvider>
       )}
     </div>

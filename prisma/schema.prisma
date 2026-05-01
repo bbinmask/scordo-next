@@ -113,6 +113,13 @@ type TournamentDetails {
   location       Address?
 }
 
+enum CommentaryEventType {
+  RUN_SCORED
+  WICKET
+  MILESTONE
+  SPECIAL_EVENT
+}
+
 model Team {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String
@@ -262,33 +269,33 @@ model TournamentTeam {
 }
 
 model Match {
-  id            String         @id @default(auto()) @map("_id") @db.ObjectId
-  teamAId       String         @db.ObjectId
-  teamBId       String         @db.ObjectId
-  tournamentId  String?        @db.ObjectId
-  overs         Int
-  overLimit     Int
-  teamA         Team           @relation("TeamA", fields: [teamAId], references: [id])
-  teamB         Team           @relation("TeamB", fields: [teamBId], references: [id])
-  tournament    Tournament?    @relation("TournamentMatches", fields: [tournamentId], references: [id])
-  playerLimit   Int
-  innings       Inning[]       @relation("MatchInnings")
-  venue         Address
-  tossWinner    String?
-  tossDecision  String?
-  category      MatchCategory  @default(others)
-  date          DateTime?
-  location      String?
-  requestStatus RequestStatus? @default(pending)
-  organizerId   String         @db.ObjectId
-  organizer     User           @relation("MatchOrganizer", fields: [organizerId], references: [id])
-  winnerId      String?        @db.ObjectId
-
-  status         MatchStatus     @default(not_started)
-  result         String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  matchOfficials MatchOfficial[]
+  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  teamAId           String          @db.ObjectId
+  teamBId           String          @db.ObjectId
+  tournamentId      String?         @db.ObjectId
+  overs             Int
+  overLimit         Int
+  teamA             Team            @relation("TeamA", fields: [teamAId], references: [id])
+  teamB             Team            @relation("TeamB", fields: [teamBId], references: [id])
+  tournament        Tournament?     @relation("TournamentMatches", fields: [tournamentId], references: [id])
+  playerLimit       Int
+  innings           Inning[]        @relation("MatchInnings")
+  venue             Address
+  tossWinner        String?
+  tossDecision      String?
+  category          MatchCategory   @default(others)
+  date              DateTime?
+  location          String?
+  requestStatus     RequestStatus?  @default(pending)
+  organizerId       String          @db.ObjectId
+  organizer         User            @relation("MatchOrganizer", fields: [organizerId], references: [id])
+  winnerId          String?         @db.ObjectId
+  commentaryEnabled Boolean         @default(false)
+  status            MatchStatus     @default(not_started)
+  result            String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  matchOfficials    MatchOfficial[]
 
   @@index([teamAId])
   @@index([teamBId])
@@ -395,10 +402,11 @@ model Ball {
   bowlerId  String  @db.ObjectId
   fielderId String? @db.ObjectId
 
-  inning  Inning  @relation("InningBalls", fields: [inningId], references: [id])
-  batsman Player  @relation("Batsman", fields: [batsmanId], references: [id])
-  bowler  Player  @relation("Bowler", fields: [bowlerId], references: [id])
-  fielder Player? @relation("Fielder", fields: [fielderId], references: [id])
+  inning     Inning       @relation("InningBalls", fields: [inningId], references: [id])
+  batsman    Player       @relation("Batsman", fields: [batsmanId], references: [id])
+  bowler     Player       @relation("Bowler", fields: [bowlerId], references: [id])
+  fielder    Player?      @relation("Fielder", fields: [fielderId], references: [id])
+  commentary Commentary[] @relation("BallCommentary")
 
   over Int
   ball Int
@@ -438,4 +446,17 @@ model TournamentOfficial {
   user       User       @relation(fields: [userId], references: [id])
 
   @@unique([tournamentId, userId])
+}
+
+model Commentary {
+  id        String              @id @default(auto()) @map("_id") @db.ObjectId
+  text      String
+  label     String
+  eventType CommentaryEventType
+  ballId    String              @db.ObjectId
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  ball      Ball                @relation("BallCommentary", fields: [ballId], references: [id])
+
+  @@index([ballId])
 }

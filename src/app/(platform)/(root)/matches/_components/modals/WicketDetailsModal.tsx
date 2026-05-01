@@ -13,6 +13,7 @@ import {
   InningDetails,
   PlayerWithUser,
 } from "@/lib/types";
+import { FallWicket } from "@/types/match.props";
 import { ArrowLeft, Check, CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { setConfig } from "next/config";
 import { useEffect, useState } from "react";
@@ -61,15 +62,7 @@ const WICKET_CONFIGS: WicketConfig[] = [
 interface WicketDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (
-    runs: number,
-    wicket: {
-      fielderId: string;
-      batsmanId: string;
-      nextBatsmanId: string | null;
-      type: WicketType;
-    } | null
-  ) => void;
+  onConfirm: (runs: number, wicket: FallWicket | null) => void;
   batsmanOnCrease: InningBattingDetails[];
   playersLeftToBat: InningBattingDetails[];
   isSubmitting: boolean;

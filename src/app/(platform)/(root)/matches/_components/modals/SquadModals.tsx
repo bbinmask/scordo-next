@@ -38,7 +38,6 @@ export const SquadModal = ({
       bench: PlayerWithUser[] = [];
 
     squad.forEach((pl) => {
-      console.log({ id: pl.userId });
       if (players?.has(pl.userId)) playing.push(pl);
       else bench.push(pl);
     });

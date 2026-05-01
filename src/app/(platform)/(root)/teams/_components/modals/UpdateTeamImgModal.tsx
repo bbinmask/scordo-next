@@ -1,8 +1,5 @@
 "use client";
 
-import ImageCropper from "@/components/ImageCropper";
-import { getCroppedImage } from "@/utils/cropImg";
-import type { Area } from "@/utils/cropImg";
 import {
   Dialog,
   DialogContent,
@@ -11,11 +8,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Team } from "@/generated/prisma";
-import { Dispatch, ReactNode, SetStateAction, useRef, useState } from "react";
-import { ImageIcon, Save } from "lucide-react";
+import { useRef, useState } from "react";
+import { Save } from "lucide-react";
 import Spinner from "@/components/Spinner";
-import { cn } from "@/lib/utils";
-import { useOnClickOutside } from "usehooks-ts";
 import { useAction } from "@/hooks/useAction";
 import { updateTeamLogoAndBanner } from "@/actions/team-actions";
 import { toast } from "sonner";

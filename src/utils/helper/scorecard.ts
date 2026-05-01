@@ -41,6 +41,10 @@ const getEcon = (runs: number, balls: number): number => {
 const getOvers = (overs: number, balls: number) => {
   const leftBalls = balls % 6;
 
+  if (leftBalls === 0) {
+    return `${overs - 1}.6`;
+  }
+
   return `${overs}.${leftBalls}`;
 };
 
@@ -71,4 +75,19 @@ const getBallLabel = (ball: CurrentOverBalls): string => {
 
   return `${ball.runs}`;
 };
-export { getPartnership, getEcon, getStrikeRate, getCRR, getOvers, getRR, getBallLabel };
+
+const isLegalBall = (ball: CurrentOverBalls) => {
+  if (ball.isWide || ball.isNoBall) return false;
+  return true;
+};
+
+export {
+  getPartnership,
+  getEcon,
+  getStrikeRate,
+  getCRR,
+  getOvers,
+  getRR,
+  getBallLabel,
+  isLegalBall,
+};

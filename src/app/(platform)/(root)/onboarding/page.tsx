@@ -32,7 +32,7 @@ interface ProfileFormData {
 const selectGenderData = [
   { label: "Male", value: "male" },
   { label: "Female", value: "female" },
-  { label: "Others", value: "others" },
+  { label: "Other", value: "other" },
 ];
 
 const selectRoleData = [

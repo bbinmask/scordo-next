@@ -76,7 +76,7 @@ const PersonalDetails = ({
   >({
     queryKey: ["bowling-stats", user.id],
     queryFn: async () => {
-      const { data } = await axios.get(`/api/stats/bowling?userId=${user.id}`, {
+      const { data } = await axios.get(`/api/stats/user/bowling`, {
         params: {
           userId: user.id,
         },
@@ -201,28 +201,33 @@ const PersonalDetails = ({
             title="Quick Stats"
             icon={BarChart3}
           >
-            <div className="grid h-full grid-cols-2 content-center gap-4">
-              <div>
-                <p className="font-[poppins] text-xs font-semibold text-green-600 uppercase dark:text-green-200">
-                  Win Rate
-                </p>
-                {/* <p className="text-3xl font-black">{user.winRate}</p> */}
-              </div>
-              <div>
-                <p className="font-[poppins] text-xs font-semibold text-green-600 uppercase dark:text-green-200">
-                  Matches
-                </p>
-                {/* <p className="text-3xl font-black">{user.matches}</p> */}
-              </div>
-              <div className="col-span-2 pt-4">
-                <div className="h-2 w-full overflow-hidden rounded-full bg-black/20 dark:bg-white/20">
-                  <div className="h-full w-[68%] bg-green-600"></div>
+            {(() => {
+              const totalRuns = battingRecords?.reduce((a, b) => a + b.runs, 0) ?? 0;
+              const totalWickets = bowlingRecords?.reduce((a, b) => a + b.wickets, 0) ?? 0;
+              const outs = battingRecords?.filter((r) => r.isOut).length ?? 0;
+              const highScore = battingRecords?.reduce((m, r) => (r.runs > m ? r.runs : m), 0) ?? 0;
+              const avg = outs > 0 ? (totalRuns / outs).toFixed(1) : totalRuns.toFixed(1);
+              return (
+                <div className="grid h-full grid-cols-2 content-center gap-3">
+                  <div>
+                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">Runs</p>
+                    <p className="font-[poppins] text-2xl font-black">{totalRuns}</p>
+                  </div>
+                  <div>
+                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">Wickets</p>
+                    <p className="font-[poppins] text-2xl font-black">{totalWickets}</p>
+                  </div>
+                  <div>
+                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">Avg</p>
+                    <p className="font-[poppins] text-2xl font-black">{avg}</p>
+                  </div>
+                  <div>
+                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">Best</p>
+                    <p className="font-[poppins] text-2xl font-black">{highScore}</p>
+                  </div>
                 </div>
-                <p className="mt-2 font-[urbanist] text-[10px] font-semibold tracking-wide text-green-100 uppercase">
-                  Progress
-                </p>
-              </div>
-            </div>
+              );
+            })()}
           </BentoCard>
 
           {/* Personal Info Grid - Columnized */}

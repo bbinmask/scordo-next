@@ -57,6 +57,7 @@ const CreateMatchForm: React.FC = () => {
     defaultValues: {
       teamAId: "",
       teamBId: "",
+      commentaryEnabled: false,
       tournamentId: "",
       overs: 20,
       overLimit: 4,
@@ -406,6 +407,10 @@ const CreateMatchForm: React.FC = () => {
                             className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pr-4 pl-11 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500 dark:border-white/10 dark:bg-slate-950"
                           />
                         </div>
+                      </div>
+                      <div className="">
+                        <label htmlFor="commentaryEnabled">Enable Commentary</label>
+                        <input {...register("commentaryEnabled")} type="checkbox" className="" />
                       </div>
                       <div>
                         <label className="mb-1 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">

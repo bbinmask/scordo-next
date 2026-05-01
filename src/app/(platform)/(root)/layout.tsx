@@ -2,13 +2,10 @@ import { AblyProviders } from "@/components/providers/AblyProviders";
 import Bottombar from "./_components/Bottombar";
 import Navbar from "@/components/Navbar";
 import { getMetadata } from "@/utils/helper/getMetadata";
-import { auth } from "@clerk/nextjs/server";
 import { Footer } from "@/components/Footer";
 export const metadata = getMetadata();
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
-  const { userId } = await auth();
-
   return (
     <AblyProviders>
       <Navbar />
@@ -16,7 +13,7 @@ const RootLayout = async ({ children }: { children: React.ReactNode }) => {
         <div className="w-full max-w-[1600px]">{children}</div>
       </div>
       <Footer />
-      {userId && userId.trim() !== "" && <Bottombar />}
+      <Bottombar />
     </AblyProviders>
   );
 };

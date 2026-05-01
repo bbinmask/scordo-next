@@ -1,31 +1,33 @@
 import { cn } from "@/lib/utils";
-import { RotateCcw, Settings } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Clock, Gavel, RotateCcw, Settings, Undo2 } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import WicketDetailsModal from "./modals/WicketDetailsModal";
-import { InningDetails, MatchWithDetails } from "@/lib/types";
+import { CurrentOverBalls, InningDetails, MatchWithDetails } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
-import { changeBowler, pushBall } from "@/actions/match-actions";
+import { changeBowler, pushBall, undoBall } from "@/actions/match-actions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { WicketType } from "@/generated/prisma";
 import axios from "axios";
 import { SelectBowlerModal } from "./modals/SelectBowlerModal";
 import { useChannel } from "ably/react";
-type ExtraType = "wd" | "nb" | "b";
+import { ShotDirectionModal } from "./modals/ShotDirectionModal";
+import { useCommentaryStore } from "@/hooks/store/use-commentary";
+import {
+  detectBatterMilestone,
+  detectHatTrick,
+  detectMaidenOver,
+  detectSpecialBoundaryEvents,
+} from "@/lib/commentary/detector";
+import { CommentaryLine, CommentaryPayload, ShotSide } from "@/lib/commentary/engine";
+import { FallWicket } from "@/types/match.props";
+import { isLegalBall } from "@/utils/helper/scorecard";
+type ExtraType = "wd" | "nb" | "b" | "lb";
 
 interface ControlPadProps {
   innings: InningDetails;
   match: MatchWithDetails;
 }
-
-const runsClasses =
-  "border-indigo-100 border dark:border-none border-input bg-indigo-100 text-indigo-600 shadow-md active:translate-y-1 active:scale-90  dark:bg-indigo-500/10 dark:text-indigo-400";
-
-const nullClasses =
-  "bg-slate-100 border border-input dark:border-none text-slate-600 shadow-sm hover:bg-slate-200  dark:bg-slate-800 dark:text-slate-300";
-
-const boundaryClasses =
-  "border-emerald-600 bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 active:translate-y-1 active:scale-90";
 
 export const ControlPad = ({ innings, match }: ControlPadProps) => {
   const queryClient = useQueryClient();
@@ -53,6 +55,25 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     },
   });
 
+  const { execute: executeUndo, isLoading: isUndoing } = useAction(undoBall, {
+    onSuccess() {
+      toast.success("Last ball undone");
+      queryClient.invalidateQueries({
+        queryKey: ["match-innings", innings.matchId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["current-over-history", innings.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["check-bowler-change", innings.id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["runs-left", match.id] });
+    },
+    onError(error) {
+      toast.error(error);
+    },
+  });
+
   const {} = useQuery<boolean>({
     queryKey: ["check-bowler-change"],
     queryFn: async () => {
@@ -66,6 +87,36 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     },
   });
 
+  const { data: history, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
+    queryKey: ["current-over-history", innings.id],
+    queryFn: async () => {
+      if (!innings) return [];
+
+      const { data } = await axios.get(`/api/matches/innings/${innings.id}/balls/current-over`);
+
+      if (!data.success) return [];
+
+      return data.data;
+    },
+    enabled: !!innings,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+  });
+
+  const { isEnabled, addLine, setGenerating, hasSeenKey, markKey } = useCommentaryStore();
+
+  // ── pending ball (held while shot modal is open) ──────────────────────────
+  const [pendingBall, setPendingBall] = useState<{
+    runs: number;
+    wicket: null | {
+      fielderId: string;
+      batsmanId: string;
+      nextBatsmanId: string | null;
+      type: WicketType;
+    };
+  } | null>(null);
+
   const onBall = (
     runs: number,
     wicket: {
@@ -75,61 +126,59 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       type: WicketType;
     } | null
   ) => {
-    if (!wicket) {
-      execute({
-        matchId: innings.matchId,
-        inningId: innings.id,
-        runs: runs,
-        batsmanId: innings.currentStrikerId as string,
-        isBye: extras.isBye ? true : extras.isWide && runs > 0 ? true : false,
-        isWide: extras.isWide,
-        isLegBye: extras.isLegBye,
-        isNoBall: extras.isNB,
-        isWicket: false,
-        isLastWicket: false,
-      });
-    } else if (wicket.type === "RUN_OUT") {
-      execute({
-        matchId: innings.matchId,
-        inningId: innings.id,
-        runs,
-        isWicket: true,
-        dismissalType: "RUN_OUT",
-        fielderId: wicket.fielderId,
-        batsmanId: wicket.batsmanId,
-        isBye: extras.isBye,
-        isLegBye: extras.isLegBye,
-        isNoBall: extras.isNB,
-        isWide: extras.isWide,
-        nextBatsmanId: wicket.nextBatsmanId as string,
-        isLastWicket: match.playerLimit === innings.wickets + 2,
-        outBatsmanId:
-          wicket.batsmanId.trim() !== "" ? wicket.batsmanId : (innings.currentStrikerId as string),
-      });
-    } else {
-      execute({
-        matchId: innings.matchId,
-        inningId: innings.id,
-        runs: 0,
-        isWicket: true,
-        dismissalType: wicket.type,
-        fielderId: wicket.fielderId,
-        batsmanId: innings.currentStrikerId as string,
-        outBatsmanId: innings.currentStrikerId as string,
-        nextBatsmanId: wicket.nextBatsmanId as string,
-        isLastWicket: match.playerLimit === innings.wickets + 2,
-        isBye: extras.isBye,
-        isLegBye: extras.isLegBye,
-        isNoBall: extras.isNB,
-        isWide: extras.isWide,
-      });
-    }
-    setExtras({
-      isWide: false,
-      isNB: false,
-      isLegBye: false,
-      isBye: false,
-    });
+    setPendingBall({ runs, wicket });
+
+    // if (!wicket) {
+    //   execute({
+    //     matchId: innings.matchId,
+    //     inningId: innings.id,
+    //     runs: runs,
+    //     batsmanId: innings.currentStrikerId as string,
+    //     isBye: extras.isBye ? true : extras.isWide && runs > 0 ? true : false,
+    //     isWide: extras.isWide,
+    //     isLegBye: extras.isLegBye,
+    //     isNoBall: extras.isNB,
+    //     isWicket: false,
+    //     isLastWicket: false,
+
+    //   });
+    // } else if (wicket.type === "RUN_OUT") {
+    //   execute({
+    //     matchId: innings.matchId,
+    //     inningId: innings.id,
+    //     runs,
+    //     isWicket: true,
+    //     dismissalType: "RUN_OUT",
+    //     fielderId: wicket.fielderId,
+    //     batsmanId: wicket.batsmanId,
+    //     isBye: extras.isBye,
+    //     isLegBye: extras.isLegBye,
+    //     isNoBall: extras.isNB,
+    //     isWide: extras.isWide,
+    //     nextBatsmanId: wicket.nextBatsmanId as string,
+    //     isLastWicket: match.playerLimit === innings.wickets + 2,
+    //     outBatsmanId:
+    //       wicket.batsmanId.trim() !== "" ? wicket.batsmanId : (innings.currentStrikerId as string),
+    //   });
+    // } else {
+    //   execute({
+    //     matchId: innings.matchId,
+    //     inningId: innings.id,
+    //     runs: 0,
+    //     isWicket: true,
+    //     dismissalType: wicket.type,
+    //     fielderId: wicket.fielderId,
+    //     batsmanId: innings.currentStrikerId as string,
+    //     outBatsmanId: innings.currentStrikerId as string,
+    //     nextBatsmanId: wicket.nextBatsmanId as string,
+    //     isLastWicket: match.playerLimit === innings.wickets + 2,
+    //     isBye: extras.isBye,
+    //     isLegBye: extras.isLegBye,
+    //     isNoBall: extras.isNB,
+    //     isWide: extras.isWide,
+    //   });
+    // }
+    resetExtras();
   };
 
   const handleChangeBowler = (bowlerId: string) => {
@@ -140,6 +189,20 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     });
   };
 
+  const isAnythingLoading = isSubmitting || isUndoing;
+
+  const batterName = useMemo(
+    () =>
+      innings.InningBatting.find((b) => b.playerId === innings.currentStrikerId)?.player.user.name,
+    [innings]
+  );
+  const bowlerName = useMemo(
+    () =>
+      innings.InningBowling.find((b) => b.playerId === innings.currentBowlerId)?.player.user.name,
+    [innings]
+  );
+  const teamScore = `${innings.runs}/${innings.wickets}`;
+  const overContext = `${innings.overs}.${innings.balls % 6}`;
   const [extras, setExtras] = useState({
     isWide: false,
     isBye: false,
@@ -157,7 +220,16 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     return innings.InningBowling;
   }, [innings]);
 
-  const onUndo = () => {};
+  const handleUndo = () => {};
+
+  // When a run-pad button is pressed: if commentary enabled, open shot modal first
+  const onBallPress = (runs: number) => {
+    if (isEnabled) {
+      setPendingBall({ runs, wicket: null });
+    } else {
+      submitBall(runs, null, null);
+    }
+  };
 
   const handleExtras = (type: ExtraType) => {
     switch (type) {
@@ -190,6 +262,179 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         break;
     }
   };
+
+  // ── Auto-event checks after each ball ────────────────────────────────────
+  const checkAutoEvents = useCallback(
+    async (runs: number, isWicket: boolean) => {
+      if (!isEnabled) return;
+
+      // Current over balls from query cache
+      const overBalls = (
+        queryClient.getQueryData<any[]>(["current-over-history", innings.id]) ?? []
+      ).map((b) => ({
+        runs: b.runs,
+        isWicket: b.isWicket,
+        isWide: b.isWide,
+        isNoBall: b.isNoBall,
+      }));
+
+      // Append the ball just played (not yet in cache)
+      const allBalls = [
+        ...overBalls,
+        { runs, isWicket, isWide: extras.isWide, isNoBall: extras.isNB },
+      ];
+
+      // 1. Batter milestone
+      const currentBatter = innings.InningBatting.find(
+        (b) => b.playerId === innings.currentStrikerId
+      );
+      if (currentBatter && !extras.isWide && !extras.isNB) {
+        const prev = currentBatter.runs;
+        const next = prev + (!extras.isBye && !extras.isLegBye ? runs : 0);
+        const milestone = detectBatterMilestone(
+          batterName ?? "Batter",
+          prev,
+          next,
+          overContext,
+          teamScore
+        );
+        if (milestone && !hasSeenKey(milestone.dedupeKey)) {
+          markKey(milestone.dedupeKey);
+
+          return; // one event per ball
+        }
+      }
+
+      // 2. Hat-trick
+      if (isWicket) {
+        const hat = detectHatTrick(allBalls, bowlerName ?? "Bowler", overContext, teamScore);
+        if (hat && !hasSeenKey(hat.dedupeKey)) {
+          markKey(hat.dedupeKey);
+
+          return;
+        }
+      }
+
+      // 3. Special boundary events
+      if (!isWicket) {
+        const special = detectSpecialBoundaryEvents(
+          allBalls,
+          batterName ?? "Batter",
+          bowlerName ?? "Bowler",
+          overContext,
+          teamScore
+        );
+        if (special && !hasSeenKey(special.dedupeKey)) {
+          markKey(special.dedupeKey);
+          return;
+        }
+      }
+
+      // 4. Maiden over — checked when over ends
+      if ((innings.balls + 1) % 6 === 0 && !extras.isWide && !extras.isNB) {
+        const maiden = detectMaidenOver(allBalls, bowlerName ?? "Bowler", overContext, teamScore);
+        if (maiden && !hasSeenKey(maiden.dedupeKey)) {
+          markKey(maiden.dedupeKey);
+        }
+      }
+    },
+    [
+      isEnabled,
+      innings,
+      extras,
+      batterName,
+      bowlerName,
+      overContext,
+      teamScore,
+      hasSeenKey,
+      markKey,
+      queryClient,
+    ]
+  );
+
+  // ── Ball submission — asks for shot direction if commentary enabled ────────
+  const submitBall = useCallback(
+    (runs: number, shotSide: ShotSide | null, wicket: FallWicket | null) => {
+      if (!wicket) {
+        execute({
+          matchId: innings.matchId,
+          inningId: innings.id,
+          runs,
+          batsmanId: innings.currentStrikerId as string,
+          isBye: extras.isBye ? true : extras.isWide && runs > 0 ? true : false,
+          isWide: extras.isWide,
+          isLegBye: extras.isLegBye,
+          isNoBall: extras.isNB,
+          isWicket: false,
+          isLastWicket: false,
+          shotSide,
+        });
+
+        // Check for auto events (slightly async — doesn't block UI)
+
+        checkAutoEvents(runs, false);
+      } else if (wicket.type === "RUN_OUT") {
+        execute({
+          matchId: innings.matchId,
+          inningId: innings.id,
+          runs,
+          isWicket: true,
+          dismissalType: "RUN_OUT",
+          fielderId: wicket.fielderId,
+          batsmanId: wicket.batsmanId,
+          isBye: extras.isBye,
+          isLegBye: extras.isLegBye,
+          isNoBall: extras.isNB,
+          isWide: extras.isWide,
+          nextBatsmanId: wicket.nextBatsmanId as string,
+          isLastWicket: match.playerLimit === innings.wickets + 2,
+          outBatsmanId:
+            wicket.batsmanId.trim() !== ""
+              ? wicket.batsmanId
+              : (innings.currentStrikerId as string),
+          shotSide,
+        });
+
+        checkAutoEvents(runs, true);
+      } else {
+        execute({
+          matchId: innings.matchId,
+          inningId: innings.id,
+          runs: 0,
+          isWicket: true,
+          dismissalType: wicket.type,
+          fielderId: wicket.fielderId,
+          batsmanId: innings.currentStrikerId as string,
+          outBatsmanId: innings.currentStrikerId as string,
+          nextBatsmanId: wicket.nextBatsmanId as string,
+          isLastWicket: match.playerLimit === innings.wickets + 2,
+          isBye: extras.isBye,
+          isLegBye: extras.isLegBye,
+          isNoBall: extras.isNB,
+          isWide: extras.isWide,
+          shotSide,
+        });
+
+        checkAutoEvents(0, true);
+      }
+
+      resetExtras();
+    },
+    [
+      execute,
+      innings,
+      match,
+      extras,
+      batterName,
+      bowlerName,
+      overContext,
+      teamScore,
+      checkAutoEvents,
+    ]
+  );
+
+  const resetExtras = () =>
+    setExtras({ isWide: false, isNB: false, isLegBye: false, isBye: false });
 
   const playerLeftToBat = useMemo(() => {
     return battingPlayers.filter(
@@ -240,118 +485,108 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
   });
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between px-4">
-        <h3 className="flex items-center gap-3 font-[poppins] text-2xl font-black uppercase italic lg:text-3xl">
-          Control
-          <span className="primary-heading pr-2">Pad</span>
-        </h3>
-        <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-        <span className="font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase">
-          Powered by Scordo
-        </span>
-      </div>
-      <div className="flex w-full flex-col justify-center gap-4 space-y-6 p-8 lg:flex-row">
-        <div className="grid w-full max-w-2xl grid-cols-5 gap-3 lg:gap-2">
-          <PadButton
-            disabled={isSubmitting}
-            label="0"
-            onClick={() => onBall(0, null)}
-            className={`${nullClasses} active:translate-y-1 active:scale-90`}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="1"
-            onClick={() => onBall(1, null)}
-            className={`${runsClasses}`}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="2"
-            onClick={() => onBall(2, null)}
-            className={`${runsClasses}`}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="WD"
-            sub="Wide"
-            active={extras.isWide}
-            className={`${nullClasses} border-input border ring-2`}
-            onClick={() => handleExtras("wd")}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="B"
-            active={extras.isBye}
-            className={`${nullClasses} ring-2`}
-            sub="Bye"
-            onClick={() => handleExtras("b")}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="3"
-            onClick={() => onBall(3, null)}
-            className={`${runsClasses}`}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="4"
-            onClick={() => onBall(4, null)}
-            className={`${boundaryClasses}`}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="6"
-            className={`${boundaryClasses}`}
-            onClick={() => onBall(6, null)}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="NB"
-            active={extras.isNB}
-            className={`${nullClasses} ring-2`}
-            sub="No Ball"
-            onClick={() => handleExtras("nb")}
-          />
-          <PadButton
-            disabled={isSubmitting}
-            label="W"
-            active={isWicket}
-            className={`${
-              isWicket ? "scale-75 text-white ring-red-500" : ""
-            } bg-red-600 text-slate-100 shadow-sm dark:bg-red-800`}
-            sub="Wicket"
-            onClick={() => setIsWicket((prev) => !prev)}
-          />
+    <aside className="space-y-6 lg:col-span-4">
+      <div className="relative overflow-hidden rounded-[3rem] border border-slate-200 bg-white p-8 shadow-2xl dark:border-white/10 dark:bg-slate-900">
+        <div className="mb-8 flex items-center justify-between">
+          <h3 className="text-sm font-black tracking-widest uppercase italic">Scoring Pad</h3>
+          <button
+            onClick={handleUndo}
+            className="rounded-2xl bg-slate-100 p-3 text-slate-400 transition-all hover:text-emerald-500 active:scale-90 dark:bg-white/5"
+            title="Undo Last Ball"
+          >
+            <Undo2 className="h-5 w-5" />
+          </button>
         </div>
 
-        <div className="flex gap-3 lg:flex-col lg:pb-6">
-          <button
-            onClick={onUndo}
-            disabled={history.length === 0}
-            className={cn(
-              "center flex min-w-40 flex-[2] gap-3 rounded-2xl bg-yellow-800 py-4 font-[inter] text-xs font-semibold text-slate-100 transition-all",
-              history.length > 0
-                ? "active:translate-y-1 active:border-b-0"
-                : "cursor-not-allowed opacity-50"
-            )}
-          >
-            <RotateCcw size={16} />
-            Undo Ball
-          </button>
-          <button
-            className={cn(
-              "flex flex-[2] items-center justify-center gap-3 rounded-2xl bg-orange-800 py-3 font-[inter] text-sm font-semibold transition-all active:translate-y-1"
-            )}
-          >
-            Retire Player
-          </button>
-          <button
-            onClick={() => toast.error("Settings coming soon!")}
-            className="flex flex-1 items-center justify-center rounded-2xl bg-teal-700 p-4 text-slate-100 active:translate-y-1"
-          >
-            <Settings size={20} />
-          </button>
+        {/* Runs Grid */}
+        <div className="mb-6 grid grid-cols-3 gap-4">
+          {[0, 1, 2, 3, 4, 6].map((num) => (
+            <button
+              key={num}
+              onClick={() => onBallPress(num)}
+              className="flex aspect-square items-center justify-center rounded-3xl border border-slate-200 bg-slate-50 text-2xl font-black shadow-sm transition-all hover:scale-105 hover:border-emerald-500 hover:bg-emerald-600 hover:text-white active:scale-95 dark:border-white/5 dark:bg-white/5"
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+
+        {/* Extras & Wicket */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <PadButton
+              label="WD"
+              sub="Wide"
+              active={extras.isWide}
+              disabled={isSubmitting}
+              onClick={() => handleExtras("wd")}
+              className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 py-4 text-[10px] font-black tracking-widest text-emerald-600 uppercase shadow-sm transition-all hover:bg-emerald-600 hover:text-white dark:text-emerald-100"
+            />
+
+            <PadButton
+              disabled={isSubmitting}
+              label="NB"
+              active={extras.isNB}
+              sub="No Ball"
+              onClick={() => handleExtras("nb")}
+              className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 py-4 text-[10px] font-black tracking-widest text-emerald-600 uppercase shadow-sm transition-all hover:bg-emerald-600 hover:text-white dark:text-emerald-100"
+            />
+
+            <PadButton
+              disabled={isSubmitting}
+              label="B"
+              active={extras.isBye}
+              sub="Bye"
+              onClick={() => handleExtras("b")}
+              className="rounded-2xl border border-slate-200 bg-slate-100 py-4 text-[10px] font-black tracking-widest text-slate-500 uppercase shadow-sm transition-all hover:bg-slate-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
+            />
+            <PadButton
+              disabled={isSubmitting}
+              label="LB"
+              active={extras.isLegBye}
+              sub="Leg bye"
+              onClick={() => handleExtras("lb")}
+              className="rounded-2xl border border-slate-200 bg-slate-100 py-4 text-[10px] font-black tracking-widest text-slate-500 uppercase shadow-sm transition-all hover:bg-slate-200 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
+            />
+
+            <PadButton
+              disabled={isSubmitting}
+              label="W"
+              active={isWicket}
+              className={`${
+                isWicket ? "scale-75 text-white ring-rose-500" : ""
+              } group col-span-2 flex w-full items-center justify-center gap-3 rounded-[2rem] border-2 border-rose-500 bg-rose-600 py-6 text-white shadow-xl shadow-rose-600/30 transition-all hover:bg-rose-700 active:scale-95 dark:bg-red-800`}
+              sub="Wicket"
+              onClick={() => setIsWicket(true)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Ball Timeline (Vertical/Mini version for sidebar) */}
+      <div className="group relative overflow-hidden rounded-[3rem] border border-white/5 bg-slate-900 p-8 text-white shadow-xl">
+        <div className="mb-6 flex items-center gap-2">
+          <Clock className="h-4 w-4 text-emerald-500" />
+          <span className="text-[10px] font-black tracking-[0.3em] text-emerald-500 uppercase">
+            Timeline
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {history &&
+            history.slice(0, 12).map((ball, i) => (
+              <div
+                key={i}
+                className={`flex h-10 w-10 items-center justify-center rounded-xl border text-[10px] font-black transition-all ${
+                  ball.isWicket
+                    ? "border-rose-600 bg-rose-500 text-white shadow-lg shadow-rose-500/40"
+                    : ball.runs === 4 || ball.runs === 6
+                      ? "border-emerald-600 bg-emerald-500 text-white shadow-lg shadow-emerald-500/40"
+                      : "border-white/20 bg-white/10 text-slate-300"
+                }`}
+              >
+                {ball.isWicket ? "W" : isLegalBall(ball) ? "Ex" : ball.runs}
+              </div>
+            ))}
         </div>
       </div>
       <WicketDetailsModal
@@ -375,7 +610,23 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         isOpen={isOverFinished && match.status !== "inning_completed"}
         onSubmit={handleChangeBowler}
       />
-    </div>
+      <ShotDirectionModal
+        isOpen={!!pendingBall}
+        runs={pendingBall?.runs ?? 0}
+        batterName={batterName}
+        onSelect={(side) => {
+          if (!pendingBall) return;
+          submitBall(pendingBall.runs, side, pendingBall.wicket);
+          setPendingBall(null);
+        }}
+        onSkip={() => {
+          if (!pendingBall) return;
+          const { runs, wicket } = pendingBall;
+          setPendingBall(null);
+          submitBall(runs, null, wicket);
+        }}
+      />
+    </aside>
   );
 };
 
@@ -398,16 +649,14 @@ const PadButton = ({
     onClick={onClick}
     disabled={disabled}
     className={cn(
-      `relative flex aspect-square max-h-32 max-w-32 flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`,
-      active ? "ring-indigo-500" : "ring-transparent",
-      className
+      `relative flex flex-col items-center justify-center rounded-2xl p-4 text-2xl font-black transition-all ease-in-out`,
+      className,
+      active && "!bg-emerald-500"
     )}
   >
-    <span className="font-[inter] text-lg font-bold">{label}</span>
+    <span className="text-lg font-bold">{label}</span>
     {sub && (
-      <span className="font-[urbanist] text-[8px] font-semibold tracking-wide uppercase opacity-70">
-        {sub}
-      </span>
+      <span className="text-[8px] font-semibold tracking-wide uppercase opacity-70">{sub}</span>
     )}
   </button>
 );
