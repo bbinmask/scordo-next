@@ -132,7 +132,6 @@ export default function ScorecardPage() {
           </div>
         </div>
 
-        {/* Inning Selector Tabs */}
         <div className="flex w-full overflow-hidden rounded-2xl bg-white p-1 ring-1 ring-slate-200 sm:w-auto dark:bg-slate-900 dark:ring-white/10">
           {innings.map((inning, idx) => (
             <button
