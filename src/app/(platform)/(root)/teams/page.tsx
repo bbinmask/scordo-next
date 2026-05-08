@@ -1,36 +1,28 @@
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
-import type { CSSProperties } from "react";
 import {
-  Users,
   PlusCircle,
-  Mail,
-  ArrowRight,
-  MapPin,
   Shield,
-  ArrowUpRight,
-  Trophy,
-  Search,
   Bell,
   LayoutGrid,
   Loader2,
   Crown,
   Activity,
-  Zap,
+  Search,
 } from "lucide-react";
-import { TeamForListComponent, TeamRequestWithDetails, TeamWithPlayers } from "@/lib/types";
+import { TeamRequestWithDetails, TeamWithPlayers } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import Spinner, { DefaultLoader } from "@/components/Spinner";
+import Spinner from "@/components/Spinner";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
 import { Carousel } from "@/components/carousel";
 import { useAction } from "@/hooks/useAction";
 import { acceptTeamRequest, declineTeamRequest } from "@/actions/invite-acions";
 import { toast } from "sonner";
-import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
+import { EmptyState } from "@/components/cards/EmptyState";
 import TeamCard from "./_components/TeamCard";
+import { SectionHeader } from "@/components/layouts/SectionHeader";
 
 const CreateTeamCard = () => (
   <div className="group relative h-52 overflow-hidden rounded-3xl bg-gradient-to-br from-green-600 to-teal-900 p-6 text-white shadow-2xl">
@@ -51,47 +43,6 @@ const CreateTeamCard = () => (
     </Link>
   </div>
 );
-
-const EmptyCard = ({ type = "managed" }: { type: "managed" | "joined" }) => {
-  const isManaged = type === "managed";
-
-  const router = useRouter();
-
-  return (
-    <div className="animate-in hover-card fade-in slide-in-from-bottom-2 border-input flex h-52 w-full flex-col items-center justify-center rounded-3xl border bg-white/40 p-8 backdrop-blur-sm transition-all duration-700 dark:bg-slate-900/40">
-      <div className="max-w-xs text-center">
-        <h4 className="mb-1 text-lg font-bold text-slate-900 uppercase dark:text-white">
-          {isManaged ? "No Squads Owned" : "No Joined Teams"}
-        </h4>
-        <p className="secondary-text font-[poppins] text-xs leading-relaxed font-normal">
-          {isManaged
-            ? "You haven't established a team legacy yet. Start your own organization today."
-            : "You aren't currently signed to any rosters. Time to hit the recruitment portal."}
-        </p>
-      </div>
-
-      <div className="mt-6">
-        {isManaged ? (
-          <Link
-            href="/teams/create"
-            className="flex items-center gap-2 rounded-xl bg-green-700 px-6 py-2 font-[poppins] text-[10px] font-bold text-white uppercase transition-all hover:bg-green-800 hover:underline"
-          >
-            <PlusCircle className="h-4 w-4" /> Create a Team
-          </Link>
-        ) : (
-          <button
-            onClick={() => {
-              router.push("/explore");
-            }}
-            className="flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-2 font-[poppins] text-xs font-bold text-white uppercase shadow-lg transition-all hover:underline hover:opacity-80 active:opacity-70 dark:bg-white dark:text-slate-900"
-          >
-            <Search className="h-4 w-4" /> Browse Open Spots
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
 
 function Invitations() {
   const [inviteId, setInviteId] = useState<string | null>(null);
@@ -252,15 +203,7 @@ const TeamsPage = () => {
             <div className="relative z-10 space-y-16">
               {/* Section: Managed Teams */}
               <>
-                <div className="mb-6 flex items-center gap-3 px-6">
-                  <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-500">
-                    <Crown size={20} />
-                  </div>
-                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-                    Managed <span className="primary-heading pr-2">By You</span>
-                  </h3>
-                  <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
-                </div>
+                <SectionHeader title="Managed" highlight="By You" />
 
                 {managedTeams && managedTeams.length > 0 ? (
                   <Carousel>
@@ -270,22 +213,22 @@ const TeamsPage = () => {
                   </Carousel>
                 ) : (
                   <div className="px-6">
-                    <EmptyCard type="managed" />
+                    <EmptyState
+                      action={{
+                        label: "Create a Squad",
+                        href: "/teams/create",
+                      }}
+                      title="No Squads Owned"
+                      description="You haven't established a team legacy yet. Start your own organization today."
+                      icon={<Shield size={20} />}
+                    />
                   </div>
                 )}
               </>
 
               {/* Section: Joined Teams */}
               <>
-                <div className="mb-6 flex items-center gap-3 px-6">
-                  <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-500">
-                    <Activity size={20} />
-                  </div>
-                  <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-                    Joined <span className={"primary-heading pr-2"}>Squads</span>
-                  </h3>
-                  <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
-                </div>
+                <SectionHeader title="Joined" highlight="Squads" />
 
                 {playerTeams && playerTeams.length > 0 ? (
                   <Carousel>
@@ -295,7 +238,15 @@ const TeamsPage = () => {
                   </Carousel>
                 ) : (
                   <div className="px-6">
-                    <EmptyCard type="joined" />
+                    <EmptyState
+                      action={{
+                        label: "Explore Squads",
+                        href: "/explore",
+                      }}
+                      title="No Squads"
+                      description="You aren't currently signed to any rosters. Time to hit the recruitment portal."
+                      icon={<Search size={20} />}
+                    />
                   </div>
                 )}
               </>

@@ -35,10 +35,17 @@ import {
 } from "./schema";
 import { currentUser } from "@/lib/currentUser";
 import { ERROR_CODES } from "@/constants";
-import { Ball, Commentary, Inning, Match } from "@/generated/prisma";
+import { Ball, Inning, Match } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 import { ablyServer } from "@/lib/ably-server";
-import { generateCommentary, ShotSide } from "@/lib/commentary/engine";
+import { generateCommentary } from "@/lib/commentary/engine";
+import { ShotSide } from "@/lib/commentary/types";
+import { currentOverData } from "@/lib/match/current-over";
+import {
+  detectBatterMilestone,
+  detectHatTrick,
+  detectSpecialBoundaryEvents,
+} from "@/lib/commentary/detector";
 
 const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeForCreate> => {
   const {
@@ -577,7 +584,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     batsmanId,
     inningId,
     matchId,
-    fielderId,
+    fielderId: initFielderId,
     isBye,
     dismissalType,
     runs,
@@ -589,86 +596,65 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     isLastWicket,
     outBatsmanId,
     shotSide,
+    shotType,
   } = data;
 
   const user = await currentUser();
+  if (!user) return { error: "Log in required" };
 
-  if (!user)
-    return {
-      error: "Log in required",
-    };
+  // ─── Run counting ────────────────────────────────────────────────────────
 
   const teamRuns = runs + (isWide ? 1 : 0) + (isNoBall ? 1 : 0);
-  const batsmanRuns = isBye || isLegBye ? 0 : runs;
-  let bowlerRuns = 0;
 
-  if (isWide && !isBye && !isLegBye) bowlerRuns = runs + 1;
-  else if (isNoBall && !isBye && !isLegBye) bowlerRuns = runs + 1;
-  else if (!isBye && !isLegBye) bowlerRuns = runs;
+  const batsmanRuns = isBye || isLegBye ? 0 : runs;
+
+  let bowlerRuns: number;
+  if (isWide) {
+    bowlerRuns = isBye || isLegBye ? 1 : runs + 1;
+  } else if (isNoBall) {
+    bowlerRuns = isBye || isLegBye ? 1 : runs + 1;
+  } else {
+    bowlerRuns = isBye || isLegBye ? 0 : runs;
+  }
+
   const isLegalDelivery = !isNoBall && !isWide;
 
-  if (isWide) bowlerRuns = 1;
-  else if (isNoBall) {
-    if (isBye || isLegBye) bowlerRuns = 1;
-    else bowlerRuns = runs + 1;
-  } else if (isLegalDelivery) bowlerRuns = runs;
-  else bowlerRuns = 0;
+  const fielderId = initFielderId?.trim() ? initFielderId : undefined;
 
-  let match, ball;
+  let target: number | undefined;
+  let runsNeeded: number | undefined;
+
+  let currentMatchStatus = "" as string;
+
+  type HydratedBall = Ball & {
+    batsman: { user: { name?: string; username?: string } };
+    bowler: { user: { name?: string; username?: string } };
+    fielder?: { user: { name?: string; username?: string } } | null;
+  };
+
+  let ball: HydratedBall;
 
   try {
-    match = await db.match.findUnique({
-      where: {
-        id: matchId,
-      },
+    const match = await db.match.findUnique({
+      where: { id: matchId },
       include: {
         matchOfficials: true,
-        teamA: {
-          select: {
-            name: true,
-            abbreviation: true,
-          },
-        },
-        teamB: {
-          select: {
-            name: true,
-            abbreviation: true,
-          },
-        },
+        teamA: { select: { name: true, abbreviation: true } },
+        teamB: { select: { name: true, abbreviation: true } },
       },
     });
 
-    if (!match)
-      return {
-        error: "Match not found!",
-      };
+    if (!match) return { error: "Match not found!" };
 
-    const status = match.status;
-    const isTest = match.category === "Test";
     const isCommentaryEnabled = match.commentaryEnabled;
 
-    const isScorer =
-      match.matchOfficials.findIndex(
-        (official) => official.userId === user.id && official.role === "SCORER"
-      ) !== -1;
+    const isScorer = match.matchOfficials.some((o) => o.userId === user.id && o.role === "SCORER");
+    if (!isScorer) return { error: "Only Scorer can update the score!" };
 
-    if (!isScorer)
-      return {
-        error: "Only Scorer can update the score!",
-      };
+    const inning = await db.inning.findUnique({ where: { id: inningId } });
+    if (!inning) return { error: "Inning not found!" };
 
-    const inning = await db.inning.findUnique({
-      where: {
-        id: inningId,
-      },
-    });
-
-    if (!inning)
-      return {
-        error: "Inning not found!",
-      };
-
-    const ballsLeft: number = match.overs * 6 - inning.balls;
+    const ballsLeft = match.overs * 6 - inning.balls;
     const overContext = `${inning.overs}.${inning.balls % 6}`;
     const teamScore = `${inning.runs}/${inning.wickets}`;
     const inningNumber = inning.inningNumber;
@@ -680,58 +666,50 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
     const battingTeam = match.teamAId === inning.battingTeamId ? match.teamA : match.teamB;
     const bowlingTeam = match.teamAId === inning.bowlingTeamId ? match.teamA : match.teamB;
 
-    const playerLimit = match.playerLimit;
-
     const battingInn = await db.inningBatting.findFirst({
-      where: {
-        inningId,
-        playerId: batsmanId,
+      where: { inningId, playerId: batsmanId },
+      include: {
+        player: { select: { user: { select: { name: true, username: true } } } },
       },
     });
-
-    if (!battingInn)
-      return {
-        error: "Batsman not found",
-      };
+    if (!battingInn) return { error: "Batsman not found" };
 
     const bowlingInn = await db.inningBowling.findFirst({
-      where: {
-        inningId,
-        playerId: inning.currentBowlerId as string,
+      where: { inningId, playerId: inning.currentBowlerId as string },
+      include: {
+        player: { select: { user: { select: { name: true, username: true } } } },
       },
     });
-
     if (!bowlingInn) return { error: "Bowler not found" };
+
+    // ── Strike rotation ────────────────────────────────────────────────────
 
     let striker = inning.currentStrikerId;
     let nonStriker = inning.currentNonStrikerId;
 
-    // A is out
-
     if (runs % 2 === 1) {
       [striker, nonStriker] = [nonStriker, striker];
-      // A         B            A            B
     }
 
     if (isLegalDelivery && nextBall % 6 === 0) {
       [striker, nonStriker] = [nonStriker, striker];
     }
 
-    if (isWicket) {
-      if (outBatsmanId === striker && !isLastWicket && nextBatsmanId) {
+    if (isWicket && !isLastWicket && nextBatsmanId) {
+      if (outBatsmanId === striker) {
         striker = nextBatsmanId;
-      } else if (outBatsmanId === nonStriker && nextBatsmanId && !isLastWicket) {
+      } else if (outBatsmanId === nonStriker) {
         nonStriker = nextBatsmanId;
       }
     }
 
+    // ── Main transaction ───────────────────────────────────────────────────
     ball = await db.$transaction(async (tsx) => {
+      // Guard: if the previous over was just completed (6 legal balls bowled by
+      // the SAME bowler who is still set as currentBowlerId), the scorer must
+      // first call changeBowler before recording the next delivery.
       const lastLegalBall = await tsx.ball.findFirst({
-        where: {
-          inningId,
-          isWide: false,
-          isNoBall: false,
-        },
+        where: { inningId, isWide: false, isNoBall: false },
         orderBy: { createdAt: "desc" },
       });
 
@@ -741,10 +719,9 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
           lastLegalBall.ball !== 0 &&
           lastLegalBall.bowlerId === inning.currentBowlerId;
 
-        if (isOverCompleted)
-          return {
-            error: "Bowler change is required before bowling next ball!",
-          };
+        if (isOverCompleted) {
+          throw new Error("Bowler change is required before bowling next ball!");
+        }
       }
 
       const createdBall = await tsx.ball.create({
@@ -759,50 +736,21 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
           isBye,
           isLegBye,
           isNoBall,
-          fielderId: fielderId?.trim() !== "" ? fielderId : undefined,
+          fielderId: fielderId,
           isWicket,
           isWide,
         },
         include: {
-          batsman: {
-            select: {
-              user: {
-                select: {
-                  name: true,
-                  username: true,
-                },
-              },
-            },
-          },
-          bowler: {
-            select: {
-              user: {
-                select: {
-                  name: true,
-                  username: true,
-                },
-              },
-            },
-          },
-          fielder: {
-            select: {
-              user: {
-                select: {
-                  name: true,
-                  username: true,
-                },
-              },
-            },
-          },
+          batsman: { select: { user: { select: { name: true, username: true } } } },
+          bowler: { select: { user: { select: { name: true, username: true } } } },
+          fielder: { select: { user: { select: { name: true, username: true } } } },
         },
       });
 
       await tsx.inningBatting.update({
-        where: {
-          id: battingInn.id,
-        },
+        where: { id: battingInn.id },
         data: {
-          balls: isLegalDelivery ? battingInn.balls + 1 : battingInn.balls,
+          balls: isLegalDelivery || isNoBall ? battingInn.balls + 1 : battingInn.balls,
           isOut: battingInn.isOut || isWicket,
           runs: battingInn.runs + batsmanRuns,
           dots:
@@ -815,9 +763,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       });
 
       await tsx.inningBowling.update({
-        where: {
-          id: bowlingInn.id,
-        },
+        where: { id: bowlingInn.id },
         data: {
           runs: bowlingInn.runs + bowlerRuns,
           balls: isLegalDelivery ? bowlingInn.balls + 1 : bowlingInn.balls,
@@ -825,7 +771,6 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
             isLegalDelivery && (bowlingInn.balls + 1) % 6 === 0
               ? bowlingInn.overs + 1
               : bowlingInn.overs,
-
           wides: isWide ? bowlingInn.wides + 1 : bowlingInn.wides,
           noBalls: isNoBall ? bowlingInn.noBalls + 1 : bowlingInn.noBalls,
           wickets:
@@ -844,122 +789,150 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
           currentNonStrikerId: nonStriker,
         },
       });
-      let commentary;
-      let target: number | undefined;
-      let runsNeeded: number | undefined;
 
       if (inningNumber === 1) {
         if (isLastWicket || nextOver === totalOvers) {
           await tsx.match.update({
-            where: {
-              id: matchId,
-            },
-            data: {
-              status: "inning_completed",
-            },
+            where: { id: matchId },
+            data: { status: "inning_completed" },
           });
 
-          await ablyServer.channels.get(`match:${matchId}`).publish("inning-completed", {});
+          currentMatchStatus = "inning_completed";
         }
       } else if (inningNumber === 2) {
         const firstInning = await tsx.inning.findFirst({
-          where: {
-            matchId,
-          },
+          where: { matchId },
+          orderBy: { inningNumber: "asc" },
         });
 
-        if (!firstInning) return { error: "First inning not found!" };
-        target = firstInning.runs;
-        runsNeeded = firstInning.runs - inning.runs;
+        if (!firstInning) throw new Error("First inning not found!");
 
-        if (isLastWicket || nextOver === totalOvers || inning.runs + teamRuns > firstInning.runs) {
-          let result = null;
-          let winnerId;
-          if (inning.runs + teamRuns > firstInning.runs) {
+        target = firstInning.runs + 1;
+        runsNeeded = target - (inning.runs + teamRuns);
+
+        const currentScore = inning.runs + teamRuns;
+        const chased = currentScore > firstInning.runs;
+        const matchComplete = isLastWicket || nextOver === totalOvers || chased;
+
+        if (matchComplete) {
+          let result: string;
+          let winnerId: string | undefined;
+
+          if (chased) {
             winnerId = inning.battingTeamId;
-            result = `${battingTeam.name} won by ${playerLimit - inning.wickets - 1} wickets`;
-          } else if (inning.runs + teamRuns < firstInning.runs) {
+            const wicketsRemaining = match.playerLimit - inning.wickets - (isWicket ? 1 : 0);
+            result = `${battingTeam.name} won by ${wicketsRemaining} wickets`;
+          } else if (currentScore < firstInning.runs) {
             winnerId = inning.bowlingTeamId;
-            result = `${bowlingTeam.name} won by ${firstInning.runs - inning.runs + teamRuns} runs`;
+
+            const runsMargin = firstInning.runs - currentScore;
+            result = `${bowlingTeam.name} won by ${runsMargin} runs`;
           } else {
-            result = "Match Drawn";
+            result = "Match Tied";
           }
-          match = await tsx.match.update({
-            where: {
-              id: matchId,
-            },
-            data: {
-              status: "completed",
-              result,
-              winnerId,
-            },
+
+          await tsx.match.update({
+            where: { id: matchId },
+            data: { status: "completed", result, winnerId },
           });
+
+          currentMatchStatus = "completed";
         }
       }
-      if (isCommentaryEnabled) {
-        const eventType = isWicket ? "WICKET" : "RUN_SCORED";
-        const { text, label } = await generateCommentary({
-          eventType,
-          ball: createdBall as Ball,
-          batterName: createdBall.batsman.user.name,
-          bowlerName: createdBall.bowler.user.name,
-          fielderName: createdBall.fielder?.user.name,
-          overContext,
-          teamScore,
-          inningNumber,
-          shotSide: shotSide as ShotSide,
-          target,
-          runsNeeded,
-          ballsLeft,
-        });
-
-        commentary = await tsx.commentary.create({
-          data: {
-            eventType,
-            label,
-            text,
-            ballId: createdBall.id,
-          },
-          include: {
-            ball: {
-              select: {
-                over: true,
-                ball: true,
-              },
-            },
-          },
-        });
-      }
-
-      await ablyServer.channels.get(`match:${matchId}`).publish("ball-added", {
-        ball: nextBall,
-        over: nextOver,
-        batsmanId,
-        bowlerId: inning.currentBowlerId as string,
-        inningId,
-        isCompleted: status === "completed" || status === "inning_completed",
-        runs,
-        dismissalType,
-        isBye,
-        isLegBye,
-        isNoBall,
-        fielderId: fielderId?.trim() !== "" ? fielderId : undefined,
-        isWicket,
-        isWide,
-        ballData: createdBall,
-        commentary: commentary || null,
-      });
       return createdBall;
     });
-  } catch (error) {
-    return {
-      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
-    };
+
+    if (currentMatchStatus === "inning_completed") {
+      await ablyServer.channels.get(`match:${matchId}`).publish("inning-completed", {});
+    }
+
+    // ── Commentary ────────────────────────────────────────────────────────
+
+    let commentary;
+
+    if (isCommentaryEnabled) {
+      const eventType = isWicket ? "WICKET" : "RUN_SCORED";
+      const currentOver = (await currentOverData(inningId)).data;
+
+      const batterName =
+        battingInn?.player.user.name ?? battingInn?.player.user.username ?? "Batter";
+      const bowlerName =
+        bowlingInn?.player.user.name ?? bowlingInn?.player.user.username ?? "Bowler";
+
+      let milestone, hattrick, special;
+
+      if (battingInn && !isWicket) {
+        const prevRuns = battingInn.runs;
+        const nextRuns = prevRuns + batsmanRuns;
+        milestone = detectBatterMilestone(batterName, prevRuns, nextRuns, overContext, teamScore);
+      }
+
+      if (isWicket) {
+        hattrick = detectHatTrick(currentOver as Ball[], bowlerName, overContext, teamScore);
+      }
+
+      if (!isWicket) {
+        special = detectSpecialBoundaryEvents(
+          currentOver as Ball[],
+          batterName,
+          bowlerName,
+          overContext,
+          teamScore
+        );
+      }
+
+      const { text, label } = await generateCommentary({
+        eventType,
+        ball: ball,
+        batterName,
+        bowlerName,
+        fielderName: ball.fielder?.user.name,
+        overContext,
+        teamScore,
+        inningNumber,
+        shotSide: shotSide as ShotSide,
+        target,
+        runsNeeded,
+        shotType,
+        ballsLeft,
+        milestoneType: milestone?.payload.milestoneType || hattrick?.payload.milestoneType,
+        specialEvent: special?.payload.specialEvent,
+        milestoneValue: milestone?.payload.milestoneValue || hattrick?.payload.milestoneValue,
+      });
+
+      commentary = await db.commentary.create({
+        data: { eventType, label, text, ballId: ball.id },
+        include: { ball: { select: { over: true, ball: true } } },
+      });
+    }
+
+    await ablyServer.channels.get(`match:${matchId}`).publish("ball-added", {
+      ball: nextBall,
+      over: nextOver,
+      batsmanId,
+      bowlerId: inning.currentBowlerId as string,
+      inningId,
+      isCompleted: currentMatchStatus === "completed" || currentMatchStatus === "inning_completed",
+      runs,
+      dismissalType,
+      isBye,
+      isLegBye,
+      isNoBall,
+      fielderId: fielderId,
+      isWicket,
+      isWide,
+      ballData: ball,
+      commentary: commentary ?? null,
+    });
+  } catch (error: any) {
+    if (error instanceof Error && error.message !== ERROR_CODES.INTERNAL_SERVER_ERROR.message) {
+      return { error: error.message };
+    }
+    return { error: ERROR_CODES.INTERNAL_SERVER_ERROR.message };
   }
 
-  return {
-    data: ball as any,
-  };
+  revalidatePath(`/matches/${matchId}`);
+  return { data: ball };
 };
 
 const startNextInningHandler = async (

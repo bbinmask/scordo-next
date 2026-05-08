@@ -1,5 +1,5 @@
 import { Ball, WicketType } from "@/generated/prisma";
-import { CommentaryLine } from "@/lib/commentary/engine";
+import { CommentaryLine } from "@/lib/commentary/types";
 
 export type FallWicket = {
   fielderId: string;

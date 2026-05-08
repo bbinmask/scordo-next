@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Carousel } from "@/components/carousel";
 import Spinner from "@/components/Spinner";
-import { EmptyCard } from "./_components/cards/EmptyCard";
+import { EmptyState } from "@/components/cards/EmptyState";
 import { MatchRequests } from "./_components/MatchRequests";
 import { MatchCard } from "./_components/cards/MatchCard";
 import { CreateMatchCard } from "./_components/cards/CreateMatchCard";
@@ -61,12 +61,13 @@ const MatchesPage = () => {
               </Carousel>
             ) : (
               <div className="px-6">
-                <EmptyCard
-                  Icon={<Sword size={24} />}
-                  type="matches"
+                <EmptyState
+                  icon={<Sword size={24} />}
                   title="No match found"
-                  linkText="Create Match"
-                  href="/matches/create"
+                  action={{
+                    label: "Create Match",
+                    href: "/matches/create",
+                  }}
                   description="The pitch is empty. Explore tournaments to join your next match."
                 />
               </div>
@@ -96,12 +97,13 @@ const MatchesPage = () => {
               </Carousel>
             ) : (
               <div className="px-6">
-                <EmptyCard
-                  Icon={<Crown size={24} />}
-                  type="matches"
+                <EmptyState
+                  icon={<Crown size={24} />}
                   title="No matches found"
-                  linkText="Create Match"
-                  href="/matches/create"
+                  action={{
+                    label: "Create Match",
+                    href: "/matches/create",
+                  }}
                   description="You are not currently scheduled for any matches. Create a new match or join an existing one."
                 />
               </div>

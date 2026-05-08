@@ -1,5 +1,5 @@
 import { ERROR_CODES } from "@/constants";
-import { db } from "@/lib/db";
+import { currentOverData } from "@/lib/match/current-over";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
@@ -9,32 +9,11 @@ export const GET = async (req: Request, { params }: { params: Promise<{ inningId
   if (!inningId) return NextResponse.json(new ApiError(ERROR_CODES.BAD_REQUEST));
 
   try {
-    const inning = await db.inning.findUnique({
-      where: { id: inningId },
-    });
+    const currentOver = await currentOverData(inningId);
 
-    if (!inning) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
+    if (!currentOver.success) return NextResponse.json(currentOver);
 
-    const currentOver = await db.ball.findMany({
-      where: {
-        inningId,
-        bowlerId: inning.currentBowlerId as string,
-        over: inning.overs,
-      },
-      select: {
-        runs: true,
-        ball: true,
-        bowlerId: true,
-        id: true,
-        isBye: true,
-        isLegBye: true,
-        isNoBall: true,
-        isWicket: true,
-        isWide: true,
-      },
-    });
-
-    return NextResponse.json(new ApiResponse(currentOver));
+    return NextResponse.json(new ApiResponse(currentOver.data));
   } catch (error) {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }

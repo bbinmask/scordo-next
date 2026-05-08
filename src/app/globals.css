@@ -1,3 +1,27 @@
+/* ============================================================
+   SCORDO — globals.css
+   ============================================================
+   Structure:
+     1. Imports
+     2. Tailwind theme tokens (@theme inline)
+     3. CSS custom properties (:root / .dark)
+     4. Tailwind base layer resets
+     5. ── UTILITY CLASSES ──
+        5a. Layout
+        5b. Typography
+        5c. Buttons
+        5d. Cards & Surfaces
+        5e. Badges & Chips
+        5f. Form inputs
+        5g. Icon buttons
+        5h. Dividers & decorative
+        5i. Animations & states
+        5j. Scrollbar
+        5k. Toggle (existing)
+   ============================================================ */
+
+/* ─── 1. Imports ──────────────────────────────────────────────────────────── */
+
 @import url("https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
 
 @import "tailwindcss";
@@ -5,7 +29,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─── 2. Tailwind @theme tokens ───────────────────────────────────────────── */
+
 @theme inline {
+  /* shadcn/ui mappings */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-background-primary: var(--background-primary);
@@ -45,20 +72,24 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* Customized */
-
+  /* Scordo brand tokens */
   --color-main: var(--main-color);
   --color-subtle: #fff;
   --color-hover: var(--hover-color);
   --color-active: var(--active-color);
 }
 
+/* ─── 3. CSS Custom Properties ────────────────────────────────────────────── */
+
 :root {
+  /* ── Radii ── */
   --radius: 0.625rem;
-  --background-: oklch(1 0 0);
+
+  /* ── shadcn/ui palette (light) ── */
+  --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(20.8% 0.042 265.755);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
@@ -87,18 +118,67 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Customized */
-
+  /* ── Scordo brand colors ── */
   --main-color: oklch(39.3% 0.095 152.535);
   --hover-color: #2a9709;
   --active-color: #35c40ac4;
-  --background-primary: oklch(91.279% 0.0001 271.152);
+
+  /* ──────────────────────────────────────────────────────────
+     SCORDO SEMANTIC TOKENS
+     Use these throughout components instead of hardcoded colors.
+     Changing a token here changes it everywhere.
+  ────────────────────────────────────────────────────────── */
+
+  /* Page backgrounds */
+  --bg-page: oklch(94% 0.002 270); /* slate-100 equivalent */
+  --bg-page-dark: #020617; /* replaces the raw hex used 9× */
+  --bg-primary: oklch(91.279% 0.0001 271.152);
+
+  /* Surface / card backgrounds */
+  --bg-surface: #ffffff; /* white cards */
+  --bg-surface-alt: oklch(97% 0 0); /* bg-slate-50 / bg-gray-50 */
+  --bg-surface-muted: oklch(96% 0.003 240); /* bg-slate-100 / bg-gray-100 */
+  --bg-surface-dark: oklch(20.5% 0 0); /* dark:bg-slate-800 */
+  --bg-surface-dark-alt: oklch(18% 0.01 240); /* dark:bg-slate-900 */
+  --bg-surface-dark-muted: rgba(255, 255, 255, 0.05); /* dark:bg-white/5 */
+
+  /* Text */
+  --text-primary: oklch(15% 0 0); /* slate-900 */
+  --text-secondary: oklch(45% 0.01 240); /* gray-600 / slate-500 */
+  --text-muted: oklch(60% 0.008 240); /* slate-400 */
+  --text-primary-dark: oklch(98.5% 0 0); /* white/slate-50 */
+  --text-secondary-dark: oklch(70% 0 0); /* gray-400 */
+  --text-muted-dark: oklch(56% 0.008 240); /* slate-400 in dark */
+
+  /* Brand green */
+  --brand: oklch(46% 0.16 155); /* green-600 */
+  --brand-hover: oklch(40% 0.15 155); /* green-700 */
+  --brand-light: oklch(96% 0.04 155); /* green-50 */
+  --brand-muted: rgba(34, 197, 94, 0.1); /* green-500/10 */
+  --brand-border: rgba(34, 197, 94, 0.2); /* green-500/20 */
+  --brand-text: oklch(46% 0.16 155); /* text-green-600 */
+  --brand-text-dark: oklch(65% 0.18 155); /* dark:text-green-400 */
+
+  /* Borders */
+  --border-subtle: oklch(90% 0.003 240); /* slate-200 / border-slate-200 */
+  --border-faint: rgba(255, 255, 255, 0.1); /* dark:border-white/10 */
+  --border-faintest: rgba(255, 255, 255, 0.05); /* dark:border-white/5 */
+
+  /* Danger/destructive */
+  --danger: oklch(55% 0.22 27); /* red-600 */
+  --danger-light: oklch(96% 0.04 27); /* red-50 */
+  --danger-text: oklch(40% 0.18 27); /* red-800 */
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-brand: 0 4px 14px 0 rgba(22, 163, 74, 0.25);
 }
 
 .dark {
+  /* ── shadcn/ui palette (dark) ── */
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(20.8% 0.042 265.755);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
@@ -128,10 +208,13 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  /* Customized */
-
-  --background-primary: oklch(21% 0.034 264.665);
+  /* Scordo dark overrides */
+  --bg-primary: oklch(21% 0.034 264.665);
+  --bg-surface: oklch(20.5% 0 0);
+  --bg-surface-alt: oklch(18% 0.01 240);
 }
+
+/* ─── 4. Base layer ───────────────────────────────────────────────────────── */
 
 @layer base {
   * {
@@ -140,25 +223,18 @@
   body {
     @apply text-foreground;
   }
-
   abbr {
     @apply no-underline;
   }
 }
 
-.min-h {
-  @apply min-h-[calc(100vh-200px)];
-}
+/* ============================================================
+   5. UTILITY CLASSES
+   ============================================================ */
 
-.primary-background {
-  @apply bg-gradient-to-r from-emerald-700 to-green-900 dark:from-gray-900 dark:to-emerald-950;
-}
+/* ─── 5a. Layout ──────────────────────────────────────────────────────────── */
 
-.layout-background {
-  @apply bg-slate-100 dark:bg-[#020617];
-  /* bg-gradient-to-br from-slate-200 to-slate-200 text-gray-800 transition-all dark:from-gray-950 dark:to-emerald-900 dark:text-gray-100; */
-}
-
+/* Vertical centering shorthand (used 139× across the codebase) */
 .center {
   @apply items-center justify-center;
 }
@@ -167,30 +243,33 @@
   @apply items-center justify-between;
 }
 
-.secondary-background {
-  @apply bg-emerald-600 dark:bg-emerald-950;
+/* Min-height helpers */
+.min-h {
+  @apply min-h-[calc(100vh-200px)];
 }
 
-.container-bg {
-  @apply bg-gray-50 dark:bg-gray-800;
+.min-h-screen-nav {
+  @apply min-h-[calc(100vh-9rem)];
 }
 
-.primary-btn {
-  @apply transform bg-emerald-600 font-[urbanist] font-semibold text-white shadow-md transition-all duration-300 ease-in-out focus:ring-2 focus:ring-emerald-400 focus:outline-none dark:bg-green-800 dark:text-lime-200 dark:focus:ring-green-500;
+/* Section divider line — was: "ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" (17 times)
+   Usage: <div class="divider-line" />  or  <div class="divider-line divider-line--strong" /> */
+.divider-line {
+  @apply h-px flex-1 bg-slate-100 dark:bg-white/5;
 }
 
-.hover-card {
-  @apply bg-gray-100 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:bg-gray-50/80 hover:shadow-md hover:shadow-green-500/30 hover:ring-green-600/40 dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600;
+.divider-line--strong {
+  @apply bg-slate-200 dark:bg-white/10;
 }
 
-.secondary-btn {
-  @apply transform rounded-md bg-gray-600 font-[urbanist] text-gray-100 shadow-md transition-all duration-300 ease-in-out focus:ring-2 focus:ring-gray-200 focus:outline-none dark:focus:ring-gray-500;
-}
+/* ─── 5b. Typography ──────────────────────────────────────────────────────── */
 
+/* Gradient brand heading — was: bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent... (8×) */
 .primary-heading {
   @apply bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400;
 }
 
+/* Body text — adapts to dark/light */
 .primary-text {
   @apply text-slate-900 dark:text-slate-50;
 }
@@ -199,11 +278,373 @@
   @apply text-gray-600 dark:text-gray-400;
 }
 
+/* ── Micro labels ──
+   The single most repeated pattern in the codebase (55 occurrences).
+   "text-[10px] font-black tracking-widest text-slate-400 uppercase"
+
+   Three size variants:
+     .label-xs  → 9px  (6 occurrences — TournamentCard, chips)
+     .label-sm  → 10px (55 occurrences — stat labels, form labels, section caps)
+     .label-md  → 11px (form section headings)
+*/
+.label-xs {
+  @apply font-[urbanist] text-[9px] font-black tracking-widest text-slate-400 uppercase;
+}
+
+.label-sm {
+  @apply text-[10px] font-black tracking-widest text-slate-400 uppercase;
+}
+
+/* Poppins variant used in form fields */
+.label-sm--poppins {
+  @apply font-[poppins] text-[10px] font-semibold tracking-widest text-slate-400 uppercase;
+}
+
+/* Dark text variant (used inside BentoCard green sections) */
+.label-sm--light {
+  @apply font-[poppins] text-[10px] font-semibold text-green-200 uppercase;
+}
+
+/* Block label with margin — "mb-1 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase" (12 times) */
+.label-field {
+  @apply mb-1 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase;
+}
+
+/* ── Section headings ──
+   "text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white" (23 occurrences)
+   Three sizes available. */
+.heading-xl {
+  @apply text-4xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white;
+}
+
+.heading-lg {
+  @apply text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white;
+}
+
+.heading-md {
+  @apply text-xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white;
+}
+
+/* Poppins variant — "font-[poppins] text-xl font-black text-slate-900 dark:text-white" (4×) */
+.heading-md--poppins {
+  @apply font-[poppins] text-xl font-black text-slate-900 dark:text-white;
+}
+
+/* ── Stat value (the big number in stat cards) ──
+   "text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white" */
+.stat-value {
+  @apply text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white;
+}
+
+/* ── Nav link text ──
+   "block truncate font-[poppins] text-sm font-black text-slate-800 hover:text-green-600
+    dark:text-white dark:hover:text-green-400" (10×) */
+.nav-link {
+  @apply block truncate font-[poppins] text-sm font-black text-slate-800 hover:text-green-600 dark:text-white dark:hover:text-green-400;
+}
+
+/* ── Meta/sub text ──
+   "truncate font-[urbanist] text-xs font-semibold text-slate-400" (10×) */
+.meta-text {
+  @apply truncate font-[urbanist] text-xs font-semibold text-slate-400;
+}
+
+/* "primary-text font-[urbanist] text-base font-semibold" (9×) */
+.body-text {
+  @apply font-[urbanist] text-base font-semibold text-slate-900 dark:text-slate-50;
+}
+
+/* Error text below inputs — "mt-1.5 flex items-center gap-1 font-[urbanist] text-xs font-semibold text-rose-500" (4×) */
+.field-error {
+  @apply mt-1.5 flex items-center gap-1 font-[urbanist] text-xs font-semibold text-rose-500;
+}
+
+/* ─── 5c. Buttons ─────────────────────────────────────────────────────────── */
+
+/* Primary CTA — green brand button */
+.primary-btn {
+  @apply transform bg-emerald-600 font-[urbanist] font-semibold text-white shadow-md transition-all duration-300 ease-in-out hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-400 focus:outline-none dark:bg-green-800 dark:text-lime-200 dark:focus:ring-green-500;
+}
+
+/* Secondary / neutral button */
+.secondary-btn {
+  @apply transform rounded-md bg-gray-600 font-[urbanist] text-gray-100 shadow-md transition-all duration-300 ease-in-out focus:ring-2 focus:ring-gray-200 focus:outline-none dark:focus:ring-gray-500;
+}
+
+/* Danger / destructive button */
+.danger-btn {
+  @apply rounded-md bg-red-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-red-700;
+}
+
+/* Ghost — transparent with border */
+.ghost-btn {
+  @apply rounded-md border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700;
+}
+
+/* Small pill CTA — green, used in EmptyState and scattered CTAs */
+/* "flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-green-500/20 transition-all hover:scale-105 hover:bg-green-700 active:scale-95" */
+.cta-pill {
+  @apply flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2 font-[urbanist] text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-green-500/20 transition-all hover:scale-105 hover:bg-green-700 active:scale-95;
+}
+
+/* ─── 5d. Cards & Surfaces ────────────────────────────────────────────────── */
+
+/* The signature Scordo hover card — used 139× */
+.hover-card {
+  @apply bg-gray-100 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:bg-gray-50/80 hover:shadow-md hover:shadow-green-500/30 hover:ring-green-600/40 dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600;
+}
+
+/* Page background */
+.layout-background {
+  @apply bg-slate-100 dark:bg-[#020617];
+}
+
+/* Section/widget background (sidebar panels, sub-sections) */
+.container-bg {
+  @apply bg-gray-50 dark:bg-gray-800;
+}
+
+/* Hero gradient backgrounds */
+.primary-background {
+  @apply bg-gradient-to-r from-emerald-700 to-green-900 dark:from-gray-900 dark:to-emerald-950;
+}
+
+.secondary-background {
+  @apply bg-emerald-600 dark:bg-emerald-950;
+}
+
+/* ── Named surface layers ──
+   Use these instead of hardcoded bg-white / dark:bg-slate-900 pairs.
+
+   surface-1: The outermost card (white / slate-900)
+   surface-2: Nested card or inner section (slate-50 / slate-800)
+   surface-3: Deeply nested, input-like (slate-100 / slate-800/50)
+*/
+.surface-1 {
+  @apply bg-white dark:bg-slate-900;
+}
+
+.surface-2 {
+  @apply bg-slate-50 dark:bg-slate-800;
+}
+
+.surface-3 {
+  @apply bg-slate-100 dark:bg-slate-800/50;
+}
+
+/* "rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-white/5 dark:bg-slate-800/50" (4×) */
+.inner-card {
+  @apply rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-white/5 dark:bg-slate-800/50;
+}
+
+/* The large rounded bento-style section card — used via BentoCard component
+   Exposed here so it can be applied directly when the component isn't used. */
+.bento-card {
+  @apply rounded-3xl border border-slate-200 bg-white p-6 shadow-sm backdrop-blur-md transition-all hover:shadow-md dark:border-white/10 dark:bg-slate-900/50;
+}
+
+/* Empty state icon container — "mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800" (6×) */
+.empty-icon {
+  @apply mb-4 inline-block rounded-3xl bg-slate-100 p-4 shadow-inner dark:bg-slate-800;
+}
+
+/* ── Table alternating rows ── */
+.table-row-alt:nth-child(even) {
+  @apply bg-slate-50 dark:bg-slate-800/30;
+}
+
+/* "rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700" (6×) */
+.tab-pill {
+  @apply rounded-2xl border border-slate-200 bg-white px-8 py-4 font-[inter] text-xs font-semibold tracking-widest text-slate-900 shadow-lg transition-all hover:bg-slate-50 dark:border-white/10 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700;
+}
+
+/* Active tab pill variant */
+.tab-pill--active {
+  @apply bg-white text-green-600 shadow-sm dark:bg-green-600 dark:text-white;
+}
+
+/* Inactive tab text */
+.tab-pill--inactive {
+  @apply text-slate-500 hover:text-slate-700 dark:hover:text-slate-300;
+}
+
+/* ─── 5e. Badges & Chips ──────────────────────────────────────────────────── */
+
+/* ── Status badge shell ──
+   Wrap with .status-badge, then apply a modifier for color.
+
+   "rounded-full border ... px-2.5 py-1 text-[8px] font-black tracking-widest uppercase" */
+.status-badge {
+  @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-[urbanist] text-[8px] font-black tracking-widest uppercase;
+}
+
+.status-badge--green {
+  @apply border border-emerald-500/20 bg-emerald-500/10 text-emerald-600;
+}
+
+.status-badge--red {
+  @apply border border-red-500/20 bg-red-500/10 text-red-600;
+}
+
+.status-badge--yellow {
+  @apply border border-yellow-500/20 bg-yellow-500/10 text-yellow-600;
+}
+
+.status-badge--slate {
+  @apply border border-slate-200 bg-slate-100 text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400;
+}
+
+/* Live pulse dot — used alongside .status-badge */
+.live-dot {
+  @apply h-1.5 w-1.5 animate-pulse rounded-full;
+}
+
+/* ── Category chip ──
+   "rounded-md border border-green-100 bg-green-50 px-2 py-0.5 text-[9px] font-black
+    uppercase tracking-widest text-green-600 dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400"
+   Used in MatchCard for category labels (T20, ODI, etc.) */
+.category-chip {
+  @apply rounded-md border border-green-100 bg-green-50 px-2 py-0.5 text-[9px] font-black tracking-widest text-green-600 uppercase dark:border-green-500/20 dark:bg-green-500/10 dark:text-green-400;
+}
+
+/* ── Availability chip ──
+   Three variants matching AvailabilityBadge component. */
+.availability-chip {
+  @apply rounded-full px-2.5 py-0.5 text-xs font-semibold;
+}
+.availability-chip--available {
+  @apply bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300;
+}
+.availability-chip--injured {
+  @apply bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300;
+}
+.availability-chip--on_break {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300;
+}
+
+/* ── Micro chip (neutral) ──
+   "rounded-full border border-slate-100 bg-slate-50 px-2.5 py-0.5
+    font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase
+    dark:border-white/5 dark:bg-white/5" (3×) */
+.micro-chip {
+  @apply rounded-full border border-slate-100 bg-slate-50 px-2.5 py-0.5 font-[urbanist] text-[10px] font-black tracking-widest text-slate-400 uppercase dark:border-white/5 dark:bg-white/5;
+}
+
+/* ─── 5f. Form inputs ─────────────────────────────────────────────────────── */
+
+/* ── Standard text input ──
+   Was: "w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm
+   font-bold outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-slate-950"
+   (17 occurrences across forms) */
+.field-input {
+  @apply w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-500 dark:border-white/10 dark:bg-slate-950;
+}
+
+/* Input with left icon (pl accounts for the icon) */
+.field-input--icon {
+  @apply py-3 pr-4 pl-11;
+}
+
+/* Uppercase constrained variant */
+.field-input--upper {
+  @apply truncate overflow-x-clip tracking-tight uppercase;
+}
+
+/* Select / dropdown input */
+.field-select {
+  @apply w-full cursor-pointer appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-green-500;
+}
+
+/* Icon overlay inside an input group */
+.field-icon {
+  @apply pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400;
+}
+
+/* ─── 5g. Icon buttons ────────────────────────────────────────────────────── */
+
+/* Accept / confirm icon button — green
+   "rounded-full p-2 text-green-600 transition hover:bg-green-100" (7×) */
+.icon-btn-accept {
+  @apply rounded-full p-2 text-green-600 transition hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/30;
+}
+
+/* Reject / danger icon button — red
+   "rounded-full p-2 text-red-600 transition hover:bg-red-100" (7×) */
+.icon-btn-reject {
+  @apply rounded-full p-2 text-red-600 transition hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-900/30;
+}
+
+/* Neutral ghost icon button — used in nav/toolbar areas */
+.icon-btn {
+  @apply rounded-xl bg-slate-100 p-2.5 text-slate-400 transition-all hover:text-green-500 dark:bg-white/5;
+}
+
+/* Sidebar row item — "flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-gray-300 hover:opacity-80 dark:hover:bg-gray-700" (5×) */
+.sidebar-item {
+  @apply flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-gray-300 hover:opacity-80 dark:hover:bg-gray-700;
+}
+
+/* Card corner action button — "cursor-pointer rounded-2xl bg-green-700 p-3 text-white shadow-xl transition-all hover:scale-110 active:scale-95" */
+.corner-action {
+  @apply cursor-pointer rounded-2xl bg-green-700 p-3 text-white shadow-xl transition-all hover:scale-110 active:scale-95;
+}
+
+/* Sidebar icon wrapper — "shrink-0 rounded-xl bg-slate-50 p-2 text-slate-300 transition-all
+   group-hover:bg-green-50 group-hover:text-green-500 dark:bg-white/5 dark:group-hover:bg-green-500/10" (3×) */
+.sidebar-icon {
+  @apply shrink-0 rounded-xl bg-slate-50 p-2 text-slate-300 transition-all group-hover:bg-green-50 group-hover:text-green-500 dark:bg-white/5 dark:group-hover:bg-green-500/10;
+}
+
+/* ─── 5h. Decorative & Structural ─────────────────────────────────────────── */
+
+/* Glow ring — used behind TournamentCard and similar cards on hover */
+.glow-ring {
+  @apply absolute -inset-0.5 rounded-[2.5rem] bg-gradient-to-r from-green-600 to-emerald-600 opacity-0 blur transition duration-700 group-hover:opacity-20;
+}
+
+/* Full-cover image — "h-full w-full object-cover" (21×) */
+.img-cover {
+  @apply h-full w-full object-cover;
+}
+
+/* Team avatar base — "flex items-center justify-center overflow-hidden rounded-xl
+   border-2 border-slate-50 bg-white shadow-lg dark:border-[#020617] dark:bg-slate-800" */
+.team-avatar {
+  @apply flex items-center justify-center overflow-hidden rounded-xl border-2 border-slate-50 bg-white shadow-lg dark:border-[#020617] dark:bg-slate-800;
+}
+
+/* ─── 5i. Animations & Interactive States ─────────────────────────────────── */
+
+/* Subtle page-entry animation applied to sections */
+.section-enter {
+  @apply animate-in fade-in slide-in-from-bottom-4 duration-700;
+}
+
+/* Slow bounce for empty-state icons */
+.icon-bounce {
+  @apply animate-bounce duration-[3000ms];
+}
+
+/* ── Overscroll helpers ── */
+.scroll-x {
+  @apply overflow-x-auto overscroll-x-contain;
+}
+
+/* ─── 5j. Scrollbar ───────────────────────────────────────────────────────── */
+
+.hide-scrollbar::-webkit-scrollbar,
 .hide_scrollbar::-webkit-scrollbar {
+  /* keep old name for backwards compat */
   display: none;
 }
 
-/* Toggle  CSS */
+.hide-scrollbar,
+.hide_scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ─── 5k. Toggle (existing, unchanged) ───────────────────────────────────── */
 
 .switch {
   @apply border-input relative h-[30px] w-[52px] rounded-full border p-0 shadow-inner shadow-gray-800 transition-all duration-500 ease-in-out;

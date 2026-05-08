@@ -5,19 +5,6 @@ export const isTabActive = (pathname: string, currentPath: string, start = true)
   return pathname === currentPath || pathname.endsWith(`${currentPath}/`);
 };
 
-export const checkAvailability = (availability: "available" | "injured" | "on_break") => {
-  switch (availability) {
-    case "available":
-      return "Available";
-    case "injured":
-      return "Injured";
-    case "on_break":
-      return "On Break";
-    default:
-      return "Unknown";
-  }
-};
-
 export const getFullAddress = (
   address: { city?: string; state?: string; country?: string } | null
 ) => {

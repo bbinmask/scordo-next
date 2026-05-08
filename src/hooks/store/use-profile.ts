@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createModalStore } from "./create";
 
 type ProfileModalProps = {
   isOpen: boolean;
@@ -6,26 +7,9 @@ type ProfileModalProps = {
   onClose: () => void;
 };
 
-export const useRequestModal = create<ProfileModalProps>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
+export const useRequestModal = createModalStore();
 
-export const useDetailsModal = create<ProfileModalProps>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
+export const useDetailsModal = createModalStore();
+export const useProfileModal = createModalStore();
 
-export const useProfileModal = create<ProfileModalProps>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
-
-export const useSettingModal = create<ProfileModalProps>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
+export const useSettingModal = createModalStore();

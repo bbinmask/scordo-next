@@ -1,7 +1,7 @@
 "use client";
 
 import { User } from "@/generated/prisma";
-import { checkAvailability, getFullAddress } from "@/utils";
+import { getFullAddress } from "@/utils";
 import { capitalize } from "lodash";
 import {
   BarChart3,
@@ -40,6 +40,7 @@ import { formatDate } from "@/utils/helper/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { BowlingStats } from "../../_components/cards/BowlingStats";
+import { checkAvailability } from "@/utils/helper/availibility";
 
 const PersonalDetails = ({
   user,
@@ -210,19 +211,27 @@ const PersonalDetails = ({
               return (
                 <div className="grid h-full grid-cols-2 content-center gap-3">
                   <div>
-                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">Runs</p>
+                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">
+                      Runs
+                    </p>
                     <p className="font-[poppins] text-2xl font-black">{totalRuns}</p>
                   </div>
                   <div>
-                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">Wickets</p>
+                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">
+                      Wickets
+                    </p>
                     <p className="font-[poppins] text-2xl font-black">{totalWickets}</p>
                   </div>
                   <div>
-                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">Avg</p>
+                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">
+                      Avg
+                    </p>
                     <p className="font-[poppins] text-2xl font-black">{avg}</p>
                   </div>
                   <div>
-                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">Best</p>
+                    <p className="font-[poppins] text-[10px] font-semibold text-green-200 uppercase">
+                      Best
+                    </p>
                     <p className="font-[poppins] text-2xl font-black">{highScore}</p>
                   </div>
                 </div>

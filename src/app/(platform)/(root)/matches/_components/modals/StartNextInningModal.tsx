@@ -146,7 +146,7 @@ export const StartNextInningModal = ({
               <h3 className="text-lg font-black tracking-tight uppercase italic">Select Openers</h3>
             </div>
 
-            <div className="hide_scrollbar relative max-h-[40vh] flex-1 overflow-hidden overflow-y-auto rounded-[2rem] bg-slate-900 p-8 font-[poppins] text-white">
+            <div className="hide_scrollbar relative max-h-[40vh] flex-1 overflow-hidden overflow-y-auto rounded-[2rem] bg-slate-50 p-8 font-[poppins] text-slate-900 dark:bg-slate-900 dark:text-white">
               <div className="absolute top-0 right-0 p-6 opacity-10">
                 <Zap className="h-24 w-24" />
               </div>
@@ -193,7 +193,10 @@ export const StartNextInningModal = ({
                         onChange={(e) => setValue("nonStrikerId", e.target.value)}
                         className="w-full cursor-pointer appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-2 font-[inter] text-sm font-semibold outline-none focus:ring-2 focus:ring-green-500"
                       >
-                        <option value="" className="bg-slate-900 text-slate-400">
+                        <option
+                          value=""
+                          className="bg-slate-50 text-slate-700 dark:bg-slate-900 dark:text-slate-400"
+                        >
                           Choose Batter
                         </option>
                         {data.nextBattingPlayers
@@ -203,7 +206,7 @@ export const StartNextInningModal = ({
                             <option
                               key={p.playerId}
                               value={p.playerId}
-                              className="bg-slate-900 pr-2 font-[urbanist]"
+                              className="bg-slate-50 pr-2 font-[urbanist] text-slate-700 dark:bg-slate-900 dark:text-slate-400"
                             >
                               {p.player.user.name}
                             </option>
@@ -214,7 +217,7 @@ export const StartNextInningModal = ({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black tracking-widest text-slate-400 uppercase">
+                  <label className="dark:text-slate-400-400 bg-slate-50 text-[9px] font-black tracking-widest text-slate-700 uppercase dark:bg-slate-900">
                     Opening Bowler (
                     {lastBatted === "teamA" ? match.teamA.abbreviation : match.teamB.abbreviation})
                   </label>
@@ -227,14 +230,17 @@ export const StartNextInningModal = ({
                       }}
                       className="fon2-[inter] w-full cursor-pointer appearance-none rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="" className="bg-slate-900 text-slate-400">
+                      <option
+                        value=""
+                        className="bg-slate-50 text-slate-700 dark:bg-slate-900 dark:text-slate-400"
+                      >
                         Choose Bowler
                       </option>
                       {data?.nextBowlingPlayers.map((p) => (
                         <option
                           key={p.playerId}
                           value={p.playerId}
-                          className="bg-slate-900 pr-2 font-[urbanist]"
+                          className="bg-slate-50 pr-2 font-[urbanist] text-slate-700 dark:bg-slate-900 dark:text-slate-400"
                         >
                           {p.player.user.name}
                         </option>

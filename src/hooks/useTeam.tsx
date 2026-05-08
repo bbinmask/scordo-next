@@ -4,83 +4,50 @@ import { useCallback, useEffect, useState } from "react";
 import useAxios from "./useAxios";
 import { AxiosResponse } from "axios";
 import { Team, User } from "@/generated/prisma";
+import { useAsyncRunner } from "./useAsyncRunner";
+import { teamService } from "@/services/team.service";
 
 export const useTeam = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const { fetchData } = useAxios();
+  const { run, error, loading } = useAsyncRunner();
   // 1. Fetch all teams
-  const fetchTeams = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res: AxiosResponse = await fetchData("/teams");
-      if (res?.data?.success) {
-        return res.data.data as Team[];
-      } else {
-        return;
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch teams.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchTeams = useCallback(
+    () =>
+      run(async () => {
+        const res = await teamService.getAll();
+        return res.success ? res.data : [];
+      }),
+    []
+  );
 
   // 2. Get a single team.
-  const getSingleTeam = useCallback(async (username: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const res: AxiosResponse = await fetchData(`/teams/${username}`);
-      if (res?.data?.success) {
-        return res.data.data as Team;
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch teams.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const getSingleTeam = useCallback(
+    (abbr: string) =>
+      run(async () => {
+        const res = await teamService.getOne(abbr);
+        return res.success ? res.data : null;
+      }),
+    []
+  );
 
   // 3. Update a team
-  const updateTeamById = useCallback(async (teamId: string, updates: Partial<Team>) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res: AxiosResponse = await fetchData(`/teams/${teamId}`, "PUT", updates);
-      if (res?.data?.success) {
-        return res.data.data;
-      } else return res?.data.success;
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch teams.");
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateTeamById = useCallback(
+    async (teamId: string, updates: Partial<Team>) =>
+      run(async () => {
+        const res = await teamService.update(teamId, updates);
+        return res.success ? res.data : null;
+      }),
+    []
+  );
 
   // 4 Search for teams
-  const searchTeams = useCallback(async (query: string) => {
-    if (!query || query.trim() === "") return;
-
-    try {
-      setLoading(true);
-      const res: AxiosResponse = await fetchData(`/teams/search?query=${query}`);
-      if (res?.data?.success) {
-        return res.data.data as Team[];
-      } else {
-        return [];
-      }
-    } catch (error: any) {
-      console.error(error?.message);
-      setError(error.message || "Couldn't find any team");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const searchTeams = useCallback(
+    async (query: string) =>
+      run(async () => {
+        const res = await teamService.search(query);
+        return res.success ? res.data : [];
+      }),
+    []
+  );
 
   return {
     loading,

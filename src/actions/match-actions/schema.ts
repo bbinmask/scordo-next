@@ -101,8 +101,24 @@ export const PushBall = z
         "mid-off",
         "long-on",
         "long-off",
+        "straight",
       ])
       .nullable()
+      .optional(),
+    shotType: z
+      .enum([
+        "DRIVE",
+        "CUT",
+        "PULL",
+        "HOOK",
+        "FLICK",
+        "GLANCE",
+        "DEFENSE",
+        "LOFTED",
+        "SWEEP",
+        "REVERSE_SWEEP",
+        "UPPER_CUT",
+      ])
       .optional(),
   })
   .superRefine((data, ctx) => {

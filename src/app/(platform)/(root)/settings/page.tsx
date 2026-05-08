@@ -11,22 +11,18 @@ import {
   User as UserIcon,
   Mail,
   Phone,
-  Calendar,
-  MapPin,
   FileText,
-  Zap,
   Shield,
   Save,
   ChevronRight,
-  CheckCircle2,
   AlertCircle,
 } from "lucide-react";
 import { DefaultLoader } from "@/components/Spinner";
 import { BentoCard } from "../_components/cards/bento-card";
-import { checkAvailability, getFullAddress } from "@/utils";
 import { formatDate } from "@/utils/helper/formatDate";
 import { capitalize } from "lodash";
 import Link from "next/link";
+import { checkAvailability } from "@/utils/helper/availibility";
 
 interface SettingsFormData {
   username: string;

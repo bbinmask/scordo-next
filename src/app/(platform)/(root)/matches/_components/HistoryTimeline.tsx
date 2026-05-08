@@ -1,12 +1,14 @@
-import { Ball } from "@/generated/prisma";
-import { History } from "lucide-react";
+import { CurrentOverBalls } from "@/lib/types";
+import { getBallClassesFromLabel } from "@/utils/helper/classes";
+import { getBallLabel, getOvers } from "@/utils/helper/scorecard";
+import { Clock, History } from "lucide-react";
 
-export const HistoryTimeline = ({ history }: { history: Ball[] }) => (
-  <div className="px-8 pb-8">
-    <div className="mb-4 flex items-center gap-2">
-      <History className="h-3.5 w-3.5 text-slate-400" />
-      <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase">
-        Match Timeline
+export const HistoryTimeline = ({ history }: { history: CurrentOverBalls[] }) => (
+  <div className="group bg-card relative overflow-hidden rounded-[3rem] border border-white/5 p-8 font-[poppins] shadow-xl">
+    <div className="mb-6 flex items-center gap-2">
+      <Clock className="h-4 w-4 text-emerald-500" />
+      <span className="text-[10px] font-black tracking-[0.3em] text-emerald-500 uppercase">
+        Timeline
       </span>
     </div>
     <div className="no-scrollbar flex gap-2 overflow-x-auto pb-2">
@@ -15,22 +17,22 @@ export const HistoryTimeline = ({ history }: { history: Ball[] }) => (
           Waiting for kickoff...
         </div>
       ) : (
-        history.map((ball) => (
-          <div
-            key={ball.id}
-            className={`animate-in zoom-in flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border text-xs font-black transition-all ${
-              ball.isWicket
-                ? "border-rose-600 bg-rose-500 text-white"
-                : ball.isNoBall || ball.isWide || ball.isWicket
-                  ? "border-amber-600 bg-amber-500 text-white"
-                  : ball.runs >= 4
-                    ? "border-emerald-600 bg-emerald-500 text-white"
-                    : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-            }`}
-          >
-            {ball.isWicket ? "W" : ball.isWide ? "Wd" : ball.isNoBall ? "Nb" : ball.runs}
-          </div>
-        ))
+        history.map((ball, i) => {
+          const label = getBallLabel(ball);
+
+          return (
+            <div key={i} className="relative">
+              <p className="truncate text-center text-[10px] font-normal">
+                {getOvers(Math.floor(ball.ball / 6), ball.ball)}
+              </p>
+              <p
+                className={`${getBallClassesFromLabel(label)} relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-[cal_sans] text-[10px] font-black`}
+              >
+                {label}
+              </p>
+            </div>
+          );
+        })
       )}
     </div>
   </div>

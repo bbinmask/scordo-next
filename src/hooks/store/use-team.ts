@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createModalStore } from "./create";
 
 type UpdateTeamProps = {
   isOpen: boolean;
@@ -6,20 +7,8 @@ type UpdateTeamProps = {
   onClose: () => void;
 };
 
-export const useUpdateTeam = create<UpdateTeamProps>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
+export const useUpdateTeam = createModalStore();
 
-export const useUpdateLogoAndBanner = create<UpdateTeamProps>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
+export const useUpdateLogoAndBanner = createModalStore();
 
-export const usePlayerModal = create<UpdateTeamProps>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
+export const usePlayerModal = createModalStore();

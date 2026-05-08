@@ -2,22 +2,16 @@
 
 import DOMPurify from "dompurify";
 import { marked } from "marked";
-import { useCommentaryStore } from "@/hooks/store/use-commentary";
 import { MessageSquare, Mic, MicOff, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import { SyncLoader } from "react-spinners";
 import { getBallClassesFromLabel } from "@/utils/helper/classes";
 import axios from "axios";
 import { useChannel } from "ably/react";
 import { CommentaryWithBall } from "@/types/match.props";
 import { getOvers } from "@/utils/helper/scorecard";
 
-export function CommentaryFeed({ matchId }: { matchId: string }) {
-  const { lines, isGenerating, isEnabled, disableCommentary, enableCommentary } =
-    useCommentaryStore();
-
+export function CommentaryFeed({ matchId, isEnabled }: { matchId: string; isEnabled: boolean }) {
   const [commentary, setCommentary] = useState<CommentaryWithBall[][]>([]);
-  // Mark newly added line as "new" for 1.5 s so it animates
 
   const channelName = `match:${matchId}`;
 
@@ -40,10 +34,11 @@ export function CommentaryFeed({ matchId }: { matchId: string }) {
 
     const commentary = [data.commentary];
 
-    setCommentary((prev) => ({ commentary, ...prev }));
+    setCommentary((prev) => [commentary, ...prev]);
   });
 
-  if (!isEnabled) return null;
+  const enableCommentary = () => {};
+  const disableCommentary = () => {};
 
   return (
     <div className="flex flex-col rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8 dark:border-white/10 dark:bg-slate-900">
@@ -69,12 +64,7 @@ export function CommentaryFeed({ matchId }: { matchId: string }) {
       </div>
 
       <div className="custom-scrollbar max-h-[300px] flex-1 space-y-4 overflow-y-auto pr-2">
-        {isGenerating && (
-          <div className={`rounded-2xl bg-slate-50 px-8 py-2 transition-all dark:bg-white/5`}>
-            <SyncLoader size={6} speedMultiplier={0.5} color="#008236" />
-          </div>
-        )}
-        {commentary.length > 1 &&
+        {commentary.length > 0 &&
           commentary.map((line) =>
             line?.map((comm) => (
               <div

@@ -17,6 +17,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { formatDate } from "@/utils/helper/formatDate";
+import { SectionHeader } from "@/components/layouts/SectionHeader";
 
 interface TournamentWithCount extends Tournament {
   _count: { participatingTeams: number };
@@ -133,19 +134,7 @@ export default function MyTournamentsPage() {
     <div className="space-y-10 pb-20">
       {/* Organized */}
       <section>
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="flex items-center gap-3 font-[poppins] text-2xl font-black tracking-tight uppercase italic dark:text-white">
-            Organized <span className="primary-heading pr-2">By Me</span>
-          </h2>
-          <div className="mx-6 h-px flex-1 bg-slate-200 dark:bg-white/5" />
-          <Link
-            href="/tournaments/create"
-            className="flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-4 py-2 font-[urbanist] text-xs font-bold text-slate-600 shadow-sm transition-all hover:border-green-500 hover:text-green-600 dark:border-white/10 dark:bg-slate-900 dark:text-slate-300"
-          >
-            <PlusCircle className="h-3.5 w-3.5" />
-            New
-          </Link>
-        </div>
+        <SectionHeader title="Organized" highlight="By You" />
 
         {orgLoading ? (
           <DefaultLoader />
@@ -162,12 +151,7 @@ export default function MyTournamentsPage() {
 
       {/* Joined */}
       <section>
-        <div className="mb-5 flex items-center gap-4">
-          <h2 className="flex items-center gap-3 font-[poppins] text-2xl font-black tracking-tight uppercase italic dark:text-white">
-            Teams <span className="primary-heading pr-2">Entered</span>
-          </h2>
-          <div className="h-px flex-1 bg-slate-200 dark:bg-white/5" />
-        </div>
+        <SectionHeader title="Teams" highlight="Entered" />
 
         {joinedLoading ? (
           <DefaultLoader />

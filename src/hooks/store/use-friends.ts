@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createModalStore } from "./create";
 
 interface ProfileFriends {
   isOpen: boolean;
@@ -6,8 +7,4 @@ interface ProfileFriends {
   onClose: () => void;
 }
 
-export const useFriendsModal = create<ProfileFriends>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
+export const useFriendsModal = createModalStore();

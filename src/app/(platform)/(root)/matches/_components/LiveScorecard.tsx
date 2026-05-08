@@ -1,21 +1,15 @@
 "use client";
 
-import Spinner from "@/components/Spinner";
 import { CurrentOverBalls, InningDetails, MatchWithDetails } from "@/lib/types";
-import {
-  getBallLabel,
-  getCRR,
-  getEcon,
-  getPartnership,
-  getRR,
-  getStrikeRate,
-} from "@/utils/helper/scorecard";
+import { getEcon, getPostSummaryData, getRunRate, getStrikeRate } from "@/utils/helper/scorecard";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Flame, Target } from "lucide-react";
 import { useState } from "react";
 import { ControlPad } from "./ControlPad";
-import ScorecardModal from "./modals/ScorecardModal";
+import MatchStatusBadge from "./cards/MatchStatusBadge";
+import { HistoryTimeline } from "./HistoryTimeline";
+import { PostMatchSummary } from "./PostMatchSummary";
 
 export const LiveScorecard = ({
   match,
@@ -70,23 +64,7 @@ export const LiveScorecard = ({
 
       <div className="space-y-8 lg:col-span-8">
         <div className="group relative mb-4 overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 font-[inter] shadow-xl dark:border-white/10 dark:bg-slate-900">
-          <div
-            className={`absolute top-8 right-6 flex max-w-fit items-center justify-evenly rounded-full border ${match.status === "in_progress" || match.status === "inning_completed" ? "border-red-500/20 bg-red-500/10" : "border-teal-500/20 bg-teal-500/10"} px-1 py-0.5`}
-          >
-            {match.status === "in_progress" || match.status === "inning_completed" ? (
-              <div className="mr-0.5 h-1 w-1 animate-pulse rounded-full bg-red-500" />
-            ) : null}
-            <span
-              className={`text-[8px] font-bold ${match.status === "in_progress" || match.status === "inning_completed" ? "text-red-500" : "text-teal-800"} uppercase`}
-            >
-              {match.status === "in_progress" || match.status === "inning_completed"
-                ? "Live"
-                : match.status === "completed"
-                  ? "Completed"
-                  : "Stopped"}
-            </span>
-          </div>
-
+          <MatchStatusBadge status={match.status} />
           <div className="relative mb-6">
             <p className="mb-1 text-[10px] font-bold tracking-wide text-indigo-100 uppercase">
               Scordo Match
@@ -136,7 +114,7 @@ export const LiveScorecard = ({
                   CRR
                 </span>
                 <p className="font-[poppins] text-lg font-bold tracking-tighter text-emerald-400 md:text-2xl">
-                  {String(getCRR(innings[length].runs, innings[length].balls))}
+                  {String(getRunRate(innings[length].runs, innings[length].balls))}
                 </p>
               </div>
 
@@ -146,7 +124,7 @@ export const LiveScorecard = ({
                     RR
                   </span>
                   <p className="font-mono text-lg font-black tracking-tighter text-emerald-400 md:text-2xl">
-                    {String(getRR(innings[0].runs, match.overs * 6 - innings[length].balls))}
+                    {String(getRunRate(innings[0].runs, match.overs * 6 - innings[length].balls))}
                   </p>
                 </div>
               )}
@@ -278,24 +256,17 @@ export const LiveScorecard = ({
             </div>
           </div>
         </div>
-        <div className="flex items-end justify-between">
-          <button
-            onClick={() => setIsScorecardOpen(true)}
-            className="center flex w-full max-w-40 flex-1 gap-1 rounded-2xl bg-slate-900 px-8 py-4 font-[inter] text-white shadow-xl transition-all active:scale-95 dark:bg-white dark:text-slate-900"
-          >
-            <span className="text-xs font-black uppercase">Scorecard</span>
-          </button>
-        </div>
+
+        {/* Ball Timeline (Vertical/Mini version for sidebar) */}
+        <HistoryTimeline history={ballHistory || []} />
       </div>
       {match.status === "in_progress" &&
         match.matchOfficials.findIndex((official) => official.userId === userId) !== -1 && (
           <ControlPad match={match} innings={innings[length]} />
         )}
-      <ScorecardModal
-        isOpen={isScorecardOpen}
-        innings={innings}
-        onClose={() => setIsScorecardOpen(false)}
-      />
+      {match.status === "completed" && match.result && (
+        <PostMatchSummary data={getPostSummaryData(match, innings[length])} matchId={match.id} />
+      )}
     </div>
   );
 };

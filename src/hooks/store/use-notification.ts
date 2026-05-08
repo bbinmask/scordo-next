@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createModalStore } from "./create";
 
 type Props = {
   isOpen: boolean;
@@ -6,8 +7,4 @@ type Props = {
   onClose: () => void;
 };
 
-export const useNotificationModal = create<Props>((set) => ({
-  isOpen: false,
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
-}));
+export const useNotificationModal = createModalStore();

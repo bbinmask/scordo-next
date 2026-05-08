@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createModalStore } from "./create";
 
 type UserModalType = {
   isOpen: boolean;
@@ -6,22 +7,6 @@ type UserModalType = {
   onClose: () => void;
 };
 
-export const useAskToJoinModal = create<UserModalType>((set) => ({
-  isOpen: false,
-  onOpen() {
-    set({ isOpen: true });
-  },
-  onClose() {
-    set({ isOpen: false });
-  },
-}));
+export const useAskToJoinModal = createModalStore();
 
-export const useJoinTheirTeamModal = create<UserModalType>((set) => ({
-  isOpen: false,
-  onOpen() {
-    set({ isOpen: true });
-  },
-  onClose() {
-    set({ isOpen: true });
-  },
-}));
+export const useJoinTheirTeamModal = createModalStore();

@@ -16,6 +16,7 @@ import {
   Compass,
 } from "lucide-react";
 import { formatDate } from "@/utils/helper/formatDate";
+import { SectionHeader } from "@/components/layouts/SectionHeader";
 
 interface FriendTournament extends Tournament {
   organizer: { name: string; username: string; avatar: string | null };
@@ -131,12 +132,7 @@ export default function FriendsTournamentsPage() {
 
   return (
     <div className="space-y-6 pb-20">
-      <div className="flex items-center gap-4">
-        <h2 className="flex items-center gap-3 font-[poppins] text-2xl font-black tracking-tight uppercase italic dark:text-white">
-          Friends' <span className="primary-heading pr-2">Tournaments</span>
-        </h2>
-        <div className="h-px flex-1 bg-slate-200 dark:bg-white/5" />
-      </div>
+      <SectionHeader title="Friends" highlight="Tournaments" />
 
       <p className="font-[urbanist] text-sm font-semibold text-slate-400">
         Tournaments your friends are participating in or organizing.

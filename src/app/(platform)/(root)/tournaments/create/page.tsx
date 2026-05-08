@@ -23,6 +23,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { SectionHeader } from "@/components/layouts/SectionHeader";
 
 type FormValues = z.infer<typeof CreateTournament>;
 
@@ -108,11 +109,7 @@ export default function CreateTournamentPage() {
   return (
     <div className="min-h-screen pb-8">
       <div className="mx-auto space-y-6 px-4 md:px-6">
-        <header className="mt-6 mb-12">
-          <h1 className="text-5xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-            Create <span className="primary-heading pr-2">Tournament</span>
-          </h1>
-        </header>
+        <SectionHeader title="Create" highlight="Tournament" />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* ── Basic Info ─────────────────────────────────────────────── */}

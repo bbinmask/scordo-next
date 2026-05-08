@@ -6,7 +6,7 @@ import TournamentCard from "../_components/TournamentCard";
 import Link from "next/link";
 import { TournamentWithDetails } from "@/lib/types";
 import Spinner from "@/components/Spinner";
-import { EmptyCard } from "../matches/_components/cards/EmptyCard";
+import { EmptyState } from "@/components/cards/EmptyState";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -64,12 +64,13 @@ const TournamentsPage = () => {
                   </Carousel>
                 ) : (
                   <div className="px-6">
-                    <EmptyCard
-                      Icon={<Trophy size={24} />}
-                      type="matches"
+                    <EmptyState
+                      icon={<Trophy size={24} />}
                       title="No tournaments found"
-                      linkText="Create Tournament"
-                      href="/tournaments/create"
+                      action={{
+                        label: "Create Tournament",
+                        href: "/tournaments/create",
+                      }}
                       description="You are not currently managing any tournaments. Create a new tournament."
                     />
                   </div>
@@ -103,13 +104,14 @@ const TournamentsPage = () => {
                     ))}
                   </Carousel>
                 ) : (
-                  <EmptyCard
-                    linkText="Explore"
-                    href="/explore"
-                    type="tournaments"
+                  <EmptyState
+                    action={{
+                      label: "Explore Tournaments",
+                      href: "/explore",
+                    }}
                     title="No tournament available"
                     description=" There are currently no active tournaments available for you to join. Please check back later or explore other sections of the platform."
-                    Icon={<Star size={24} />}
+                    icon={<Star size={24} />}
                   />
                 )}
               </div>

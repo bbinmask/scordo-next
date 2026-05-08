@@ -3,206 +3,17 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, Shield } from "lucide-react";
-import { DefaultLoader } from "@/components/Spinner";
-import { InningDetails, MatchWithDetails } from "@/lib/types";
-
-// ── helpers ──────────────────────────────────────────────────────────────────
-
-function oversDisplay(overs: number, balls: number) {
-  return `${overs}.${balls % 6}`;
-}
-
-function sr(runs: number, balls: number) {
-  return balls > 0 ? ((runs / balls) * 100).toFixed(1) : "-";
-}
-
-function econ(runs: number, overs: number, balls: number) {
-  const total = overs * 6 + (balls % 6);
-  return total > 0 ? ((runs / total) * 6).toFixed(1) : "-";
-}
-
-// ── Batting table ─────────────────────────────────────────────────────────────
-
-function BattingTable({ inning }: { inning: InningDetails }) {
-  const sorted = [...(inning.InningBatting ?? [])].sort((a, b) => b.runs - a.runs);
-
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-slate-200 text-left font-[urbanist] text-[11px] font-black tracking-widest text-slate-400 uppercase dark:border-white/10">
-            <th className="py-2 pr-4 font-semibold">Batter</th>
-            <th className="px-3 py-2 text-center font-semibold">R</th>
-            <th className="px-3 py-2 text-center font-semibold">B</th>
-            <th className="px-3 py-2 text-center font-semibold">4s</th>
-            <th className="px-3 py-2 text-center font-semibold">6s</th>
-            <th className="px-3 py-2 text-center font-semibold">SR</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-          {sorted.length === 0 ? (
-            <tr>
-              <td colSpan={6} className="py-6 text-center font-[urbanist] text-sm text-slate-400">
-                No batting data yet
-              </td>
-            </tr>
-          ) : (
-            sorted.map((b) => (
-              <tr key={b.id} className="transition-colors hover:bg-slate-50 dark:hover:bg-white/5">
-                <td className="py-2.5 pr-4">
-                  <p className="font-[poppins] text-sm font-semibold">
-                    {b.player.user.name}
-                  </p>
-                  <p className="font-[urbanist] text-[11px] text-slate-400">
-                    @{b.player.user.username}
-                    {b.isOut ? (
-                      <span className="ml-2 text-red-400 font-semibold">out</span>
-                    ) : (
-                      <span className="ml-2 text-green-500 font-semibold">not out</span>
-                    )}
-                  </p>
-                </td>
-                <td className="px-3 py-2.5 text-center font-[poppins] font-black">{b.runs}</td>
-                <td className="px-3 py-2.5 text-center font-[urbanist] text-slate-500">{b.balls}</td>
-                <td className="px-3 py-2.5 text-center font-[urbanist] text-blue-500 font-semibold">{b.fours}</td>
-                <td className="px-3 py-2.5 text-center font-[urbanist] text-emerald-500 font-semibold">{b.sixes}</td>
-                <td className="px-3 py-2.5 text-center font-[urbanist] text-slate-500">{sr(b.runs, b.balls)}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-        <tfoot>
-          <tr className="border-t border-slate-200 dark:border-white/10">
-            <td className="py-2 font-[poppins] text-xs font-black uppercase text-slate-400">Total</td>
-            <td className="px-3 py-2 text-center font-[poppins] text-sm font-black text-emerald-500">
-              {inning.runs}/{inning.wickets}
-            </td>
-            <td colSpan={3} className="px-3 py-2 text-center font-[urbanist] text-xs text-slate-400">
-              ({oversDisplay(inning.overs, inning.balls)} ov)
-            </td>
-            <td />
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  );
-}
-
-// ── Bowling table ─────────────────────────────────────────────────────────────
-
-function BowlingTable({ inning }: { inning: InningDetails }) {
-  const sorted = [...(inning.InningBowling ?? [])].sort((a, b) => b.wickets - a.wickets);
-
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-slate-200 text-left font-[urbanist] text-[11px] font-black tracking-widest text-slate-400 uppercase dark:border-white/10">
-            <th className="py-2 pr-4 font-semibold">Bowler</th>
-            <th className="px-3 py-2 text-center font-semibold">O</th>
-            <th className="px-3 py-2 text-center font-semibold">M</th>
-            <th className="px-3 py-2 text-center font-semibold">R</th>
-            <th className="px-3 py-2 text-center font-semibold">W</th>
-            <th className="px-3 py-2 text-center font-semibold">Econ</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-          {sorted.length === 0 ? (
-            <tr>
-              <td colSpan={6} className="py-6 text-center font-[urbanist] text-sm text-slate-400">
-                No bowling data yet
-              </td>
-            </tr>
-          ) : (
-            sorted.map((b) => (
-              <tr key={b.id} className="transition-colors hover:bg-slate-50 dark:hover:bg-white/5">
-                <td className="py-2.5 pr-4">
-                  <p className="font-[poppins] text-sm font-semibold">{b.player.user.name}</p>
-                  <p className="font-[urbanist] text-[11px] text-slate-400">@{b.player.user.username}</p>
-                </td>
-                <td className="px-3 py-2.5 text-center font-[urbanist] text-slate-500">
-                  {oversDisplay(b.overs, b.balls)}
-                </td>
-                <td className="px-3 py-2.5 text-center font-[urbanist] text-slate-500">{b.maidens}</td>
-                <td className="px-3 py-2.5 text-center font-[urbanist] text-slate-500">{b.runs}</td>
-                <td className="px-3 py-2.5 text-center font-[poppins] font-black text-red-500">{b.wickets}</td>
-                <td className="px-3 py-2.5 text-center font-[urbanist] text-slate-500">
-                  {econ(b.runs, b.overs, b.balls)}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// ── Inning section ────────────────────────────────────────────────────────────
-
-function InningSection({ inning, inningNumber }: { inning: InningDetails; inningNumber: number }) {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-white/10 dark:bg-slate-900/40">
-      {/* Inning header */}
-      <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-4 dark:border-white/5 dark:bg-white/5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 font-[poppins] text-xs font-black text-white">
-            {inningNumber}
-          </div>
-          <div>
-            <p className="font-[poppins] text-base font-black">{inning.battingTeam.name}</p>
-            <p className="font-[urbanist] text-xs text-slate-400">
-              batting · {inning.bowlingTeam.abbreviation} bowling
-            </p>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="font-[poppins] text-2xl font-black text-emerald-500">
-            {inning.runs}/{inning.wickets}
-          </p>
-          <p className="font-[urbanist] text-xs text-slate-400">
-            {oversDisplay(inning.overs, inning.balls)} overs
-          </p>
-        </div>
-      </div>
-
-      <div className="divide-y divide-slate-100 dark:divide-white/5">
-        {/* Batting */}
-        <div className="px-6 py-5">
-          <p className="mb-3 font-[urbanist] text-[11px] font-black tracking-widest text-slate-400 uppercase">
-            Batting
-          </p>
-          <BattingTable inning={inning} />
-        </div>
-
-        {/* Bowling */}
-        <div className="px-6 py-5">
-          <p className="mb-3 font-[urbanist] text-[11px] font-black tracking-widest text-slate-400 uppercase">
-            Bowling
-          </p>
-          <BowlingTable inning={inning} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Page ──────────────────────────────────────────────────────────────────────
+import { ChevronRight, Flame, LayoutList, Sword, Target, UserCircle2 } from "lucide-react";
+import { InningDetails } from "@/lib/types";
+import { getEcon, getStrikeRate } from "@/utils/helper/scorecard";
+import { useMemo, useState } from "react";
 
 export default function ScorecardPage() {
+  const [activeInningIdx, setActiveInningIdx] = useState(0);
+
   const { id } = useParams<{ id: string }>();
 
-  const { data: match, isLoading: matchLoading } = useQuery<MatchWithDetails>({
-    queryKey: ["match", id],
-    queryFn: async () => {
-      const { data } = await axios.get(`/api/matches/${id}`);
-      return data.data;
-    },
-  });
-
-  const { data: innings, isLoading: inningsLoading } = useQuery<InningDetails[]>({
+  const { data: innings } = useQuery<InningDetails[]>({
     queryKey: ["match-innings", id],
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/${id}/innings`);
@@ -211,92 +22,295 @@ export default function ScorecardPage() {
     },
   });
 
-  const isLoading = matchLoading || inningsLoading;
+  const { data: wicketsMap, isLoading: isLoadingWickets } = useQuery<Record<string, string> | null>(
+    {
+      queryKey: ["inning-wickets", innings?.[activeInningIdx]?.id],
+      queryFn: async () => {
+        const inningId = innings?.[activeInningIdx]?.id;
+        if (!inningId) return null;
 
-  if (isLoading) return <DefaultLoader />;
-  if (!match) return <p className="p-8 text-center text-slate-500">Match not found.</p>;
+        const { data } = await axios.get(`/api/matches/innings/${inningId}/wickets`);
+        if (!data.success) return null;
 
-  const sortedInnings = [...(innings ?? [])].sort(
-    (a, b) => (a.inningNumber ?? 0) - (b.inningNumber ?? 0)
+        const dismissalMap: Record<string, string> = {};
+        for (const ball of data.data) {
+          let text = "";
+          const bowlerName = ball.bowler?.user.name;
+          const fielderName = ball.fielder?.user.name;
+
+          switch (ball.dismissalType) {
+            case "CAUGHT":
+              text =
+                ball.fielder?.user.username === ball.bowler?.user.username
+                  ? `c&b ${bowlerName}`
+                  : `c. ${fielderName} b. ${bowlerName}`;
+              break;
+            case "BOWLED":
+              text = `b. ${bowlerName}`;
+              break;
+            case "LBW":
+              text = `lbw b. ${bowlerName}`;
+              break;
+            case "RUN_OUT":
+              text = `run out (${fielderName})`;
+              break;
+            case "STUMPED":
+              text = `st ${fielderName} b. ${bowlerName}`;
+              break;
+            case "HIT_WICKET":
+              text = `hit wicket b. ${bowlerName}`;
+              break;
+            default:
+              text = "out";
+          }
+          dismissalMap[ball.batsmanId] = text;
+        }
+        return dismissalMap;
+      },
+      enabled: !!innings?.[activeInningIdx]?.id,
+    }
   );
 
-  return (
-    <div className="min-h-screen bg-slate-50 pb-24 font-sans dark:bg-[#020617]">
-      {/* Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-green-600 to-green-800 px-4 py-10 md:px-10">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-        <div className="relative mx-auto max-w-4xl">
-          <Link
-            href={`/matches/${id}`}
-            className="mb-6 inline-flex items-center gap-2 font-[urbanist] text-sm font-semibold text-green-100 transition-colors hover:text-white"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to match
-          </Link>
+  let currentInning = innings?.[activeInningIdx];
 
-          <div className="flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="font-[urbanist] text-xs font-black tracking-widest text-green-200 uppercase">
-                Full Scorecard
-              </p>
-              <h1 className="mt-1 font-[poppins] text-3xl font-black text-white md:text-4xl">
-                {match.teamA.abbreviation}{" "}
-                <span className="text-green-300">vs</span>{" "}
-                {match.teamB.abbreviation}
-              </h1>
-              <p className="mt-1 font-[urbanist] text-sm text-green-200">
-                {match.teamA.name} · {match.teamB.name}
-              </p>
-            </div>
-            <div className="mt-4 flex items-center gap-3 md:mt-0">
-              <div className="flex items-center gap-2 rounded-2xl bg-white/10 px-4 py-2 backdrop-blur-sm">
-                <Shield className="h-4 w-4 text-green-200" />
-                <span className="font-[urbanist] text-sm font-semibold text-white">
-                  {match.category} · {match.overs} ov
-                </span>
-              </div>
-              <div
-                className={`rounded-2xl px-4 py-2 font-[urbanist] text-sm font-semibold ${
-                  match.status === "completed"
-                    ? "bg-white/20 text-white"
-                    : match.status === "in_progress"
-                      ? "bg-red-500/80 text-white"
-                      : "bg-white/10 text-green-200"
-                }`}
-              >
-                {match.status === "completed"
-                  ? "Final"
-                  : match.status === "in_progress"
-                    ? "Live"
-                    : match.status.replace("_", " ")}
-              </div>
-            </div>
+  const didNotBatPlayers = useMemo(() => {
+    if (!currentInning) return [];
+    return currentInning.InningBatting.filter(
+      (b) =>
+        !b.isOut &&
+        b.playerId !== currentInning?.currentStrikerId &&
+        b.playerId !== currentInning?.currentNonStrikerId &&
+        b.runs === 0 &&
+        b.balls === 0
+    );
+  }, [currentInning]);
+
+  const battedPlayers = useMemo(() => {
+    if (!currentInning) return [];
+    return currentInning.InningBatting.filter(
+      (b) =>
+        b.isOut ||
+        b.playerId === currentInning?.currentStrikerId ||
+        b.playerId === currentInning?.currentNonStrikerId ||
+        b.balls > 0
+    );
+  }, [currentInning]);
+
+  if (!innings || innings.length === 0) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center p-8 text-center">
+        <div className="rounded-full bg-slate-100 p-6 dark:bg-slate-800">
+          <LayoutList className="h-12 w-12 text-slate-400" />
+        </div>
+        <h2 className="mt-4 text-xl font-bold text-slate-900 dark:text-white">
+          No Scorecard Available
+        </h2>
+        <p className="mt-2 text-slate-500">Wait for the match to begin to see live statistics.</p>
+      </div>
+    );
+  }
+
+  currentInning = innings[activeInningIdx];
+
+  return (
+    <div className="mx-auto min-h-screen max-w-6xl bg-slate-50/50 p-4 font-sans antialiased sm:p-8 dark:bg-slate-950">
+      {/* Header Section */}
+      <header className="mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-200 dark:shadow-none">
+            <LayoutList className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <nav className="flex items-center gap-2 text-xs font-bold tracking-widest text-emerald-600 uppercase">
+              <span>Match Center</span>
+              <ChevronRight className="h-3 w-3" />
+              <span>Full Scorecard</span>
+            </nav>
+            <h1 className="font-[poppins] text-3xl font-black tracking-tight text-slate-900 uppercase italic dark:text-white">
+              Scorecard
+            </h1>
+          </div>
+        </div>
+
+        {/* Inning Selector Tabs */}
+        <div className="flex w-full overflow-hidden rounded-2xl bg-white p-1 ring-1 ring-slate-200 sm:w-auto dark:bg-slate-900 dark:ring-white/10">
+          {innings.map((inning, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveInningIdx(idx)}
+              className={`flex-1 px-6 py-2.5 text-xs font-bold tracking-wider uppercase transition-all sm:flex-none ${
+                activeInningIdx === idx
+                  ? "rounded-xl bg-emerald-600 text-white shadow-md"
+                  : "text-slate-500 hover:text-emerald-600"
+              }`}
+            >
+              {inning.battingTeam.name}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      {/* Inning Overview Banner */}
+      <div className="mb-8 overflow-hidden rounded-[2.5rem] bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-white/10">
+        <div className="relative flex flex-col items-center justify-between gap-8 p-8 sm:flex-row sm:p-12">
+          <div className="relative z-10 text-center sm:text-left">
+            <p className="mb-2 text-xs font-black tracking-[0.3em] text-emerald-500 uppercase">
+              Batting Team
+            </p>
+            <h2 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
+              {currentInning?.battingTeam.name}
+            </h2>
           </div>
 
-          {match.result && (
-            <div className="mt-4 inline-block rounded-xl bg-white/15 px-4 py-2 font-[poppins] text-sm font-semibold text-white backdrop-blur-sm">
-              {match.result}
+          <div className="relative z-10 flex flex-col items-center gap-1 sm:items-end">
+            <div className="flex items-baseline gap-2">
+              <span className="text-6xl font-black text-slate-900 dark:text-white">
+                {currentInning?.runs}
+              </span>
+              <span className="text-3xl font-bold text-slate-400">/{currentInning?.wickets}</span>
             </div>
-          )}
+            <div className="flex items-center gap-2 font-[urbanist] text-sm font-bold tracking-widest text-slate-500 uppercase">
+              <Target className="h-4 w-4 text-emerald-500" />
+              <span>
+                {currentInning?.overs}.{currentInning?.balls % 6} Overs
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Innings */}
-      <div className="mx-auto mt-8 max-w-4xl space-y-6 px-4 md:px-6">
-        {sortedInnings.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center dark:border-white/10 dark:bg-slate-900/40">
-            <p className="font-[poppins] text-lg font-black text-slate-400">
-              No innings data yet
-            </p>
-            <p className="mt-1 font-[urbanist] text-sm text-slate-400">
-              The scorecard will appear once the match is initialized.
-            </p>
-          </div>
-        ) : (
-          sortedInnings.map((inning, i) => (
-            <InningSection key={inning.id} inning={inning} inningNumber={i + 1} />
-          ))
-        )}
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Left/Main Column: Batting */}
+        <div className="space-y-8 lg:col-span-2">
+          <section>
+            <div className="mb-4 flex items-center gap-3">
+              <div className="rounded-full bg-emerald-100 p-2 dark:bg-emerald-950">
+                <Sword className="h-5 w-5 text-emerald-600" />
+              </div>
+              <h3 className="text-sm font-black tracking-widest text-slate-900 uppercase dark:text-white">
+                Batting Performance
+              </h3>
+            </div>
+
+            <div className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-white/10">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-[10px] font-black tracking-widest text-slate-400 uppercase dark:bg-white/5">
+                    <tr>
+                      <th className="px-6 py-4">Batsman</th>
+                      <th className="px-4 py-4 text-center">R</th>
+                      <th className="px-4 py-4 text-center">B</th>
+                      <th className="hidden px-4 py-4 text-center sm:table-cell">4s</th>
+                      <th className="hidden px-4 py-4 text-center sm:table-cell">6s</th>
+                      <th className="px-4 py-4 text-center text-emerald-600">SR</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                    {battedPlayers.map((batsman, i) => (
+                      <tr key={i} className="group hover:bg-slate-50 dark:hover:bg-white/5">
+                        <td className="px-6 py-4">
+                          <p className="text-sm font-bold text-slate-900 uppercase dark:text-white">
+                            {batsman.player.user.name}
+                          </p>
+                          <p className="mt-1 text-[10px] font-medium text-slate-400 italic">
+                            {isLoadingWickets
+                              ? "Checking..."
+                              : wicketsMap?.[batsman.playerId] || "Not out"}
+                          </p>
+                        </td>
+                        <td className="px-4 py-4 text-center text-base font-black text-slate-900 dark:text-white">
+                          {batsman.runs}
+                        </td>
+                        <td className="px-4 py-4 text-center text-sm font-medium text-slate-500">
+                          {batsman.balls}
+                        </td>
+                        <td className="hidden px-4 py-4 text-center text-sm font-medium text-slate-400 sm:table-cell">
+                          {batsman.fours}
+                        </td>
+                        <td className="hidden px-4 py-4 text-center text-sm font-medium text-slate-400 sm:table-cell">
+                          {batsman.sixes}
+                        </td>
+                        <td className="px-4 py-4 text-center text-sm font-black text-emerald-600">
+                          {getStrikeRate(batsman.runs, batsman.balls)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          {didNotBatPlayers.length > 0 && (
+            <section>
+              <div className="mb-4 flex items-center gap-3">
+                <div className="rounded-full bg-slate-100 p-2 dark:bg-slate-800">
+                  <UserCircle2 className="h-5 w-5 text-slate-400" />
+                </div>
+                <h3 className="text-sm font-black tracking-widest text-slate-500 uppercase">
+                  Did Not Bat
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2 rounded-2xl bg-white p-4 ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-white/10">
+                {didNotBatPlayers.map((p, idx) => (
+                  <span
+                    key={idx}
+                    className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 uppercase dark:bg-slate-800 dark:text-slate-400"
+                  >
+                    {p.player.user.name}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Right Column: Bowling */}
+        <div className="space-y-8">
+          <section>
+            <div className="mb-4 flex items-center gap-3">
+              <div className="rounded-full bg-rose-100 p-2 dark:bg-rose-950">
+                <Flame className="h-5 w-5 text-rose-600" />
+              </div>
+              <h3 className="text-sm font-black tracking-widest text-slate-900 uppercase dark:text-white">
+                Bowling Figures
+              </h3>
+            </div>
+
+            <div className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-white/10">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 text-[10px] font-black tracking-widest text-slate-400 uppercase dark:bg-white/5">
+                  <tr>
+                    <th className="px-6 py-4">Bowler</th>
+                    <th className="px-4 py-4 text-center">O</th>
+                    <th className="px-4 py-4 text-center">W</th>
+                    <th className="px-4 py-4 text-center">Econ</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                  {currentInning?.InningBowling.filter((b) => b.balls > 0).map((bowler, i) => (
+                    <tr key={i} className="hover:bg-slate-50 dark:hover:bg-white/5">
+                      <td className="px-6 py-4">
+                        <p className="text-sm font-bold text-slate-900 uppercase dark:text-white">
+                          {bowler.player.user.name}
+                        </p>
+                      </td>
+                      <td className="px-4 py-4 text-center text-sm font-bold text-slate-700 dark:text-slate-300">
+                        {bowler.overs}.{bowler.balls % 6}
+                      </td>
+                      <td className="px-4 py-4 text-center text-base font-black text-emerald-600">
+                        {bowler.wickets}
+                      </td>
+                      <td className="px-4 py-4 text-center text-xs font-bold text-slate-400">
+                        {getEcon(bowler.runs, bowler.balls)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );

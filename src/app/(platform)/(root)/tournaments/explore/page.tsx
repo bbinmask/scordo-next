@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/utils/helper/formatDate";
 import { useDebounceValue } from "usehooks-ts";
+import { SectionHeader } from "@/components/layouts/SectionHeader";
 
 interface TournamentResult extends Tournament {
   organizer: { name: string };
@@ -65,12 +66,7 @@ export default function ExploreTournamentsPage() {
   return (
     <div className="space-y-6 pb-20">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <h2 className="flex items-center gap-3 font-[poppins] text-2xl font-black tracking-tight uppercase italic dark:text-white">
-          Explore <span className="primary-heading pr-2">Tournaments</span>
-        </h2>
-        <div className="h-px flex-1 bg-slate-200 dark:bg-white/5" />
-      </div>
+      <SectionHeader title="Explore" highlight="Tournaments" />
 
       {/* Search + Filters Row */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center">

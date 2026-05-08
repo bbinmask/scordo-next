@@ -37,7 +37,7 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 right-0 left-0 z-[1000] transition-all duration-500 ${
-        isScrolled ? "px-2 py-3" : "border-b border-slate-200 py-0 dark:border-white/10"
+        isScrolled ? "p-2" : "border-b border-slate-200 py-2 dark:border-white/10"
       }`}
     >
       <div
@@ -48,20 +48,20 @@ const Navbar = () => {
         }`}
       >
         <div
-          className={`flex h-16 items-center justify-between transition-all duration-500 ${isScrolled ? "px-6" : "px-2"}`}
+          className={`flex h-8 items-center justify-between py-2 transition-all duration-500 md:h-10 lg:h-12 ${isScrolled ? "px-6" : "px-2"}`}
         >
           {/* LOGO */}
-          <div className="flex w-full items-center gap-4">
+          <div className="flex w-full items-center gap-2">
             {headingText !== "dashboard" && headingText !== "" && (
               <button onClick={() => router.back()} className="cursor-pointer">
-                <ArrowLeft />
+                <ArrowLeft size={20} />
               </button>
             )}
             <Link
               href={`/${headingText === "u" ? "/" : headingText}`}
               className="group flex w-full cursor-pointer items-center gap-2"
             >
-              <h1 className="w-full text-[100%] leading-none font-black tracking-tighter text-slate-900 uppercase italic sm:text-[2vw] dark:text-white">
+              <h1 className="w-full text-xs leading-none font-black tracking-tighter text-slate-900 uppercase italic sm:text-sm md:text-base lg:text-lg dark:text-white">
                 {headingText === "dashboard" || headingText === ""
                   ? "SCORDO"
                   : headingText === "u"
@@ -78,24 +78,24 @@ const Navbar = () => {
               {!user && pathname !== "/explore" && (
                 <Link
                   href={"/explore"}
-                  className="relative rounded-xl border border-slate-200 bg-white p-3 text-slate-400 shadow-sm transition-all hover:text-indigo-500 dark:border-white/10 dark:bg-slate-900"
+                  className="relative rounded-sm border border-slate-200 bg-white p-1.5 text-slate-400 shadow-sm transition-all hover:text-emerald-500 dark:border-white/10 dark:bg-slate-900"
                 >
-                  <Search size={18} />
+                  <Search size={16} />
                 </Link>
               )}
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-xl border border-slate-200 bg-white p-3 text-slate-400 shadow-sm transition-all hover:text-emerald-500 dark:border-white/10 dark:bg-slate-900"
+                className="rounded-sm border border-slate-200 bg-white p-1.5 text-slate-400 shadow-sm transition-all hover:text-emerald-500 dark:border-white/10 dark:bg-slate-900"
               >
-                {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
+                {theme === "dark" ? <Moon size={16} /> : <Sun size={16} />}
               </button>
 
               {user && (
                 <button
                   onClick={onOpen}
-                  className="relative rounded-xl border border-slate-200 bg-white p-3 text-slate-400 shadow-sm transition-all hover:text-indigo-500 dark:border-white/10 dark:bg-slate-900"
+                  className="relative rounded-sm border border-slate-200 bg-white p-1.5 text-slate-400 shadow-sm transition-all hover:text-indigo-500 dark:border-white/10 dark:bg-slate-900"
                 >
-                  <Bell size={18} />
+                  <Bell size={16} />
                   <div className="absolute top-2 right-2 h-2 w-2 animate-pulse rounded-full border-2 border-white bg-red-500 dark:border-slate-900" />
                 </button>
               )}

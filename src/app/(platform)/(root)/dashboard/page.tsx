@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "./_components/Card";
-import { BarChart2, Newspaper, Shield, Video } from "lucide-react";
+import { BarChart2, Shield, Trophy, Swords } from "lucide-react";
 import { TypographyHeading } from "@/components/Typography";
 import HeroSection from "../_components/Hero";
 import { useQuery } from "@tanstack/react-query";
@@ -19,8 +19,22 @@ const cardData = [
     link: "/teams",
     icon: <Shield className="h-6 w-6" />,
   },
+
   {
-    title: "Performance",
+    title: "Create Match",
+    desc: "Create a new match",
+    link: "/matches/create",
+    icon: <Swords className="h-6 w-6" />,
+  },
+
+  {
+    title: "Create Tournament",
+    icon: <Trophy className="h-6 w-6" />,
+    link: "/tournaments/create",
+    desc: "Create a new tournament",
+  },
+  {
+    title: "Profile",
     desc: "See your performance",
     link: "/profile",
     icon: <BarChart2 className="h-6 w-6" />,

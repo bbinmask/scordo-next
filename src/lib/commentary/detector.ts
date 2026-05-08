@@ -1,27 +1,9 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// Commentary Auto-Event Detector — lib/commentary/detector.ts
-//
-// Analyses ball history and batting/bowling stats to detect milestone and
-// special events that should auto-trigger commentary without user input.
-// ─────────────────────────────────────────────────────────────────────────────
-
-import {
-  CommentaryPayload,
-  MilestoneType,
-  SpecialEventType,
-} from "./engine";
+import { Ball } from "@/generated/prisma";
+import { CommentaryPayload, MilestoneType } from "./types";
 
 export interface DetectedEvent {
   payload: CommentaryPayload;
-  // Used to deduplicate — don't fire the same milestone twice
   dedupeKey: string;
-}
-
-interface BallSnapshot {
-  runs: number;
-  isWicket: boolean;
-  isWide: boolean;
-  isNoBall: boolean;
 }
 
 // ── Milestone detection from batting stats ────────────────────────────────────
@@ -34,7 +16,7 @@ export function detectBatterMilestone(
   teamScore: string
 ): DetectedEvent | null {
   const milestones: { threshold: number; type: MilestoneType }[] = [
-    { threshold: 50,  type: "FIFTY"   },
+    { threshold: 50, type: "FIFTY" },
     { threshold: 100, type: "CENTURY" },
   ];
 
@@ -46,6 +28,8 @@ export function detectBatterMilestone(
           milestoneType: type,
           milestoneValue: currentRuns,
           batterName,
+          ball: null,
+          bowlerName: "",
           overContext,
           teamScore,
         },
@@ -62,7 +46,7 @@ export function detectBatterMilestone(
 // We check the last 3 balls in history for wickets by the current bowler.
 
 export function detectHatTrick(
-  recentBalls: BallSnapshot[],
+  recentBalls: Ball[],
   bowlerName: string,
   overContext: string,
   teamScore: string
@@ -80,6 +64,7 @@ export function detectHatTrick(
       eventType: "MILESTONE",
       milestoneType: "HAT_TRICK",
       bowlerName,
+      ball: null,
       overContext,
       teamScore,
     },
@@ -90,7 +75,7 @@ export function detectHatTrick(
 // ── Back-to-back / multiple boundaries detection ──────────────────────────────
 
 export function detectSpecialBoundaryEvents(
-  recentBalls: BallSnapshot[],
+  recentBalls: Ball[],
   batterName: string,
   bowlerName: string,
   overContext: string,
@@ -109,6 +94,7 @@ export function detectSpecialBoundaryEvents(
         specialEvent: "BACK_TO_BACK_SIXES",
         batterName,
         bowlerName,
+        ball: null,
         overContext,
         teamScore,
       },
@@ -121,6 +107,7 @@ export function detectSpecialBoundaryEvents(
       payload: {
         eventType: "SPECIAL_EVENT",
         specialEvent: "BACK_TO_BACK_FOURS",
+        ball: null,
         batterName,
         bowlerName,
         overContext,
@@ -138,6 +125,7 @@ export function detectSpecialBoundaryEvents(
         eventType: "SPECIAL_EVENT",
         specialEvent: "MULTIPLE_BOUNDARIES",
         batterName,
+        ball: null,
         bowlerName,
         overContext,
         teamScore,
@@ -153,7 +141,7 @@ export function detectSpecialBoundaryEvents(
 // Called when an over completes (balls % 6 === 0)
 
 export function detectMaidenOver(
-  overBalls: BallSnapshot[],
+  overBalls: Ball[],
   bowlerName: string,
   overContext: string,
   teamScore: string
@@ -169,6 +157,7 @@ export function detectMaidenOver(
         eventType: "SPECIAL_EVENT",
         specialEvent: "MAIDEN_OVER",
         bowlerName,
+        ball: null,
         overContext,
         teamScore,
       },

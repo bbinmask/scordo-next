@@ -19,14 +19,14 @@ const ScorecardModal = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  innings: InningDetails[];
+  innings?: InningDetails[];
 }) => {
   const [activeInningIdx, setActiveInningIdx] = useState(0);
   const { data: wicketsMap, isLoading } = useQuery<Record<string, string> | null>({
-    queryKey: ["inning-wickets", innings[activeInningIdx].id],
+    queryKey: ["inning-wickets", innings?.[activeInningIdx]?.id],
     queryFn: async () => {
       const { data } = await axios.get(
-        `/api/matches/innings/${innings[activeInningIdx].id}/wickets`
+        `/api/matches/innings/${innings?.[activeInningIdx]?.id}/wickets`
       );
 
       if (!data.success) return null;
@@ -72,8 +72,10 @@ const ScorecardModal = ({
 
       return dismissalMap;
     },
-    enabled: !!innings[activeInningIdx]?.id,
+    enabled: !!innings?.[activeInningIdx]?.id,
   });
+
+  if (!innings) return null;
 
   const currentInning = innings[activeInningIdx];
 

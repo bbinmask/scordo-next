@@ -1,52 +1,28 @@
-import { MatchWithDetails } from "@/lib/types";
+import type { MatchWithDetails } from "@/lib/types";
 import { formatDate } from "@/utils/helper/formatDate";
 import { ArrowUpRight, Calendar, MapPin } from "lucide-react";
 import Link from "next/link";
+import TeamAvatar from "@/components/TeamAvatar";
+import { MatchStatusBadge } from "@/components/shared/MatchStatusBadge";
 
 export const MatchCard = ({ match }: { match?: MatchWithDetails }) => {
   if (!match) return null;
 
   return (
-    <div className="">
+    <div>
       <div className="hover-card group relative flex h-52 w-72 flex-shrink-0 flex-col justify-between overflow-hidden rounded-[2rem] border border-slate-300 p-6 dark:border-white/10">
-        {/* Visual Versus Header */}
+        {/* Teams Header */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex -space-x-3">
-            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border-2 border-slate-50 bg-white shadow-lg dark:border-[#020617] dark:bg-slate-800">
-              <img
-                src={
-                  match.teamA.logo ||
-                  `https://placehold.co/48x48/A62626/FFFFFF?text=${match.teamA.name
-                    .split(" ")
-                    .map((word) => word[0])
-                    .join("")}`
-                }
-                className="h-full w-full object-cover"
-                alt="Team A"
-              />
-            </div>
-            <div className="z-10 flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border-2 border-slate-50 bg-white shadow-lg dark:border-[#020617] dark:bg-slate-800">
-              <img
-                src={
-                  match.teamB.logo ||
-                  `https://placehold.co/48x48/A62626/FFFFFF?text=${match.teamB.name
-                    .split(" ")
-                    .map((word) => word[0])
-                    .join("")}`
-                }
-                className="h-full w-full object-cover"
-                alt="Team B"
-              />
-            </div>
+            <TeamAvatar name={match.teamA.name} logo={match.teamA.logo} />
+            <TeamAvatar name={match.teamB.name} logo={match.teamB.logo} zIndex />
           </div>
-          <div className="flex gap-2">
-            <Link
-              href={`/matches/${match.id}`}
-              className="rounded-xl bg-slate-100 p-2.5 text-slate-400 transition-all hover:text-green-500 dark:bg-white/5"
-            >
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
-          </div>
+          <Link
+            href={`/matches/${match.id}`}
+            className="rounded-xl bg-slate-100 p-2.5 text-slate-400 transition-all hover:text-green-500 dark:bg-white/5"
+          >
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
 
         {/* Match Info */}
@@ -69,7 +45,7 @@ export const MatchCard = ({ match }: { match?: MatchWithDetails }) => {
           </p>
         </div>
 
-        {/* Footer Status */}
+        {/* Footer */}
         <div className="flex items-center justify-between border-t border-slate-100 pt-3 dark:border-white/5">
           {match.result ? (
             <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
@@ -77,7 +53,7 @@ export const MatchCard = ({ match }: { match?: MatchWithDetails }) => {
             </span>
           ) : (
             <>
-              {match?.date && (
+              {match.date && (
                 <div className="flex items-center gap-2">
                   <Calendar className="h-3 w-3 text-slate-400" />
                   <span className="text-[10px] font-black tracking-tighter text-green-500 uppercase">
@@ -85,20 +61,7 @@ export const MatchCard = ({ match }: { match?: MatchWithDetails }) => {
                   </span>
                 </div>
               )}
-              <span className="inline-flex animate-pulse items-center gap-1 text-[9px] font-black text-green-500 uppercase italic">
-                {match.status === "in_progress" ? (
-                  <>
-                    <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                    <span className="text-red-500">Live Feed</span>
-                  </>
-                ) : match.status === "not_started" ? (
-                  <span className="text-slate-500">Not Started</span>
-                ) : match.status === "completed" ? (
-                  <span className="text-slate-500">Completed</span>
-                ) : (
-                  "Unknown"
-                )}
-              </span>
+              <MatchStatusBadge status={match.status} />
             </>
           )}
         </div>

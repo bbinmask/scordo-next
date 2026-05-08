@@ -16,7 +16,52 @@ export type AxiosProps = (
   options?: AxiosRequestConfig
 ) => Promise<any>;
 
-export interface BreadScrumbLinkProps {
+export interface BreadcrumbLinkProps {
+  href: string;
+  name: string;
+}
+
+export type SearchCategory = "all" | "teams" | "matches" | "users" | "tournaments";
+
+/** Shared shape for every item in the Explore results list */
+export interface ExploreResult {
+  id: string;
+  type: SearchCategory;
+  title: string;
+  subtitle: string;
+  meta: string;
+  href: string;
+}
+
+export interface ExploreTeamResult extends ExploreResult {
+  short: string;
+  image: string | null;
+  trending: boolean;
+}
+
+export interface ExploreMatchResult extends ExploreResult {
+  status: string;
+  badge?: string | null;
+}
+
+export interface ExploreUserResult extends ExploreResult {
+  image: string | null;
+}
+
+export interface ExploreTournamentResult extends ExploreResult {
+  badge?: string;
+}
+
+export interface ExploreResultsProps {
+  teams: ExploreTeamResult[];
+  matches: ExploreMatchResult[];
+  users: ExploreUserResult[];
+  tournaments: ExploreTournamentResult[];
+}
+
+export type IImageType = "logo" | "banner" | "avatar";
+
+export interface BreadcrumbLinkProps {
   href: string;
   name: string;
 }
@@ -62,5 +107,3 @@ export interface ExploreResultsProps {
     badge?: string;
   }[];
 }
-
-export type IImageType = "logo" | "banner" | "avatar";
