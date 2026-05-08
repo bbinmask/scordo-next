@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, User, Bell, Activity, Moon, Sun, ArrowLeft } from "lucide-react";
+import { Search, Bell, Moon, Sun, ArrowLeft } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -48,7 +48,7 @@ const Navbar = () => {
         }`}
       >
         <div
-          className={`flex h-8 items-center justify-between py-2 transition-all duration-500 md:h-10 lg:h-12 ${isScrolled ? "px-6" : "px-2"}`}
+          className={`flex h-8 items-center justify-between transition-all duration-500 md:h-10 lg:h-12 ${isScrolled ? "px-6 py-2" : "px-2 py-2"}`}
         >
           {/* LOGO */}
           <div className="flex w-full items-center gap-2">
@@ -59,7 +59,7 @@ const Navbar = () => {
             )}
             <Link
               href={`/${headingText === "u" ? "/" : headingText}`}
-              className="group flex w-full cursor-pointer items-center gap-2"
+              className="group flex cursor-pointer items-center gap-2"
             >
               <h1 className="w-full text-xs leading-none font-black tracking-tighter text-slate-900 uppercase italic sm:text-sm md:text-base lg:text-lg dark:text-white">
                 {headingText === "dashboard" || headingText === ""

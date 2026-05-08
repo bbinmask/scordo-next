@@ -8,14 +8,6 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
-export function setAuthToken(token: string | null) {
-  if (token) {
-    apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    delete apiClient.defaults.headers.common["Authorization"];
-  }
-}
-
 export const apiFetch = async <T = unknown>(
   url: string,
   method: HttpMethod = "GET",
@@ -23,10 +15,12 @@ export const apiFetch = async <T = unknown>(
 ): Promise<ApiResponse<T>> => {
   try {
     const res = await apiClient.request<ApiResponse<T>>({
-      url,
+      url: `${baseURL}${url}`,
       method,
       data: body,
     });
+
+    console.log({ url: `${baseURL}${url}`, res });
     return res.data;
   } catch (err: any) {
     return (

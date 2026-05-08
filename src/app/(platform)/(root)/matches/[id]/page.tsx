@@ -4,7 +4,6 @@ import { ChannelProvider } from "ably/react";
 import { User } from "@/generated/prisma";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import React, { useMemo, useState } from "react";
 import { MapPin, Calendar, Activity, Gavel, Share2, ClipboardList, Swords } from "lucide-react";
 import NotFoundParagraph from "@/components/NotFoundParagraph";
@@ -25,34 +24,18 @@ import { formatDate } from "@/utils/helper/formatDate";
 import { CommentaryFeed } from "../_components/commentary/CommentaryFeed";
 import { SectionHeader } from "@/components/layouts/SectionHeader";
 import ScorecardModal from "../_components/modals/ScorecardModal";
-import { apiFetch } from "@/services/api.service";
 import { matchService } from "@/services/match.service";
-import { userService } from "@/services/user.service";
 import { currentUser } from "@/lib/currentUser";
 
 const MatchIdPage = () => {
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
 
-  // ── Data fetching ──────────────────────────────────────────────────────────
-  // BUG FIX #3: All three queries used raw `axios.get(...)` inline instead of
-  // going through the service layer. This scatters API URLs across the component
-  // — changing a route requires hunting across every file that calls it.
-  // Import from the service layer (or at minimum a central api client).
-  // For now we use the apiFetch wrapper from the service layer.
-  // Replace the axios.get lines with: `import { matchService, userService } from "@/services"`
-  // and call matchService.getMatch(id), matchService.getInnings(id), userService.getMe().
-
   const { data: match, isLoading } = useQuery<MatchWithDetails>({
     queryKey: ["match", id],
     queryFn: async () => {
-      // Use matchService.getMatch(id) once the service layer is wired up.
-      // import { matchService } from "@/services/match.service";
-      // const res = await matchService.getMatch(id);
-      // if (!res.success) throw new Error(res.message);
-      // return res.data!;
-
       const res = await matchService.getMatch(id);
+
       if (!res.success) throw new Error(res.message);
       return res.data!;
     },
