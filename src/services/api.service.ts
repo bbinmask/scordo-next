@@ -20,7 +20,6 @@ export const apiFetch = async <T = unknown>(
       data: body,
     });
 
-    console.log({ url: `${baseURL}${url}`, res });
     return res.data;
   } catch (err: any) {
     return (
