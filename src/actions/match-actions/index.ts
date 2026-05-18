@@ -71,7 +71,7 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
       error: ERROR_CODES.UNAUTHORIZED.message,
     };
 
-  let match: Match, tournament, matchOfficial;
+  let match: Match, tournament;
 
   try {
     const teamA = await db.team.findUnique({
@@ -134,14 +134,18 @@ const createMatchHandler = async (data: InputTypeForCreate): Promise<ReturnTypeF
       };
 
     if (matchOfficials && matchOfficials.length > 0) {
-      matchOfficial = await db.matchOfficial.createMany({
-        data: matchOfficials?.map((official: any) => ({
+      await db.matchOfficial.createMany({
+        data: matchOfficials?.map((official) => ({
           ...official,
           matchId: match.id,
         })),
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error?.message || "Something went wrong!",
+      };
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
@@ -207,7 +211,11 @@ const addOfficialsHandler = async (
         matchId,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error?.message,
+      };
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
@@ -251,7 +259,11 @@ const removeOfficialHandler = async (data: InputTypeForRemove): Promise<ReturnTy
     });
 
     revalidatePath(`/matches/${official.matchId}`);
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error?.message,
+      };
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
@@ -303,7 +315,11 @@ const declineMatchRequestHandler = async (
     match = await db.match.delete({
       where: { id },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error?.message,
+      };
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
@@ -312,7 +328,7 @@ const declineMatchRequestHandler = async (
   revalidatePath(`/teams`);
 
   return {
-    data: match,
+    data: true,
   };
 };
 
@@ -360,7 +376,11 @@ const acceptMatchRequestHandler = async (
         requestStatus: "accepted",
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error?.message,
+      };
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
@@ -369,7 +389,7 @@ const acceptMatchRequestHandler = async (
   revalidatePath(`/teams`);
 
   return {
-    data: match,
+    data: true,
   };
 };
 
@@ -572,7 +592,11 @@ const initializeMatchHandler = async (
     return {
       data: foundInning,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error?.message,
+      };
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
@@ -881,24 +905,27 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
         );
       }
 
-      const { text, label } = await generateCommentary({
-        eventType,
-        ball: ball,
-        batterName,
-        bowlerName,
-        fielderName: ball.fielder?.user.name,
-        overContext,
-        teamScore,
-        inningNumber,
-        shotSide: shotSide as ShotSide,
-        target,
-        runsNeeded,
-        shotType,
-        ballsLeft,
-        milestoneType: milestone?.payload.milestoneType || hattrick?.payload.milestoneType,
-        specialEvent: special?.payload.specialEvent,
-        milestoneValue: milestone?.payload.milestoneValue || hattrick?.payload.milestoneValue,
-      });
+      const { text, label } = await generateCommentary(
+        {
+          eventType,
+          ball: ball,
+          batterName,
+          bowlerName,
+          fielderName: ball.fielder?.user.name,
+          overContext,
+          teamScore,
+          inningNumber,
+          shotSide: shotSide as ShotSide,
+          target,
+          runsNeeded,
+          shotType,
+          ballsLeft,
+          milestoneType: milestone?.payload.milestoneType || hattrick?.payload.milestoneType,
+          specialEvent: special?.payload.specialEvent,
+          milestoneValue: milestone?.payload.milestoneValue || hattrick?.payload.milestoneValue,
+        },
+        true
+      );
 
       commentary = await db.commentary.create({
         data: { eventType, label, text, ballId: ball.id },
@@ -924,7 +951,7 @@ const pushBallHandler = async (data: InputTypeForPushBall): Promise<ReturnTypeFo
       ballData: ball,
       commentary: commentary ?? null,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error && error.message !== ERROR_CODES.INTERNAL_SERVER_ERROR.message) {
       return { error: error.message };
     }
@@ -1125,8 +1152,20 @@ const changeBowlerHandler = async (
       return { data: updated };
     });
 
-    if ("error" in result) return result;
-  } catch (e) {
+    if (!result)
+      return {
+        error: "Match not found!",
+      };
+
+    return {
+      data: true,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return {
+        error: error?.message,
+      };
+    }
     return { error: ERROR_CODES.INTERNAL_SERVER_ERROR.message };
   }
 
@@ -1135,7 +1174,7 @@ const changeBowlerHandler = async (
   return { data: true };
 };
 
-const deleteMatchHandler = async (data: InputTypeForRequest): Promise<any> => {
+const deleteMatchHandler = async (data: InputTypeForRequest): Promise<ReturnTypeForRequest> => {
   const user = await currentUser();
   const { id: matchId } = data;
   if (!user)
@@ -1203,7 +1242,11 @@ const deleteMatchHandler = async (data: InputTypeForRequest): Promise<any> => {
         where: { id: matchId },
       });
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error?.message,
+      };
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
@@ -1313,7 +1356,15 @@ const undoMatchHandler = async (data: InputTypeForUndoBall): Promise<ReturnTypeF
         });
       }
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error?.message,
+      };
+    if (error instanceof Error)
+      return {
+        error: error?.message || "Something went wrong!",
+      };
     return {
       error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };

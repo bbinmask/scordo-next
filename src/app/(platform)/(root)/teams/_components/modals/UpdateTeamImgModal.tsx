@@ -73,7 +73,7 @@ export function UpdateLogoAndBanner({
   const wrapperRef = useRef<HTMLDivElement>(null) as React.RefObject<HTMLDivElement>;
 
   const { execute, isLoading } = useAction(updateTeamLogoAndBanner, {
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Changes successfull.");
       onClose();
     },

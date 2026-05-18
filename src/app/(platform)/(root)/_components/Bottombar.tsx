@@ -67,7 +67,7 @@ const Bottombar = () => {
 
   const [isMoreActive, setIsMoreActive] = useState(false);
 
-  useOnClickOutside(moreRef as any, () => {
+  useOnClickOutside(moreRef as React.RefObject<HTMLElement>, () => {
     setIsMoreActive(false);
   });
 
@@ -83,7 +83,7 @@ const Bottombar = () => {
               {item.title.toLowerCase() === "more" ? (
                 <MorePopover closeActive={() => setIsMoreActive(false)}>
                   <div
-                    ref={moreRef as any}
+                    ref={moreRef}
                     onClick={() => setIsMoreActive(true)}
                     className={`center flex flex-col rounded-md px-2 py-1 font-[inter] text-stone-900 shadow-black transition-all duration-300 ease-linear hover:translate-y-0 hover:gap-0 hover:bg-green-600 hover:text-lime-300 hover:shadow-md hover:brightness-125 dark:text-gray-50 dark:hover:bg-green-800 ${isMoreActive ? "translate-y-0 gap-0 bg-green-500 shadow-md" : "translate-y-4 gap-8"}`}
                   >
@@ -128,7 +128,7 @@ const MorePopover = ({ children, closeActive }: MorePopoverProps) => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  const { onOpen, onClose, isOpen } = useNotificationModal();
+  const { onOpen } = useNotificationModal();
 
   useEffect(() => {
     setMounted(true);

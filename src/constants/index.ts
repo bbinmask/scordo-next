@@ -1,6 +1,4 @@
-import PlayerProps from "@/types/player.props";
 import TeamProps from "@/types/teams.props";
-import UserProps from "@/types/user.props";
 
 export const user = {
   name: "Irfan Madar",
@@ -169,103 +167,7 @@ export const ERROR_CODES = {
   },
 };
 
-// const mockPlayers: PlayerProps[] = [
-//   {
-//     id: "p1",
-//     username: "playerOne",
-//     name: "Evelyn Carter",
-//     dob: "1995-04-10",
-//     role: "player",
-//     teams: [],
-//     avatar: "/avatars/playerOne.png",
-//     following: [],
-//     follwers: [],
-//     rank: "Gold",
-//   },
-//   {
-//     id: "p2",
-//     username: "playerTwo",
-//     name: "Marcus Wright",
-//     dob: "1997-09-22",
-//     role: "player",
-//     teams: [],
-//     avatar: "/avatars/playerTwo.png",
-//     following: [],
-//     follwers: [],
-//     rank: "Platinum",
-//   },
-//   {
-//     id: "p3",
-//     username: "playerThree",
-//     name: "Sophia Lee",
-//     dob: "1996-12-15",
-//     role: "player",
-//     teams: [],
-//     avatar: "/avatars/playerThree.png",
-//     following: [],
-//     follwers: [],
-//     rank: "Diamond",
-//   },
-//   {
-//     id: "p4",
-//     username: "playerFour",
-//     name: "Daniel Kim",
-//     dob: "1998-07-03",
-//     role: "player",
-//     teams: [],
-//     avatar: "/avatars/playerFour.png",
-//     following: [],
-//     follwers: [],
-//     rank: "Silver",
-//   },
-// ];
-
-// const mockUsers: UserProps[] = [
-//   {
-//     id: "u1",
-//     username: "alice",
-//     name: "Alice Johnson",
-//     dob: "1995-05-12",
-//     role: "admin",
-//     teams: [],
-//     avatar: "/avatars/alice.png",
-//     following: ["u2", "u3"],
-//     follwers: ["u3", "u4"], // note: typo matches your interface
-//   },
-//   {
-//     id: "u2",
-//     username: "bob",
-//     name: "Bob Smith",
-//     dob: "1998-11-23",
-//     role: "player",
-//     teams: [],
-//     avatar: "/avatars/bob.png",
-//     following: ["u1"],
-//     follwers: ["u1", "u4"],
-//   },
-//   {
-//     id: "u3",
-//     username: "charlie",
-//     name: "Charlie Evans",
-//     dob: "1992-03-10",
-//     role: "fan",
-//     teams: [],
-//     avatar: "/avatars/charlie.png",
-//     following: ["u1", "u2"],
-//     follwers: ["u1"],
-//   },
-//   {
-//     id: "u4",
-//     username: "dave",
-//     name: "Dave Lee",
-//     dob: "2000-07-19",
-//     role: "player",
-//     teams: [],
-//     avatar: "/avatars/dave.png",
-//     following: [],
-//     follwers: ["u2", "u3"],
-//   },
-// ];
+export const STORAGE_KEY = "scordo_quick_matches";
 
 export const mockTournaments = [
   {

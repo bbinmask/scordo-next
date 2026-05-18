@@ -44,7 +44,7 @@ const MatchesPage = () => {
           <section className="relative z-10">
             <div className="mb-6 flex items-center justify-between px-4">
               <h3 className="flex items-center gap-3 text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-                Team <span className={"primary-heading pr-2"}>Matches</span>
+                Team <span className={"primary-heading"}>Matches</span>
               </h3>
               <div className="mx-6 h-px flex-1 bg-slate-100 dark:bg-white/5" />
             </div>
@@ -80,7 +80,7 @@ const MatchesPage = () => {
           <section className="relative z-10">
             <div className="mb-6 flex items-center justify-between px-4">
               <h3 className="flex items-center gap-2 text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-                Matches As <span className={"primary-heading pr-2"}>Official</span>
+                Matches As <span className={"primary-heading"}>Official</span>
               </h3>
               <div className="mx-6 h-px flex-1 bg-slate-100 dark:bg-white/5" />
             </div>

@@ -22,12 +22,12 @@ export function CommentaryFeed({ matchId, isEnabled }: { matchId: string; isEnab
 
         if (!data.success) return;
         setCommentary(data.data);
-      } catch (error: any) {
-        throw new Error(error?.message || "Something went wrong");
+      } catch (error: unknown) {
+        throw new Error((error as Error)?.message || "Something went wrong");
       }
     };
     fetchData();
-  }, []);
+  }, [matchId]);
 
   useChannel(channelName, "ball-added", async (msg) => {
     const { data } = msg;
@@ -49,7 +49,7 @@ export function CommentaryFeed({ matchId, isEnabled }: { matchId: string; isEnab
           </div>
           <h3 className="flex items-center gap-2 font-[poppins] text-base font-black tracking-tight text-slate-800 uppercase italic dark:text-white">
             <Sparkles className="h-4 w-4 text-emerald-500" />
-            AI <span className="primary-heading pr-1">Commentary</span>
+            AI <span className="primary-heading">Commentary</span>
           </h3>
         </div>
         <div className="flex items-center gap-2">

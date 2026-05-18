@@ -4,6 +4,7 @@ import { getMetadata } from "@/utils/helper/getMetadata";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "@/components/providers/QueryProvider";
+import { Toaster } from "sonner";
 
 const urbanist = Urbanist({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -35,6 +36,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="layout-background">
         <QueryProvider>
+          <Toaster />
+
           <ThemeProvider>
             <ClerkProvider>
               <main

@@ -30,10 +30,7 @@ const NotFoundParagraph = ({ className, description, redirect, link, title }: Pa
         {description || "Nothing to show here!"}
       </p>
       {redirect && (
-        <Button
-          type="button"
-          className="primary-btn rounded-full px-10 py-6 font-[poppins] text-lg"
-        >
+        <Button type="button" className="cta-pill rounded-full px-10 py-6 font-[poppins] text-lg">
           <Link href={link}>{title}</Link>
         </Button>
       )}

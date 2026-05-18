@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import { ChevronRight, Flame, LayoutList, Sword, Target, UserCircle2 } from "lucide-react";
+import { Flame, LayoutList, Sword, Target, UserCircle2 } from "lucide-react";
 import { InningDetails } from "@/lib/types";
 import { getEcon, getStrikeRate } from "@/utils/helper/scorecard";
 import { useMemo, useState } from "react";
@@ -117,19 +117,9 @@ export default function ScorecardPage() {
       {/* Header Section */}
       <header className="mb-8 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 shadow-lg shadow-emerald-200 dark:shadow-none">
-            <LayoutList className="h-7 w-7 text-white" />
-          </div>
-          <div>
-            <nav className="flex items-center gap-2 text-xs font-bold tracking-widest text-emerald-600 uppercase">
-              <span>Match Center</span>
-              <ChevronRight className="h-3 w-3" />
-              <span>Full Scorecard</span>
-            </nav>
-            <h1 className="font-[poppins] text-3xl font-black tracking-tight text-slate-900 uppercase italic dark:text-white">
-              Scorecard
-            </h1>
-          </div>
+          <h1 className="font-[poppins] text-3xl font-black tracking-tight text-slate-900 uppercase italic dark:text-white">
+            Scorecard
+          </h1>
         </div>
 
         <div className="flex w-full overflow-hidden rounded-2xl bg-white p-1 ring-1 ring-slate-200 sm:w-auto dark:bg-slate-900 dark:ring-white/10">

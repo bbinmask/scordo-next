@@ -6,22 +6,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Ball, WicketType } from "@/generated/prisma";
-import {
-  InningBattingDetails,
-  InningBowlingDetails,
-  InningDetails,
-  PlayerWithUser,
-} from "@/lib/types";
+import { WicketType } from "@/generated/prisma";
+import { InningBattingDetails, InningBowlingDetails } from "@/lib/types";
 import { FallWicket } from "@/types/match.props";
-import { ArrowLeft, Check, CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { setConfig } from "next/config";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface WicketDetails {
-  primary?: string; // e.g., Fielder name
-  secondary?: string; // e.g., Thrown by
+  primary?: string;
+  secondary?: string;
 }
 
 interface WicketConfig {

@@ -31,9 +31,9 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
 
   const { onOpen: onNotificationOpen } = useRequestModal();
 
-  const popoverRef = useRef<any>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
-  const { execute: executeRecruiting, isLoading } = useAction(updateRecruiting, {
+  const { execute: executeRecruiting } = useAction(updateRecruiting, {
     onSuccess(data) {
       setIsRecruiting(data.isRecruiting);
       toast.success("Recruiting updated!");
@@ -43,7 +43,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
     },
   });
   const { execute: executeDelete } = useAction(deleteTeam, {
-    onSuccess(data) {
+    onSuccess() {
       toast.success("Team Deleted!");
       router.push("/teams");
     },
@@ -66,7 +66,7 @@ const OptionsPopover = ({ team }: OptionsPopoverProps) => {
     executeRecruiting({ abbreviation: team.abbreviation, recruiting });
   }, 2000);
 
-  useOnClickOutside(popoverRef, () => {
+  useOnClickOutside(popoverRef as React.RefObject<HTMLElement>, () => {
     closeConfirmModal();
   });
 

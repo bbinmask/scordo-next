@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useAction } from "@/hooks/useAction";
 import { createTournament } from "@/actions/tournament-actions";
 import { CreateTournament } from "@/actions/tournament-actions/schema";
-import Spinner from "@/components/Spinner";
 import {
   Trophy,
   Calendar,
@@ -21,6 +20,7 @@ import {
   CircleArrowOutUpRight,
   Loader2,
   AlertCircle,
+  LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { SectionHeader } from "@/components/layouts/SectionHeader";
@@ -41,7 +41,7 @@ const Section = ({
   color = "emerald",
   children,
 }: {
-  icon: any;
+  icon: LucideIcon;
   title: string;
   color?: string;
   children: React.ReactNode;
@@ -343,7 +343,7 @@ export default function CreateTournamentPage() {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     if (ruleInput.trim()) {
-                      appendRule(ruleInput.trim() as any);
+                      appendRule(ruleInput.trim());
                       setRuleInput("");
                     }
                   }

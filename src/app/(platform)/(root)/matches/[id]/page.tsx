@@ -195,7 +195,7 @@ const MatchIdPage = () => {
           <div className="w-full max-w-4xl text-center">
             <div className="center mb-4 flex flex-col text-3xl font-black tracking-tighter uppercase italic md:text-5xl">
               <h1 className="text-start">{match.teamA.name}</h1>
-              <span className="primary-heading pr-2 text-center">vs</span>
+              <span className="primary-heading text-center">vs</span>
               <h1 className="text-end">{match.teamB.name}</h1>
             </div>
 

@@ -130,7 +130,13 @@ async function callAI(
     if (text) {
       return { success: true, data: text };
     }
-  } catch (err) {
+  } catch (error) {
+    if (error instanceof Error)
+      return {
+        success: false,
+        error: error?.message || "Something went wrong!",
+      };
+
     console.error("Gemini failed → falling back...");
   }
 
@@ -146,7 +152,13 @@ async function callAI(
     if (text) {
       return { success: true, data: text };
     }
-  } catch (err) {
+  } catch (error) {
+    if (error instanceof Error)
+      return {
+        success: false,
+        error: error?.message,
+      };
+
     console.error("OpenAI failed → falling back...");
   }
 
@@ -163,7 +175,13 @@ async function callAI(
     if (text) {
       return { success: true, data: text };
     }
-  } catch (err) {
+  } catch (error) {
+    if (error instanceof Error)
+      return {
+        success: false,
+        error: error?.message || "Something went wrong!",
+      };
+
     console.error("Groq also failed.");
   }
 
@@ -173,63 +191,10 @@ async function callAI(
   };
 }
 
-export async function generateCommentary(payload: CommentaryPayload): Promise<CommentaryLine> {
-  const prompt = buildPrompt(payload);
-
-  const last6Balls = await db.ball.findMany({
-    where: {
-      inningId: payload.ball?.inningId,
-    },
-    take: 6,
-    orderBy: {
-      createdAt: "desc",
-    },
-    select: {
-      batsman: {
-        select: {
-          user: {
-            select: {
-              name: true,
-              username: true,
-            },
-          },
-        },
-      },
-      bowler: {
-        select: {
-          user: {
-            select: {
-              name: true,
-              username: true,
-            },
-          },
-        },
-      },
-      fielder: {
-        select: {
-          user: {
-            select: {
-              name: true,
-              username: true,
-            },
-          },
-        },
-      },
-      ball: true,
-      runs: true,
-      over: true,
-      dismissalType: true,
-      isBye: true,
-      isLegBye: true,
-      isNoBall: true,
-      isWicket: true,
-      isWide: true,
-      createdAt: true,
-    },
-  });
-  const userQuery = JSON.stringify({ ...payload, last6Balls }, null, 2);
-  const response = await callAI(prompt, userQuery);
-
+export async function generateCommentary(
+  payload: CommentaryPayload,
+  aiEnabled = false
+): Promise<CommentaryLine> {
   const data: CommentaryLine = {
     eventType: payload.eventType,
     label: getBallLabel(payload?.ball),
@@ -238,16 +203,74 @@ export async function generateCommentary(payload: CommentaryPayload): Promise<Co
     timestamp: new Date(),
   };
 
-  if (response.success) {
-    data.text = response.data;
+  if (aiEnabled) {
+    const prompt = buildPrompt(payload);
+    const last6Balls = await db.ball.findMany({
+      where: {
+        inningId: payload.ball?.inningId,
+      },
+      take: 6,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        batsman: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+              },
+            },
+          },
+        },
+        bowler: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+              },
+            },
+          },
+        },
+        fielder: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                username: true,
+              },
+            },
+          },
+        },
+        ball: true,
+        runs: true,
+        over: true,
+        dismissalType: true,
+        isBye: true,
+        isLegBye: true,
+        isNoBall: true,
+        isWicket: true,
+        isWide: true,
+        createdAt: true,
+      },
+    });
+    const userQuery = JSON.stringify({ ...payload, last6Balls }, null, 2);
 
-    return data;
-  }
+    const response = await callAI(prompt, userQuery);
 
-  if (!payload.ball) {
-    data.text = `What a moment in this match! Let's see how it unfolds.`;
+    if (response.success) {
+      data.text = response.data;
 
-    return data;
+      return data;
+    }
+
+    if (!payload.ball) {
+      data.text = `What a moment in this match! Let's see how it unfolds.`;
+
+      return data;
+    }
   }
 
   const fallback = getFallbackCommentary(payload);

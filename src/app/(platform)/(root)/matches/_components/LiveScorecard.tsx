@@ -5,7 +5,6 @@ import { getEcon, getPostSummaryData, getRunRate, getStrikeRate } from "@/utils/
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Flame, Target } from "lucide-react";
-import { useState } from "react";
 import { ControlPad } from "./ControlPad";
 import MatchStatusBadge from "./cards/MatchStatusBadge";
 import { HistoryTimeline } from "./HistoryTimeline";
@@ -20,9 +19,7 @@ export const LiveScorecard = ({
   innings?: InningDetails[];
   userId?: string;
 }) => {
-  const [isScorecardOpen, setIsScorecardOpen] = useState(false);
-
-  const { data: ballHistory, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
+  const { data: ballHistory } = useQuery<CurrentOverBalls[]>({
     queryKey: ["current-over-history", innings?.at(innings?.length - 1 || 0)?.id],
     queryFn: async () => {
       if (!innings || innings.length === 0) return [];
@@ -70,7 +67,7 @@ export const LiveScorecard = ({
               Scordo Match
             </p>
             <div className="flex items-center gap-3">
-              <h2 className="primary-heading pr-2 text-4xl font-black uppercase italic">
+              <h2 className="primary-heading text-4xl font-black uppercase italic">
                 {String(innings[length].battingTeam.abbreviation)}
               </h2>
               <span className="font-bold text-indigo-300 italic">vs</span>

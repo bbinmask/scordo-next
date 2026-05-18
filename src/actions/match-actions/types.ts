@@ -20,22 +20,22 @@ export type InputTypeForOfficials = z.infer<typeof AddOfficials>;
 export type ReturnTypeForOfficials = ActionState<InputTypeForOfficials, MatchOfficial[]>;
 
 export type InputTypeForRemove = z.infer<typeof RemoveOfficial>;
-export type ReturnTypeForRemove = ActionState<InputTypeForRemove, any>;
+export type ReturnTypeForRemove = ActionState<InputTypeForRemove, boolean>;
 
 export type InputTypeForRequest = z.infer<typeof Request>;
-export type ReturnTypeForRequest = ActionState<InputTypeForRequest, any>;
+export type ReturnTypeForRequest = ActionState<InputTypeForRequest, boolean>;
 
 export type InputTypeForInitializeMatch = z.infer<typeof InitializeMatch>;
-export type ReturnTypeForInitialieMatch = ActionState<InputTypeForInitializeMatch, any>;
+export type ReturnTypeForInitialieMatch = ActionState<InputTypeForInitializeMatch, Inning>;
 
 export type InputTypeForPushBall = z.infer<typeof PushBall>;
 export type ReturnTypeForPushBall = ActionState<InputTypeForPushBall, Ball>;
 
 export type InputTypeForChangeBowler = z.infer<typeof ChangeBowler>;
-export type ReturnTypeForChangeBowler = ActionState<InputTypeForChangeBowler, any>;
+export type ReturnTypeForChangeBowler = ActionState<InputTypeForChangeBowler, boolean>;
 
 export type InputTypeForNextInning = z.infer<typeof StartNextInning>;
-export type ReturnTypeForNextInning = ActionState<InputTypeForNextInning, any>;
+export type ReturnTypeForNextInning = ActionState<InputTypeForNextInning, Inning>;
 
 export type InputTypeForUndoBall = z.infer<typeof UndoBall>;
-export type ReturnTypeForUndoBall = ActionState<InputTypeForUndoBall, any>;
+export type ReturnTypeForUndoBall = ActionState<InputTypeForUndoBall, boolean>;

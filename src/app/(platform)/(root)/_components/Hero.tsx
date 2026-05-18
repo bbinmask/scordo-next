@@ -1,10 +1,10 @@
 import { ActionButton } from "@/components/ActionButton";
-import { Match } from "@/generated/prisma";
 import { MatchWithDetails, UserWithTeamsProps } from "@/lib/types";
 import { formatDate } from "@/utils/helper/formatDate";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { ArrowRight, PlusCircle, Search, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, Search, Shield, Sparkles, Swords, Trophy } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 interface HeroSectionProps {
@@ -69,7 +69,7 @@ const HeroSection = ({ user }: HeroSectionProps) => {
                     Ready to <span className="text-emerald-500">Dominate?</span>
                   </h3>
                   <p className="max-w-md text-sm leading-relaxed font-medium text-slate-500 dark:text-slate-400">
-                    You don't have any upcoming matches currently. Explore active tournaments.
+                    You don&apos;t have any upcoming matches currently. Explore active tournaments.
                   </p>
                 </div>
               </div>
@@ -106,7 +106,9 @@ const HeroSection = ({ user }: HeroSectionProps) => {
                   href={`/teams/${upcomingMatch.teamA.abbreviation}`}
                   className="col-span-2 flex flex-col items-center gap-2 text-center lg:flex-row lg:gap-4"
                 >
-                  <img
+                  <Image
+                    width={1000}
+                    height={1000}
                     src={
                       upcomingMatch.teamA.logo ||
                       `https://placehold.co/60x60/A62626/FFFFFF?text=${upcomingMatch.teamA.name
@@ -131,7 +133,9 @@ const HeroSection = ({ user }: HeroSectionProps) => {
                   <span className="font-[poppins] text-sm font-semibold text-slate-800 md:text-lg lg:text-xl dark:text-slate-100">
                     {upcomingMatch.teamB.name}
                   </span>
-                  <img
+                  <Image
+                    width={1000}
+                    height={1000}
                     src={
                       upcomingMatch.teamB.logo ||
                       `https://placehold.co/60x60/A62626/FFFFFF?text=${upcomingMatch.teamB.name
@@ -155,7 +159,8 @@ const HeroSection = ({ user }: HeroSectionProps) => {
 
           {/* Quick Actions */}
           <div className="flex w-full flex-col items-center justify-center gap-4 sm:flex-row lg:col-span-2 lg:flex-col">
-            <ActionButton title="Create a New Match" icon={PlusCircle} href="/matches/create" />
+            <ActionButton title="Start a quick match" icon={Swords} href="/quick-match" />
+            <ActionButton title="See Teams" icon={Shield} href="/teams" />
             <ActionButton title="Find a Player" icon={Search} href="/explore" />
           </div>
         </div>

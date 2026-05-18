@@ -1,7 +1,7 @@
 "use client";
 
 import { Carousel } from "@/components/carousel";
-import { Gavel, Globe, LayoutGrid, PlusCircle, Search, Star, Trophy } from "lucide-react";
+import { Gavel, Globe, PlusCircle, Search, Star, Trophy } from "lucide-react";
 import TournamentCard from "../_components/TournamentCard";
 import Link from "next/link";
 import { TournamentWithDetails } from "@/lib/types";
@@ -47,7 +47,7 @@ const TournamentsPage = () => {
                     <Gavel size={22} />
                   </div>
                   <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-                    Managed <span className={"primary-heading pr-2"}>By You</span>
+                    Managed <span className={"primary-heading"}>By You</span>
                   </h3>
                   <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
                 </div>
@@ -89,7 +89,7 @@ const TournamentsPage = () => {
                     <Globe size={22} />
                   </div>
                   <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase italic dark:text-white">
-                    Discover <span className={"primary-heading pr-2"}>Active Leagues</span>
+                    Discover <span className={"primary-heading"}>Active Leagues</span>
                   </h3>
                   <div className="ml-4 h-px flex-1 bg-slate-100 dark:bg-white/5" />
                 </div>

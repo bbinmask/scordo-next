@@ -266,7 +266,7 @@
 
 /* Gradient brand heading — was: bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent... (8×) */
 .primary-heading {
-  @apply bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text text-transparent dark:from-green-500 dark:to-emerald-400;
+  @apply bg-gradient-to-r from-green-600 to-emerald-800 bg-clip-text pr-2 text-transparent dark:from-green-500 dark:to-emerald-400;
 }
 
 /* Body text — adapts to dark/light */
@@ -349,9 +349,9 @@
   @apply truncate font-[urbanist] text-xs font-semibold text-slate-400;
 }
 
-/* "primary-text font-[urbanist] text-base font-semibold" (9×) */
+/* "primary-text font-[urbanist] text-base" (9×) */
 .body-text {
-  @apply font-[urbanist] text-base font-semibold text-slate-900 dark:text-slate-50;
+  @apply font-[urbanist] text-base text-slate-900 dark:text-slate-50;
 }
 
 /* Error text below inputs — "mt-1.5 flex items-center gap-1 font-[urbanist] text-xs font-semibold text-rose-500" (4×) */
