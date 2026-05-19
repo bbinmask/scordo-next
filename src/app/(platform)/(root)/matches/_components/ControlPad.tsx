@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
-import { Clock, Undo2 } from "lucide-react";
+import { Undo2 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import WicketDetailsModal from "./modals/WicketDetailsModal";
-import { CurrentOverBalls, InningDetails, MatchWithDetails } from "@/lib/types";
+import { InningDetails, MatchWithDetails } from "@/lib/types";
 import { useAction } from "@/hooks/useAction";
 import { changeBowler, pushBall, undoBall } from "@/actions/match-actions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,9 +14,6 @@ import { useChannel } from "ably/react";
 import { ShotDirectionModal } from "./modals/ShotDirectionModal";
 import { ShotSide, ShotType } from "@/lib/commentary/types";
 import { FallWicket } from "@/types/match.props";
-import { getBallLabel, getOvers } from "@/utils/helper/scorecard";
-import { getBallClassesFromLabel } from "@/utils/helper/classes";
-import { HistoryTimeline } from "./HistoryTimeline";
 type ExtraType = "wd" | "nb" | "b" | "lb";
 
 interface ControlPadProps {
@@ -28,14 +25,14 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
   const queryClient = useQueryClient();
 
   const { execute, isLoading: isSubmitting } = useAction(pushBall, {
-    onSuccess(data) {},
+    onSuccess() {},
     onError(error) {
       toast.error(error);
     },
   });
 
   const { execute: executeChangeBowler, isLoading: isChanging } = useAction(changeBowler, {
-    onSuccess(data) {
+    onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["match-innings", innings.matchId] });
       queryClient.invalidateQueries({ queryKey: ["current-over-history", innings.id] });
       setIsOverFinished(false);
@@ -77,23 +74,6 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     },
   });
 
-  const { data: history, isLoading: historyLoading } = useQuery<CurrentOverBalls[]>({
-    queryKey: ["current-over-history", innings.id],
-    queryFn: async () => {
-      if (!innings) return [];
-
-      const { data } = await axios.get(`/api/matches/innings/${innings.id}/balls/current-over`);
-
-      if (!data.success) return [];
-
-      return data.data;
-    },
-    enabled: !!innings,
-    staleTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-  });
-
   const [pendingBall, setPendingBall] = useState<{
     runs: number;
     wicket: null | {
@@ -118,11 +98,6 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
       innings.InningBatting.find((b) => b.playerId === innings.currentStrikerId)?.player.user.name,
     [innings]
   );
-  const bowlerName = useMemo(
-    () =>
-      innings.InningBowling.find((b) => b.playerId === innings.currentBowlerId)?.player.user.name,
-    [innings]
-  );
 
   const battingPlayers = useMemo(() => {
     return innings.InningBatting;
@@ -139,12 +114,9 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
         batsman.playerId !== innings.currentStrikerId &&
         !batsman.isOut
     );
-  }, [innings]);
+  }, [battingPlayers, innings.currentNonStrikerId, innings.currentStrikerId]);
 
   const isLoading = isSubmitting || isUndoing;
-
-  const teamScore = `${innings.runs}/${innings.wickets}`;
-  const overContext = `${innings.overs}.${innings.balls % 6}`;
 
   const handleUndo = () => {};
 
@@ -293,7 +265,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
 
       resetExtras();
     },
-    [execute, innings, match, extras, batterName, bowlerName, overContext, teamScore]
+    [execute, innings, match, extras]
   );
 
   const channelName = `match:${match.id}`;
@@ -328,7 +300,7 @@ export const ControlPad = ({ innings, match }: ControlPadProps) => {
     });
   });
 
-  useChannel(channelName, "inning-completed", async (msg) => {
+  useChannel(channelName, "inning-completed", async () => {
     setIsOverFinished(false);
     await queryClient.refetchQueries({
       queryKey: ["match", match.id],
@@ -456,7 +428,7 @@ const PadButton = ({
 }: {
   label: string;
   sub?: string;
-  onClick: any;
+  onClick: () => void;
   disabled: boolean;
   active?: boolean;
   className?: string;

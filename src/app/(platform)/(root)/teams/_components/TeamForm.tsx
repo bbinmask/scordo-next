@@ -1,15 +1,8 @@
 "use client";
 
-import React, { ChangeEvent, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { CgSpinner } from "react-icons/cg";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { createTeam } from "@/actions/team-actions";
-import { useAction } from "@/hooks/useAction";
-import { EnumFormSelect } from "../../_components/FormSelect";
 import { debounce } from "lodash";
 import axios from "axios";
 import { Team } from "@/generated/prisma";
@@ -28,6 +21,7 @@ import {
 } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { ImagePreview, UploadImg } from "@/components/Image";
+import Image from "next/image";
 
 interface TeamFormProps {
   children: React.ReactNode;
@@ -46,7 +40,6 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
     setError,
     setValue,
     clearErrors,
-    watch,
   } = useForm<InputTypeForCreateTeam>({
     defaultValues: {
       name: team?.name || "",
@@ -63,18 +56,7 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
   const [logoPreview, setLogoPreview] = useState<string>(team?.logo || "");
   const [bannerPreview, setBannerPreview] = useState<string>(team?.banner || "");
 
-  const [logoFileName, setLogoFileName] = useState<string | null>(null);
-  const [bannerFileName, setBannerFileName] = useState<string | null>(null);
-  const navigate = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  // const handleFileChange = (
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   fieldName: "logo" | "banner"
-  // ) => {
-  //   const file = e.target.files?.[0];
-  //   if (fieldName === "logo") setLogoFileName(file?.name || null);
-  //   if (fieldName === "banner") setBannerFileName(file?.name || null);
-  // };
 
   const checkAbbreviation = useMemo(
     () =>
@@ -90,14 +72,14 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
           } else {
             clearErrors("abbreviation");
           }
-        } catch (error) {
+        } catch {
           toast.error("Something went wrong!");
         } finally {
           setIsLoading(false);
         }
       }, 500),
 
-    []
+    [clearErrors, setError]
   );
 
   const handleSave = async (file: File, type: Type) => {
@@ -115,7 +97,13 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
     <div className="w-full overflow-x-hidden bg-slate-50 pb-12 text-slate-900 dark:bg-[#020617] dark:text-slate-100">
       <div className="relative mb-12 h-64 w-full overflow-hidden md:h-80">
         {bannerPreview ? (
-          <img src={bannerPreview} className="h-full w-full object-cover" alt="Banner Preview" />
+          <Image
+            width={1280}
+            height={720}
+            src={bannerPreview}
+            className="h-full w-full object-cover"
+            alt="Banner Preview"
+          />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-r from-green-900 via-slate-900 to-green-950">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
@@ -133,7 +121,9 @@ const TeamForm = ({ children, onSubmit, team }: TeamFormProps) => {
         <div className="flex w-full flex-col items-center gap-6 md:flex-row md:items-end">
           <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-[2.5rem] border-8 border-slate-50 bg-white shadow-2xl md:h-40 md:w-40 dark:border-[#020617] dark:bg-slate-900">
             {logoPreview ? (
-              <img
+              <Image
+                width={1000}
+                height={1000}
                 src={logoPreview}
                 className="z-50 h-full w-full object-cover"
                 alt="Logo Preview"

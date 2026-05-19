@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export const GET = async (_: any, { params }: { params: Promise<{ id: string }> }) => {
+export const GET = async (_: Request, { params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 
   if (!id) return NextResponse.json(new ApiError(ERROR_CODES.BAD_REQUEST));
@@ -84,7 +84,7 @@ export const GET = async (_: any, { params }: { params: Promise<{ id: string }> 
     });
 
     return NextResponse.json(new ApiResponse(innings));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { ERROR_CODES } from "@/constants";
-import { ExploreResultsProps } from "@/types/index.props";
+import { ExploreResultsProps, SearchCategory } from "@/types/index.props";
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   try {
-    let results: ExploreResultsProps = {
+    const results: ExploreResultsProps = {
       teams: [],
       matches: [],
       users: [],
@@ -25,7 +25,7 @@ export const GET = async (req: NextRequest) => {
 
     const mappedTeams = teams.map((team) => ({
       id: team.id,
-      type: "teams" as any,
+      type: "teams" as SearchCategory,
       href: `/teams/${team.abbreviation}`,
       short: team.abbreviation,
       title: team.name,
@@ -50,7 +50,7 @@ export const GET = async (req: NextRequest) => {
 
     const mappedMatches = matches.map((match) => ({
       id: match.id,
-      type: "matches" as any,
+      type: "matches" as SearchCategory,
       href: `/matches/${match.id}`,
       title: `${match.teamA.abbreviation} vs ${match.teamB.abbreviation}`,
       subtitle: match.date
@@ -72,7 +72,7 @@ export const GET = async (req: NextRequest) => {
 
     const mappedUsers = users.map((user) => ({
       id: user.id,
-      type: "users" as any,
+      type: "users" as SearchCategory,
       href: `/u/${user.username}`,
       title: user.name,
       subtitle: user.email,
@@ -91,7 +91,7 @@ export const GET = async (req: NextRequest) => {
 
     const mappedTournaments = tournaments.map((tournament) => ({
       id: tournament.id,
-      type: "tournaments" as any,
+      type: "tournaments" as SearchCategory,
       title: tournament.title,
       href: `/tournaments/${tournament.id}`,
       subtitle: `${tournament.details.location?.city}(${tournament.details.location?.state})`,
@@ -102,8 +102,7 @@ export const GET = async (req: NextRequest) => {
     results.tournaments = mappedTournaments;
 
     return NextResponse.json(new ApiResponse(results));
-  } catch (error) {
-    console.error(error);
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR), { status: 500 });
   }
 };

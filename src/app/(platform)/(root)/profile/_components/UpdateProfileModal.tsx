@@ -5,11 +5,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import UserDetailsForm from "../../_components/UserDetailsForm";
 import { User } from "@/generated/prisma";
 import { ImagePreview, UploadImg } from "@/components/Image";
 import { useState } from "react";
-import { IImageType } from "@/types/index.props";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/Spinner";
 import { useProfileModal } from "@/hooks/store/use-profile";
@@ -43,22 +41,17 @@ interface UpdateAvatarProps {
 }
 
 const UpdateAvatar = ({ user, onClose }: UpdateAvatarProps) => {
-  const [isActive, setIsActive] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(user.avatar || "");
   const [avatar, setAvatar] = useState<File>();
 
-  const onDeactive = () => {
-    setIsActive(false);
-  };
-
-  const handleSave = (file: File, type: IImageType) => {
+  const handleSave = async (file: File) => {
     const image = URL.createObjectURL(file);
     setAvatar(file);
     setAvatarUrl(image);
   };
 
   const { execute, isLoading } = useAction(updateUserProfile, {
-    onSuccess(data) {
+    onSuccess() {
       toast.success("Profile updated!");
       onClose();
     },
@@ -75,15 +68,11 @@ const UpdateAvatar = ({ user, onClose }: UpdateAvatarProps) => {
 
   return (
     <div className="center flex flex-col space-y-4">
-      <ImagePreview
-        onClick={() => {
-          setIsActive(true);
-        }}
-        url={avatarUrl}
-        type="avatar"
-      >
-        <UploadImg isActive={isActive} onDeactive={onDeactive} onSave={handleSave} type="avatar" />
-      </ImagePreview>
+      <div className="cursor-pointer">
+        <ImagePreview url={avatarUrl} type="avatar">
+          <UploadImg url={avatarUrl} onSave={handleSave} type="avatar" />
+        </ImagePreview>
+      </div>
 
       <Button
         type="button"

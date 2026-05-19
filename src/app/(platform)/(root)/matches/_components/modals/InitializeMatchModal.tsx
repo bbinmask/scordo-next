@@ -33,6 +33,10 @@ import { useAction } from "@/hooks/useAction";
 import { useRouter } from "next/navigation";
 import { useChannel } from "ably/react";
 import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
+
+type TossDecision = "BAT" | "BOWL";
+
 export const InitializeMatchModal = ({
   isOpen,
   onClose,
@@ -59,12 +63,7 @@ export const InitializeMatchModal = ({
   });
   const [step, setStep] = useState(1);
 
-  const {
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { isValid, errors },
-  } = useForm<InitializeMatchForm>({
+  const { handleSubmit, watch, setValue } = useForm<InitializeMatchForm>({
     defaultValues: {
       matchId: match.id,
       tossWinnerId: "",
@@ -100,7 +99,7 @@ export const InitializeMatchModal = ({
     return battingTeam.players.filter((p) =>
       activeIds.some((player) => player.userId === p.userId)
     );
-  }, [battingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds]);
+  }, [battingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds, match.teamA.id]);
 
   const activeBowlingPlayers = useMemo(() => {
     if (!bowlingTeam) return [];
@@ -109,7 +108,7 @@ export const InitializeMatchModal = ({
     return bowlingTeam.players.filter((p) =>
       activeIds.some((player) => player.userId === p.userId)
     );
-  }, [bowlingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds]);
+  }, [bowlingTeam, formData.teamAPlayerIds, formData.teamBPlayerIds, match.teamA.id]);
 
   const onSubmit: SubmitHandler<InitializeMatchForm> = (data) => {
     executeInitialize(data);
@@ -130,7 +129,7 @@ export const InitializeMatchModal = ({
     }
   };
 
-  useChannel(`match:${match.id}`, "match-start", (msg) => {
+  useChannel(`match:${match.id}`, "match-start", () => {
     queryClient.invalidateQueries({ queryKey: ["matches", match.id] });
   });
 
@@ -187,8 +186,10 @@ export const InitializeMatchModal = ({
                           }`}
                         >
                           <div className="h-16 w-16 overflow-hidden rounded-2xl border border-slate-100 bg-white dark:border-white/10">
-                            <img
-                              src={team?.logo || undefined}
+                            <Image
+                              width={1000}
+                              height={1000}
+                              src={team?.logo || "/team.svg"}
                               className="h-full w-full object-cover"
                               alt={team.name}
                             />
@@ -214,7 +215,7 @@ export const InitializeMatchModal = ({
                           <button
                             key={decision}
                             type="button"
-                            onClick={() => setValue("tossDecision", decision as any)}
+                            onClick={() => setValue("tossDecision", decision as TossDecision)}
                             className={`flex items-center justify-center gap-3 rounded-2xl border p-4 text-xs font-black tracking-widest uppercase transition-all ${
                               formData.tossDecision === decision
                                 ? "border-emerald-500 bg-emerald-500/20 shadow-xl"

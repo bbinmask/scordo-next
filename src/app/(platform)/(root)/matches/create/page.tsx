@@ -2,12 +2,10 @@
 
 import React, {
   ChangeEvent,
-  ComponentRef,
-  Ref,
   startTransition,
+  useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import {
@@ -34,25 +32,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { PlayerWithUser, TeamWithPlayers } from "@/lib/types";
 import axios from "axios";
-import { OfficialRole, User } from "@/generated/prisma";
+import { OfficialRole } from "@/generated/prisma";
 import { debounce } from "lodash";
 import { toast } from "sonner";
 import Spinner, { DefaultLoader } from "@/components/Spinner";
 import { useAction } from "@/hooks/useAction";
 import { createMatch } from "@/actions/match-actions";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const CreateMatchForm: React.FC = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    getValues,
-    setValue,
-    watch,
-  } = useForm<z.infer<typeof CreateMatch>>({
+  const { register, handleSubmit, getValues, setValue, watch } = useForm<
+    z.infer<typeof CreateMatch>
+  >({
     resolver: zodResolver(CreateMatch),
     defaultValues: {
       teamAId: "",
@@ -60,6 +54,8 @@ const CreateMatchForm: React.FC = () => {
       commentaryEnabled: false,
       tournamentId: "",
       overs: 20,
+      playerLimit: 11,
+      date: new Date().toISOString().split("T")[0],
       overLimit: 4,
       venue: { city: "", state: "", country: "" },
       category: "others",
@@ -102,7 +98,7 @@ const CreateMatchForm: React.FC = () => {
 
   const teamAId = watch("teamAId");
   const teamBId = watch("teamBId");
-
+  const commentaryEnabled = watch("commentaryEnabled");
   const onSubmit: SubmitHandler<z.infer<typeof CreateMatch>> = async (data) => {
     setIsLoading(true);
     execute(data);
@@ -152,13 +148,27 @@ const CreateMatchForm: React.FC = () => {
         try {
           const { data } = await axios.get(`/api/search/teams?query=${q}`);
           setOpponentTeams(data.data);
-        } catch (error) {
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            toast.error(error?.message);
+          }
           toast.error("Couldn't find teams!");
         } finally {
           setTeamsLoading(false);
         }
       }, 500),
     []
+  );
+
+  const getTeamA = useCallback(
+    (id?: string): TeamWithPlayers | null =>
+      id ? (teams?.find((t) => t.id === id) ?? null) : null,
+    [teams]
+  );
+  const getTeamB = useCallback(
+    (id?: string): TeamWithPlayers | null =>
+      id ? (opponentTeams?.find((t) => t.id === id) ?? null) : null,
+    [opponentTeams]
   );
 
   useEffect(() => {
@@ -173,12 +183,7 @@ const CreateMatchForm: React.FC = () => {
     );
 
     setPlayers(uniquePlayers);
-  }, [teamAId, teamBId]);
-
-  const getTeamA = (id?: string): TeamWithPlayers | null =>
-    id ? (teams?.find((t) => t.id === id) ?? null) : null;
-  const getTeamB = (id?: string): TeamWithPlayers | null =>
-    id ? (opponentTeams?.find((t) => t.id === id) ?? null) : null;
+  }, [teamAId, teamBId, getTeamA, getTeamB]);
 
   return (
     <div className={`transition-colors duration-500`}>
@@ -204,7 +209,9 @@ const CreateMatchForm: React.FC = () => {
                 <div className="relative z-10 flex flex-col items-center gap-4">
                   <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-slate-100 shadow-xl md:h-32 md:w-32 dark:border-slate-950 dark:bg-slate-800">
                     {getTeamA(teamAId)?.logo ? (
-                      <img
+                      <Image
+                        width={1000}
+                        height={1000}
                         src={getTeamA(teamAId)?.logo as string}
                         className="h-full w-full object-cover"
                         alt="Team A"
@@ -242,7 +249,9 @@ const CreateMatchForm: React.FC = () => {
                 <div className="relative z-10 flex flex-col items-center gap-4">
                   <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-4 border-white bg-slate-100 shadow-xl md:h-32 md:w-32 dark:border-slate-950 dark:bg-slate-800">
                     {getTeamB(teamBId)?.logo ? (
-                      <img
+                      <Image
+                        width={1000}
+                        height={1000}
                         src={getTeamB(teamBId)?.logo as string}
                         className="h-full w-full object-cover"
                         alt="Team B"
@@ -281,7 +290,13 @@ const CreateMatchForm: React.FC = () => {
                               <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg border border-white bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
                                   {team.logo ? (
-                                    <img src={team.logo} className="h-full w-full object-cover" />
+                                    <Image
+                                      alt={`${team.name} logo`}
+                                      width={1000}
+                                      height={1000}
+                                      src={team.logo}
+                                      className="h-full w-full object-cover"
+                                    />
                                   ) : (
                                     <Shield className="h-4 w-4 text-slate-400" />
                                   )}
@@ -408,9 +423,24 @@ const CreateMatchForm: React.FC = () => {
                           />
                         </div>
                       </div>
-                      <div className="">
-                        <label htmlFor="commentaryEnabled">Enable Commentary</label>
-                        <input {...register("commentaryEnabled")} type="checkbox" className="" />
+                      <div className="w-full">
+                        <label className="flex w-full cursor-pointer items-center justify-between gap-3">
+                          <span className="label-sm text-slate-700 dark:text-slate-300">
+                            Enable Commentary
+                          </span>
+                          <div
+                            className={`switch bg-gradient-to-r ${commentaryEnabled ? "from-green-500 via-green-600 to-green-700" : "from-green-500/30 via-green-600/30 to-green-700/30"}`}
+                          >
+                            <input
+                              {...register("commentaryEnabled")}
+                              id="isRecruiting"
+                              type="checkbox"
+                              defaultChecked={commentaryEnabled}
+                              className="relative z-20 h-full w-full rounded border-gray-300 text-emerald-600"
+                            />
+                            <div className="slider" />
+                          </div>
+                        </label>
                       </div>
                       <div>
                         <label className="mb-1 ml-1 block text-[10px] font-black tracking-widest text-slate-400 uppercase">
@@ -419,6 +449,8 @@ const CreateMatchForm: React.FC = () => {
                         <div className="relative">
                           <Trophy className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400" />
                           <input
+                            readOnly
+                            onClick={() => toast.error("This feature is not available!")}
                             type="text"
                             {...register("tournamentId", { validate: (v) => v?.toString() })}
                             name="tournamentId"

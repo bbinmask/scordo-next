@@ -33,7 +33,7 @@ export const GET = async (_: Request, { params }: { params: Promise<{ inningId: 
       lastLegalBall.ball !== 0 &&
       lastLegalBall.bowlerId === inning.currentBowlerId;
     return NextResponse.json(new ApiResponse(isOverComplete));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

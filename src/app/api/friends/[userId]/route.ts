@@ -36,7 +36,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ userId?:
     });
 
     return NextResponse.json(friends);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

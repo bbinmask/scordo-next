@@ -27,7 +27,7 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
 
     const inningId = match.innings.at(-1)?.id as string;
 
-    let nextBowlingPlayers = await db.inningBatting.findMany({
+    const nextBowlingPlayers = await db.inningBatting.findMany({
       where: {
         inningId,
       },
@@ -48,7 +48,7 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
       },
     });
 
-    let nextBattingPlayers = await db.inningBowling.findMany({
+    const nextBattingPlayers = await db.inningBowling.findMany({
       where: {
         inningId,
       },
@@ -70,7 +70,7 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
     });
 
     return NextResponse.json(new ApiResponse({ nextBattingPlayers, nextBowlingPlayers }));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

@@ -25,8 +25,7 @@ export async function GET() {
         "Cache-Control": "no-store",
       },
     });
-  } catch (error) {
-    console.error("Error creating token request:", error);
+  } catch {
     return NextResponse.json({ error: "Failed to create token request" }, { status: 500 });
   }
 }

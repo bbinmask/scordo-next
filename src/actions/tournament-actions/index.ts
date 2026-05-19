@@ -63,8 +63,15 @@ const createTournamentHandler = async (data: InputTypeForCreate): Promise<Return
         },
       },
     });
-  } catch (error: any) {
-    return { error: error?.message ?? ERROR_CODES.INTERNAL_SERVER_ERROR.message };
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
+    return {
+      error: "Something went wrong!",
+    };
   }
 
   revalidatePath("/tournaments/my");

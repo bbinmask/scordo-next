@@ -1,4 +1,4 @@
-import { ERROR_CODES, user } from "@/constants";
+import { ERROR_CODES } from "@/constants";
 import { currentUser } from "@/lib/currentUser";
 import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
@@ -33,7 +33,7 @@ export const GET = async (req: Request, { params }: { params: Promise<{ abbr: st
     });
 
     return NextResponse.json(new ApiResponse(request));
-  } catch (error) {
+  } catch {
     return NextResponse.error();
   }
 };

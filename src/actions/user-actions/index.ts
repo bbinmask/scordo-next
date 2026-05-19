@@ -14,7 +14,7 @@ import {
 } from "./types";
 import Error from "http-errors";
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { createSafeAction, ActionState } from "@/lib/create-safe-action";
+import { createSafeAction } from "@/lib/create-safe-action";
 import {
   RecievedRequest,
   CreateUser,
@@ -26,6 +26,7 @@ import { User } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@/lib/currentUser";
 import { uploadImage } from "@/utils/uploadOnCloudinary";
+import { ERROR_CODES } from "@/constants";
 
 const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreateUserType> => {
   const { userId } = await auth();
@@ -85,9 +86,10 @@ const createUserHandler = async (data: InputCreateUserType): Promise<ReturnCreat
     }
 
     return { data: user };
-  } catch (error: any) {
-    console.error(error?.message);
-    return { error: error.message || "Failed to create user" };
+  } catch {
+    return {
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+    };
   }
 };
 
@@ -112,9 +114,9 @@ const sendFriendRequestHandler = async (
 
   try {
     requester = await currentUser();
-  } catch (error: any) {
+  } catch {
     return {
-      error: error.message || "User not found",
+      error: "Something went wrong!",
     };
   }
 
@@ -162,7 +164,7 @@ const sendFriendRequestHandler = async (
         },
       });
     }
-  } catch (err) {
+  } catch {
     return { error: "An unexpected error occurred. Please try again." };
   }
 
@@ -199,7 +201,7 @@ const acceptRequestHandler = async (
         status: "ACCEPTED",
       },
     });
-  } catch (error) {
+  } catch {
     return {
       error: "Something went wrong",
     };
@@ -230,7 +232,7 @@ const cancelFriendRequestHandler = async (
         },
       },
     });
-  } catch (error) {
+  } catch {
     return {
       error: "Something went wrong",
     };
@@ -259,7 +261,7 @@ const removeFriendHandler = async (data: InputSentRequestType): Promise<ReturnSe
         ],
       },
     });
-  } catch (error) {
+  } catch {
     return {
       error: "Something went wrong",
     };
@@ -295,9 +297,9 @@ const updateUserDetailsHandler = async (
         name,
       },
     });
-  } catch (error: any) {
+  } catch {
     return {
-      error: error?.message,
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
   }
 
@@ -335,9 +337,9 @@ const updateUserProfileHandler = async (
         avatar: url as string,
       },
     });
-  } catch (error: any) {
+  } catch {
     return {
-      error: error.message,
+      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
     };
   }
 
@@ -345,8 +347,6 @@ const updateUserProfileHandler = async (
 
   return { data: user };
 };
-
-const declineRequestHandler = async () => {};
 
 export const createUser = createSafeAction(CreateUser, createUserHandler);
 

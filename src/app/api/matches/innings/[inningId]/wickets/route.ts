@@ -22,7 +22,7 @@ export const GET = async (req: Request, { params }: { params: Promise<{ inningId
     });
 
     return NextResponse.json(new ApiResponse(wicketBalls));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

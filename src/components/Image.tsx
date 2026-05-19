@@ -1,9 +1,10 @@
 import { cn } from "@/lib/utils";
 import { getCroppedImage } from "@/utils/cropImg";
-import { ImageIcon, Upload } from "lucide-react";
-import { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import { Upload } from "lucide-react";
+import { ReactNode, useState } from "react";
 import { Area } from "react-easy-crop";
 import ImageCropper from "./ImageCropper";
+import Image from "next/image";
 
 export const ImagePreview = ({
   url,
@@ -18,6 +19,9 @@ export const ImagePreview = ({
 }) => {
   const isBanner = type === "banner";
 
+  const width = isBanner ? 1280 : 1000,
+    height = isBanner ? 720 : 1000;
+
   return (
     <div
       className={cn(
@@ -26,7 +30,9 @@ export const ImagePreview = ({
       )}
     >
       {url && (
-        <img
+        <Image
+          width={width}
+          height={height}
           src={url}
           alt={`${type} preview`}
           className="absolute h-full w-full rounded-[2rem] object-cover"

@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { ApiError } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 import { ERROR_CODES } from "@/constants";
-export async function GET(req: Request) {
+export async function GET() {
   const user = await currentUser();
 
   if (!user) return NextResponse.json(new ApiError(ERROR_CODES.NOT_FOUND));
@@ -38,7 +38,7 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json(requests);
-  } catch (error) {
+  } catch {
     return NextResponse.error();
   }
 }

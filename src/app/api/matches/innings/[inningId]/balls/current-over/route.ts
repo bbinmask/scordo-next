@@ -14,7 +14,7 @@ export const GET = async (req: Request, { params }: { params: Promise<{ inningId
     if (!currentOver.success) return NextResponse.json(currentOver);
 
     return NextResponse.json(new ApiResponse(currentOver.data));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

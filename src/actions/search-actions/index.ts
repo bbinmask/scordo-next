@@ -34,12 +34,16 @@ export const searchForTeams = async (data: InputType): Promise<ReturnTypeForTeam
       },
       take: 20,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message || "Teams not found",
+      error: "Something went wrong!",
     };
   }
-
   return { data: teams };
 };
 
@@ -71,9 +75,14 @@ export const searchForTournaments = async (data: InputType): Promise<ReturnTypeF
       },
       take: 20,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message || "Teams not found",
+      error: "Something went wrong!",
     };
   }
 
@@ -117,9 +126,14 @@ export const searchForUsers = async (data: InputType): Promise<ReturnTypeForUser
       },
       take: 15,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message || "Teams not found",
+      error: "Something went wrong!",
     };
   }
 

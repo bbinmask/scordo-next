@@ -51,9 +51,14 @@ const inviteInTeamHandler = async (
         toId: fromId,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message,
+      error: "Something went wrong!",
     };
   }
 
@@ -155,9 +160,14 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
         id: reqId,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message,
+      error: "Something went wrong!",
     };
   }
 
@@ -195,9 +205,14 @@ const declineReqHandler = async (data: InputTypeForDecline): Promise<ReturnTypeF
         id,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message,
+      error: "Something went wrong!",
     };
   }
 

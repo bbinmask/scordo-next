@@ -5,8 +5,10 @@ import Link from "next/link";
 import TeamAvatar from "@/components/TeamAvatar";
 import { MatchStatusBadge } from "@/components/shared/MatchStatusBadge";
 
-export const MatchCard = ({ match }: { match?: MatchWithDetails }) => {
+export const MatchCard = ({ match, link }: { match?: MatchWithDetails; link?: string }) => {
   if (!match) return null;
+
+  const href = link ? link : `/matches/${match.id}`;
 
   return (
     <div>
@@ -18,7 +20,7 @@ export const MatchCard = ({ match }: { match?: MatchWithDetails }) => {
             <TeamAvatar name={match.teamB.name} logo={match.teamB.logo} zIndex />
           </div>
           <Link
-            href={`/matches/${match.id}`}
+            href={href}
             className="rounded-xl bg-slate-100 p-2.5 text-slate-400 transition-all hover:text-green-500 dark:bg-white/5"
           >
             <ArrowUpRight className="h-4 w-4" />

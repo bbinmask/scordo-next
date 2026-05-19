@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { ApiError } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
-export const GET = async (req: Request) => {
+export const GET = async () => {
   try {
     const liveMatches = await db.match.findMany({
       where: {
@@ -26,7 +26,7 @@ export const GET = async (req: Request) => {
     });
 
     return NextResponse.json({ success: true, data: { upcomingMatches, liveMatches } });
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

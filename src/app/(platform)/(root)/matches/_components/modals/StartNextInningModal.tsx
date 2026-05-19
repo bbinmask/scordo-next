@@ -12,28 +12,12 @@ import {
   InningBowlingDetails,
   InningDetails,
   MatchWithDetails,
-  PlayerWithUser,
 } from "@/lib/types";
-import {
-  Check,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Flame,
-  Gavel,
-  Info,
-  Loader2,
-  Rocket,
-  Sword,
-  Target,
-  Users,
-  Zap,
-} from "lucide-react";
-import { startTransition, useMemo, useState } from "react";
+import { ChevronRight, Info, Loader2, Rocket, Target, Zap } from "lucide-react";
+import { startTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { type InputTypeForNextInning as InitializeMatchForm } from "@/actions/match-actions/types";
 import { toast } from "sonner";
-import { MatchStatus } from "@/generated/prisma";
 import { startNextInning } from "@/actions/match-actions";
 import { useAction } from "@/hooks/useAction";
 import { useRouter } from "next/navigation";
@@ -70,12 +54,7 @@ export const StartNextInningModal = ({
     },
   });
 
-  const {
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { isValid, errors },
-  } = useForm<InitializeMatchForm>({
+  const { handleSubmit, watch, setValue } = useForm<InitializeMatchForm>({
     defaultValues: {
       matchId: match.id,
       strikerId: "",
@@ -101,8 +80,6 @@ export const StartNextInningModal = ({
     queryFn: async () => {
       const { data } = await axios.get(`/api/matches/${match.id}/next-inning-players`);
 
-      ({ data });
-
       if (!data.success) {
         onClose();
         return null;
@@ -111,7 +88,7 @@ export const StartNextInningModal = ({
     },
   });
 
-  useChannel(`match:${match.id}`, "next-inning", async (msg) => {
+  useChannel(`match:${match.id}`, "next-inning", async () => {
     await queryClient.refetchQueries({
       queryKey: ["match", match.id],
     });

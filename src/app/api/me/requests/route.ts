@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
-export const GET = async (req: Request) => {
+export const GET = async () => {
   const user = await currentUser();
 
   if (!user) return NextResponse.json(new ApiError(ERROR_CODES.UNAUTHORIZED), { status: 401 });
@@ -77,7 +77,7 @@ export const GET = async (req: Request) => {
         userId: user.id,
       })
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR), { status: 500 });
   }
 };

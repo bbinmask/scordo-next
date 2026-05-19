@@ -5,6 +5,7 @@ import { MatchWithDetails } from "@/lib/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Bell } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -21,7 +22,7 @@ export function MatchRequests() {
   });
 
   const { execute: executeAccept, isLoading: isAccepting } = useAction(acceptMatchRequest, {
-    onSuccess(data) {
+    onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["match-requests"] });
       toast.success("Accepted!");
       setInviteId(null);
@@ -33,7 +34,7 @@ export function MatchRequests() {
   });
 
   const { execute: executeDecline, isLoading: isCanceling } = useAction(declineMatchRequest, {
-    onSuccess(data) {
+    onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["team-invites"] });
       toast.success("Request Declined!");
       setInviteId(null);
@@ -90,7 +91,9 @@ export function MatchRequests() {
               <li key={req.id} className="rounded-lg px-3 py-2">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <img
+                    <Image
+                      width={1000}
+                      height={1000}
                       src={req?.teamA?.logo || "/team.svg"}
                       alt={req.teamA.name}
                       className="h-8 w-8 rounded-full bg-white"

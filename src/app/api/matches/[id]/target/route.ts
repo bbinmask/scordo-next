@@ -44,7 +44,7 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
     }
 
     return NextResponse.json(new ApiError(ERROR_CODES.BAD_REQUEST));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

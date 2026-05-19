@@ -26,7 +26,7 @@ export const HistoryTimeline = ({ history }: { history: CurrentOverBalls[] }) =>
                 {getOvers(Math.floor(ball.ball / 6), ball.ball)}
               </p>
               <p
-                className={`${getBallClassesFromLabel(label)} relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-[cal_sans] text-[10px] font-black`}
+                className={`${getBallClassesFromLabel(label)} relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-[poppins] text-[10px] font-black`}
               >
                 {label}
               </p>

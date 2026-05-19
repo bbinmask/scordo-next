@@ -42,7 +42,6 @@ import { uploadImage } from "@/utils/uploadOnCloudinary";
 import { Player, User } from "@/generated/prisma";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/currentUser";
-import { ERROR_CODES } from "@/constants";
 
 const createTeamHandler = async (
   data: InputTypeForCreateTeam
@@ -96,9 +95,14 @@ const createTeamHandler = async (
       return {
         error: "Failed to create team",
       };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message || "Failed to create",
+      error: "Something went wrong!",
     };
   }
 
@@ -123,9 +127,14 @@ const teamUpdateHandler = async (
           clerkId,
         },
       })) ?? null;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message || "User not found!",
+      error: "Something went wrong!",
     };
   }
   try {
@@ -146,9 +155,14 @@ const teamUpdateHandler = async (
         type,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message,
+      error: "Something went wrong!",
     };
   }
   revalidatePath(`/teams/${abbreviation}`);
@@ -181,8 +195,15 @@ const logoAndBannerUpdateHandler = async (
         banner: bannerUrl as string,
       },
     });
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
+    return {
+      error: "Something went wrong!",
+    };
   }
 
   revalidatePath(`/teams/${abbreviation}`);
@@ -207,8 +228,15 @@ const recruitingUpdateHanlder = async (
         isRecruiting: recruiting,
       },
     });
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
+    return {
+      error: "Something went wrong!",
+    };
   }
   revalidatePath(`/teams/${abbreviation}`);
 
@@ -279,9 +307,14 @@ const sendRequestHandler = async (data: InputTypeForSend): Promise<ReturnTypeFor
         },
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message,
+      error: "Something went wrong!",
     };
   }
 
@@ -357,9 +390,14 @@ const acceptReqHandler = async (data: InputTypeForAccept): Promise<ReturnTypeFor
         id,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: error.message,
+      error: "Something went wrong!",
     };
   }
 
@@ -378,7 +416,7 @@ const leaveTeamHandler = async (data: InputTypeForLeave): Promise<ReturnTypeForL
 
   const { teamId } = data;
 
-  let team, player;
+  let team;
 
   try {
     team = await db.team.findUnique({
@@ -392,7 +430,7 @@ const leaveTeamHandler = async (data: InputTypeForLeave): Promise<ReturnTypeForL
         error: "Team not found!",
       };
 
-    player = await db.player.deleteMany({
+    await db.player.deleteMany({
       where: {
         teamId,
         userId: user.id,
@@ -427,7 +465,12 @@ const leaveTeamHandler = async (data: InputTypeForLeave): Promise<ReturnTypeForL
         },
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
       error: "Something went wrong!",
     };
@@ -460,7 +503,12 @@ const widthdrawRequestHandler = async (
         fromId: user.id,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
       error: "Something went wrong!",
     };
@@ -483,7 +531,7 @@ const removeFromTeamHandler = async (
       error: "Unauthorized",
     };
 
-  let team, player;
+  let team;
 
   try {
     team = await db.team.findUnique({
@@ -507,13 +555,18 @@ const removeFromTeamHandler = async (
         error: "Owner cannot be removed",
       };
 
-    player = await db.player.deleteMany({
+    await db.player.deleteMany({
       where: {
         userId: playerId,
         teamId,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
       error: "Something went wrong!",
     };
@@ -537,7 +590,7 @@ const deleteTeamHandler = async (
       error: "Log in required!",
     };
 
-  let team, players;
+  let team;
 
   try {
     team = await db.team.findUnique({
@@ -559,7 +612,7 @@ const deleteTeamHandler = async (
         error: "Only owner can delete the Team!",
       };
 
-    players = await db.player.deleteMany({
+    await db.player.deleteMany({
       where: {
         teamId: id,
       },
@@ -570,9 +623,14 @@ const deleteTeamHandler = async (
         id,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: ERROR_CODES.INTERNAL_SERVER_ERROR.message,
+      error: "Something went wrong!",
     };
   }
 
@@ -620,12 +678,16 @@ const updateCaptainHandler = async (
         captainId: playerId,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return {
+        error: error.message,
+      };
+
     return {
-      error: "Something went wrong",
+      error: "Something went wrong!",
     };
   }
-
   revalidatePath(`/teams/${team.abbreviation}`);
   return {
     data: team,

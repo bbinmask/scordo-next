@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { ApiError, ApiResponse } from "@/utils/ApiResponse";
 import { NextResponse } from "next/server";
 
-export const GET = async (req: Request) => {
+export const GET = async () => {
   const user = await currentUser();
 
   if (!user) return NextResponse.json(new ApiError(ERROR_CODES.UNAUTHORIZED));
@@ -30,7 +30,7 @@ export const GET = async (req: Request) => {
     });
 
     return NextResponse.json(new ApiResponse(matches));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 };

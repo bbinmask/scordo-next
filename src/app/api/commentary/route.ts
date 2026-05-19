@@ -54,8 +54,7 @@ export const POST = async (req: Request) => {
     const commentary = balls.map((ball) => ball.commentary);
 
     return NextResponse.json(new ApiResponse(commentary), { status: 201 });
-  } catch (error: any) {
-    console.error("[/api/commentary] Error:", error);
+  } catch {
     return NextResponse.json(
       { success: false, error: "Commentary generation failed" },
       { status: 500 }

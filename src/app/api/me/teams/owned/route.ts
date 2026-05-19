@@ -1,11 +1,11 @@
 import { db } from "@/lib/db";
 import { ApiResponse } from "@/utils/ApiResponse";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { ApiError } from "@/utils/ApiResponse";
 import { ERROR_CODES } from "@/constants";
 import { currentUser } from "@/lib/currentUser";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const user = await currentUser();
 
   if (!user) return NextResponse.json(new ApiError(ERROR_CODES.UNAUTHORIZED));
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(new ApiResponse(teams, 201));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR));
   }
 }

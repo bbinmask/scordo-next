@@ -169,7 +169,7 @@ export const POST = async (req: Request, { params }: { params: Promise<{ id: str
     // });
 
     return NextResponse.json(new ApiResponse(manOfTheMatch));
-  } catch (error) {
+  } catch {
     return NextResponse.json(new ApiError(ERROR_CODES.INTERNAL_SERVER_ERROR), { status: 500 });
   }
 };
