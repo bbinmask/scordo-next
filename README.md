@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="http://www.scordo.app/" target="_blank"><strong>🌐 Live App</strong></a> ·
+  <a href="https://scordo.vercel.app/" target="_blank"><strong>🌐 Live App</strong></a> ·
   <a href="#-features"><strong>✨ Features</strong></a> ·
   <a href="#-getting-started"><strong>🚀 Getting Started</strong></a> ·
   <a href="#-how-to-use-scordo"><strong>📖 Usage Guide</strong></a>
