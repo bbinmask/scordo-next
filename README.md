@@ -1,6 +1,6 @@
 <div align="center">
  
-  <img src="https://res.cloudinary.com/irfanulmadar/image/upload/v1783976962/Scene_____D_animated_cartoon_pprygd.gif" alt="Scordo Banner" width="90px">
+  <img width="100%" src="https://res.cloudinary.com/irfanulmadar/image/upload/v1783976962/Scene_____D_animated_cartoon_pprygd.gif" alt="Scordo Banner" width="90px">
 </div>
 
 <h1 align="center">
