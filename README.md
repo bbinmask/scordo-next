@@ -1,6 +1,6 @@
 <div align="center">
-  <!-- 📸 Replace this with an actual screenshot or banner of Scordo (e.g. a live match scorecard) -->
-  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Activities/Cricket%20Game.png" alt="Scordo Banner" width="90px">
+ 
+  <img src="https://res.cloudinary.com/irfanulmadar/image/upload/v1783976962/Scene_____D_animated_cartoon_pprygd.gif" alt="Scordo Banner" width="90px">
 </div>
 
 <h1 align="center">
@@ -19,7 +19,6 @@
 </p>
 
 <p align="center">
-  <!-- 🔁 Swap "bbinmask/scordo" for your actual GitHub repo path if it's different -->
   <img src="https://img.shields.io/github/stars/bbinmask/scordo?style=for-the-badge&color=FFD700" alt="Stars"/>
   <img src="https://img.shields.io/github/forks/bbinmask/scordo?style=for-the-badge&color=blue" alt="Forks"/>
   <img src="https://img.shields.io/github/last-commit/bbinmask/scordo?style=for-the-badge&color=green" alt="Last Commit"/>
@@ -64,8 +63,8 @@
 <br/>
 
 <div align="center">
-  <!-- 🎥 Replace this with a real screen-recording GIF of a live match being scored -->
-  <p><i>[Add a GIF of Scordo's live scoring in action here]</i></p>
+  
+  <p><i>[Have to add a gif later]</i></p>
 </div>
 
 <br/>
