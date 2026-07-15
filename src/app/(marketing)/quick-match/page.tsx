@@ -83,7 +83,7 @@ export default function QuickMatchPage() {
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/quick-match/create" className="cta-pill px-10 py-4 text-sm">
+            <Link href="/quick-match/create" className="cta-pill rounded-2xl px-10 py-4 text-sm">
               <Zap className="h-4 w-4" />
               Start Quick Match
               <ArrowRight className="h-4 w-4" />
@@ -119,7 +119,7 @@ export default function QuickMatchPage() {
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map(({ icon: Icon, color, bg, title, description }) => (
-            <div key={title} className="bento-card hover-card group">
+            <div key={title} className="bento-card group">
               <div className={`mb-4 inline-flex rounded-xl p-3 ${bg}`}>
                 <Icon className={`h-5 w-5 ${color}`} />
               </div>
@@ -166,7 +166,7 @@ export default function QuickMatchPage() {
               <div className="absolute -left-10 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-black text-white shadow-lg shadow-emerald-600/30">
                 {step}
               </div>
-              <h3 className="label-sm mb-1 text-slate-900 dark:text-white">{title}</h3>
+              <h3 className="label-sm mb-1 font-black text-slate-900 dark:text-white">{title}</h3>
               <p className="secondary-text text-sm">{desc}</p>
             </li>
           ))}
@@ -181,7 +181,7 @@ export default function QuickMatchPage() {
           <p className="secondary-text mb-6 text-sm">
             Your match is saved locally and persists across browser refreshes.
           </p>
-          <Link href="/quick-match/create" className="cta-pill mx-auto w-fit">
+          <Link href="/quick-match/create" className="cta-pill mx-auto w-fit rounded-2xl text-sm">
             Create Quick Match
             <ArrowRight className="h-4 w-4" />
           </Link>

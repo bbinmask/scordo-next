@@ -1,5 +1,5 @@
 import { User } from "@/generated/prisma";
-import { FriendshipWithBoth } from "@/lib/types";
+import { FriendRequest, FriendshipWithBoth } from "@/lib/types";
 
 export const getFriends = (friendships: FriendshipWithBoth[], userId: string): User[] => {
   if (friendships.length === 0) return [];
@@ -11,7 +11,10 @@ export const getFriends = (friendships: FriendshipWithBoth[], userId: string): U
   return friends;
 };
 
-export const getFriendRequests = (friendships: FriendshipWithBoth[], userId: string) => {
+export const getFriendRequests = (
+  friendships: FriendshipWithBoth[],
+  userId: string
+): FriendRequest[] => {
   if (friendships.length === 0 || !friendships) return [];
 
   const requests = friendships.map((fr) => {

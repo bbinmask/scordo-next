@@ -65,6 +65,7 @@ const isPublicApiRoute = createRouteMatcher([
   "/api/teams/(.*)",
   "/explore(.*)",
   "/api/search(.*)",
+  "/quick-match(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

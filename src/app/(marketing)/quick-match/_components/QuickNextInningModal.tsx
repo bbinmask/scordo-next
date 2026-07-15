@@ -1,18 +1,13 @@
 "use client";
-// src/app/(platform)/(root)/matches/quick-match/_components/QuickNextInningModal.tsx
-//
-// Selects the opening players for the second innings.
-// Mirrors StartNextInningModal layout but reads from QuickTeam (local) instead
-// of fetching /api/matches/[id]/next-inning-players.
 
 import { useForm } from "react-hook-form";
 import { Flame, Rocket, ChevronLeft } from "lucide-react";
-import type { QuickMatch } from "@/types/quick-match";
+import type { QuickMatch } from "@/types/quick-match.props";
 
 interface FormValues {
-  strikerId:    string;
+  strikerId: string;
   nonStrikerId: string;
-  bowlerId:     string;
+  bowlerId: string;
 }
 
 interface QuickNextInningModalProps {
@@ -28,7 +23,12 @@ export function QuickNextInningModal({
   onConfirm,
   onClose,
 }: QuickNextInningModalProps) {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormValues>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormValues>({
     defaultValues: { strikerId: "", nonStrikerId: "", bowlerId: "" },
   });
 
@@ -36,16 +36,16 @@ export function QuickNextInningModal({
 
   // Teams swap for the second innings:
   // whoever bowled in inning 1 now bats, whoever batted now bowls.
-  const firstInning   = match.innings[0];
-  const newBattingId  = firstInning?.bowlingTeamId ?? match.teamB.id;
-  const newBowlingId  = firstInning?.battingTeamId ?? match.teamA.id;
+  const firstInning = match.innings[0];
+  const newBattingId = firstInning?.bowlingTeamId ?? match.teamB.id;
+  const newBowlingId = firstInning?.battingTeamId ?? match.teamA.id;
 
-  const battingTeam  = match.teamA.id === newBattingId ? match.teamA : match.teamB;
-  const bowlingTeam  = match.teamA.id === newBowlingId ? match.teamA : match.teamB;
+  const battingTeam = match.teamA.id === newBattingId ? match.teamA : match.teamB;
+  const bowlingTeam = match.teamA.id === newBowlingId ? match.teamA : match.teamB;
 
   const target = firstInning ? firstInning.runs + 1 : null;
 
-  const strikerId    = watch("strikerId");
+  const strikerId = watch("strikerId");
   const nonStrikerId = watch("nonStrikerId");
 
   const onSubmit = (data: FormValues) => onConfirm(data);
@@ -53,7 +53,6 @@ export function QuickNextInningModal({
   return (
     <div className="animate-in fade-in fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/95 p-4 backdrop-blur-md">
       <div className="animate-in zoom-in relative w-full max-w-md overflow-hidden rounded-[3rem] border border-slate-200 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900">
-
         {/* Header */}
         <div className="bg-gradient-to-br from-emerald-500/10 to-transparent p-8 pb-4">
           <div className="flex items-center gap-4">
@@ -72,7 +71,7 @@ export function QuickNextInningModal({
         {/* Target chip */}
         {target && (
           <div className="mx-8 mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
-            <p className="label-sm text-emerald-600">
+            <p className="label-sm font-black text-emerald-600">
               Target: <span className="text-lg font-black">{target}</span>
             </p>
             <p className="meta-text text-[10px]">
@@ -82,7 +81,6 @@ export function QuickNextInningModal({
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-8 pt-5">
-
           {/* Striker */}
           <div>
             <label className="label-field">
@@ -97,7 +95,9 @@ export function QuickNextInningModal({
               {battingTeam.players
                 .filter((p) => p.id !== nonStrikerId)
                 .map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
                 ))}
             </select>
             {errors.strikerId && <p className="field-error">{errors.strikerId.message}</p>}
@@ -114,7 +114,9 @@ export function QuickNextInningModal({
               {battingTeam.players
                 .filter((p) => p.id !== strikerId)
                 .map((p) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
                 ))}
             </select>
             {errors.nonStrikerId && <p className="field-error">{errors.nonStrikerId.message}</p>}
@@ -129,7 +131,9 @@ export function QuickNextInningModal({
             >
               <option value="">Select bowler</option>
               {bowlingTeam.players.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
               ))}
             </select>
             {errors.bowlerId && <p className="field-error">{errors.bowlerId.message}</p>}
@@ -141,7 +145,7 @@ export function QuickNextInningModal({
             </button>
             <button
               type="submit"
-              className="primary-btn flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-black uppercase tracking-widest"
+              className="primary-btn flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-black tracking-widest uppercase"
             >
               <Rocket className="h-4 w-4" />
               Start 2nd Innings

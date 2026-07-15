@@ -64,6 +64,7 @@ export default function QuickMatchCreatePage() {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors },
     watch,
   } = useForm<FormValues>({
@@ -108,12 +109,20 @@ export default function QuickMatchCreatePage() {
       const now = new Date().toISOString();
       const matchId = `qm_${nanoid(10)}`;
 
-      if (data.teamAPlayers.length !== data.teamBPlayers.length)
+      if (data.teamAPlayers.length !== data.teamBPlayers.length) {
+        setError("teamAPlayers", { message: "Players must be equal on both side!" });
+        setError("teamBPlayers", { message: "Players must be equal on both side!" });
         throw new Error("Players must be equal on both side!");
-      if (data.teamAPlayers.length !== data.playerLimit)
+      }
+      if (data.teamAPlayers.length !== data.playerLimit) {
+        setError("teamAPlayers", { message: `Team must have exactly ${data.playerLimit} players` });
+        setError("teamBPlayers", { message: `Team must have exactly ${data.playerLimit} players` });
         throw new Error("Player limit does not match with the team!");
-      if (data.teamAPlayers.length * data.overLimit < data.overs)
+      }
+      if (data.teamAPlayers.length * data.overLimit < data.overs) {
+        setError("overLimit", { message: "Over limit is too low for the total overs" });
         throw new Error("Please increase over limit!");
+      }
       const teamA = buildTeam(data.teamAName, data.teamAPlayers);
       const teamB = buildTeam(data.teamBName, data.teamBPlayers);
 
@@ -175,18 +184,15 @@ export default function QuickMatchCreatePage() {
       <div className="mx-auto max-w-4xl space-y-8 px-4 py-10 pb-24">
         {/* ── Header ────────────────────────────────────────────────── */}
         <div>
-          <span className="label-xs text-emerald-500">Guest Mode</span>
+          <span className="label-xs text-emerald-500!">Guest Mode</span>
           <h1 className="heading-xl mt-1">
             Quick <span className="primary-heading">Match</span>
           </h1>
-          <p className="secondary-text mt-2 text-sm">
-            No sign-up needed. Your match is stored locally in this browser.
-          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* ── Teams ───────────────────────────────────────────────── */}
-          <div className="hover-card relative grid grid-cols-1 items-start gap-6 rounded-[2rem] p-8 md:grid-cols-3">
+          <div className="bento-card relative grid grid-cols-1 items-start gap-6 rounded-[2rem] p-8 md:grid-cols-3">
             {/* Team A */}
             <TeamColumn
               teamLabel="Team A"
@@ -224,7 +230,7 @@ export default function QuickMatchCreatePage() {
           {/* ── Match settings & venue ───────────────────────────────── */}
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             {/* Left: Match Logic */}
-            <div className="hover-card rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
+            <div className="bento-card rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
               <div className="mb-6 flex items-center gap-3">
                 <div className="rounded-lg bg-indigo-500/10 p-2 text-indigo-500">
                   <Settings2 className="h-5 w-5" />
@@ -263,7 +269,27 @@ export default function QuickMatchCreatePage() {
                     <div className="relative">
                       <ShieldAlert className="field-icon" />
                       <input
-                        {...register("overLimit", { valueAsNumber: true })}
+                        {...register("overLimit", {
+                          valueAsNumber: true,
+
+                          onChange: (e) => {
+                            const value = parseInt(e.target.value);
+
+                            if (value < 1) {
+                              setError("overLimit", {
+                                message: "Over limit must be at least 1",
+                              });
+                            }
+                            const overs = watch("overs");
+                            const playerLimit = watch("playerLimit");
+
+                            if (value * playerLimit < overs) {
+                              setError("overLimit", {
+                                message: "Over limit is too low for the total overs",
+                              });
+                            }
+                          },
+                        })}
                         type="number"
                         placeholder="4"
                         className="field-input--icon w-full"
@@ -289,10 +315,13 @@ export default function QuickMatchCreatePage() {
                   )}
                 </div>
                 {/* Commentary toggle */}
-                <label className="flex cursor-pointer items-center gap-3">
-                  <span className="label-sm text-slate-700 dark:text-slate-300">
+                <div className="flex items-center justify-between gap-3">
+                  <label
+                    htmlFor="isRecruiting"
+                    className="label-sm cursor-pointer font-black text-slate-700 dark:text-slate-300"
+                  >
                     Enable Commentary
-                  </span>
+                  </label>
                   <div
                     className={`switch bg-gradient-to-r ${commentaryEnabled ? "from-green-500 via-green-600 to-green-700" : "from-green-500/30 via-green-600/30 to-green-700/30"}`}
                   >
@@ -301,16 +330,16 @@ export default function QuickMatchCreatePage() {
                       id="isRecruiting"
                       type="checkbox"
                       defaultChecked={commentaryEnabled}
-                      className="relative z-20 h-full w-full rounded border-gray-300 text-emerald-600"
+                      className="relative z-20 h-full w-full cursor-pointer rounded border-gray-300 text-emerald-600"
                     />
                     <div className="slider" />
                   </div>
-                </label>
+                </div>
               </div>
             </div>
 
             {/* Right: Venue & Schedule */}
-            <div className="hover-card rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
+            <div className="bento-card rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl dark:border-white/10 dark:bg-slate-900">
               <div className="mb-6 flex items-center gap-3">
                 <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-500">
                   <MapPin className="h-5 w-5" />

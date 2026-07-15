@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { Toaster } from "sonner";
+import ModalProvider from "@/components/providers/ModalProvider";
 
 const urbanist = Urbanist({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -32,11 +33,11 @@ export default function RootLayout({
       <body className="layout-background">
         <QueryProvider>
           <Toaster />
-
+          <ModalProvider />
           <ThemeProvider>
             <ClerkProvider>
               <main
-                className={`min-h-[calc(100vh-100px)] w-full antialiased ${poppins.className} ${urbanist.className} ${inter.className}`}
+                className={`dark:bg-[#0a1208]] min-h-[calc(100vh-100px)] w-full bg-[f7f6f1] text-[#0d1a0f] antialiased dark:text-[#e8f5e9] ${poppins.className} ${urbanist.className} ${inter.className}`}
               >
                 {children}
               </main>

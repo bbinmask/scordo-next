@@ -266,6 +266,15 @@ export type TournamentRequestWithDetails = Prisma.TournamentRequestGetPayload<
 
 export type FriendshipWithBoth = Prisma.FriendshipGetPayload<typeof friendshipWithBoth>;
 
+export type FriendRequest = Omit<FriendshipWithBoth, "requester" | "addressee"> & {
+  requester: null | Prisma.UserGetPayload<{
+    select: { id: true; username: true; name: true; avatar: true };
+  }>;
+  addressee: null | Prisma.UserGetPayload<{
+    select: { id: true; username: true; name: true; avatar: true };
+  }>;
+};
+
 export type TeamWithPlayers = Prisma.TeamGetPayload<typeof teamWithPlayers>;
 
 export type TeamForListComponent = Prisma.TeamGetPayload<typeof teamWithPlayerCountAndOwner>;

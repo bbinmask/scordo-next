@@ -278,15 +278,6 @@
   @apply text-gray-600 dark:text-gray-400;
 }
 
-/* ── Micro labels ──
-   The single most repeated pattern in the codebase (55 occurrences).
-   "text-[10px] font-black tracking-widest text-slate-400 uppercase"
-
-   Three size variants:
-     .label-xs  → 9px  (6 occurrences — TournamentCard, chips)
-     .label-sm  → 10px (55 occurrences — stat labels, form labels, section caps)
-     .label-md  → 11px (form section headings)
-*/
 .label-xs {
   @apply font-[urbanist] text-[9px] font-black tracking-widest text-slate-400 uppercase;
 }
@@ -384,16 +375,15 @@
 /* Small pill CTA — green, used in EmptyState and scattered CTAs */
 /* "flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-green-500/20 transition-all hover:scale-105 hover:bg-green-700 active:scale-95" */
 .cta-pill {
-  @apply flex items-center gap-2 rounded-xl bg-green-600 px-6 py-2 font-[urbanist] text-[10px] font-black tracking-widest text-white uppercase shadow-lg shadow-green-500/20 transition-all hover:scale-105 hover:bg-green-700 active:scale-95;
+  @apply flex items-center gap-2 bg-green-600 px-6 py-2 font-[urbanist] text-white uppercase shadow-lg shadow-green-500/20 transition-all hover:scale-105 hover:bg-green-700 active:scale-95;
 }
 
 /* ─── 5d. Cards & Surfaces ────────────────────────────────────────────────── */
 
 /* The signature Scordo hover card — used 139× */
 .hover-card {
-  @apply bg-gray-100 font-[urbanist] font-semibold shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 ease-in-out hover:bg-gray-50/80 hover:shadow-md hover:shadow-green-500/30 hover:ring-green-600/40 dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600;
+  @apply border-input bg-white font-[urbanist] font-semibold shadow-md ring-1 ring-slate-200 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:bg-white hover:shadow-lg hover:shadow-slate-300/30 hover:ring-slate-300 dark:bg-slate-800/50 dark:text-slate-300 dark:ring-slate-700/50 dark:hover:bg-slate-800/80 dark:hover:text-white dark:hover:shadow-lg dark:hover:shadow-green-500/10 dark:hover:ring-slate-600;
 }
-
 /* Page background */
 .layout-background {
   @apply bg-slate-100 dark:bg-[#020617];

@@ -24,7 +24,7 @@ import { useForm } from "react-hook-form";
 import { ProfileFormData } from "../page";
 import FriendsModal from "@/components/modals/FriendsModal";
 import {
-  FriendshipWithBoth,
+  FriendRequest,
   InningBattingDetails,
   InningBowlingDetails,
   TeamRequestWithDetails,
@@ -41,6 +41,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { BowlingStats } from "../../_components/cards/BowlingStats";
 import { checkAvailability } from "@/utils/helper/availibility";
+import Image from "next/image";
 
 const PersonalDetails = ({
   user,
@@ -49,7 +50,7 @@ const PersonalDetails = ({
 }: {
   user: User;
   requests: {
-    friendRequests: FriendshipWithBoth[];
+    friendRequests: FriendRequest[];
     tournamentRequests: TournamentRequestWithDetails[];
     teamRequests: TeamRequestWithDetails[];
   };
@@ -89,10 +90,7 @@ const PersonalDetails = ({
     },
   });
 
-  const {
-    reset,
-    formState: { errors },
-  } = useForm<ProfileFormData>({
+  const {} = useForm<ProfileFormData>({
     defaultValues: {
       newUsername: user?.username || "",
       newName: user?.name || "",
@@ -101,17 +99,9 @@ const PersonalDetails = ({
     },
   });
 
-  const {
-    isOpen: isProfileOpen,
-    onClose: onProfileClose,
-    onOpen: onProfileOpen,
-  } = useProfileModal();
+  const { onOpen: onProfileOpen } = useProfileModal();
   const { onOpen: onDetailOpen } = useDetailsModal();
-  const {
-    isOpen: isRequestOpen,
-    onClose: onRequestClose,
-    onOpen: onRequestOpen,
-  } = useRequestModal();
+  const { onOpen: onRequestOpen } = useRequestModal();
   const optionsData = [
     {
       onClose: () => {},
@@ -150,7 +140,13 @@ const PersonalDetails = ({
             <div className="group relative">
               <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl border-8 border-white bg-slate-200 shadow-2xl transition-transform duration-300 group-hover:scale-[1.02] md:h-48 md:w-48 dark:border-slate-900 dark:bg-slate-800">
                 {user.avatar ? (
-                  <img src={user.avatar} alt="User avatar" className="h-full w-full object-cover" />
+                  <Image
+                    width={1000}
+                    height={1000}
+                    src={user.avatar}
+                    alt="User avatar"
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <UserIcon className="h-20 w-20 text-slate-400" />
                 )}

@@ -1,96 +1,244 @@
-import { Button } from "@/components/ui/button";
-import { BarChart2, PlayCircle, Trophy, Users } from "lucide-react";
-import Image from "next/image";
+import React from "react";
+import {
+  Trophy,
+  Users,
+  BarChart2,
+  PlayCircle,
+  Zap,
+  Activity,
+  ChevronRight,
+  Smartphone,
+  ChevronDown,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 
-const MarketingPage = () => {
-  return (
-    <div className="container mx-auto px-4 pt-16 pb-8 sm:px-6 md:px-8">
-      {/* Hero Section */}
-      <section className="container-bg mt-4 mb-10 flex flex-col items-start justify-between rounded-2xl p-6 shadow-xl md:flex-row xl:p-10">
-        <div className="mb-6 xl:pt-4">
-          <h1 className="font-[poppins] text-5xl font-black text-green-600 lg:text-7xl">Scordo</h1>
-          <h3 className="mb-2 font-[poppins] text-xl font-bold text-wrap text-gray-800 lg:mb-6 lg:text-3xl dark:text-gray-50">
-            Cricket
-            <span className="mx-2 text-green-500">Tournament</span>
-            Manager
-          </h3>
-          <p className="mx-auto mb-6 max-w-lg pr-4 font-[poppins] text-sm font-medium text-gray-700 antialiased sm:pr-20 sm:text-lg md:mx-0 dark:text-gray-300">
-            Stay connected while organizing tournaments. Create and manage your own cricket teams
-            and tournaments. Also check your teams performances.
-          </p>
-          <Button
-            variant={"default"}
-            className="center text-accent primary-btn mx-auto transform rounded-full border-none px-6 py-4 shadow-lg transition-all duration-300 hover:scale-105 md:mx-0"
-          >
-            <Link
-              href={"/auth/sign-in"}
-              className="center flex w-full font-[urbanist] font-semibold text-gray-50"
-            >
-              <PlayCircle className="mr-2 h-10 w-10" /> Create Account
-            </Link>
-          </Button>
-        </div>
-        <div className="relative flex items-center justify-center md:w-1/2">
-          <div className="absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full opacity-30 blur-3xl sm:h-64 sm:w-64 md:opacity-40" />
-          <Image
-            src={"https://res.cloudinary.com/irfanulmadar/image/upload/v1757671381/hero_rqiked.png"}
-            alt="Cricket hero"
-            className="relative z-10 ml-6 h-auto w-full max-w-xs rotate-3 transform rounded-xl transition-transform duration-500 hover:rotate-0 md:max-w-sm xl:max-w-md"
-          />
-        </div>
-      </section>
+const TICKER_ITEMS = [
+  "🏏 Live Scores",
+  "📊 Player Stats",
+  "🏆 Tournaments",
+  "⚡ Quick Match",
+  "👥 Team Manager",
+  "📅 Match Schedule",
+  "🎯 Bowling Analysis",
+  "🔥 Top Performers",
+];
+import "./Marketing.css";
 
-      {/* Features Section */}
-      <section className="mb-10">
-        <h3 className="mb-6 flex items-center font-[poppins] text-3xl font-bold text-gray-800 dark:text-gray-100">
-          <Trophy className="text-main mr-2 h-8 w-8 contrast-50 saturate-200" /> Key Features
-        </h3>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div className="transform rounded-xl border border-gray-200 bg-white p-6 text-center shadow-md transition-transform duration-300 hover:scale-105 dark:border-gray-700 dark:bg-gray-800">
-            <Users className="text-main mx-auto mb-4 h-12 w-12 contrast-50 saturate-200" />
-            <h4 className="text-accent-foreground mb-2 font-[poppins] text-xl font-semibold">
-              Teams & Players
-            </h4>
-            <p className="text-accent-foreground font-[urbanist] font-medium">
-              Dive deep into team profiles and player statistics.
-            </p>
-          </div>
-          <div className="transform rounded-xl border border-gray-200 bg-white p-6 text-center shadow-md transition-transform duration-300 hover:scale-105 dark:border-gray-700 dark:bg-gray-800">
-            <BarChart2 className="text-main mx-auto mb-4 h-12 w-12 contrast-50 saturate-200" />
-            <h4 className="text-accent-foreground mb-2 font-[poppins] text-xl font-semibold">
-              Detailed Stats
-            </h4>
-            <p className="text-accent-foreground font-[urbanist] font-medium">
-              Access comprehensive stats for every match and player.
-            </p>
-          </div>
-          <div className="transform rounded-xl border border-gray-200 bg-white p-6 text-center shadow-md transition-transform duration-300 hover:scale-105 dark:border-gray-700 dark:bg-gray-800">
-            <Trophy className="text-main mx-auto mb-4 h-12 w-12 contrast-50 saturate-200" />
-            <h4 className="text-accent-foreground mb-2 font-[poppins] text-xl font-semibold">
-              Tournament Info
-            </h4>
-            <p className="text-accent-foreground font-[urbanist] font-medium">
-              Get schedules, standings, and results for all tournaments.
-            </p>
-          </div>
-        </div>
-      </section>
+const MarketingPage = () => (
+  <div className="mp-root">
+    {/* Animated grid background */}
+    <div className="mp-grid-bg" />
 
-      <section className="bg-main dark:bg-main/80 transform rounded-2xl p-8 text-center text-white shadow-lg transition-transform duration-300 hover:scale-105 md:p-12">
-        <h3 className="mb-4 font-[poppins] text-3xl md:text-4xl">Ready to Catch the Action?</h3>
-        <p className="mb-6 font-[urbanist] text-lg font-semibold md:text-xl">
-          Join Scordo today and never miss a moment of your favorite cricket matches!
+    {/* ── Hero ── */}
+    <section className="mp-hero">
+      <div className="mp-orb mp-orb-1" />
+      <div className="mp-orb mp-orb-2" />
+
+      {/* Left copy */}
+      <div style={{ position: "relative", zIndex: 2 }}>
+        <h1 className="primary-heading mp-wordmark">Scordo</h1>
+
+        <h2 className="mp-tagline">
+          Organize. Score. <em>Dominate.</em>
+        </h2>
+
+        <p className="secondary-text mb-10 max-w-md font-[poppins] text-sm leading-relaxed font-light tracking-wider">
+          The all-in-one platform to run cricket tournaments, track live scores, and analyze player
+          performance — from a friendly gully match to a state-level league.
         </p>
-        <Link
-          href={"/auth/sign-up"}
-          className="mx-auto transform rounded-full border-none bg-white px-10 py-3 font-semibold text-green-700 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-100 dark:text-emerald-900"
-        >
-          Sign Up Now
-        </Link>
-      </section>
+
+        <div className="mp-cta-group">
+          <Link href="/auth/sign-up" className="mp-btn-primary">
+            <PlayCircle size={18} /> Get Started Free
+          </Link>
+          <Link href="/quick-match" className="mp-btn-ghost">
+            <Zap size={16} /> Quick Match
+          </Link>
+        </div>
+        <div className="secondary-text mt-10 flex items-center gap-6 text-sm font-semibold text-slate-500">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={18} className="text-green-500" /> Verified Profiles
+          </div>
+          <div className="flex items-center gap-2">
+            <Smartphone size={18} className="text-green-500" /> Mobile Ready
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll cue */}
+      <div className="mp-scroll-cue">
+        <span>Scroll</span>
+        <ChevronDown size={16} />
+      </div>
+    </section>
+
+    {/* --- STATS / SOCIAL PROOF --- */}
+    <div className="border-y border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/50">
+      <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
+          {[
+            { label: "Active Players", value: "10,000+" },
+            { label: "Matches Scored", value: "45,000+" },
+            { label: "Tournaments", value: "1,200+" },
+            { label: "Data Accuracy", value: "99.9%" },
+          ].map((stat, i) => (
+            <div key={i}>
+              <p className="primary-text mb-1 text-3xl font-black sm:text-4xl">{stat.value}</p>
+              <p className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-  );
-};
+    <div className="mp-ticker-wrap">
+      <div className="mp-ticker-track">
+        {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
+          <span key={i} className="mp-ticker-item">
+            {item}
+            <span style={{ opacity: 0.45 }}>•</span>
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* --- FEATURES BENTO GRID --- */}
+    <section className="mx-auto max-w-7xl px-6 py-24">
+      <div className="mx-auto mb-16 max-w-2xl text-center">
+        <h2 className="mb-3 text-sm font-bold tracking-widest text-green-600 uppercase dark:text-green-500">
+          Core Infrastructure
+        </h2>
+        <h3 className="primary-text mb-6 text-3xl font-black tracking-tight md:text-5xl">
+          Everything you need to manage the game.
+        </h3>
+        <p className="secondary-text text-lg">
+          From gully cricket to professional regional leagues, Scordo provides the digital tools to
+          elevate your tournaments.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {/* Feature 1: Large Span */}
+        <div className="group bento-card relative overflow-hidden rounded-3xl border p-8 shadow-md md:col-span-2 md:p-12">
+          <div className="relative z-10">
+            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
+              <Activity size={28} />
+            </div>
+            <h4 className="primary-text mb-4 text-2xl font-bold">Pro-Level Scoring Engine</h4>
+            <p className="secondary-text max-w-md text-sm leading-relaxed">
+              A high-fidelity, ball-by-ball scoring interface. Handles complex scenarios including
+              byes, leg-byes, no-balls, and undo functionality with real-time cloud synchronization.
+            </p>
+            <div className="group/link mt-8 flex cursor-pointer items-center gap-2 font-semibold text-green-600">
+              Explore Match Center{" "}
+              <ChevronRight
+                size={18}
+                className="transition-transform group-hover/link:translate-x-1"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Feature 2 */}
+        <div className="group bento-card rounded-3xl border p-8 shadow-md">
+          <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+            <Trophy size={28} />
+          </div>
+          <h4 className="primary-text mb-3 text-xl font-bold">Tournament Architect</h4>
+          <p className="secondary-text text-sm leading-relaxed">
+            Create massive leagues with custom rulesets, entry fees, and automated standings. Get
+            schedules and results instantly.
+          </p>
+        </div>
+
+        {/* Feature 3 */}
+        <div className="group bento-card rounded-3xl border p-8 shadow-md">
+          <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+            <Users size={28} />
+          </div>
+          <h4 className="primary-text mb-3 text-xl font-bold">Squad Management</h4>
+          <p className="secondary-text text-sm leading-relaxed">
+            Build your roster, send invites, and manage playing XIs. Maintain a persistent history
+            of your team&apos;s legacy.
+          </p>
+        </div>
+
+        {/* Feature 4: Medium Span */}
+        <div className="primary-text bento-card relative overflow-hidden rounded-3xl border p-8 shadow-md md:col-span-2 md:p-10">
+          <div className="relative z-10 flex flex-col items-center justify-between gap-8 md:flex-row">
+            <div>
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-white">
+                <BarChart2 size={28} />
+              </div>
+              <h4 className="mb-3 text-2xl font-bold">Deep Player Analytics</h4>
+              <p className="max-w-sm leading-relaxed text-slate-400">
+                Access comprehensive stats for every match. We turn raw runs and wickets into
+                beautiful career profiles.
+              </p>
+            </div>
+            <div className="w-full flex-shrink-0 md:w-auto">
+              <div className="border-input rounded-2xl border bg-green-700 p-6 shadow-2xl">
+                <div className="mb-4 flex items-end justify-between gap-12">
+                  <div>
+                    <p className="mb-1 text-xs tracking-widest text-slate-400 uppercase">
+                      Career Runs
+                    </p>
+                    <p className="text-4xl font-black text-white">2,405</p>
+                  </div>
+                  <BarChart2 className="h-8 w-8 text-green-300" />
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-700">
+                  <div className="h-full w-[75%] bg-green-300" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div className="mp-qm-band">
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <div className="mp-qm-eyebrow">⚡ New Feature</div>
+        <h3 className="mp-qm-title">Jump Into a Quick Match</h3>
+        <p className="max-w-md font-[poppins] text-xs leading-relaxed font-light tracking-wider text-slate-300">
+          No setup required. Choose teams, set overs, and start scoring in seconds. Perfect for
+          casual games on the fly.
+        </p>
+      </div>
+      <Link href="/quick-match" className="mp-btn-qm" style={{ position: "relative", zIndex: 1 }}>
+        <Zap size={18} /> Start Quick Match
+      </Link>
+    </div>
+
+    {/* --- CTA SECTION --- */}
+    <section className="mp-final-cta">
+      <div className="mp-final-cta-bg" />
+      <h2>
+        Ready to run your
+        <br />
+        best tournament yet?
+      </h2>
+      <p>
+        Join thousands of organizers who trust Scordo to manage their cricket leagues, tournaments,
+        and friendlies.
+      </p>
+      <div className="mp-final-buttons">
+        <Link
+          href="/auth/sign-up"
+          className="mp-btn-primary"
+          style={{ padding: "1rem 2.4rem", fontSize: "1.05rem" }}
+        >
+          <PlayCircle size={20} /> Create Free Account
+        </Link>
+        <Link href="/auth/sign-in" className="mp-btn-ghost" style={{ padding: "1rem 2rem" }}>
+          Sign In
+        </Link>
+      </div>
+    </section>
+  </div>
+);
 
 export default MarketingPage;

@@ -47,17 +47,7 @@ const ProfilePage = async () => {
 
   const friends = getFriends(friendships, user.id);
 
-  const friendRequests: any = getFriendRequests(friendReqs, user.id);
-
-  // const teams = await db.team.findMany({
-  //   where: {
-  //     players: {
-  //       some: {
-  //         userId: user.id,
-  //       },
-  //     },
-  //   },
-  // });
+  const friendRequests = getFriendRequests(friendReqs, user.id);
 
   const teamRequests: TeamRequestWithDetails[] = await db.teamRequest.findMany({
     where: {

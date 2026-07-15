@@ -287,7 +287,7 @@ export function QuickScorecardModal({ isOpen, match, onClose }: QuickScorecardMo
           {match.status === "completed" && match.result && (
             <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-center">
               <Star className="mx-auto mb-2 h-5 w-5 text-emerald-500" />
-              <p className="label-sm text-emerald-600">{match.result}</p>
+              <p className="label-sm font-black text-emerald-600">{match.result}</p>
             </div>
           )}
         </div>

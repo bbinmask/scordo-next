@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+
+  images: {
+    remotePatterns: [new URL("https://res.cloudinary.com/irfanulmadar/**")],
+  },
 };
 
 export default nextConfig;

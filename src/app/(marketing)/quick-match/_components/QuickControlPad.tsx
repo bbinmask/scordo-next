@@ -183,7 +183,7 @@ export function QuickControlPad({ match, inning, hook }: QuickControlPadProps) {
       {/* ── Scoring pad ──────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-[3rem] border border-slate-200 bg-white p-8 shadow-2xl dark:border-white/10 dark:bg-slate-900">
         <div className="mb-8 flex items-center justify-between">
-          <h3 className="label-sm italic">Scoring Pad</h3>
+          <h3 className="label-sm font-black italic">Scoring Pad</h3>
           <button
             onClick={undoBall}
             disabled={isSubmitting || inning.balls_history.length === 0}

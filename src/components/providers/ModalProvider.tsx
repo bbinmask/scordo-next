@@ -1,7 +1,7 @@
 "use client";
 
+import { AuthPrompt } from "@/components/modals/AuthPrompt";
 import { useEffect, useState } from "react";
-import FriendsModal from "@/components/modals/FriendsModal";
 const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -11,7 +11,11 @@ const ModalProvider = () => {
 
   if (!isMounted) return null;
 
-  return <>{/* <FriendsModal /> */}</>;
+  return (
+    <>
+      <AuthPrompt />
+    </>
+  );
 };
 
 export default ModalProvider;

@@ -499,7 +499,26 @@ export const teams: TeamProps[] = [
   },
 ];
 
+export const REASON_COPY: Record<string, { headline: string; sub: string }> = {
+  "create-team": {
+    headline: "Initialize Your Squad",
+    sub: "Sign in to create and manage your professional cricket roster.",
+  },
+  "join-match": {
+    headline: "Access Match Engine",
+    sub: "Sign in to record live stats and join competitive fixtures.",
+  },
+  "view-stats": {
+    headline: "Unlock Analytics",
+    sub: "Sign in to view detailed player and team performance dossiers.",
+  },
+  general: {
+    headline: "Join the Circuit",
+    sub: "Sign in to access the Scordo professional cricket infrastructure.",
+  },
+};
 export const message = "Required parameter is missing";
+
 export const errorMessage = (term: string) => {
   return `${message} (${term})`;
 };

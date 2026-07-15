@@ -9,7 +9,7 @@ const MarketingLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div>
       <Navbar />
-      <div className="mt-[70px] pb-2">{children}</div>
+      <div className="mt-[67px]">{children}</div>
     </div>
   );
 };

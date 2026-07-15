@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  FriendshipWithBoth,
-  TournamentRequestWithDetails,
-  TeamRequestWithDetails,
-} from "@/lib/types";
+import { TournamentRequestWithDetails, TeamRequestWithDetails, FriendRequest } from "@/lib/types";
 import { Check, Trophy, UserPlus, X, ChevronLeft, ChevronUp, ShieldPlus } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -21,10 +17,11 @@ import { useConfirmModal } from "@/hooks/useConfirmModal";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { getFriendRequests } from "@/utils/helper/getFriends";
+import Image from "next/image";
 
 interface RequestsModalProps {
   initialRequests?: {
-    friendRequests?: FriendshipWithBoth[];
+    friendRequests?: FriendRequest[];
     tournamentRequests?: TournamentRequestWithDetails[];
     teamRequests?: TeamRequestWithDetails[];
   };
@@ -50,7 +47,7 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
   const { isOpen, onClose } = useRequestModal();
 
   const { execute: acceptFriendRequest, isLoading } = useAction(acceptRequest, {
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("You are now friends");
     },
     onError: (err) => {
@@ -89,7 +86,7 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
     }));
   };
 
-  const handleFriendDecline = (requestId: string, reqUsername: string) => {
+  const handleFriendDecline = (requestId: string) => {
     if (!requests.friendRequests) return;
 
     const filteredRequests = requests.friendRequests.filter((prev) => prev.id !== requestId);
@@ -130,7 +127,7 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
 
       const friendReqs = data.data.friendReqs;
 
-      const friendRequests: any = getFriendRequests(friendReqs, userId);
+      const friendRequests = getFriendRequests(friendReqs, userId);
 
       setRequests({
         friendRequests,
@@ -153,6 +150,7 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
     visible: { height: "auto", opacity: 1 },
     exit: { height: 0, opacity: 0 },
   };
+
   return (
     <>
       <Dialog onOpenChange={onClose} open={isOpen}>
@@ -186,13 +184,14 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
                       >
                         {requests.friendRequests.map((request) => {
                           const user = request.addressee || request.requester;
+                          if (!user) return;
                           return (
                             <li key={user.id} className="flex items-center space-x-3">
-                              <img
+                              <Image
                                 src={user.avatar || "/user.svg"}
                                 alt={`${user.name}'s avatar`}
-                                width={40}
-                                height={40}
+                                width={1000}
+                                height={1000}
                                 className="rounded-full"
                               />
                               <div className="flex-1">
@@ -213,7 +212,7 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
                                       confirmText: "Accept",
                                       confirmVariant: "primary",
                                       onConfirm: () =>
-                                        handleFriendAccept(request.id, user.username),
+                                        handleFriendAccept(request.id, user?.username),
                                     });
                                   }}
                                   className="rounded-full p-2 text-green-600 transition hover:bg-green-100"
@@ -228,8 +227,7 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
                                       description: `Are you sure you want to decline ${user.name}'s request?`,
                                       confirmText: "Decline",
                                       confirmVariant: "destructive",
-                                      onConfirm: () =>
-                                        handleFriendDecline(request.id, user.username),
+                                      onConfirm: () => handleFriendDecline(request.id),
                                     });
                                   }}
                                   className="rounded-full p-2 text-red-600 transition hover:bg-red-100"
@@ -268,14 +266,14 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
                       >
                         {requests.teamRequests.map((request) => (
                           <li key={request.id} className="flex items-center space-x-3">
-                            <img
+                            <Image
                               src={
                                 request.team.logo ||
                                 "https://placehold.co/40x40/E0E7FF/4F46E5?text=Avatar"
                               }
                               alt={`${request.team.name}'s avatar`}
-                              width={40}
-                              height={40}
+                              width={1000}
+                              height={1000}
                               className="rounded-full"
                             />
                             <div className="flex-1">
@@ -347,8 +345,8 @@ export default function RequestsModal({ initialRequests, enabled }: RequestsModa
                         className="mb-2 space-y-4 overflow-hidden"
                       >
                         {requests.tournamentRequests.map((request) => (
-                          <li key={request.id} className="flex items-center space-x-3">
-                            <img src="/trophy.svg" alt="" width={40} height={40} />
+                          <li key={request.id} className="space-x0-3 flex items-center">
+                            <Image src="/trophy.svg" alt="" width={1000} height={1000} />
                             <div className="flex-1">
                               <p className="primary-text text-sm font-medium">
                                 {request.tournament.title}

@@ -425,7 +425,7 @@ const CreateMatchForm: React.FC = () => {
                       </div>
                       <div className="w-full">
                         <label className="flex w-full cursor-pointer items-center justify-between gap-3">
-                          <span className="label-sm text-slate-700 dark:text-slate-300">
+                          <span className="label-sm font-black text-slate-700 dark:text-slate-300">
                             Enable Commentary
                           </span>
                           <div
